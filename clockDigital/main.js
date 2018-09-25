@@ -6,7 +6,7 @@ function clockRun() {
     'ip': '127.0.0.1',
     'port': 80,
     'auth': 'root:pass',
-    'serviceName': 'Clock',
+    'serviceName': 'Digital Clock',
     'serviceID': -1
   });
 
