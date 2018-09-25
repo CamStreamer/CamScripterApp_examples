@@ -19,3 +19,6 @@
 [submodule "vapixEvents/CamStreamerLib"]
 	path = vapixEvents/CamStreamerLib
 	url = ../CamStreamerLib.git
+[submodule "clockDigital/CamStreamerLib"]
+	path = clockDigital/CamStreamerLib
+	url = ../CamStreamerLib.git
