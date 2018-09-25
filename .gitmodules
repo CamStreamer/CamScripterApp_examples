@@ -4,9 +4,6 @@
 [submodule "camStreamerAPI/CamStreamerLib"]
 	path = camStreamerAPI/CamStreamerLib
 	url = ../CamStreamerLib.git
-[submodule "clock/CamStreamerLib"]
-	path = clock/CamStreamerLib
-	url = ../CamStreamerLib.git
 [submodule "clockAnalog/CamStreamerLib"]
 	path = clockAnalog/CamStreamerLib
 	url = ../CamStreamerLib.git
