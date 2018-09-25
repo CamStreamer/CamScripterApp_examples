@@ -1,6 +1,6 @@
 {
-  "package_name": "clock",
-  "package_menu_name": "Clock",
+  "package_name": "clockDigital",
+  "package_menu_name": "Digital Clock",
   "package_version": "1.0.0",
   "vendor": "Camstreamer s.r.o.",
   "required_camscripter_version": "1.0.0",
