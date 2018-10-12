@@ -20,7 +20,7 @@ function subscribeEvents() {
   cv.on('eventsConnect', function() { console.log('Events connected') });
   cv.on('eventsDisconnect', function(err) { console.log('Events disconnected: ' + err) });
 
-  cv.on('axis:CameraApplicationPlatform/VMD/Camera1Profile1/.', function(event) {
+  cv.on('tnsaxis:CameraApplicationPlatform/VMD/Camera1Profile1/.', function(event) {
     try {
       var simpleItem = event['tt:MetadataStream']['tt:Event']
         [0]['wsnt:NotificationMessage']
