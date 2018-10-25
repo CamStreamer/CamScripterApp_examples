@@ -18,6 +18,10 @@ function createImage() {
     console.log('COAPI-Error: ' + err);
   });
 
+  co.on('close', function() {
+    console.log('COAPI: closed');
+  });
+
   co.connect().then(function() {
     co.cairo('cairo_image_surface_create', 'CAIRO_FORMAT_ARGB32', 200, 200).then(function(surfaceRes) {
       var surface = surfaceRes.var;
