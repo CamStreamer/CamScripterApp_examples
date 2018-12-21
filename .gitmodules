@@ -22,3 +22,6 @@
 [submodule "clockDigital/CamStreamerLib"]
 	path = clockDigital/CamStreamerLib
 	url = ../CamStreamerLib.git
+[submodule "doorController/CamStreamerLib"]
+	path = doorController/CamStreamerLib
+	url = ../CamStreamerLib.git

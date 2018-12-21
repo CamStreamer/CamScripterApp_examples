@@ -1,0 +1,217 @@
+<html>
+<header>
+  <title>CamScripter - DoorController</title>
+  <link rel="stylesheet" href="bootstrap/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="DataTables/datatables.min.css"/>
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.0/css/all.css" integrity="sha384-aOkxzJ5uQz7WBObEZcHvV5JvRW3TUc2rNPA7pe3AwnsUohiw1Vj2Rgx2KSOkF5+h" crossorigin="anonymous">
+</header>
+<body>
+  <nav class="navbar navbar-dark bg-dark">
+    <a class="navbar-brand" href="#">CamSripter Door Controller Management</a>
+  </nav>
+
+  <div class="jumbotron">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-3">
+          <h5>Camera Settings</h5>
+        </div>
+        <div class="col-md-9">
+          <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#cameraSettingsModal"><i class="fas fa-cog"></i></button>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-3">
+          <h5>Door Controller Settings</h5>
+        </div>
+        <div class="col-md-9">
+          <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#controllerSettingsModal"><i class="fas fa-cog"></i></button>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-3">
+          <h5>Display Settings</h5>
+        </div>
+        <div class="col-md-9">
+          <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#displaySettingsModal"><i class="fas fa-cog"></i></button>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <div>&nbsp;</div>
+          <div class="form-group">
+            <button type="button" class="btn btn-secondary" id="checkConnectionBtn">Check Connection / Refresh</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="messages"></div>
+
+  <div class="container">
+    <div class="row">
+      <div id="userList" class="col-md-12"></div>
+    </div>
+  </div>
+
+  <form id="imgForm" class="d-none">
+    <input class="form-control" type="file" id="uploadedImage" name="uploadedImage" data-validation="required extension" data-validation-allowing="png,jpg">';
+  </form>
+
+  <div class="modal fade" id="cameraSettingsModal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title">Camera Settings</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+
+        <!-- Modal body -->
+        <div class="modal-body">
+          <form class="myForm">
+            <div class="form-group">
+              <label for="cameraUser">User</label>
+              <input type="text" class="form-control" id="cameraUser" placeholder="root">
+            </div>
+            <div class="form-group">
+              <label for="cameraPass">Password</label>
+              <input type="password" class="form-control" id="cameraPass" placeholder="password" autocomplete="new-password">
+            </div>
+          </form>
+        </div>
+
+        <!-- Modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="controllerSettingsModal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title">Door Controller Settings</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+
+        <!-- Modal body -->
+        <div class="modal-body">
+          <form class="myForm">
+            <div class="form-group">
+              <label for="ctrlHost">Host</label>
+              <input type="text" class="form-control" id="ctrlHost" placeholder="192.168.100.100">
+            </div>
+            <div class="form-group">
+              <label for="ctrlPort">Port</label>
+              <input type="text" class="form-control" id="ctrlPort" placeholder="80">
+            </div>
+            <div class="form-group">
+              <label for="ctrlUser">User</label>
+              <input type="text" class="form-control" id="ctrlUser" placeholder="root">
+            </div>
+            <div class="form-group">
+              <label for="ctrlPass">Password</label>
+              <input type="password" class="form-control" id="ctrlPass" placeholder="password" autocomplete="new-password">
+            </div>
+          </form>
+        </div>
+
+        <!-- Modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="displaySettingsModal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title">Display Settings</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+
+        <!-- Modal body -->
+        <div class="modal-body">
+          <form class="myForm">
+            <div class="form-group">
+              <label for="posX">Position X</label>
+              <div class="input-group">
+                <input type="text" class="form-control" id="posX" placeholder="0">
+                <div class="input-group-append">
+                  <span class="input-group-text" id="basic-addon1">px</span>
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="posY">Position Y</label>
+              <div class="input-group">
+                <input type="text" class="form-control" id="posY" placeholder="0">
+                <div class="input-group-append">
+                  <span class="input-group-text" id="basic-addon2">px</span>
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="width">Stream Width</label>
+              <input type="text" class="form-control" id="width" placeholder="1920">
+            </div>
+            <div class="form-group">
+              <label for="height">Stream Height</label>
+              <input type="text" class="form-control" id="height" placeholder="1080">
+            </div>
+            <div class="form-group">
+              <label for="scale">Scale</label>
+              <input type="text" class="form-control" id="scale" placeholder="1.0">
+            </div>
+          </form>
+        </div>
+
+        <!-- Modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="imgPrevModal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 id="imgPrevModalTitle" class="modal-title"></h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+
+        <!-- Modal body -->
+        <div class="modal-body text-center">
+          <img id="imgPrevModalImage" src="" alt="No image found" style="max-width:100%; max-height:100%;" />
+        </div>
+
+        <!-- Modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script type="text/javascript" src="jquery-2.2.4/jquery-2.2.4.min.js"></script>
+  <script type="text/javascript" src="bootstrap/bootstrap.min.js"></script>
+  <script type="text/javascript" src="DataTables/datatables.min.js"></script>
+  <script type="text/javascript" src="index.js"></script>
+</body>
+</html>
