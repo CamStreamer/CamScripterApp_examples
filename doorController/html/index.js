@@ -106,7 +106,8 @@ function createUserList() {
   $('#userTable').DataTable();
 
   $('.showImage').click(function(event) {
-    $('#imgPrevModalTitle').text(user.name);
+    var userToken = event.target.id;
+    $('#imgPrevModalTitle').text(users[userToken].name);
     $('#imgPrevModalImage').attr('src', '/local/camscripter/package/doorController/proxy/image.cgi?userToken=' + encodeURIComponent(event.target.id));
     $('#imgPrevModal').modal('show');
   });
