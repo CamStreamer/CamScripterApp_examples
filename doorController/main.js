@@ -261,7 +261,7 @@ function drawImage(userToken, accessGranted) {
 
       // Draw date and time
       var d = new Date();
-      var dateText = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate() + " " + d.getHours() + ':' + d.getMinutes();
+      var dateText = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate() + " " + d.getHours() + ':' + ('0' + d.getMinutes()).slice(-2);
       co.cairo('cairo_set_font_face', cairo, baseFont.var);
       co.cairo('cairo_set_source_rgb', cairo, 1.0, 1.0, 1.0);
       co.writeText(cairo, dateText, 25, 20, 230, 28, 'A_LEFT');
