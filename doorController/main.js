@@ -175,7 +175,7 @@ function readUserList() {
         response = JSON.parse(response);
         for (var i = 0; i < response.UserInfo.length; i++) {
           var userInfo = response.UserInfo[i];
-          users[userInfo.token] = {'name': userInfo.Name, 'description': userInfo.Description};
+          users[userInfo.token] = {'name': userInfo.Name, 'description': userInfo.Description, 'hasImage': fs.existsSync(process.env.PERSISTENT_DATA_PATH + userInfo.token)};
         }
         //console.log(users);
         resolve();

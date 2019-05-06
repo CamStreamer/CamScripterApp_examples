@@ -89,9 +89,9 @@ function createUserList() {
     html += '<tr>';
     html += '<td>' + user.name + '</td><td class="text-center">' + user.card + '</td>';
     html += '<td class="text-center">';
-    html += '<i id="' + userToken + '" class="showImage far fa-image" title="Show image" style="cursor: hand; cursor: pointer;"></i>&nbsp;&nbsp;';
-    html += '<i id="' + userToken + '" class="uploadImage far fa-arrow-alt-circle-up" title="Upload image" style="cursor: hand; cursor: pointer;"></i>&nbsp;&nbsp;';
-    html += '<i id="' + userToken + '" class="deleteImage far fa-trash-alt" title="Delete image" style="cursor: hand; cursor: pointer;"></i>';
+    html += '<i id="' + userToken + '" class="showImage far fa-image" title="Show image"></i>&nbsp;&nbsp;';
+    html += '<i id="' + userToken + '" class="uploadImage far fa-arrow-alt-circle-up" title="Upload image"></i>&nbsp;&nbsp;';
+    html += '<i id="' + userToken + '" class="deleteImage far fa-trash-alt" title="Delete image"></i>';
     html += '<sup class="text-danger"> *</sup>';
     html += '</td>';
     html += '</tr>';
@@ -103,23 +103,55 @@ function createUserList() {
   html += '<div class="text-danger">* Profile picture resolution: 144x182px (or same aspect ration).</div>';
 
   $('#userList').html(html);
-  $('#userTable').DataTable();
-
-  $('.showImage').click(function(event) {
-    var userToken = event.target.id;
-    $('#imgPrevModalTitle').text(users[userToken].name);
-    $('#imgPrevModalImage').attr('src', '/local/camscripter/package/doorController/proxy/image.cgi?userToken=' + encodeURIComponent(event.target.id));
-    $('#imgPrevModal').modal('show');
+  $('#userTable').on('draw.dt', function() {
+    for (var userToken in users) {
+      setButtonsActive(userToken, users[userToken].hasImage);
+    }
   });
-  $('.uploadImage').click(function(event) {
+  $('#userTable').DataTable();
+}
+
+function setButtonsActive(userToken, active) {
+  users[userToken].hasImage = active;
+  var userTokeId = userToken.replace( /(:|\.|\[|\]|,|=|@)/g, "\\$1" );
+  var showImgElement = $('i#' + userTokeId + '.showImage');
+  var deleteImgElement = $('i#' + userTokeId + '.deleteImage');
+  if (!active) {
+    showImgElement.css('opacity', 0.5);
+    showImgElement.css('cursor', 'auto');
+    showImgElement.unbind();
+
+    deleteImgElement.css('opacity', 0.5);
+    deleteImgElement.css('cursor', 'auto');
+    deleteImgElement.unbind();
+  } else {
+    showImgElement.css('opacity', 1.0);
+    showImgElement.css('cursor', 'hand');
+    showImgElement.click(function(event) {
+      var userToken = event.target.id;
+      $('#imgPrevModalTitle').text(users[userToken].name);
+      $('#imgPrevModalImage').attr('src', '/local/camscripter/package/doorController/proxy/image.cgi?userToken=' + encodeURIComponent(userToken));
+      $('#imgPrevModal').modal('show');
+    });
+
+    deleteImgElement.css('opacity', 1.0);
+    deleteImgElement.css('cursor', 'hand');
+    deleteImgElement.click(function(event) {
+    var userToken = event.target.id;
+      $.get('/local/camscripter/package/doorController/proxy/delete_image.cgi?userToken=' + encodeURIComponent(userToken), function() {
+        showMessage('success', 'Image deleted.');
+        setButtonsActive(userToken, false);
+      });
+    });
+  }
+
+  var uploadImgElement = $('i#' + userTokeId + '.uploadImage');
+  uploadImgElement.css('cursor', 'hand');
+  uploadImgElement.unbind();
+  uploadImgElement.click(function(event) {
     userTokenClicked = event.target.id;
     $("#uploadedImage").val('');
     $('#uploadedImage').trigger('click');
-  });
-  $('.deleteImage').click(function(event) {
-    $.get('/local/camscripter/package/doorController/proxy/delete_image.cgi?userToken=' + encodeURIComponent(event.target.id), function() {
-      showMessage('success', 'Image deleted.')
-    });
   });
 }
 
@@ -145,6 +177,7 @@ function uploadedImageChanged() {
         return;
       }
       showMessage('success', 'Image uploaded.')
+      setButtonsActive(userTokenClicked, true);
     }
   });
 

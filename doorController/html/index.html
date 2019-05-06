@@ -7,7 +7,9 @@
 </header>
 <body>
   <nav class="navbar navbar-dark bg-dark">
-    <a class="navbar-brand" href="#">CamScripter Door Controller Management</a>
+    <div class="container">
+      <a class="navbar-brand" href="#">CamScripter Door Controller Management</a>
+    </div>
   </nav>
 
   <div class="jumbotron">
@@ -47,13 +49,16 @@
     </div>
   </div>
 
-  <div id="messages"></div>
+  <div class="container">
+    <div id="messages"></div>
+  </div>
 
   <div class="container">
     <div class="row">
       <div id="userList" class="col-md-12"></div>
     </div>
   </div>
+  <div class="container"><br /></div>
 
   <form id="imgForm" class="d-none">
     <input class="form-control" type="file" id="uploadedImage" name="uploadedImage" data-validation="required extension" data-validation-allowing="png,jpg">';
@@ -85,7 +90,7 @@
 
         <!-- Modal footer -->
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Save</button>
         </div>
       </div>
     </div>
@@ -125,7 +130,7 @@
 
         <!-- Modal footer -->
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Save</button>
         </div>
       </div>
     </div>
@@ -179,7 +184,7 @@
 
         <!-- Modal footer -->
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Save</button>
         </div>
       </div>
     </div>
