@@ -7,7 +7,8 @@ function clockRun() {
     'port': 80,
     'auth': 'root:pass',
     'serviceName': 'Digital Clock',
-    'serviceID': -1
+    'serviceID': -1,
+    'camera': 0
   });
 
   co.on('msg', function(msg) {
