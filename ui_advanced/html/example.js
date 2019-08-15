@@ -1,5 +1,5 @@
 $(document).ready(function() {
-  $.get('/local/camscripter/package/ui_advanced/proxy/get_color.cgi', function(data) {
+  $.get('/local/camscripter/proxy/ui_advanced/get_color.cgi', function(data) {
     $('#preview').css('backgroundColor', data.color);
     $('input[name=color][value="' + data.color + '"]').prop('checked', true);
   });
@@ -10,5 +10,5 @@ $(document).ready(function() {
 function radioClickedCallback() {
   $('#preview').css('backgroundColor', $(this).val());
   var data = '{"color": "' + $(this).val() + '"}';
-  $.get('/local/camscripter/package/ui_advanced/proxy/set_color.cgi?data=' + data, function(data) {});
+  $.get('/local/camscripter/proxy/ui_advanced/set_color.cgi?data=' + data, function(data) {});
 }
