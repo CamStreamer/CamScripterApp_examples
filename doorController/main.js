@@ -381,7 +381,6 @@ subscribeEvents();
 co = new CamOverlayAPI({
   'ip': '127.0.0.1',
   'port': 80,
-  //'port': 52431,
   'auth': settings.camera_user + ':' + settings.camera_pass,
   'serviceName': 'Door Controller',
   'serviceID': -1,
@@ -411,7 +410,6 @@ co.connect().then(function() {
       loadFont('FreeSans.ttf').then(function(font) {
         baseFont = font
         coConnected = true;
-        //drawImage('8c88a8b3', false);
       });
     });
   });

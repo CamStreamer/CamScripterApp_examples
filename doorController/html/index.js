@@ -53,9 +53,9 @@ function inputChanged() {
 
 function loadUsers() {
   $('#userList').html('');
-  $.get('/local/camscripter/package/doorController/proxy/get_credentials.cgi', function(credentialsResponse) {
+  $.get('/local/camscripter/proxy/doorController/get_credentials.cgi', function(credentialsResponse) {
     credentialsResponse = JSON.parse(credentialsResponse);
-    $.get('/local/camscripter/package/doorController/proxy/get_users.cgi', function(usersResponse) {
+    $.get('/local/camscripter/proxy/doorController/get_users.cgi', function(usersResponse) {
       users = JSON.parse(usersResponse);
       // Add info about card to users
       for (var cardId in credentialsResponse) {
@@ -130,7 +130,7 @@ function setButtonsActive(userToken, active) {
     showImgElement.click(function(event) {
       var userToken = event.target.id;
       $('#imgPrevModalTitle').text(users[userToken].name);
-      $('#imgPrevModalImage').attr('src', '/local/camscripter/package/doorController/proxy/image.cgi?userToken=' + encodeURIComponent(userToken));
+      $('#imgPrevModalImage').attr('src', '/local/camscripter/proxy/doorController/image.cgi?userToken=' + encodeURIComponent(userToken));
       $('#imgPrevModal').modal('show');
     });
 
@@ -138,7 +138,7 @@ function setButtonsActive(userToken, active) {
     deleteImgElement.css('cursor', 'hand');
     deleteImgElement.click(function(event) {
     var userToken = event.target.id;
-      $.get('/local/camscripter/package/doorController/proxy/delete_image.cgi?userToken=' + encodeURIComponent(userToken), function() {
+      $.get('/local/camscripter/proxy/doorController/delete_image.cgi?userToken=' + encodeURIComponent(userToken), function() {
         showMessage('success', 'Image deleted.');
         setButtonsActive(userToken, false);
       });
@@ -166,7 +166,7 @@ function uploadedImageChanged() {
   formData.append("userToken", userTokenClicked);
 
   $.ajax({
-    url: '/local/camscripter/package/doorController/proxy/upload_image.cgi',
+    url: '/local/camscripter/proxy/doorController/upload_image.cgi',
     data: formData,
     type: 'POST',
     contentType: false, // NEEDED, DON'T OMIT THIS (requires jQuery 1.6+)
