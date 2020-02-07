@@ -1,5 +1,5 @@
 const fs = require('fs');  // see https://nodejs.org/api/fs.html
-const CamOverlayAPI = require('./CamStreamerLib/CamOverlayAPI'); // load the library
+const CamOverlayAPI = require('camstreamerlib/CamOverlayAPI'); // load the library
 
 // Main function
 function clockRun() {

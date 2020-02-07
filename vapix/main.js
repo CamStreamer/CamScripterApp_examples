@@ -1,5 +1,5 @@
 const fs = require('fs');
-const CameraVapix = require('./CamStreamerLib/CameraVapix');
+const CameraVapix = require('camstreamerlib/CameraVapix');
 
 var cv = new CameraVapix({
   'protocol': 'http',

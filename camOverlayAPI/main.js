@@ -1,11 +1,11 @@
 const fs = require('fs');
-const CamOverlayAPI = require('./CamStreamerLib/CamOverlayAPI');
+const CamOverlayAPI = require('camstreamerlib/CamOverlayAPI');
 
 function createImage() {
   var co = new CamOverlayAPI({
     'ip': '127.0.0.1',
     'port': 80,
-    'auth': 'root:pass',
+    'auth': 'root:pass2',
     'serviceName': 'Drawing Test',
     'serviceID': -1
   });

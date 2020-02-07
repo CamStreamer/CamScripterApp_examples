@@ -1,6 +1,6 @@
 const url = require('url');
 const fs = require('fs');
-const HttpServer = require('./CamStreamerLib/HttpServer');
+const HttpServer = require('camstreamerlib/HttpServer');
 
 var httpServer = new HttpServer();
 httpServer.onRequest('/get_color.cgi', processRequestGetColor);

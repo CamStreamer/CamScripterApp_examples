@@ -2,9 +2,9 @@ const fs = require('fs');
 const url = require('url');
 const querystring = require('querystring');
 const formidable = require('formidable');
-const HttpServer = require('./CamStreamerLib/HttpServer');
-const CameraVapix = require('./CamStreamerLib/CameraVapix');
-const CamOverlayAPI = require('./CamStreamerLib/CamOverlayAPI');
+const HttpServer = require('camstreamerlib/HttpServer');
+const CameraVapix = require('camstreamerlib/CameraVapix');
+const CamOverlayAPI = require('camstreamerlib/CamOverlayAPI');
 
 var settings = {};
 var cv = null;

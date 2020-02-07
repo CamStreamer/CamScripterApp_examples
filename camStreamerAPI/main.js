@@ -1,5 +1,5 @@
 const fs = require('fs');
-const CamStreamerAPI = require('./CamStreamerLib/CamStreamerAPI');
+const CamStreamerAPI = require('camstreamerlib/CamStreamerAPI');
 
 var cs = new CamStreamerAPI({
   'protocol': 'http',

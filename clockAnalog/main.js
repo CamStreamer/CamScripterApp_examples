@@ -1,6 +1,6 @@
 const url = require('url');
 const fs = require('fs');
-const CamOverlayAPI = require('./CamStreamerLib/CamOverlayAPI');
+const CamOverlayAPI = require('camstreamerlib/CamOverlayAPI');
 
 var settings = null;
 
