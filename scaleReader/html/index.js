@@ -2,14 +2,15 @@ $(document).ready(function() {
   $.get('/local/camscripter/package/settings.cgi?package_name=scaleReader&action=get', (settings) => {
     console.log(settings);
     if (Object.keys(settings).length == 0) {
-      settings = {"camera_pass": "", "scale_ip": "", "scale_port": 10000, "service_id": "", "field_name": "", "refresh_rate": 300};
+      settings = {"camera_pass": "", "scale_ip": "", "scale_port": 10000, "service_id": "", "value_field_name": "", "unit_field_name": "", "refresh_rate": 300};
     }
 
     $('#cameraPass').val(settings.camera_pass);
     $('#scaleIP').val(settings.scale_ip);
     $('#scalePort').val(settings.scale_port);
     $('#serviceId').val(settings.service_id);
-    $('#fieldName').val(settings.field_name);
+    $('#valueFieldName').val(settings.value_field_name);
+    $('#unitFieldName').val(settings.unit_field_name);
     $('#refreshRate').val(settings.refresh_rate);
   });
 
@@ -27,7 +28,8 @@ function inputChanged() {
     'scale_ip': $('#scaleIP').val(),
     'scale_port': parseInt($('#scalePort').val()),
     'service_id': $('#serviceId').val(),
-    'field_name': $('#fieldName').val(),
+    'value_field_name': $('#valueFieldName').val(),
+    'unit_field_name': $('#unitFieldName').val(),
     'refresh_rate': parseInt($('#refreshRate').val())
   };
   $.post('/local/camscripter/package/settings.cgi?package_name=scaleReader&action=set', JSON.stringify(settings), (data) => {});

@@ -2,7 +2,7 @@ const net = require('net');
 const fs = require('fs');
 const CameraVapix = require('camstreamerlib/CameraVapix');
 
-let prevWeight = null;
+let prevWeightData = null;
 let dataBuffer = '';
 
 // Read script configuration
@@ -34,17 +34,24 @@ client.connect(settings.scale_port, settings.scale_ip, () => {
 
 client.on('data', (data) => {
   dataBuffer += Buffer.from(data, 'hex').toString();
-  let messageEnd = dataBuffer.indexOf('\r\n');
+  const messageEnd = dataBuffer.indexOf('\r\n');
   if (messageEnd == -1) {
     return;
   }
-  let weight = dataBuffer.substring(0, messageEnd);
+  const weightData = dataBuffer.substring(0, messageEnd);
   dataBuffer = '';
 
-  if (prevWeight != weight) {
-    prevWeight = weight;
+  if (prevWeightData != weightData) {
+    prevWeightData = weightData;
 
-    cv.vapixGet('/local/camoverlay/api/textAndBackground.cgi?service_id=' + settings.service_id + '&' + settings.field_name + '=' + weight).then((response) => {
+    // Parse weight and unit
+    const weight = prevWeightData.substring(0, 9);
+    const unit = prevWeightData.substring(9);
+
+    cv.vapixGet('/local/camoverlay/api/textAndBackground.cgi?service_id=' + settings.service_id + '&' +
+      settings.value_field_name + '=' + weight + '&' +
+      settings.unit_field_name + '=' + unit)
+    .then((response) => {
       //console.log(response);
     }, function(err) {
       console.error(err);
