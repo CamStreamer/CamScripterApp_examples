@@ -4,5 +4,5 @@
   "package_version": "1.0.1",
   "vendor": "Camstreamer s.r.o.",
   "required_camscripter_version": "1.2.3",
-  "ui_link": "/local/camscripter/proxy/ui/index.html"
+  "ui_link": "/local/camscripter/package/ui/index.html"
 }
