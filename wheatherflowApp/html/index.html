@@ -1,0 +1,70 @@
+<html>
+<head>
+  <title>CamScripter - Wheatherflow</title>
+  <link rel="stylesheet" href="bootstrap/bootstrap.min.css" />
+</head>
+<body>
+  <nav class="navbar navbar-dark" style="background-color: lightgrey;">
+  </nav>
+  <div class="container pt-4">
+      <div class="row">
+        <div class="col-md-12">
+          <h4>Camera access</h4>
+          <form class="myForm">
+            <div class="form-group">
+              <label for="userCam">User</label>
+              <input type="text" class="form-control" id="userCam" placeholder="root">
+            </div>
+            <div class="form-group">
+              <label for="passCam">Password</label>
+              <input type="password" class="form-control" id="passCam" placeholder="" autocomplete="new-password">
+            </div>
+          </form>
+          <br />
+          <h4>Wheatherflow API</h4>
+          <form class="myForm">
+            <div class="form-group">
+              <label for="stationID">Station ID</label>
+              <input type="text" class="form-control" id="stationID" placeholder="">
+            </div>
+            <div class="form-group">
+              <label for="accessToken">Access Token</label>
+              <input type="text" class="form-control" id="accessToken" placeholder="">
+            </div>
+          </form>
+          <br />
+          <h4>CamOverlay Settings</h4>
+          <form class="myForm">
+            <div class="form-group">
+              <label for="coServiceID">Service ID</label>
+              <input type="text" class="form-control" id="coServiceID" placeholder="">
+              <small id="passwordHelpBlock" class="form-text text-muted">
+                (name of fields have to be: temperature, humidity, timestamp)
+              </small>
+            </div>
+            <div class="form-group">
+              <label for="timeOffset">Time Offset from UTC time [hour]</label>
+              <input type="text" class="form-control" id="timeOffset" placeholder="">
+            </div>
+            <div class="form-group">
+              <div>Temperature Units</div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="tempUnitsRadioOptions" id="tempUnitsRadio1" value="celsius" checked="">
+                <label class="form-check-label" for="tempUnitsRadio1">&#8451;</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="tempUnitsRadioOptions" id="tempUnitsRadio2" value="fahrenheit">
+                <label class="form-check-label" for="tempUnitsRadio2">&#8457;</label>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+  </div>
+  <div><br /><br /></div>
+
+  <script type="text/javascript" src="jquery-2.2.4/jquery-2.2.4.min.js"></script>
+  <script type="text/javascript" src="bootstrap/bootstrap.min.js"></script>
+  <script type="text/javascript" src="index.js"></script>
+</body>
+</html>

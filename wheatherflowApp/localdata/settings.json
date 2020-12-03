@@ -1,0 +1,11 @@
+
+{
+    "camera_user": "root",
+    "camera_pass": "pass",
+    "sync_period": 3600,
+    "access_token": "d8e23bd3-b235-4c64-9a21-39b1e8199913",
+    "station_id": "26334",
+    "co_service_id": 1,
+    "time_offset": 0,
+    "temperature_units": "f"
+}

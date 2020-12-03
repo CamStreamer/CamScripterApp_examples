@@ -1,0 +1,8 @@
+{
+  "package_name": "wheatherflow",
+  "package_menu_name": "Wheatherflow",
+  "package_version": "1.0.0",
+  "vendor": "Camstreamer s.r.o.",
+  "required_camscripter_version": "1.3.0",
+  "ui_link": "/local/camscripter/package/wheatherflow/index.html"
+}
