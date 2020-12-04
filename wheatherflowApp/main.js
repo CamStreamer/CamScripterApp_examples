@@ -290,10 +290,8 @@ co.on('close', function() {
 
 var count = 0;
 function oneAppPeriod(){
-  if (count = 0){
+  if (count = 0){ //jednou za X period žádáme o data Wheatherflow
     reqWheatherflowData(stationID,accessToken);
-  }else{
-
   }
   count++;
   count %= updatePeriod*12 //12*5s=60s
