@@ -10,10 +10,11 @@ let user = 'root';
 let pass = 'pass';
 let accessToken = '';
 let stationID = '';
-let syncPeriod = 3600;
+let updatePeriod = 5; // minute count
 let coServiceID = 1;
 let timeOffset = 0;
-let temperatureUnits = 'celsius';
+let unitSystem = 'metric';
+let location = "Hic Sunt Leones";
 let coQuery = null;
 let coUpdateInProgress = false;
 
@@ -26,18 +27,19 @@ try {
   const data = fs.readFileSync(process.env.PERSISTENT_DATA_PATH + 'settings.json');
   const settings = JSON.parse(data);
   if (typeof settings.camera_user == 'string' && typeof settings.camera_pass == 'string' &&
-      typeof settings.access_token == 'string' && typeof settings.station_id == 'string' && typeof settings.sync_period == 'number' &&
-      typeof settings.co_service_id == 'number' && typeof settings.time_offset == 'number' &&
-      typeof settings.temperature_units == 'string') {
+      typeof settings.access_token == 'string' && typeof settings.station_id == 'number' && typeof settings.wheather_check_period == 'number' &&
+      typeof settings.co_service_id == 'number' && typeof settings.time_offset == 'number' && typeof settings.location == 'string' &&
+      typeof settings.units == 'string') {
 
     user = settings.camera_user;
     pass = settings.camera_pass;
     accessToken = settings.access_token;
-    stationID = settings.station_id;
-    syncPeriod = settings.sync_period;
+    stationID = settings.station_id.toString();
+    updatePeriod = settings.wheather_check_period //minute count
     coServiceID = settings.co_service_id;
     timeOffset = settings.time_offset;
-    temperatureUnits = settings.temperature_units;
+    unitSystem = settings.units;
+    location = settings.location;
 
   } else {
     console.error("Invalid or incomplete configuration found");
@@ -91,10 +93,64 @@ CamOverlayAPI.prototype.updateCustomGraphics= function(action,fields){
 
 
 
+const unit_monikers = { //translation of unit propmts to displayable text
+  "c": "°C",
+  "f": "°F",
+  "mph": "mph",
+  "km/h": "km/h",
+  "m/s": "m/s",
+  "in": "in",
+  "mm": "mm",
+  "inhg": "inHg",
+  "hpa": "hPa",
+  "mi": "mi",
+  "km": "km"
+};
+const units_systems = {
+  "metric":{
+    "units_temp": "c",
+    "units_pressure": "hpa",
+    "units_distance": "km",
+    "units_precip": "mm",
+    "units_wind": "km/h"   
+  },
+  "imperial":{
+    "units_temp": "f",
+    "units_pressure": "inhg",
+    "units_distance": "mi",
+    "units_precip": "in",
+    "units_wind": "mph"
+  },
+  "conversions":{ // from metric to imperial
+    "imperial":{
+      "units_temp": [32,1.8,1], // [offset, ratio]  ratio = imp(met(1))
+      "units_pressure": [0,0.02953,1],
+      "units_distance": [0,0.621371192,2],
+      "units_precip": [0,0.0393700787,2],
+      "units_wind": [0,0.621371192,2]
+    }
+  }
+};
 
+function createConvertor(offset,u_ratio,fixed_dec){
+  return (value)=>{return ((value * u_ratio) + offset).toFixed(fixed_dec)};    
+}
+function createInvConvertor(offset,u_ratio,fixed_dec){
+  return (value)=>{return ((value - offset)/ u_ratio).toFixed(fixed_dec);};    
+}
 
-function timestamp(ux_timestamp){
-  let date = new Date(ux_timestamp*1000);
+var convertors = {
+  "imperial":{},
+  "metric":{}
+}; //origin:target
+
+for (unit_class in units_systems.conversions.imperial){
+  conv = units_systems.conversions.imperial[unit_class];
+  convertors["imperial"][unit_class] = createConvertor(conv[0],conv[1]);
+  convertors["metric"][unit_class] = (x)=>{return x}; 
+}
+
+function parseTime(date){
   var month = new Array();
   month[0] = "January";
   month[1] = "February";
@@ -108,22 +164,14 @@ function timestamp(ux_timestamp){
   month[9] = "October";
   month[10] = "November";
   month[11] = "December";
-  return month[date.getMonth()] +" "+ date.getDate()+", "+date.getHours()+":"+date.getMinutes();
+  return [month[date.getMonth()],date.getDate(),date.getHours()+":"+date.getMinutes()];
 }
-function temperature(value,units,degree=true){ 
-  
-  let unit = degree ? "°"+units.toUpperCase(): units.toUpperCase();
-  return value+unit;
+
+function simpleUnit(value,unit_type){
+  //console.log(convertors);
+  return convertors[unitSystem][unit_type](value)+unit_monikers[units_systems[unitSystem][unit_type]];
 }
-function wind(value,unit){ 
-  return value+unit;
-}
-function precip(value, unit){ 
-  return value+unit;
-}
-function pressure(value,unit){ 
-  return value+unit;
-}
+
 function direction(degrees){ 
   let directions = ["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW","N"];
   let index = degrees % 360;
@@ -138,19 +186,31 @@ barometricPressure
 windAvg
 windDirection
 windGust
-precipAccumLast1hr 
+precipAccumLast1h
+date
+time
+location 
 */
-function conversion(raw_data){
-  let units = raw_data.station_units;
+function mapData(raw_data){
+  //let station_units = raw_data.station_units;
+  //PŘÍCHOZÍ HODNOTY JSOU VŽDY METRIC
   let vals = raw_data.obs[0];
+  let UXtime = parseTime(new Date(vals.timestamp*1000));
+  let timestamp = UXtime[0]+" "+UXtime[1]+", "+UXtime[2];
+  let cameratime = parseTime(new Date());
+  let date = unitSystem == "metric" ? cameratime[1]+" "+cameratime[0] : cameratime[0]+" "+cameratime[1];
+  let time = cameratime[2]; 
   let result = {
-    "timestamp": timestamp(vals.timestamp),
-    "airTemperature": temperature(vals.air_temperature, units.units_temp),
-    "barometricPressure": pressure(vals.barometric_pressure, units.units_pressure),
-    "windAvg": wind(vals.wind_avg, units.units_wind),
+    "timestamp": timestamp, //ČASOVÁ ZÓNA!
+    "airTemperature": simpleUnit(vals.air_temperature,"units_temp"),
+    "barometricPressure": simpleUnit(vals.barometric_pressure, "units_pressure"),
+    "windAvg": simpleUnit(vals.wind_avg, "units_wind"),
     "windDirection": direction(vals.wind_direction),
-    "windGust": wind(vals.wind_gust, units.units_wind),
-    "precipAccumLast1hr":precip(vals.precip_accum_last_1hr, units.units_precip),
+    "windGust": simpleUnit(vals.wind_gust, "units_wind"),
+    "precipAccumLast1hr": simpleUnit(vals.precip_accum_last_1hr, "units_precip"),
+    "date":date,
+    "time": time,
+    "location" : location
   };
   return result;
 }
@@ -194,7 +254,7 @@ function reqWheatherflowData(station,acc_token){
   let wheatherAPIUrl = "https://swd.weatherflow.com/swd/rest/observations/station/"+station+"?token="+acc_token;
   let data = sendRequest(wheatherAPIUrl, "").then(function(results){
     console.log("Converting!");
-    var res = conversion(JSON.parse(results));
+    var res = mapData(JSON.parse(results));
     let fields = []
     for(v in res){
       fields.push({
@@ -228,20 +288,18 @@ co.on('close', function() {
   process.exit(1);
 });
 
-var fields = [{
-  "field_name":"santa",
-  "text": "HoHoHo",
-  "color":"255255255"
-},{
-  "field_name":"satan",
-  "text": "HaHaHa",
-  "color":"255255255"
-}];
+var count = 0;
+function oneAppPeriod(){
+  if (count = 0){
+    reqWheatherflowData(stationID,accessToken);
+  }else{
 
+  }
+  count++;
+  count %= updatePeriod*12 //12*5s=60s
+}
 
-console.log("Updating Wheatherflow!")
-reqWheatherflowData("26334","d8e23bd3-b235-4c64-9a21-39b1e8199913");
+oneAppPeriod()
+setInterval(oneAppPeriod,5000);
+
 //co.updateCustomGraphics("update_text",fields);
-
-//var text = reqWheatherflowData("26334","d8e23bd3-b235-4c64-9a21-39b1e8199913");
-//console.log(text);

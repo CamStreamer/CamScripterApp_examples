@@ -8,10 +8,11 @@ $(document).ready(() => {
         "camera_pass": "",
         "access_token": "",
         "station_id": "",
-        "sync_period": 3600,
+        "wheather_check_period": 5, //MINUTES!!!
         "co_service_id": 1,
         "time_offset": 0,
-        "temperature_units": 'celsius'
+        "units": 'metric',
+        "location": ""
       };
     }
 
@@ -19,14 +20,14 @@ $(document).ready(() => {
     $('#passCam').val(settings.camera_pass);
     $('#accessToken').val(settings.access_token);
     $('#stationID').val(settings.station_id);
-    $('#syncPeriod').val(settings.sync_period);
+    $('#updatePeriod').val(settings.wheather_check_period);
     $('#coServiceID').val(settings.co_service_id);
     $('#timeOffset').val(settings.time_offset);
-
-    if (settings.temperature_units == 'celsius') {
-      $('#tempUnitsRadio1').prop("checked", true);
+    $('#location').val(settings.location);
+    if (settings.units == 'metric') {
+      $('#unitsRadio1').prop("checked", true);
     } else {
-      $('#tempUnitsRadio2').prop("checked", true);
+      $('#unitsRadio2').prop("checked", true);
     }
   });
 
@@ -44,11 +45,12 @@ function inputChanged() {
     'camera_user': $('#userCam').val().trim(),
     'camera_pass': $('#passCam').val().trim(),
     'access_token': $('#accessToken').val().trim(),
-    'station_id': $('#stationID').val().trim(),
-    'sync_period': parseInt($('#syncPeriod').val().trim()),
+    'station_id': parseInt($('#stationID').val().trim()),
+    'wheather_check_period': parseInt($('#updatePeriod').val().trim()),
     'co_service_id': parseInt($('#coServiceID').val().trim()),
     'time_offset': parseInt($('#timeOffset').val().trim()),
-    'temperature_units': $("input[name='tempUnitsRadioOptions']:checked").val()
+    'units': $("input[name='unitsRadioOptions']:checked").val(),
+    'location': $('#location').val().trim()
   };
   $.post('/local/camscripter/package/settings.cgi?package_name=wheatherflow&action=set', JSON.stringify(settings), (data) => {});
 }
