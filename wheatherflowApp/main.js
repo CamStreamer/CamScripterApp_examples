@@ -140,7 +140,6 @@ function parseTime(date, eng_time = false){
 }
 
 function simpleUnit(value,unit_type){
-  //console.log(convertors);
   return convertors[unitSystem][unit_type](value)+unit_monikers[units_systems[unitSystem][unit_type]];
 }
 
@@ -229,8 +228,7 @@ async function reqWheatherflowData(station,acc_token){
       console.log("Data aquired!");
       return JSON.parse(data);
   }catch(error){
-    console.log("Error Wheather Request");
-    console.log(error);
+    console.log("Cannot get data form station: " + station + "with access token: " + acc_token);
   }
 }
 var co = new CamOverlayAPI({
@@ -261,7 +259,7 @@ async function oneAppPeriod(){
     if (count == 0){ //jednou za X period žádáme o data Wheatherflow
       unmapped_data = await reqWheatherflowData(stationID,accessToken);
     }
-    console.log("Updating CO");
+    console.log("Updating CamOverlay");
     var res = mapData(unmapped_data);
     let fields = [];
     for(v in res){
@@ -275,8 +273,7 @@ async function oneAppPeriod(){
     count++;
     count %= updatePeriod*12 //uP*12*5s == uP*60s
   }catch(error){
-    console.log("Error Wheather Request Higher");
-    console.log(error);
+    console.log("Error Updating CamOverlay");
   }  
 }
 
