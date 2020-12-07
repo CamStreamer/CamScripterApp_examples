@@ -150,7 +150,7 @@ for (unit_class in units_systems.conversions.imperial){
   convertors["metric"][unit_class] = (x)=>{return x}; 
 }
 
-function parseTime(date){
+function parseTime(date, eng_time = false){
   var month = new Array();
   month[0] = "January";
   month[1] = "February";
@@ -164,7 +164,22 @@ function parseTime(date){
   month[9] = "October";
   month[10] = "November";
   month[11] = "December";
-  return [month[date.getMonth()],date.getDate(),date.getHours()+":"+date.getMinutes()];
+  let time = "0:00";
+  if (eng_time){
+    let cz_hours = date.getHours();
+    let en_hours = cz_hours % 12;
+    let am_pm = "AM";
+    if (cz_hours >= 12){
+      am_pm = "PM"
+      if (en_hours == 0) {
+        en_hours = 12;
+      }
+    }
+    time = (en_hours)+":"+("0"+date.getMinutes()).slice(-2) + " " + am_pm;
+  }else{
+    time = ("0"+date.getHours()).slice(-2)+":"+("0"+date.getMinutes()).slice(-2);
+  }
+  return [month[date.getMonth()],date.getDate(),time];
 }
 
 function simpleUnit(value,unit_type){
@@ -197,7 +212,7 @@ function mapData(raw_data){
   let vals = raw_data.obs[0];
   let UXtime = parseTime(new Date(vals.timestamp*1000));
   let timestamp = UXtime[0]+" "+UXtime[1]+", "+UXtime[2];
-  let cameratime = parseTime(new Date());
+  let cameratime = parseTime(new Date(), true);
   let date = unitSystem == "metric" ? cameratime[1]+" "+cameratime[0] : cameratime[0]+" "+cameratime[1];
   let time = cameratime[2]; 
   let result = {
@@ -214,7 +229,7 @@ function mapData(raw_data){
   };
   return result;
 }
-async function sendRequest(sendUrl, auth) {
+function sendRequest(sendUrl, auth) {
   return new Promise((resolve, reject) => {
     sendUrl = url.parse(sendUrl);
     let options = {
@@ -250,22 +265,16 @@ async function sendRequest(sendUrl, auth) {
   });
 }
 
-function reqWheatherflowData(station,acc_token){
-  let wheatherAPIUrl = "https://swd.weatherflow.com/swd/rest/observations/station/"+station+"?token="+acc_token;
-  let data = sendRequest(wheatherAPIUrl, "").then(function(results){
-    console.log("Converting!");
-    var res = mapData(JSON.parse(results));
-    let fields = []
-    for(v in res){
-      fields.push({
-        "field_name": v,
-        "text": res[v],
-        "color": "255255255" //všechno paušálně bíle zatím
-      })    
-    }
-    co.updateCustomGraphics("update_text",fields);
-    //console.log(fields);
-  },()=>{console.log("Error Wheather Request")});
+async function reqWheatherflowData(station,acc_token){
+  try{
+      let wheatherAPIUrl = "https://swd.weatherflow.com/swd/rest/observations/station/"+station+"?token="+acc_token;
+      const data = await sendRequest(wheatherAPIUrl, "");
+      console.log("Data aquired!");
+      return JSON.parse(data);
+  }catch(error){
+    console.log("Error Wheather Request");
+    console.log(error);
+  }
 }
 var co = new CamOverlayAPI({
   'ip': '127.0.0.1',
@@ -289,12 +298,30 @@ co.on('close', function() {
 });
 
 var count = 0;
-function oneAppPeriod(){
-  if (count = 0){ //jednou za X period žádáme o data Wheatherflow
-    reqWheatherflowData(stationID,accessToken);
-  }
-  count++;
-  count %= updatePeriod*12 //12*5s=60s
+var unmapped_data;
+async function oneAppPeriod(){
+  //
+  try{
+    if (count == 0){ //jednou za X period žádáme o data Wheatherflow
+      unmapped_data = await reqWheatherflowData(stationID,accessToken);
+    }
+    console.log("Updating CO");
+    var res = mapData(unmapped_data);
+    let fields = [];
+    for(v in res){
+    fields.push({
+        "field_name": v,
+        "text": res[v],
+        "color": "255255255" //všechno paušálně bíle zatím
+      });    
+    }
+    co.updateCustomGraphics("update_text",fields);
+    count++;
+    count %= updatePeriod*12 //uP*12*5s == uP*60s
+  }catch(error){
+    console.log("Error Wheather Request Higher");
+    console.log(error);
+  }  
 }
 
 oneAppPeriod()
