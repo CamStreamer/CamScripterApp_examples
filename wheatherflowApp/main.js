@@ -210,7 +210,7 @@ function mapData(raw_data){
   //let station_units = raw_data.station_units;
   //PŘÍCHOZÍ HODNOTY JSOU VŽDY METRIC
   let vals = raw_data.obs[0];
-  let UXtime = parseTime(new Date(vals.timestamp*1000));
+  let UXtime = parseTime(new Date((vals.timestamp + (timeOffset*60*60))*1000));
   let timestamp = UXtime[0]+" "+UXtime[1]+", "+UXtime[2];
   let cameratime = parseTime(new Date(), true);
   let date = unitSystem == "metric" ? cameratime[1]+" "+cameratime[0] : cameratime[0]+" "+cameratime[1];
