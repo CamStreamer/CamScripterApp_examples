@@ -14,7 +14,7 @@ let updatePeriod = 5; // minute count
 let coServiceID = 1;
 let timeOffset = 0;
 let unitSystem = 'metric';
-let location = "Hic Sunt Leones";
+let location = "Name of location";
 let coQuery = null;
 let coUpdateInProgress = false;
 
@@ -40,6 +40,9 @@ try {
     timeOffset = settings.time_offset;
     unitSystem = settings.units;
     location = settings.location;
+    if (accessToken == ""){
+      console.error("No Access Token!");
+    }
 
   } else {
     console.error("Invalid or incomplete configuration found");
@@ -103,7 +106,7 @@ var convertors = {
 
 for (unit_class in units_systems.conversions.imperial){
   conv = units_systems.conversions.imperial[unit_class];
-  convertors["imperial"][unit_class] = createConvertor(conv[0],conv[1]);
+  convertors["imperial"][unit_class] = createConvertor(conv[0],conv[1],conv[2]);
   convertors["metric"][unit_class] = (x)=>{return x}; 
 }
 
@@ -144,9 +147,9 @@ function simpleUnit(value,unit_type){
 }
 
 function direction(degrees){ 
-  let directions = ["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW","N"];
+  let directions = ["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW","N"]; //17
   let index = degrees % 360;
-  index = Math.round(index/ 22.5,0)+1;
+  index = Math.round(index/ 22.5,0);
   compassdir = directions[index];
   return compassdir;
 }
@@ -163,16 +166,17 @@ time
 location 
 */
 function mapData(raw_data){
-  //let station_units = raw_data.station_units;
-  //PŘÍCHOZÍ HODNOTY JSOU VŽDY METRIC
+  //INCOMING VALUES ARE ALWAYS IN METRIC
   let vals = raw_data.obs[0];
-  let UXtime = parseTime(new Date((vals.timestamp + (timeOffset*60*60))*1000));
-  let timestamp = UXtime[0]+" "+UXtime[1]+", "+UXtime[2];
+  let timestamp = new Date(vals.timestamp*1000);
+  uxdate = timestamp.getTime() + (((timeOffset*60) + timestamp.getTimezoneOffset())*60000);
+  let UXtime = parseTime(new Date(uxdate));
+  let timestamp_str = "metric" ? UXtime[0]+" "+UXtime[1]+", "+UXtime[2]: UXtime[1]+" "+UXtime[0]+", "+UXtime[2];
   let cameratime = parseTime(new Date(), true);
   let date = unitSystem == "metric" ? cameratime[1]+" "+cameratime[0] : cameratime[0]+" "+cameratime[1];
   let time = cameratime[2]; 
   let result = {
-    "timestamp": timestamp, //ČASOVÁ ZÓNA!
+    "timestamp": timestamp_str, //ČASOVÁ ZÓNA!
     "airTemperature": simpleUnit(vals.air_temperature,"units_temp"),
     "barometricPressure": simpleUnit(vals.barometric_pressure, "units_pressure"),
     "windAvg": simpleUnit(vals.wind_avg, "units_wind"),
@@ -228,7 +232,7 @@ async function reqWheatherflowData(station,acc_token){
       console.log("Data aquired!");
       return JSON.parse(data);
   }catch(error){
-    console.log("Cannot get data form station: " + station + "with access token: " + acc_token);
+    console.log("Cannot get data form station: " + station + " with access token: " + acc_token);
   }
 }
 var co = new CamOverlayAPI({
@@ -265,8 +269,8 @@ async function oneAppPeriod(){
     for(v in res){
     fields.push({
         "field_name": v,
-        "text": res[v],
-        "color": "255255255" //všechno paušálně bíle zatím
+        "text": res[v]
+        //"color": "255255255" //všechno paušálně bíle zatím
       });    
     }
     co.updateCGText(fields);
@@ -274,6 +278,7 @@ async function oneAppPeriod(){
     count %= updatePeriod*12 //uP*12*5s == uP*60s
   }catch(error){
     console.log("Error Updating CamOverlay");
+    //console.log(error);
   }  
 }
 
