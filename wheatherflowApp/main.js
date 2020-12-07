@@ -171,7 +171,7 @@ function mapData(raw_data){
   let timestamp = new Date(vals.timestamp*1000);
   uxdate = timestamp.getTime() + (((timeOffset*60) + timestamp.getTimezoneOffset())*60000);
   let UXtime = parseTime(new Date(uxdate));
-  let timestamp_str = "metric" ? UXtime[0]+" "+UXtime[1]+", "+UXtime[2]: UXtime[1]+" "+UXtime[0]+", "+UXtime[2];
+  let timestamp_str = unitSystem =="metric" ? (UXtime[1]+" "+UXtime[0]+", "+UXtime[2]) : (UXtime[0]+" "+UXtime[1]+", "+UXtime[2]);
   let cameratime = parseTime(new Date(), true);
   let date = unitSystem == "metric" ? cameratime[1]+" "+cameratime[0] : cameratime[0]+" "+cameratime[1];
   let time = cameratime[2]; 
