@@ -50,49 +50,6 @@ try {
   return;
 }
 
-
-/*
-* fields = [
-    {
-      field_name: name1
-      text: text1
-      color: color1
-    },
-    {
-      ...
-    }
-  ]
-*/
-CamOverlayAPI.prototype.updateCustomGraphics= function(action,fields){
-  let pathofCG = "/local/camoverlay/api/customGraphics.cgi?";
-  let cg_action = "action="+action;
-  let cg_service = "&service_id="+this.serviceID;
-  let field_specs = "";
- 
-  for(let i = 0;i<fields.length;i++){
-    let f = fields[i];
-    field_specs+="&";
-    let name = f.field_name;
-    field_specs += name+"="+f.text;
-    field_specs += "&"+name+"_color="+f.color;
-  }
-  console.log(pathofCG + cg_action + cg_service + field_specs);
-  var promise = new Promise(function(resolve, reject) {
-    httpRequest({
-      "method":"POST",
-      "host": this.ip,
-      "port": this.port,
-      "path": encodeURI(pathofCG + cg_action + cg_service + field_specs),
-      "auth": this.auth
-    },"").then(function(response) {
-      resolve();
-    }, reject);
-  }.bind(this));
-  return promise;
-}
-
-
-
 const unit_monikers = { //translation of unit propmts to displayable text
   "c": "°C",
   "f": "°F",
@@ -300,7 +257,6 @@ co.on('close', function() {
 var count = 0;
 var unmapped_data;
 async function oneAppPeriod(){
-  //
   try{
     if (count == 0){ //jednou za X period žádáme o data Wheatherflow
       unmapped_data = await reqWheatherflowData(stationID,accessToken);
@@ -315,7 +271,7 @@ async function oneAppPeriod(){
         "color": "255255255" //všechno paušálně bíle zatím
       });    
     }
-    co.updateCustomGraphics("update_text",fields);
+    co.updateCGText(fields);
     count++;
     count %= updatePeriod*12 //uP*12*5s == uP*60s
   }catch(error){
@@ -326,5 +282,3 @@ async function oneAppPeriod(){
 
 oneAppPeriod()
 setInterval(oneAppPeriod,5000);
-
-//co.updateCustomGraphics("update_text",fields);
