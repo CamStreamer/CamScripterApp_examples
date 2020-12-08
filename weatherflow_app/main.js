@@ -225,7 +225,7 @@ function sendRequest(sendUrl, auth) {
   });
 }
 
-async function reqWheatherflowData(station,acc_token){
+async function reqWeatherflowData(station,acc_token){
   try{
       let wheatherAPIUrl = "https://swd.weatherflow.com/swd/rest/observations/station/"+station+"?token="+acc_token;
       const data = await sendRequest(wheatherAPIUrl, "");
@@ -260,8 +260,8 @@ var count = 0;
 var unmapped_data;
 async function oneAppPeriod(){
   try{
-    if (count == 0){ //jednou za X period žádáme o data Wheatherflow
-      unmapped_data = await reqWheatherflowData(stationID,accessToken);
+    if (count == 0){ //jednou za X period žádáme o data Weatherflow
+      unmapped_data = await reqWeatherflowData(stationID,accessToken);
     }
     console.log("Updating CamOverlay");
     var res = mapData(unmapped_data);

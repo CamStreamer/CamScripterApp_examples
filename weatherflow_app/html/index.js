@@ -1,6 +1,6 @@
 $(document).ready(() => {
 
-  $.get('/local/camscripter/package/settings.cgi?package_name=wheatherflow&action=get', (settings) => {
+  $.get('/local/camscripter/package/settings.cgi?package_name=weatherflow&action=get', (settings) => {
     console.log(settings);
     if (Object.keys(settings).length == 0) {
       settings = {
@@ -52,5 +52,5 @@ function inputChanged() {
     'units': $("input[name='unitsRadioOptions']:checked").val(),
     'location': $('#location').val().trim()
   };
-  $.post('/local/camscripter/package/settings.cgi?package_name=wheatherflow&action=set', JSON.stringify(settings), (data) => {});
+  $.post('/local/camscripter/package/settings.cgi?package_name=weatherflow&action=set', JSON.stringify(settings), (data) => {});
 }
