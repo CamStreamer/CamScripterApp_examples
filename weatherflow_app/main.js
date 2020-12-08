@@ -21,9 +21,9 @@ let coUpdateInProgress = false;
 process.on('unhandledRejection', function(error) {
   console.error('unhandledRejection', error.message);
 }); //error handling
-console.log("Hello Wheatherflow!")
+console.log("Hello WeatherFlow!")
 
-try { 
+try {
   const data = fs.readFileSync(process.env.PERSISTENT_DATA_PATH + 'settings.json');
   const settings = JSON.parse(data);
   if (typeof settings.camera_user == 'string' && typeof settings.camera_pass == 'string' &&
@@ -72,7 +72,7 @@ const units_systems = {
     "units_pressure": "hpa",
     "units_distance": "km",
     "units_precip": "mm",
-    "units_wind": "km/h"   
+    "units_wind": "km/h"
   },
   "imperial":{
     "units_temp": "f",
@@ -93,10 +93,10 @@ const units_systems = {
 };
 
 function createConvertor(offset,u_ratio,fixed_dec){
-  return (value)=>{return ((value * u_ratio) + offset).toFixed(fixed_dec)};    
+  return (value)=>{return ((value * u_ratio) + offset).toFixed(fixed_dec)};
 }
 function createInvConvertor(offset,u_ratio,fixed_dec){
-  return (value)=>{return ((value - offset)/ u_ratio).toFixed(fixed_dec);};    
+  return (value)=>{return ((value - offset)/ u_ratio).toFixed(fixed_dec);};
 }
 
 var convertors = {
@@ -107,7 +107,7 @@ var convertors = {
 for (unit_class in units_systems.conversions.imperial){
   conv = units_systems.conversions.imperial[unit_class];
   convertors["imperial"][unit_class] = createConvertor(conv[0],conv[1],conv[2]);
-  convertors["metric"][unit_class] = (x)=>{return x}; 
+  convertors["metric"][unit_class] = (x)=>{return x};
 }
 
 function parseTime(date, eng_time = false){
@@ -146,7 +146,7 @@ function simpleUnit(value,unit_type){
   return convertors[unitSystem][unit_type](value)+unit_monikers[units_systems[unitSystem][unit_type]];
 }
 
-function direction(degrees){ 
+function direction(degrees){
   let directions = ["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW","N"]; //17
   let index = degrees % 360;
   index = Math.round(index/ 22.5,0);
@@ -163,7 +163,7 @@ windGust
 precipAccumLast1h
 date
 time
-location 
+location
 */
 function mapData(raw_data){
   //INCOMING VALUES ARE ALWAYS IN METRIC
@@ -174,7 +174,7 @@ function mapData(raw_data){
   let timestamp_str = unitSystem =="metric" ? (UXtime[1]+" "+UXtime[0]+", "+UXtime[2]) : (UXtime[0]+" "+UXtime[1]+", "+UXtime[2]);
   let cameratime = parseTime(new Date(), true);
   let date = unitSystem == "metric" ? cameratime[1]+" "+cameratime[0] : cameratime[0]+" "+cameratime[1];
-  let time = cameratime[2]; 
+  let time = cameratime[2];
   let result = {
     "timestamp": timestamp_str, //ČASOVÁ ZÓNA!
     "airTemperature": simpleUnit(vals.air_temperature,"units_temp"),
@@ -271,15 +271,15 @@ async function oneAppPeriod(){
         "field_name": v,
         "text": res[v]
         //"color": "255255255" //všechno paušálně bíle zatím
-      });    
+      });
     }
     co.updateCGText(fields);
     count++;
     count %= updatePeriod*12 //uP*12*5s == uP*60s
   }catch(error){
     console.log("Error Updating CamOverlay");
-    //console.log(error);
-  }  
+    console.log(error);
+  }
 }
 
 oneAppPeriod()

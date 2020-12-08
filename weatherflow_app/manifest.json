@@ -1,6 +1,6 @@
 {
-  "package_name": "wheatherflow",
-  "package_menu_name": "Wheatherflow",
+  "package_name": "weatherflow",
+  "package_menu_name": "WeatherFlow",
   "package_version": "1.0.0",
   "vendor": "Camstreamer s.r.o.",
   "required_camscripter_version": "1.3.0",
