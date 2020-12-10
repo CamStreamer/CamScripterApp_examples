@@ -1,18 +1,17 @@
 # CamScripterApp_examples
 Example packages for CamScripter Acap application.
-##Package Structure
+## Package Structure
 In source form the package should have the following structure:
 ```
 packagename/
 ├── html
-│   ├── other_ui_filesor_dirs
+│   ├── other_ui_files_or_dirs
 │   ├── index.html
 │   └── index.js
 ├── localdata
 │   └── settings.json
 ├── main.js
 ├── manifest.json
-├── [node_modules]
 ├── package.json
 └── package-lock.json
 ```
