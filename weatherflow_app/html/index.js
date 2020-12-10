@@ -1,6 +1,6 @@
 $(document).ready(() => {
 
-  $.get('/local/camscripter/package/settings.cgi?package_name=weatherflow&action=get', (settings) => {
+  $.get("/local/camscripter/package/settings.cgi?package_name=weatherflow&action=get", (settings) => {
     console.log(settings);
     if (Object.keys(settings).length == 0) {
       settings = {
@@ -16,18 +16,18 @@ $(document).ready(() => {
       };
     }
 
-    $('#userCam').val(settings.camera_user);
-    $('#passCam').val(settings.camera_pass);
-    $('#accessToken').val(settings.access_token);
-    $('#stationID').val(settings.station_id);
-    $('#updatePeriod').val(settings.wheather_check_period);
-    $('#coServiceID').val(settings.co_service_id);
-    $('#timeOffset').val(settings.time_offset);
-    $('#location').val(settings.location);
-    if (settings.units == 'metric') {
-      $('#unitsRadio1').prop("checked", true);
+    $("#userCam").val(settings.camera_user);
+    $("#passCam").val(settings.camera_pass);
+    $("#accessToken").val(settings.access_token);
+    $("#stationID").val(settings.station_id);
+    $("#updatePeriod").val(settings.wheather_check_period);
+    $("#coServiceID").val(settings.co_service_id);
+    $("#timeOffset").val(settings.time_offset);
+    $("#location").val(settings.location);
+    if (settings.units == "metric") {
+      $("#unitsRadio1").prop("checked", true);
     } else {
-      $('#unitsRadio2').prop("checked", true);
+      $("#unitsRadio2").prop("checked", true);
     }
   });
 
@@ -40,17 +40,17 @@ $(document).ready(() => {
 });
 
 function inputChanged() {
-  console.log('param changed');
+  console.log("param changed");
   var settings = {
-    'camera_user': $('#userCam').val().trim(),
-    'camera_pass': $('#passCam').val().trim(),
-    'access_token': $('#accessToken').val().trim(),
-    'station_id': parseInt($('#stationID').val().trim()),
-    'wheather_check_period': parseInt($('#updatePeriod').val().trim()),
-    'co_service_id': parseInt($('#coServiceID').val().trim()),
-    'time_offset': parseInt($('#timeOffset').val().trim()),
-    'units': $("input[name='unitsRadioOptions']:checked").val(),
-    'location': $('#location').val().trim()
+    "camera_user": $("#userCam").val().trim(),
+    "camera_pass": $("#passCam").val().trim(),
+    "access_token": $("#accessToken").val().trim(),
+    "station_id": parseInt($("#stationID").val().trim()),
+    "wheather_check_period": parseInt($("#updatePeriod").val().trim()),
+    "co_service_id": parseInt($("#coServiceID").val().trim()),
+    "time_offset": parseInt($("#timeOffset").val().trim()),
+    "units": $("input[name='unitsRadioOptions']:checked").val(),
+    "location": $("#location").val().trim()
   };
-  $.post('/local/camscripter/package/settings.cgi?package_name=weatherflow&action=set', JSON.stringify(settings), (data) => {});
+  $.post("/local/camscripter/package/settings.cgi?package_name=weatherflow&action=set", JSON.stringify(settings), (data) => {});
 }
