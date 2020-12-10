@@ -1,0 +1,11 @@
+{
+    "camera_user": "root",
+    "camera_pass": "pass",
+    "wheather_check_period": 5,
+    "access_token": "",
+    "station_id": "",
+    "co_service_id": 1,
+    "time_offset": 0,
+    "units": "imperial",
+    "location": "Name of location"
+}
