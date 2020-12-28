@@ -197,7 +197,7 @@ function sendRequest(send_url, auth) {
       port: send_url.port,
       path: send_url.path,
       headers: { "Authorization": auth },
-      timeout: 10
+      timeout: 5000 //5s
     };
     const req = https.request(options, (res) => {
       res.setEncoding("utf8");
@@ -208,7 +208,7 @@ function sendRequest(send_url, auth) {
       });
 
       res.on("end", () => {
-        if (res.status_code != 200) {
+        if (!(res.status_code === undefined) && res.status_code != 200) {
           reject(new Error("Server returned status code: " + res.status_code + ", message: " + data));
         } else {
           resolve(data);
@@ -232,8 +232,10 @@ async function reqWeatherflowData(station, acc_token) {
     return JSON.parse(data);
   } catch (error) {
     console.log("Cannot get data form station: " + station + " with access token: " + acc_token);
+    console.log(error);
   }
 }
+
 var co = new CamOverlayAPI({
   "ip": "127.0.0.1",
   "port": 80,
@@ -272,7 +274,8 @@ async function oneAppPeriod() {
         //"color": "255255255"
       });
     }
-    co.updateCGText(fields);
+    console.log(co.promiseCGUpdate)
+    await co.updateCGText(fields);
     count++;
     count %= updatePeriod * 12; //uP*12*5s == uP*60s
   } catch (error) {
