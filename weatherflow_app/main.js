@@ -70,7 +70,7 @@ const units_systems = {
     "units_pressure": "hpa",
     "units_distance": "km",
     "units_precip": "mm",
-    "units_wind": "km/h"
+    "units_wind": "m/s"
   },
   "imperial": {
     "units_temp": "f",
@@ -85,7 +85,7 @@ const units_systems = {
       "units_pressure": [0, 0.02953, 1],
       "units_distance": [0, 0.621371192, 2],
       "units_precip": [0, 0.0393700787, 2],
-      "units_wind": [0, 0.621371192, 2]
+      "units_wind": [0, 2.2369362920544, 2]
     }
   }
 };
