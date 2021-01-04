@@ -208,8 +208,8 @@ function sendRequest(send_url, auth) {
       });
 
       res.on("end", () => {
-        if (!(res.status_code === undefined) && res.status_code != 200) {
-          reject(new Error("Server returned status code: " + res.status_code + ", message: " + data));
+        if (res.statusCode != 200) {
+          reject(new Error("Server returned status code: " + res.statusCode + ", message: " + data));
         } else {
           resolve(data);
         }
