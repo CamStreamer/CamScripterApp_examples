@@ -27,8 +27,9 @@ class CairoFrame {
         this.children.push(frame); //order of insertion is order of rendering
     }
 
-    generateOwnImage(co, cairo, ppX, ppY) {
+    generateOwnImage(co, cairo, ppX, ppY, scale) {
         co.cairo('cairo_identity_matrix', cairo);
+
         if (this.bg_color){
             co.cairo('cairo_set_source_rgba', cairo, this.bg_color[0], this.bg_color[1], this.bg_color[2], this.bg_color[3]);
             this.drawFrame(cairo,co);
@@ -37,7 +38,7 @@ class CairoFrame {
             if (this.bg_type == 'fit') {
                 let sx = this.width / this.bg_width;
                 let sy = this.height / this.bg_height;
-                co.cairo('cairo_scale', cairo, sx, sy);
+                co.cairo('cairo_scale', cairo, scale*sx, scale*sy);
             }
             co.cairo('cairo_translate', cairo, ppX, ppY);
             co.cairo('cairo_set_source_surface', cairo, this.bg_image, 0, 0);
@@ -51,13 +52,14 @@ class CairoFrame {
         return true;
     }
 
-    generateImage(co, cairo, parentPos) {
+    generateImage(co, cairo, parentPos, scale) {
+        let real_scale = scale||1;
         let ppX = parentPos[0];
         let ppY = parentPos[1];
 
-        this.generateOwnImage(co, cairo, ppX, ppY)
+        this.generateOwnImage(co, cairo, ppX, ppY,real_scale)
         for (let child of this.children) {
-            child.generateImage(co, cairo, [this.posX + ppX, this.posY + ppY]);
+            child.generateImage(co, cairo, [this.posX + ppX, this.posY + ppY], real_scale);
         }
         //co.cairo('cairo_translate', cairo, -ppX, -ppY);
     }

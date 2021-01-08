@@ -135,7 +135,7 @@ function mapData(data, frames){
 
 function genLayout(){
   let layout = {};
-  layout.background = new CairoPainter(0,0,180,180,null,null,null);
+  layout.background = new CairoPainter(settings.pos_x,settings.pos_y,180,180,null,null,null);
   layout.value = new CairoFrame(30,25,120,70,null,"0",[1.0,1.0,1.0]);
   layout.label = new CairoFrame(0,10,180,20,null,"0",[1.0,1.0,1.0]);
   layout.background.insert(layout.value);
@@ -158,7 +158,7 @@ async function oneAppPeriod(co){
   try{
     let data = await requestAQI(settings.location, settings.access_token);
     mapData(data,frames);
-    frames.background.generateImage(co)
+    frames.background.generateImage(co, settings.scale/100);
   } catch(error){
     console.log(error);
   }

@@ -18,15 +18,16 @@ class CairoPainter extends CairoFrame{
         });
         return promise;
     }
-    async generateImage (co){
+    async generateImage (co,scale){
+        let real_scale = scale || 1;
         let access = await this._begin(co);
         this.surface = access[0];
         this.cairo = access[1];
-        this.generateOwnImage(co,this.cairo,0,0);
+        this.generateOwnImage(co,this.cairo,0,0,real_scale);
         for (let child of this.children){
-            child.generateImage(co,this.cairo, [0,0]);
+            child.generateImage(co,this.cairo, [0,0],real_scale);
         }
-        co.showCairoImageAbsolute(this.surface, this.posX, this.posY, this.width, this.height);
+        co.showCairoImage(this.surface, this.posX, this.posY, scale*this.width, scale*this.height);
         this._destroy(co);
     }
     async _begin(co){

@@ -6,11 +6,11 @@ $(document).ready(function() {
       settings = {
         "camera_user": "root",
         "camera_pass": "",
-        "scale": 1,
-        "coordinates": "left",
-        "ms_data_url": "http://",
-        "lake_data_url": "http://",
-        "location": "Area 51",
+        "scale": 100,
+        "coordinates": "",
+        "access_token": "",
+        "display_location": "",
+        "location": "london",
         "pos_x": 0,
         "pos_y": 0
       };
