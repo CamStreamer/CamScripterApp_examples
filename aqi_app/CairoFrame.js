@@ -29,7 +29,6 @@ class CairoFrame {
 
     generateOwnImage(co, cairo, ppX, ppY, scale) {
         co.cairo('cairo_identity_matrix', cairo);
-
         if (this.bg_color){
             co.cairo('cairo_set_source_rgba', cairo, this.bg_color[0], this.bg_color[1], this.bg_color[2], this.bg_color[3]);
             this.drawFrame(cairo,co);
@@ -46,8 +45,7 @@ class CairoFrame {
         }
         if (this.text) {
             co.cairo('cairo_set_source_rgb', cairo, this.font_color[0], this.font_color[1], this.font_color[2]);
-            console.log("Align"+this.align);
-            co.writeText(cairo, ""+this.text, this.posX, this.posY, this.width, this.height, this.align);
+            co.writeText(cairo, ""+this.text, scale*this.posX, scale*this.posY, scale*this.width, scale*this.height, this.align);
         }
         return true;
     }
@@ -61,7 +59,6 @@ class CairoFrame {
         for (let child of this.children) {
             child.generateImage(co, cairo, [this.posX + ppX, this.posY + ppY], real_scale);
         }
-        //co.cairo('cairo_translate', cairo, -ppX, -ppY);
     }
 
     drawFrame(cairo, co){
@@ -80,18 +77,12 @@ class CairoFrame {
         co.cairo('cairo_paint', cairo);
     }
 
-    async loadImage(fileName, co, type) {
-        const image_data = await this.uploadImage(fileName, co);
+    async setBgImage(image_data, type) {
         this.bg_image = image_data.var;
         this.bg_width = image_data.width;
         this.bg_height = image_data.height;
         this.bg_type = type;
 
-    }
-    uploadImage(fileName, co) {
-        var imgData = fs.readFileSync(fileName);
-        const promise = co.uploadImageData(imgData);
-        return promise;
     }
 }
 module.exports = CairoFrame;
