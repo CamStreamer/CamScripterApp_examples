@@ -1,12 +1,13 @@
 {
     "camera_user": "root",
-    "camera_pass": "pass",
+    "camera_pass": "",
     "scale": 100,
     "update_frequency": 1,
     "coordinates": "top_left",
-    "access_token": "44c62324028dc82954d80e17576a8d705b552f16",
+    "access_token": "",
     "display_location": "London",
     "location": "london",
     "pos_x": 0,
-    "pos_y": 0
+    "pos_y": 0,
+    "resolution": "1920x1080"
 }

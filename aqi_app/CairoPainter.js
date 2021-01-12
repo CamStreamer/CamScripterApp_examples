@@ -46,13 +46,13 @@ class CairoPainter extends CairoFrame{
         for (let child of this.children){
             child.generateImage(co,this.cairo, [0,0],real_scale);
         }
-        co.showCairoImage(this.surface, this._convertor(this.co_ord[0],this.screen_width, this.posX, this.width),
-         this._convertor(this.co_ord[1], this.screen_height, this.posY, this.height));
+        co.showCairoImage(this.surface, this._convertor(this.co_ord[0],this.screen_width, this.posX, scale*this.width),
+         this._convertor(this.co_ord[1], this.screen_height, this.posY, scale*this.height));
         this._destroy(co);
     }
     _convertor(b,v,d,corr){
-        let c = b >= 0 ? -1 : 1;
-        let d2 = b >= 0 ? corr + d : d;
+        let c = b >= 0 ? -1 : 1; //směr posuvu
+        let d2 = b >= 0 ? corr + d : d; //posuv
         return b + c * d2 * (2.0 / v)
 
     }

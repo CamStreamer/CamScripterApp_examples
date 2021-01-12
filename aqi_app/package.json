@@ -9,8 +9,7 @@
   "author": "CamStreamer s.r.o",
   "license": "ISC",
   "dependencies": {
-    "camstreamerlib": "^1.1.1",
-    "csv-parse": "^4.14.2",
+    "camstreamerlib": "^1.1.5",
     "follow-redirects": "^1.13.0",
     "xmlhttprequest": "^1.8.0"
   }

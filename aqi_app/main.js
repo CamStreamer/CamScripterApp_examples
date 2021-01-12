@@ -6,7 +6,6 @@ const CairoPainter = require('./CairoPainter');
 const CamOverlayAPI = require('camstreamerlib/CamOverlayAPI');
 const parse = require('csv-parse/lib/sync');
 const { send } = require('process');
-const CameraVapix = require('camstreamerlib/CameraVapix');
 
 
 var settings = null;
@@ -19,16 +18,15 @@ function run() {
   try {
     var data = fs.readFileSync(process.env.PERSISTENT_DATA_PATH + 'settings.json');
     settings = JSON.parse(data);
+    let resolution = settings.resolution.split("x");
+    cam_width = parseInt(resolution[0]);
+    cam_height = parseInt(resolution[1]);
   } catch (err) {
     console.log('No settings file found');
     return;
   }
-  cv = new CameraVapix({
-    'protocol': 'http',
-    'ip': '127.0.0.1',
-    'port': 80,
-    'auth': 'root:pass',
-  });
+
+
   co = new CamOverlayAPI({
     'ip': '127.0.0.1',
     'port': 80,
@@ -46,7 +44,6 @@ function run() {
   });
 
   co.connect().then(async function(){
-    await getWindow();
     uploadCodeImages(co,codes);
     frames = genLayout(cam_width,cam_height);
     oneAppPeriod(co,frames);
@@ -95,8 +92,7 @@ function sendRequest(send_url, auth) {
 async function getWindow(){
   const data = await cv.getParameterGroup ("image.i0.appearance");
   let resolution = data["root.Image.I0.Appearance.Resolution"].split("x");
-  cam_width = parseInt(resolution[0]);
-  cam_height = parseInt(resolution[1]);
+
 }
 
 
