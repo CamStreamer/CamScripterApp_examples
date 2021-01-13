@@ -1,0 +1,110 @@
+<html>
+<head>
+  <title>Air Quality Index App</title>
+  <link rel="stylesheet" href="bootstrap/bootstrap.min.css">
+</head>
+<body>
+  <nav class="navbar navbar-dark bg-dark">
+    <a class="navbar-brand" href="#">CamScripter</a>
+  </nav>
+
+  <div class="jumbotron">
+    <div class="container">
+      <h1 class="display-3">Air Quality Index App</h1>
+      <p>Read Terms of Service on <a href="https://aqicn.org/api/" target="_blank">https://aqicn.org/api/</a>.
+        Changes are saved automatically, you don't have to save them.</p>
+      <div class="container">
+        <div class="row">
+          <div class="col-md-6">
+            <form class="myForm">
+              <div class="form-group">
+                <label for="userCam">Camera User</label>
+                <input type="text" class="form-control" id="userCam" placeholder="root">
+              </div>
+              <div class="form-group">
+                <label for="passCam">Camera Password</label>
+                <input type="password" class="form-control" id="passCam" placeholder="password" autocomplete="new-password">
+              </div>
+            </form>
+          </div>
+
+          <div class="col-md-6">
+            <form class="myForm">
+              <div class="form-group">
+                <label for="accessToken">Access Token</label>
+                <input type="text" class="form-control" id="accessToken" placeholder="">
+                <small>Get your own access token <a href="https://aqicn.org/data-platform/token/" target="_blank">here</a></small>
+              </div>
+
+              <div class="form-group">
+                <label for="updateFreq">Update Frequency [min]</label>
+                <input type="text" class="form-control" id="updateFreq" placeholder="1">
+              </div>
+              <div class="form-group">
+                <label for="location">Location[path]</label>
+                <input type="text" class="form-control" id="location" placeholder="">
+                <small>
+                  Check your location on <a href="https://aqicn.org/" target="_blank">https://aqicn.org/</a>.
+                  Valid entries are e.g. <b>London</b> or <b>united-kingdom/london-westminster</b>
+                  Do not use words city, country or station in the path.
+                </small>
+              </div>
+
+              <div class="form-group">
+                <label for="displayLocation">Displayed Name of Location</label>
+                <input type="text" class="form-control" id="displayLocation" placeholder="">
+              </div>
+              <div class="form-group">
+                <label for="scale">Scale[%]</label>
+                <input type="text" class="form-control" id="scale" placeholder="100">
+              </div>
+              <div class="form-group">
+                <label for="resolutions">Resolution</label>
+                <input type="text" class="form-control" id="resW" placeholder="1920">
+                <span>x</span>
+                <input type="text" class="form-control" id="resH" placeholder="1080">
+              </div>
+              <div class="form-group">
+                <label for="coordinates">Coordinates</label>
+                <select name="coordinates" class="form-control" id="coordinates">
+                  <option value="top_left" selected>Top Left</option>
+                  <option value="top_center">Top Center</option>
+                  <option value="top_right">Top Right</option>
+                  <option value="center_left">Left Center</option>
+                  <option value="center">Center</option>
+                  <option value="center_right">Right Center</option>
+                  <option value="bottom_left">Left Bottom</option>
+                  <option value="bottom_center">Center Bottom</option>
+                  <option value="bottom_right">Right Bottom</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="posX">Position X</label>
+                <div class="input-group">
+                  <input type="text" class="form-control" id="posX" placeholder="0">
+                  <div class="input-group-append">
+                    <span class="input-group-text" id="basic-addon1">px</span>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="posY">Position Y</label>
+                <div class="input-group">
+                  <input type="text" class="form-control" id="posY" placeholder="0">
+                  <div class="input-group-append">
+                    <span class="input-group-text" id="basic-addon2">px</span>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="text/javascript" src="jquery-2.2.4/jquery-2.2.4.min.js"></script>
+  <script type="text/javascript" src="bootstrap/bootstrap.min.js"></script>
+  <script type="text/javascript" src="index.js"></script>
+</body>
+</html>
