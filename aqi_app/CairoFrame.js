@@ -1,5 +1,4 @@
-const CamOverlayAPI = require('camstreamerlib/CamOverlayAPI')
-const fs = require('fs');
+
 class CairoFrame {
     constructor(posX, posY, width, height, bg, text, font_color, bg_color) {
         this.posX = posX;
