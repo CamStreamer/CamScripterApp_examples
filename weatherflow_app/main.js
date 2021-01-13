@@ -232,7 +232,7 @@ async function reqWeatherflowData(station, acc_token) {
     return JSON.parse(data);
   } catch (error) {
     console.log("Cannot get data form station: " + station + " with access token: " + acc_token);
-    console.log(error);
+    console.err(error);
   }
 }
 
@@ -274,13 +274,12 @@ async function oneAppPeriod() {
         //"color": "255255255"
       });
     }
-    console.log(co.promiseCGUpdate)
     await co.updateCGText(fields);
     count++;
     count %= updatePeriod * 12; //uP*12*5s == uP*60s
   } catch (error) {
     console.log("Error Updating CamOverlay");
-    console.log(error);
+    console.err(error);
   }
 }
 
