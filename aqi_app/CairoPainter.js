@@ -22,23 +22,9 @@ class CairoPainter extends CairoFrame{
         this.screen_height = res_h;
     }
 
-    async loadFont(){
-        if (!this.font) {
-            this.font = await this.loadTTF('fonts/arial_b.ttf');
-        }
-    }
-    loadTTF (fileName) {
-        var promise = new Promise(function(resolve, reject) {
-        var imgData = fs.readFileSync(fileName);
-            co.uploadFontData(imgData).then(function(fontRes) {
-                resolve(fontRes.var);
-            });
-        });
-        return promise;
-    }
+
     async generateImage (co,scale){
         let real_scale = scale || 1;
-        //console.log(real_scale);
         let access = await this._begin(co,scale);
         this.surface = access[0];
         this.cairo = access[1];

@@ -8,6 +8,7 @@ class CairoFrame {
         this.height = height;
         this.children = [];
         this.text = text || '';
+        this.font = null;
         this.font_color = font_color || [1.0, 1.0, 1.0];
         this.bg_color = bg_color || null; //RGBA
         this.fill = true;
@@ -29,6 +30,9 @@ class CairoFrame {
 
     generateOwnImage(co, cairo, ppX, ppY, scale) {
         co.cairo('cairo_identity_matrix', cairo);
+        if (this.font){
+            co.cairo('cairo_set_font_face', cairo, this.font);
+        }
         if (this.bg_color){
             co.cairo('cairo_set_source_rgba', cairo, this.bg_color[0], this.bg_color[1], this.bg_color[2], this.bg_color[3]);
             this.drawFrame(cairo,co);
@@ -80,7 +84,11 @@ class CairoFrame {
         co.cairo('cairo_paint', cairo);
     }
 
-    async setBgImage(image_data, type) {
+    setFont(fontdata){
+        this.font = fontdata;
+    }
+
+    setBgImage(image_data, type) {
         this.bg_image = image_data.var;
         this.bg_width = image_data.width;
         this.bg_height = image_data.height;

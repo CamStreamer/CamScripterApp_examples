@@ -44,6 +44,8 @@ function run() {
 
   co.connect().then(async function(){
     uploadCodeImages(co,codes);
+    await uploadFont(co, "OpenSans-Regular.ttf");
+    await uploadFont(co, "ComicSans.ttf");
     frames = genLayout(cam_width,cam_height);
     oneAppPeriod(co,frames);
     setInterval(oneAppPeriod, 5000, co, frames);
@@ -88,13 +90,12 @@ function sendRequest(send_url, auth) {
   });
 }
 
+var fonts = {};
 
 async function uploadCodeImages(co, codes){
   for (let c in codes){
-    console.log(JSON.stringify(codes[c]));
     const image_data = await uploadImage(process.env.PERSISTENT_DATA_PATH + "images/" + codes[c].img_file,co,"fit");
     codes[c].image = image_data;
-    console.log(JSON.stringify(codes[c]));
   }
 }
 
@@ -103,6 +104,22 @@ function uploadImage(fileName, co) {
   const promise = co.uploadImageData(imgData);
   return promise;
 }
+
+async function uploadFont(co, name){
+  const f = await loadTTF(co, process.env.PERSISTENT_DATA_PATH  + "fonts/"+name);
+  fonts[name] = f;
+  console.log(JSON.stringify(fonts));
+}
+function loadTTF (co, fileName) {
+  var promise = new Promise(function(resolve, reject) {
+  var imgData = fs.readFileSync(fileName);
+      co.uploadFontData(imgData).then(function(fontRes) {
+          resolve(fontRes.var);
+      });
+  });
+  return promise;
+}
+
 var codes = {
   "good": {
     "text": "Good",
@@ -149,7 +166,13 @@ var codes = {
 };
 
 function mapData(data, frames){
-  let value = data.data.aqi;
+  let value;
+  try{
+    value = data.data.aqi;
+  }catch(err){
+    value = undefined
+  }
+
   frames.value.setText(value,"A_CENTER",[1.0,1.0,1.0]);
   frames.label.setText(settings.display_location,"A_CENTER",[1.0,1.0,1.0]);
   let code = null;
@@ -177,10 +200,11 @@ function genLayout(resolution_w, resolution_h){
   let layout = {};
   layout.background = new CairoPainter(resolution_w, resolution_h,settings.coordinates,settings.pos_x,settings.pos_y,180,180,null,null,null);
 
-  layout.value = new CairoFrame(0,30,180,100,null,"0",[1.0,1.0,1.0]);
+  layout.value = new CairoFrame(0,35,180,100,null,"0",[1.0,1.0,1.0]);
   layout.label = new CairoFrame(0,10,180,30,null,"",[1.0,1.0,1.0]);
   layout.background.insert(layout.value);
   layout.background.insert(layout.label);
+  layout.background.setFont(fonts["OpenSans-Regular.ttf"]);
   return layout;
 }
 
