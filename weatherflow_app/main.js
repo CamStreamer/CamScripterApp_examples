@@ -232,7 +232,7 @@ async function reqWeatherflowData(station, acc_token) {
     return JSON.parse(data);
   } catch (error) {
     console.log("Cannot get data form station: " + station + " with access token: " + acc_token);
-    console.err(error);
+    //console.err(error);
   }
 }
 
