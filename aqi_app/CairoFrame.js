@@ -13,7 +13,7 @@ class CairoFrame {
         this.fill = true;
 
         this.bg_image = bg || null;
-        this.bg_type = 'plain'; //fit/wrap/plain
+        this.bg_type = 'plain'; //fit/stretch/plain
         this.align = 'A_LEFT';
     }
 
@@ -38,6 +38,8 @@ class CairoFrame {
                 let sx = this.width / this.bg_width;
                 let sy = this.height / this.bg_height;
                 co.cairo('cairo_scale', cairo, scale*sx, scale*sy);
+            }else {
+                co.cairo('cairo_scale', cairo, scale, scale);
             }
             co.cairo('cairo_translate', cairo, ppX, ppY);
             co.cairo('cairo_set_source_surface', cairo, this.bg_image, 0, 0);
@@ -45,7 +47,8 @@ class CairoFrame {
         }
         if (this.text) {
             co.cairo('cairo_set_source_rgb', cairo, this.font_color[0], this.font_color[1], this.font_color[2]);
-            co.writeText(cairo, ""+this.text, scale*this.posX, scale*this.posY, scale*this.width, scale*this.height, this.align);
+            co.writeText(cairo, ""+this.text, Math.floor(scale*this.posX),
+                Math.floor(scale*this.posY), Math.floor(scale*this.width), Math.floor(scale*this.height), this.align);
         }
         return true;
     }
@@ -81,8 +84,11 @@ class CairoFrame {
         this.bg_image = image_data.var;
         this.bg_width = image_data.width;
         this.bg_height = image_data.height;
+        if (type == "stretch"){
+            this.width = this.bg_width;
+            this.height = this.bg_height;
+        }
         this.bg_type = type;
-
     }
 }
 module.exports = CairoFrame;

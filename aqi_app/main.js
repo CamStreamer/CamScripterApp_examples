@@ -4,7 +4,6 @@ const https = require("follow-redirects").https;
 const CairoFrame = require('./CairoFrame');
 const CairoPainter = require('./CairoPainter');
 const CamOverlayAPI = require('camstreamerlib/CamOverlayAPI');
-const parse = require('csv-parse/lib/sync');
 const { send } = require('process');
 
 
@@ -89,12 +88,6 @@ function sendRequest(send_url, auth) {
   });
 }
 
-async function getWindow(){
-  const data = await cv.getParameterGroup ("image.i0.appearance");
-  let resolution = data["root.Image.I0.Appearance.Resolution"].split("x");
-
-}
-
 
 async function uploadCodeImages(co, codes){
   for (let c in codes){
@@ -146,6 +139,12 @@ var codes = {
     "img_file":"Hazardous.png",
     "image": undefined,
     "color": [153/255,0,0]
+  },
+  "error":{
+    "text": "Error",
+    "img_file":"Error.jpg",
+    "image": undefined,
+    "color": [0,0,0]
   }
 };
 
@@ -164,17 +163,22 @@ function mapData(data, frames){
     code = codes.unhealthy;
   }else if (value <= 300){
     code = codes.vunhealthy;
-  }else {
+  }else if (value > 300){
     code = codes.hazard;
+  } else {
+    code = codes.error;
   }
-  frames.background.setBgImage(code.image,"fit");
+  frames.background.setBgImage(code.image,"stretch");
+  frames.label.width = frames.background.width;
+  frames.value.width = frames.background.width;
 }
 
 function genLayout(resolution_w, resolution_h){
   let layout = {};
   layout.background = new CairoPainter(resolution_w, resolution_h,settings.coordinates,settings.pos_x,settings.pos_y,180,180,null,null,null);
-  layout.value = new CairoFrame(0,25,180,70,null,"0",[1.0,1.0,1.0]);
-  layout.label = new CairoFrame(0,10,180,20,null,"",[1.0,1.0,1.0]);
+
+  layout.value = new CairoFrame(0,30,180,100,null,"0",[1.0,1.0,1.0]);
+  layout.label = new CairoFrame(0,10,180,30,null,"",[1.0,1.0,1.0]);
   layout.background.insert(layout.value);
   layout.background.insert(layout.label);
   return layout;
