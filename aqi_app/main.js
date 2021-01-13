@@ -142,7 +142,7 @@ var codes = {
   },
   "error":{
     "text": "Error",
-    "img_file":"Error.jpg",
+    "img_file":"Error.png",
     "image": undefined,
     "color": [0,0,0]
   }
