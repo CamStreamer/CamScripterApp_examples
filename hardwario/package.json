@@ -1,0 +1,15 @@
+{
+  "name": "hardwario",
+  "version": "1.0.1",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "CamStreamer s.r.o",
+  "license": "ISC",
+  "dependencies": {
+    "camstreamerlib": "^1.0.3",
+    "follow-redirects": "^1.13.0"
+  }
+}
