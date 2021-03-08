@@ -1,0 +1,15 @@
+{
+    "camera_user": "root",
+    "camera_pass": "",
+    "remote_hide": false,
+    "toggle_field": "E4",
+    "sheet_addr": "http://",
+    "refresh_rate": 3,
+    "field_list": [
+        {
+            "name": "HOME",
+            "field": "B4"
+        }
+    ],
+    "overlay_id": 1
+}
