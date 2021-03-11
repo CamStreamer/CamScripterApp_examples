@@ -1,8 +1,8 @@
 const url = require('url');
 const fs = require('fs');
 const https = require("follow-redirects").https;
-const CairoFrame = require('./CairoFrame');
-const CairoPainter = require('./CairoPainter');
+//const CairoFrame = require('./CairoFrame');
+//const CairoPainter = require('./CairoPainter');
 const CamOverlayAPI = require('camstreamerlib/CamOverlayAPI');
 const { send } = require('process');
 
@@ -17,9 +17,6 @@ function run() {
   try {
     var data = fs.readFileSync(process.env.PERSISTENT_DATA_PATH + 'settings.json');
     settings = JSON.parse(data);
-    let resolution = settings.resolution.split("x");
-    cam_width = parseInt(resolution[0]);
-    cam_height = parseInt(resolution[1]);
   } catch (err) {
     console.log('No settings file found');
     return;
@@ -30,7 +27,7 @@ function run() {
     'ip': '127.0.0.1',
     'port': 80,
     'auth': settings.camera_user + ':' + settings.camera_pass,
-    'serviceName': 'AQI'
+    'serviceID': settings.overlay_id
   });
 
   co.on('error', (err) => {
@@ -43,9 +40,8 @@ function run() {
   });
 
   co.connect().then(async function(){
-    console.log(await requestSheet());
-    //oneAppPeriod(co,frames);
-    //setInterval(oneAppPeriod, 5000, co, frames);
+    oneAppPeriod(co);
+    setInterval(oneAppPeriod, 1000, co);
   }, () => {
     console.log('COAPI-Error: connection error');
     process.exit(1);
@@ -89,7 +85,7 @@ function sendRequest(send_url, auth) {
 
 function mapData(data){
   let overlay_fields = [];
-  for (let i = 0; i < settings.field_list.lenght; i++){
+  for (let i = 0; i < settings.field_list.length; i++){
     let name = settings.field_list[i].name;
     let value = findIn(settings.field_list[i].field,data);
     overlay_fields.push({
@@ -99,15 +95,22 @@ function mapData(data){
   }
   return overlay_fields;
 }
+function findIn(field_name, field_list){
+  for (let f of field_list){
+    if (f.title["$t"] == field_name){
+      return f.content["$t"];
+    }
+  }
+}
 
-async function requestSheet() {
+async function requestSheet(doc_id) {
   try {
-    let api_url = "https://spreadsheets.google.com/feeds/cells/1wmqsFkIX4AXHCgpxOoZLG2Vi0mWBPEAqLQUvb4QnOcI/1/public/full?alt=json"
+    let api_url = "https://spreadsheets.google.com/feeds/cells/"+doc_id+"/1/public/full?alt=json";
     const data = await sendRequest(api_url, "");
     console.log("Data aquired!");
     return JSON.parse(data);
   } catch (error) {
-    console.log("Cannot get data form AQI");
+    console.log("Cannot get data form Google Sheets");
     console.log(error);
   }
 }
@@ -116,12 +119,17 @@ var data = {};
 
 async function oneAppPeriod(co){
   try{
-    if (true){
-      data = await requestSheet();
+    let enabled = await co.isEnabled()
+    if (!enabled) return;
+
+    if (period_count % settings.refresh_rate == 0){
+      data = await requestSheet(settings.sheet_addr);
       period_count = 0;
     }
-    let fields = mapData(data);
+    let fields = mapData(data.feed.entry);
+    //console.log(JSON.stringify(fields));
     co.updateCGText(fields);
+    period_count++;
   } catch(error){
     console.log(error);
   }

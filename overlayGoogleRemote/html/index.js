@@ -1,14 +1,13 @@
 var fields = [];
 $(document).ready(function() {
-  $.get('/local/camscripter/package/settings.cgi?package_name=overlayremote&action=get', function(settings) {
-    console.log(settings);
+  $.get('/local/camscripter/package/settings.cgi?package_name=camoverlay_remote_ctrl&action=get', function(settings) {
     if (Object.keys(settings).length == 0) {
       settings = {
         "camera_user": "root",
         "camera_pass": "",
         "remote_hide": false,
         "toggle_field": "E4",
-        "sheet_addr": "http://",
+        "sheet_addr": "",
         "refresh_rate": 3,
         "field_list": [
             {
@@ -19,11 +18,12 @@ $(document).ready(function() {
         "overlay_id": 1
       };
     }
-
+    createLayout(settings);
   });
-
+  $("#substractFieldBtn").click(substractField);
+  $("#addFieldBtn").click(addField);
   $(".form-control").change(inputChanged);
-
+  $("#forceSaveBtn").click(inputChanged);
   $(".myForm").submit(function() {
     return false;
   });
@@ -35,10 +35,12 @@ function createLayout(settings) {
   $('#updateFreq').val(settings.refresh_rate);
   $('#overlayID').val(settings.overlay_id);
   $('#sheetAddr').val(settings.sheet_addr);
-  $('#remoteHideLoc').val(settings.toggle_field);
-  $('#remoteHide').val(settings.remote_hide);
+  //$('#remoteHideLocation').val(settings.toggle_field);
+  //document.getElementById('remoteHide').checked = settings.remote_hide;
   $('#fieldContainer').html(genFields(settings.field_list.length));
   populateFields(settings.field_list);
+  $(".form-control").change(inputChanged);
+
 }
 
 function genFields(number) {
@@ -60,14 +62,15 @@ function populateFields(field_list){
     $("#fieldLocation"+i).val(field_list[i]["field"]);
   }
   field_count = field_list.length;
+  fields = field_list;
 }
 
 function readTheFields(){
   let field_list = [];
   for (let i = 0; i < field_count; i++){
     let field = {
-      "name": $("fieldName" + i).val(),
-      "field": $("fieldLocation" + i).val()
+      "name": $("#fieldName" + i).val(),
+      "field": $("#fieldLocation" + i).val()
     };
     field_list.push(field);
   }
@@ -75,29 +78,35 @@ function readTheFields(){
 }
 
 function addField(){
+  //alert(field_count);
   field_count++;
-  settings.field_list.push({"name": "NewField", "field": "A1"});
-  $("fieldContainer").html(genFields(field_count));
-  populateFields(settings.field_list);
+  fields.push({"name": "NewField", "field": "A1"});
+  $("#fieldContainer").html(genFields(field_count));
+  populateFields(fields);
+  $(".form-control").change(inputChanged);
+  inputChanged();
 }
 function substractField(){
   field_count--;
-  settings.field_list.pop();
-  $("fieldContainer").html(genFields(field_count));
-  populateFields(settings.field_list);
+  fields.pop();
+  $("#fieldContainer").html(genFields(field_count));
+  populateFields(fields);
+  $(".form-control").change(inputChanged);
+  inputChanged();
 }
 
 function inputChanged() {
   console.log('param changed');
+  fields = readTheFields();
   var settings = {
     'camera_user': $('#userCam').val(),
     'camera_pass': $('#passCam').val(),
     'refresh_rate': $('#updateFreq').val(),
-    "overlay_id":$('#overlayID').val(),
+    'overlay_id':$('#overlayID').val(),
     'sheet_addr': $('#sheetAddr').val(),
-    'toggle_field': $('#remoteHideLoc').val(),
-    'remote_hide': parseInt($('#remoteHide').val()),
-    'field_list': readTheFields()
+    //'toggle_field': $('#remoteHideLocation').val(),
+    //'remote_hide': document.getElementById('remoteHide').checked,
+    'field_list': fields
   };
-  $.post('/local/camscripter/package/settings.cgi?package_name=overlayremote&action=set', JSON.stringify(settings), function(data) {});
+  $.post('/local/camscripter/package/settings.cgi?package_name=camoverlay_remote_ctrl&action=set', JSON.stringify(settings), function(data) {});
 }
