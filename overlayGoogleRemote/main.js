@@ -5,7 +5,7 @@ const CamOverlayAPI = require('camstreamerlib/CamOverlayAPI');
 
 var settings = null;
 var co = null;
-var default_period_time = 100;
+var default_period_time = 1000;
 function run() {
   try {
     var data = fs.readFileSync(process.env.PERSISTENT_DATA_PATH + 'settings.json');
@@ -34,7 +34,6 @@ function run() {
 
   co.connect().then(async function(){
     oneAppPeriod(co);
-    setTimeout( oneAppPeriod, settings.refresh_rate * default_period_time, co);
   }, () => {
     console.log('COAPI-Error: connection error');
     process.exit(1);
@@ -107,23 +106,20 @@ async function requestSheet(doc_id) {
     console.log(error);
   }
 }
-var period_count = 0;
-var data = {};
+
 
 async function oneAppPeriod(co){
   try{
     let enabled = await co.isEnabled()
     if (enabled) {
-      if (period_count % settings.refresh_rate == 0){
-        data = await requestSheet(settings.sheet_addr);
-        period_count = 0;
-      }
+      let data = await requestSheet(settings.sheet_addr);
       let fields = mapData(data.feed.entry);
       co.updateCGText(fields);
-      setTimeout(oneAppPeriod, settings.refresh_rate * default_period_time, co);
     }
   } catch(error){
     console.log(error);
+  } finally {
+    setTimeout(oneAppPeriod, settings.refresh_rate * default_period_time, co);
   }
 }
 

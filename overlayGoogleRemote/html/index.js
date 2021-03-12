@@ -1,24 +1,12 @@
 var fields = [];
 $(document).ready(function() {
   $.get('/local/camscripter/package/settings.cgi?package_name=camoverlay_remote_ctrl&action=get', function(settings) {
-    if (Object.keys(settings).length == 0) {
-      settings = {
-        "camera_user": "root",
-        "camera_pass": "",
-        "remote_hide": false,
-        "toggle_field": "E4",
-        "sheet_addr": "",
-        "refresh_rate": 3,
-        "field_list": [
-            {
-                "name": "HOME",
-                "field": "B4"
-            }
-        ],
-        "overlay_id": 1
-      };
+    if (Object.keys(settings).length != 0) {
+      createLayout(settings);
+    } else {
+      console.log("Error: No settings file found!");
     }
-    createLayout(settings);
+
   });
   $("#substractFieldBtn").click(substractField);
   $("#addFieldBtn").click(addField);
