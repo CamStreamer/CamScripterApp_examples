@@ -1,18 +1,11 @@
 const url = require('url');
 const fs = require('fs');
 const https = require("follow-redirects").https;
-//const CairoFrame = require('./CairoFrame');
-//const CairoPainter = require('./CairoPainter');
 const CamOverlayAPI = require('camstreamerlib/CamOverlayAPI');
-const { send } = require('process');
-
 
 var settings = null;
 var co = null;
-var cv = null;
-var frames = {};
-var cam_width = null;
-var cam_height = null;
+var default_period_time = 100;
 function run() {
   try {
     var data = fs.readFileSync(process.env.PERSISTENT_DATA_PATH + 'settings.json');
@@ -41,7 +34,7 @@ function run() {
 
   co.connect().then(async function(){
     oneAppPeriod(co);
-    setInterval(oneAppPeriod, 1000, co);
+    setTimeout( oneAppPeriod, settings.refresh_rate * default_period_time, co);
   }, () => {
     console.log('COAPI-Error: connection error');
     process.exit(1);
@@ -120,16 +113,15 @@ var data = {};
 async function oneAppPeriod(co){
   try{
     let enabled = await co.isEnabled()
-    if (!enabled) return;
-
-    if (period_count % settings.refresh_rate == 0){
-      data = await requestSheet(settings.sheet_addr);
-      period_count = 0;
+    if (enabled) {
+      if (period_count % settings.refresh_rate == 0){
+        data = await requestSheet(settings.sheet_addr);
+        period_count = 0;
+      }
+      let fields = mapData(data.feed.entry);
+      co.updateCGText(fields);
+      setTimeout(oneAppPeriod, settings.refresh_rate * default_period_time, co);
     }
-    let fields = mapData(data.feed.entry);
-    //console.log(JSON.stringify(fields));
-    co.updateCGText(fields);
-    period_count++;
   } catch(error){
     console.log(error);
   }

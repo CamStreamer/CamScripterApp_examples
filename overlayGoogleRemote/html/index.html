@@ -31,12 +31,14 @@
             <form class="myForm">
               <div class="form-group">
                 <label for="accessToken">Google Sheet Endpoint Adress</label><br>
+                <div style="overflow-wrap: break-word;">
                 <small><i>
-                  Step 1: Publish sheet to the web: File > Publish to the web > Publish <br>
-                  Step 2: Share your sheet with public settings: Anyone on the internet with this link can view.<br>
-                  Step 3: Copy only sheet ID from sheet URL:  e.g. <br>https://docs.google.com/spreadsheets/d/<b>abcde12345BpVoRMQv3J_6yFpSWuSwtRf5QnyqT_qyOI</b>/edit#gid=0<br> (the bold part)
+                  Step 1: Create the Google Sheer and click "File" - "Publish to web"Publish sheet to the web: File > Publish to the web > Publish <br>
+                  Step 2: Share and allow editing your sheet with the people you want to change the values in the video remotely.<br>
+                  Step 3: Copy unique Google Sheet ID from sheet URL: e.g. <br>https://docs.google.com/spreadsheets/d/<b>abcde12345BpVoRMQv3J_6yFpSWuSwtRf5QnyqT_qyOI</b>/edit#gid=0<br> (the bold part)
                 </i></small>
                 <input type="text" class="form-control" id="sheetAddr" placeholder="">
+                <div>
               </div>
               <div class="form-group">
                 <label for="location">Overlay Service ID</label>
@@ -46,11 +48,6 @@
                 <label for="updateFreq">Update Frequency [s]</label>
                 <input type="text" class="form-control" id="updateFreq" placeholder="1">
               </div>
-              <!--<div class="form-group">
-                <label for="remoteHide">Remote Hide</label>
-                <input type="checkbox" class="form-control" id="remoteHide">
-                <input type="input" class="form-control" id="remoteHideLocation" placeholder="">
-              </div>-->
               <div class="form-group">
                 <div>
                   <span>CamOveraly Field ID</span><span style="text-align: right;float: right;">Google Sheet Cell</span>
