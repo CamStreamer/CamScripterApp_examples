@@ -1,6 +1,6 @@
 var fields = [];
 $(document).ready(function() {
-  $.get('/local/camscripter/package/settings.cgi?package_name=camoverlay_remote_ctrl&action=get', function(settings) {
+  $.get('/local/camscripter/package/settings.cgi?package_name=remote_api&action=get', function(settings) {
     if (Object.keys(settings).length != 0) {
       createLayout(settings);
     } else {
@@ -21,7 +21,6 @@ function createLayout(settings) {
   $('#userCam').val(settings.camera_user);
   $('#passCam').val(settings.camera_pass);
   $('#updateFreq').val(settings.refresh_rate);
-  $('#overlayID').val(settings.overlay_id);
   $('#sheetAddr').val(settings.sheet_addr);
   $('#fieldContainer').html(genFields(settings.field_list.length));
   populateFields(settings.field_list);
@@ -34,10 +33,10 @@ function genFields(number) {
   let outputstring = "";
   for (let i = 0; i < number; i++){
     outputstring += "<div class=\"input-group\">";
-    outputstring += "<input type=\"text\" class=\"form-control\" id=fieldName"+i+" placeholder=\"0\">";
-    outputstring += "<input type=\"text\" class=\"form-control\" id=fieldCommand"+i+" placeholder=\"0\">";
-    outputstring += "<input type=\"text\" class=\"form-control\" id=fieldLocation"+i+" placeholder=\"0\">";
-    outputstring += "<input type=\"text\" class=\"form-control\" id=fieldTrigg"+i+" placeholder=\"0\">";
+    outputstring += "<input type=\"text\" class=\"form-control\" id=fieldName"+i+" >";
+    outputstring += "<input type=\"text\" class=\"form-control\" id=fieldCommand"+i+" placeholder=\"http://\">";
+    outputstring += "<input type=\"text\" class=\"form-control\" id=fieldLocation"+i+" placeholder=\"A1\">";
+    outputstring += "<input type=\"text\" class=\"form-control\" id=fieldTrigg"+i+" placeholder=\"TRUE\">";
     outputstring += "</div>";
   }
   return outputstring;
@@ -69,7 +68,7 @@ function readTheFields(){
 }
 
 function addField(){
-  fields.push({"name": "NewField","command": "http:\\", "field": "A1", "trigger": "TRUE"});
+  fields.push({"name": "NewField","command": "http://", "field": "A1", "trigger": "TRUE"});
   $("#fieldContainer").html(genFields(fields.length));
   populateFields(fields);
   $(".form-control").off();
@@ -92,9 +91,8 @@ function inputChanged() {
     'camera_user': $('#userCam').val(),
     'camera_pass': $('#passCam').val(),
     'refresh_rate': $('#updateFreq').val(),
-    'overlay_id':$('#overlayID').val(),
     'sheet_addr': $('#sheetAddr').val(),
     'field_list': fields
   };
-  $.post('/local/camscripter/package/settings.cgi?package_name=camoverlay_remote_ctrl&action=set', JSON.stringify(settings), function(data) {});
+  $.post('/local/camscripter/package/settings.cgi?package_name=remote_api&action=set', JSON.stringify(settings), function(data) {});
 }

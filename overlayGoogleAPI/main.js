@@ -1,6 +1,6 @@
 const url = require('url');
 const fs = require('fs');
-const https = require("follow-redirects").https;
+const { http, https } = require('follow-redirects');
 const CamOverlayAPI = require('camstreamerlib/CamOverlayAPI');
 
 var settings = null;
@@ -40,19 +40,23 @@ function run() {
   });
 }
 
-function sendRequest(send_url, auth) {
+function sendRequest(raw_url, auth) {
   return new Promise((resolve, reject) => {
-    send_url = new URL(send_url);
-    let authorisation = auth || (send_url.username + ":" + send_url.password)
+    send_url = new url.URL(raw_url);
+    let authorisation = send_url.username && send_url.password ? (send_url.username + ":" + send_url.password) : auth;
+
+    let client = send_url.protocol === 'http:' ? http : https;
     let options = {
       method: "GET",
       host: send_url.hostname,
       port: send_url.port,
-      path: send_url.path,
-      headers: { "Authorization": authorisation },
+      path: send_url.pathname + send_url.search,
       timeout: 5000 //5s
     };
-    const req = https.request(options, (res) => {
+    if (authorisation){
+      options.auth = authorisation;
+    }
+    const req = client.request(options, (res) => {
       res.setEncoding("utf8");
       let data = "";
       res.on('data', (chunk) => {
@@ -79,14 +83,13 @@ function sendRequest(send_url, auth) {
 function mapRequests(data){
   let trigger_requests = [];
   for (let i = 0; i < settings.field_list.length; i++){
-    let name = settings.field_list[i].name;
     let value = findIn(settings.field_list[i].field,data);
     if (settings.field_list[i].trigger == value){
       trigger_requests.push(settings.field_list[i].command);
     }
 
   }
-  return overlay_fields;
+  return trigger_requests;
 }
 function findIn(field_name, field_list){
   for (let f of field_list){
@@ -97,6 +100,8 @@ function findIn(field_name, field_list){
 }
 
 async function requestSheet(doc_id) {
+  if (!doc_id) return null; //skip if no doc_id is provided
+
   try {
     let api_url = "https://spreadsheets.google.com/feeds/cells/"+doc_id+"/1/public/full?alt=json";
     const data = await sendRequest(api_url, "");
@@ -110,15 +115,15 @@ async function requestSheet(doc_id) {
 
 function fireRequests(request_field){
   for (let i = 0; i < request_field.length; i++){
+    console.log("Fire request: " + request_field[i]);
     sendRequest(request_field[i], null);
   }
 }
 
 async function oneAppPeriod(co){
   try{
-    let enabled = await co.isEnabled()
-    if (enabled) {
-      let data = await requestSheet(settings.sheet_addr);
+    let data = await requestSheet(settings.sheet_addr);
+    if (data){
       let requests = mapRequests(data.feed.entry);
       fireRequests(requests);
     }

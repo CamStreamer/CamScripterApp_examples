@@ -4,14 +4,15 @@
     "remote_hide": true,
     "toggle_field": "E4",
     "sheet_addr": "",
+    "list_number": 1,
     "refresh_rate": 3,
     "field_list": [
         {
             "name": "HOME",
-            "command": "",
+            "command": "http://",
             "field": "B4",
             "trigger": "TRUE"
         }
-    ],
-    "overlay_id": 1
+    ]
+
 }
