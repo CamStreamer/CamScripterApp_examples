@@ -1,4 +1,4 @@
-var fields = [];
+let fields = [];
 $(document).ready(function() {
   $.get('/local/camscripter/package/settings.cgi?package_name=remote_api&action=get', function(settings) {
     if (Object.keys(settings).length != 0) {
@@ -8,7 +8,7 @@ $(document).ready(function() {
     }
 
   });
-  $("#substractFieldBtn").click(substractField);
+  $("#subtractFieldBtn").click(substractField);
   $("#addFieldBtn").click(addField);
   $(".form-control").change(inputChanged);
   $("#forceSaveBtn").click(inputChanged);
@@ -23,6 +23,7 @@ function createLayout(settings) {
   $('#updateFreq').val(settings.refresh_rate);
   $('#sheetAddr').val(settings.sheet_addr);
   $('#fieldContainer').html(genFields(settings.field_list.length));
+  fields = settings.field_list;
   populateFields(settings.field_list);
   $(".form-control").off();
   $(".form-control").change(inputChanged);
@@ -50,7 +51,6 @@ function populateFields(field_list){
     $("#fieldLocation"+i).val(field_list[i]["field"]);
     $("#fieldTrigg"+i).val(field_list[i]["trigger"]);
   }
-  fields = field_list;
 }
 
 function readTheFields(){

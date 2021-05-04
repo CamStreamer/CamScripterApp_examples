@@ -2,13 +2,15 @@ const url = require('url');
 const fs = require('fs');
 const { http, https } = require('follow-redirects');
 const CamOverlayAPI = require('camstreamerlib/CamOverlayAPI');
+const HTTPRequest = require('camstreamerlib/HTTPRequest')
 
-var settings = null;
-var co = null;
-var default_period_time = 1000;
+let settings = null;
+let co = null;
+let default_period_time = 1000;
+
 function run() {
   try {
-    var data = fs.readFileSync(process.env.PERSISTENT_DATA_PATH + 'settings.json');
+    const data = fs.readFileSync(process.env.PERSISTENT_DATA_PATH + 'settings.json');
     settings = JSON.parse(data);
   } catch (err) {
     console.log('No settings file found');
@@ -32,7 +34,7 @@ function run() {
     process.exit(1);
   });
 
-  co.connect().then(async function(){
+  co.connect().then(() => {
     oneAppPeriod(co);
   }, () => {
     console.log('COAPI-Error: connection error');
