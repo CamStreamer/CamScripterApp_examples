@@ -1,0 +1,16 @@
+{
+  "name": "remote_api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "CamStreamer s.r.o",
+  "license": "ISC",
+  "dependencies": {
+    "camstreamerlib": "^1.2.4",
+    "follow-redirects": "^1.13.0",
+    "xmlhttprequest": "^1.8.0"
+  }
+}

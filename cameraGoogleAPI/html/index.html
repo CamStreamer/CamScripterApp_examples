@@ -1,0 +1,73 @@
+<html>
+<head>
+  <title>Camera Remote API</title>
+  <link rel="stylesheet" href="bootstrap/bootstrap.min.css">
+</head>
+<body>
+  <nav class="navbar navbar-dark bg-dark">
+    <a class="navbar-brand" href="#">CamScripter</a>
+  </nav>
+
+  <div class="jumbotron">
+    <div class="container">
+      <h1 class="display-3">Camera Remote API</h1>
+      <p>Changes are saved automatically, you don't have to save them.</p>
+      <div class="container">
+        <div class="row">
+          <div class="col-md-6">
+            <form class="myForm">
+              <div class="form-group">
+                <label for="userCam">Camera User</label>
+                <input type="text" class="form-control" id="userCam" placeholder="root">
+              </div>
+              <div class="form-group">
+                <label for="passCam">Camera Password</label>
+                <input type="password" class="form-control" id="passCam" placeholder="password" autocomplete="new-password">
+              </div>
+            </form>
+          </div>
+
+          <div class="col-md-6">
+            <form class="myForm">
+              <div class="form-group">
+                <label for="accessToken">Google Sheet Endpoint Adress</label><br>
+                <div style="overflow-wrap: break-word;">
+                <small><i>
+                  Step 1: Create the Google Sheet and click <q>File</q> - <q>Publish to web</q> Publish sheet to the web: File > Publish to the web > Publish <br>
+                  Step 2: Share and allow editing your sheet with the people you want to change the values in the video remotely.<br>
+                  Step 3: Copy unique Google Sheet ID from sheet URL: e.g. <br>https://docs.google.com/spreadsheets/d/<b>abcde12345BpVoRMQv3J_6yFpSWuSwtRf5QnyqT_qyOI</b>/edit#gid=0<br> (the bold part)
+                </i></small>
+                <input type="text" class="form-control" id="sheetAddr" placeholder="">
+                <div>
+              </div>
+              <div class="form-group">
+                <label for="updateFreq">Update Frequency [s]</label>
+                <input type="text" class="form-control" id="updateFreq" placeholder="1">
+              </div>
+              <div class="form-group">
+                <table style="width: 100%;">
+                  <tr>
+                    <td style="width: 25%;">Name</td>
+                    <td style="width: 25%;">Command</td>
+                    <td style="width: 25%">Sheet Cell</td>
+                    <td style="width: 25%">Cell Trigger</td>
+                  </tr>
+                </table>
+                <div id="fieldContainer">
+                </div>
+                <input type="button" id="addFieldBtn" value="+">
+                <input type="button" id="subtractFieldBtn" value="-">
+                <input type="button" id="forceSaveBtn" value="Save All Fields" style="float: right;">
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="text/javascript" src="jquery-2.2.4/jquery-2.2.4.min.js"></script>
+  <script type="text/javascript" src="bootstrap/bootstrap.min.js"></script>
+  <script type="text/javascript" src="index.js"></script>
+</body>
+</html>
