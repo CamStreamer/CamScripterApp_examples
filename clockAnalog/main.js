@@ -2,18 +2,18 @@ const url = require('url');
 const fs = require('fs');
 const CamOverlayAPI = require('camstreamerlib/CamOverlayAPI');
 
-var settings = null;
+let settings = null;
 
-var co = null;
-var imgClockFace = null;
-var imgCentre = null;
-var imgHourHand = null;
-var imgMinuteHand = null;
-var imgSecondHand = null;
+let co = null;
+let imgClockFace = null;
+let imgCentre = null;
+let imgHourHand = null;
+let imgMinuteHand = null;
+let imgSecondHand = null;
 
 function clockRun() {
   try {
-    var data = fs.readFileSync(process.env.PERSISTENT_DATA_PATH + 'settings.json');
+    let data = fs.readFileSync(process.env.PERSISTENT_DATA_PATH + 'settings.json');
     settings = JSON.parse(data);
   } catch (err) {
     console.log('No settings file found');
@@ -21,8 +21,8 @@ function clockRun() {
   }
 
   co = new CamOverlayAPI({
-    'ip': '127.0.0.1',
-    'port': 80,
+    'ip': settings.camera_ip ? settings.camera_ip : '127.0.0.1',
+    'port': settings.camera_port ? settings.camera_port : 80,
     'auth': settings.camera_user + ':' + settings.camera_pass,
     'serviceName': 'Analog Clock',
     'serviceID': -1,
@@ -51,9 +51,9 @@ function clockRun() {
 function createImage(co) {
   loadImages().then(function() {
     co.cairo('cairo_image_surface_create', 'CAIRO_FORMAT_ARGB32', Math.floor(263 * settings.scale), Math.floor(265 * settings.scale)).then(function(surfaceRes) {
-      var surface = surfaceRes.var;
+      let surface = surfaceRes.var;
       co.cairo('cairo_create', surface).then(function(cairoRes) {
-        var cairo = cairoRes.var;
+        let cairo = cairoRes.var;
 
         // Write clock face
         co.cairo('cairo_scale', cairo, settings.scale, settings.scale);
@@ -61,10 +61,10 @@ function createImage(co) {
         co.cairo('cairo_set_source_surface', cairo, imgClockFace, 0, 0);
         co.cairo('cairo_paint', cairo);
 
-        var d = new Date();
-        var hourAngle = (d.getHours() + d.getMinutes() / 60) / 12 * 2 * Math.PI + Math.PI;
-        var minAngle = (d.getMinutes() + (d.getSeconds() + 1) / 60) / 60 * 2 * Math.PI + Math.PI;
-        var secAngle = (d.getSeconds() + 1) / 60 * 2 * Math.PI + Math.PI;
+        let d = new Date();
+        let hourAngle = (d.getHours() + d.getMinutes() / 60) / 12 * 2 * Math.PI + Math.PI;
+        let minAngle = (d.getMinutes() + (d.getSeconds() + 1) / 60) / 60 * 2 * Math.PI + Math.PI;
+        let secAngle = (d.getSeconds() + 1) / 60 * 2 * Math.PI + Math.PI;
 
         // Write hours
         co.cairo('cairo_identity_matrix', cairo);
@@ -111,7 +111,7 @@ function createImage(co) {
 }
 
 function loadImages() {
-  var promise = new Promise(function(resolve, reject) {
+  let promise = new Promise(function(resolve, reject) {
     if (imgClockFace == null) {
       loadImage('clock_face.png').then(function(img) {
         imgClockFace = img;
@@ -137,8 +137,8 @@ function loadImages() {
 }
 
 function loadImage(fileName) {
-  var promise = new Promise(function(resolve, reject) {
-    var imgData = fs.readFileSync(fileName);
+  let promise = new Promise(function(resolve, reject) {
+    let imgData = fs.readFileSync(fileName);
     co.uploadImageData(imgData).then(function(imgSurfaceRes) {
       resolve(imgSurfaceRes.var);
     });

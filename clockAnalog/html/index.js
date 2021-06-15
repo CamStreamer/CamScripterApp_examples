@@ -3,9 +3,21 @@ $(document).ready(function() {
   $.get('/local/camscripter/package/settings.cgi?package_name=clockAnalog&action=get', function(settings) {
     console.log(settings);
     if (Object.keys(settings).length == 0) {
-      settings = {"camera_user": "root", "camera_pass": "", "pos_x": 0, "pos_y": 0, "width": 1920, "height": 1080, "scale": 1.0};
+      settings = {
+        "camera_ip": "127.0.0.1",
+        "camera_port": 80,
+        "camera_user": "root",
+        "camera_pass": "",
+        "pos_x": 0,
+        "pos_y": 0,
+        "width": 1920,
+        "height": 1080,
+        "scale": 1.0
+      };
     }
 
+    $('#ipCam').val(settings.camera_ip);
+    $('#portCam').val(settings.camera_port);
     $('#userCam').val(settings.camera_user);
     $('#passCam').val(settings.camera_pass);
     $('#posX').val(settings.pos_x);
@@ -25,6 +37,8 @@ $(document).ready(function() {
 function inputChanged() {
   console.log('param changed');
   var settings = {
+    'camera_ip': $('#ipCam').val(),
+    'camera_port': $('#portCam').val(),
     'camera_user': $('#userCam').val(),
     'camera_pass': $('#passCam').val(),
     'pos_x': parseInt($('#posX').val()),
