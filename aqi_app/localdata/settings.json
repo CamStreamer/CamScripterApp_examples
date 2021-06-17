@@ -2,6 +2,7 @@
     "camera_user": "root",
     "camera_pass": "",
     "camera_ip": "127.0.0.1",
+    "camera_port": 80,
     "scale": 100,
     "update_frequency": 1,
     "coordinates": "top_left",

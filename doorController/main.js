@@ -380,7 +380,7 @@ subscribeEvents();
 
 co = new CamOverlayAPI({
   'ip': settings.camera_ip,
-  'port': 80,
+  'port': settings.camera_port,
   'auth': settings.camera_user + ':' + settings.camera_pass,
   'serviceName': 'Door Controller',
   'serviceID': -1,

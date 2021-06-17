@@ -16,7 +16,7 @@ var tweetNum = 0;
 function connectCamOverlay() {
   co = new CamOverlayAPI({
     'ip': settingsJson.camera_ip,
-    'port': 80,
+    'port': settingsJson.camera_port,
     'auth': settingsJson.camera_user + ':' + settingsJson.camera_pass,
     'serviceName': 'Twitter',
     'serviceID': -1

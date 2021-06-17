@@ -7,6 +7,7 @@ let user = 'root';
 let pass = '';
 let bearerToken = '';
 let camIP = '127.0.0.1';
+let camPort = 80;
 let groupID = '';
 let deviceID = '';
 let syncPeriod = 3600;
@@ -32,6 +33,7 @@ try {
 
     user = settings.camera_user;
     pass = settings.camera_pass;
+    camPort = settings.camera_port
     bearerToken = settings.bearer_token;
     camIP = settings.camera_ip;
     groupID = settings.group_id;
@@ -92,8 +94,8 @@ async function updateGraphics() {
 
   let options = {
     method: 'GET',
-    host: camera_ip,
-    port: 80,
+    host: camIP,
+    port: camPort,
     path: '/local/camoverlay/api/customGraphics.cgi?' + coQuery,
     auth: user + ':' + pass,
     timeout: 10
