@@ -1,6 +1,7 @@
 {
     "camera_user": "root",
     "camera_pass": "",
+    "camera_ip": "127.0.0.1",
     "remote_hide": true,
     "toggle_field": "E4",
     "sheet_addr": "",

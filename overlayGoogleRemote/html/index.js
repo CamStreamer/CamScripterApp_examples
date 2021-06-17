@@ -20,6 +20,7 @@ $(document).ready(function() {
 function createLayout(settings) {
   $('#userCam').val(settings.camera_user);
   $('#passCam').val(settings.camera_pass);
+  $('#camIP').val(settings.camera_ip);
   $('#updateFreq').val(settings.refresh_rate);
   $('#overlayID').val(settings.overlay_id);
   $('#sheetAddr').val(settings.sheet_addr);
@@ -89,6 +90,7 @@ function inputChanged() {
   var settings = {
     'camera_user': $('#userCam').val(),
     'camera_pass': $('#passCam').val(),
+    'camera_ip': $('#camIP').val(),
     'refresh_rate': $('#updateFreq').val(),
     'overlay_id':$('#overlayID').val(),
     'sheet_addr': $('#sheetAddr').val(),

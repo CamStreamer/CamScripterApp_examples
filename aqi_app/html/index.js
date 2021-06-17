@@ -6,6 +6,7 @@ $(document).ready(function() {
       settings = {
         'camera_user': 'root',
         'camera_pass': '',
+        'camera_ip': '127.0.0.1',
         'scale': 100,
         'coordinates': 'top_left',
         'access_token': '',
@@ -19,6 +20,7 @@ $(document).ready(function() {
     }
     $('#userCam').val(settings.camera_user);
     $('#passCam').val(settings.camera_pass);
+    $('#camIP').val(settings.camera_ip);
     $('#updateFreq').val(settings.update_frequency);
     $('#posX').val(settings.pos_x);
     $('#posY').val(settings.pos_y);
@@ -44,6 +46,7 @@ function inputChanged() {
   var settings = {
     'camera_user': $('#userCam').val(),
     'camera_pass': $('#passCam').val(),
+    'camera_ip': $('#camIP').val(),
     'access_token': $('#accessToken').val(),
     "display_location":$('#displayLocation').val(),
     'coordinates': $('#coordinates').val(),

@@ -17,7 +17,7 @@ function run() {
 
 
   co = new CamOverlayAPI({
-    'ip': '127.0.0.1',
+    'ip': settings.camera_ip,
     'port': 80,
     'auth': settings.camera_user + ':' + settings.camera_pass,
     'serviceID': settings.overlay_id

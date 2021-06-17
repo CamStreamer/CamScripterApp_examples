@@ -2,9 +2,11 @@ $(document).ready(function() {
   $.get('/local/camscripter/package/settings.cgi?package_name=scaleReader&action=get', (settings) => {
     console.log(settings);
     if (Object.keys(settings).length == 0) {
-      settings = {"camera_pass": "", "scale_ip": "", "scale_port": 10000, "service_id": "", "value_field_name": "", "unit_field_name": "", "refresh_rate": 300};
+      settings = {"camera_user": "", "camera_ip": "127.0.0.1", "camera_pass": "", "scale_ip": "", "scale_port": 10000, "service_id": "", "value_field_name": "", "unit_field_name": "", "refresh_rate": 300};
     }
 
+    $('#cameraUser').val(settings.camera_user);
+    $('#camIP').val(settings.camera_ip);
     $('#cameraPass').val(settings.camera_pass);
     $('#scaleIP').val(settings.scale_ip);
     $('#scalePort').val(settings.scale_port);
@@ -24,6 +26,8 @@ $(document).ready(function() {
 function inputChanged() {
   console.log('param changed');
   var settings = {
+    'camera_user': $('#cameraUser').val(),
+    'camera_ip': $('#camIP').val(),
     'camera_pass': $('#cameraPass').val(),
     'scale_ip': $('#scaleIP').val(),
     'scale_port': parseInt($('#scalePort').val()),
