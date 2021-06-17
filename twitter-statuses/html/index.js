@@ -6,7 +6,7 @@ $(document).ready(function() {
     console.log(data);
     settings = data;
     if (Object.keys(settings).length == 0) {
-      settings = {"filter": "twitter", "camera_user": "root", "camera_pass": "pass", "camera_ip": 80, "camera_ip": "127.0.0.1", "tweets_num": 3, "refresh_period": "10", "consumer_key": "", "consumer_secret": "", "access_token": "", "access_token_secret": ""};
+      settings = {"filter": "twitter", "camera_user": "root", "camera_pass": "pass", "camera_port": 80, "camera_ip": "127.0.0.1", "tweets_num": 3, "refresh_period": "10", "consumer_key": "", "consumer_secret": "", "access_token": "", "access_token_secret": ""};
     }
 
     $('#filter').val(settings.filter);
