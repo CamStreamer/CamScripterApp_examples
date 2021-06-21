@@ -379,8 +379,8 @@ readUserList().then(function() {}, function() {
 subscribeEvents();
 
 co = new CamOverlayAPI({
-  'ip': '127.0.0.1',
-  'port': 80,
+  'ip': settings.camera_ip,
+  'port': settings.camera_port,
   'auth': settings.camera_user + ':' + settings.camera_pass,
   'serviceName': 'Door Controller',
   'serviceID': -1,

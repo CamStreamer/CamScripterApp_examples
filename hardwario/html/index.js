@@ -6,6 +6,8 @@ $(document).ready(() => {
       settings = {
         "camera_user": "root",
         "camera_pass": "",
+        "camera_ip": "127.0.0.1",
+        "camera_port": 80,
         "bearer_token": "",
         "group_id": "",
         "device_id": "",
@@ -18,6 +20,8 @@ $(document).ready(() => {
 
     $('#userCam').val(settings.camera_user);
     $('#passCam').val(settings.camera_pass);
+    $('#camIP').val(settings.camera_ip);
+    $('#camPort').val(settings.camera_port);
     $('#bearerToken').val(settings.bearer_token);
     $('#groupID').val(settings.group_id);
     $('#deviceID').val(settings.device_id);
@@ -45,6 +49,8 @@ function inputChanged() {
   var settings = {
     'camera_user': $('#userCam').val().trim(),
     'camera_pass': $('#passCam').val().trim(),
+    'camera_ip': $('#camIP').val().trim(),
+    'camera_port': $('#camPort').val().trim(),
     'bearer_token': $('#bearerToken').val().trim(),
     'group_id': $('#groupID').val().trim(),
     'device_id': $('#deviceID').val().trim(),

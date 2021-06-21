@@ -20,6 +20,8 @@ $(document).ready(function() {
 function createLayout(settings) {
   $('#userCam').val(settings.camera_user);
   $('#passCam').val(settings.camera_pass);
+  $('#camIP').val(settings.camera_ip);
+  $('#camPort').val(settings.camera_port);
   $('#updateFreq').val(settings.refresh_rate);
   $('#sheetAddr').val(settings.sheet_addr);
   $('#fieldContainer').html(genFields(settings.field_list.length));
@@ -90,6 +92,8 @@ function inputChanged() {
   var settings = {
     'camera_user': $('#userCam').val(),
     'camera_pass': $('#passCam').val(),
+    'camera_ip': $('#camIP').val(),
+    'camera_port': $('#camPort').val(),
     'refresh_rate': $('#updateFreq').val(),
     'sheet_addr': $('#sheetAddr').val(),
     'field_list': fields

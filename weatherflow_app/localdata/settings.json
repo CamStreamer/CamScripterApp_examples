@@ -1,6 +1,7 @@
 {
     "camera_user": "root",
     "camera_pass": "pass",
+    "camera_ip": "127.0.0.1",
     "wheather_check_period": 5,
     "access_token": "",
     "station_id": "",

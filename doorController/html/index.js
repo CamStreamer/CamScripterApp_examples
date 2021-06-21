@@ -6,11 +6,13 @@ $(document).ready(function() {
   $.get('/local/camscripter/package/settings.cgi?package_name=doorController&action=get', function(settings) {
     console.log(settings);
     if (Object.keys(settings).length == 0) {
-      settings = {"camera_user": "root", "camera_pass": "", "controller_host": "", "controller_port": 80, "controller_user": "root", "controller_pass": "", "pos_x": 0, "pos_y": 0, "width": 1920, "height": 1080, "scale": 1.0};
+      settings = {"camera_user": "root", "camera_pass": "", "camera_port": 80,  "camera_ip": "127.0.0.1", "controller_host": "", "controller_port": 80, "controller_user": "root", "controller_pass": "", "pos_x": 0, "pos_y": 0, "width": 1920, "height": 1080, "scale": 1.0};
     }
 
     $('#cameraUser').val(settings.camera_user);
     $('#cameraPass').val(settings.camera_pass);
+    $('#cameraIP').val(settings.camera_ip);
+    $('#cameraPort').val(settings.camera_port);
     $('#ctrlHost').val(settings.controller_host);
     $('#ctrlPort').val(settings.controller_port);
     $('#ctrlUser').val(settings.controller_user);
@@ -38,6 +40,8 @@ function inputChanged() {
   var settings = {
     'camera_user': $('#cameraUser').val(),
     'camera_pass': $('#cameraPass').val(),
+    'camera_ip': $('#cameraIP').val(),
+    'camera_port': $('#cameraPort').val(),
     'controller_host': $('#ctrlHost').val(),
     'controller_port': parseInt($('#ctrlPort').val()),
     'controller_user': $('#ctrlUser').val(),

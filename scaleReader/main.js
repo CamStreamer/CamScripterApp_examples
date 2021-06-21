@@ -18,9 +18,9 @@ try {
 // Create camera client for http requests
 var cv = new CameraVapix({
   'protocol': 'http',
-  'ip': '127.0.0.1',
-  'port': 80,
-  'auth': 'root:' + settings.camera_pass,
+  'ip': settings.camera_ip,
+  'port': settings.camera_port,
+  'auth': settings.camera_user + ':' + settings.camera_pass,
 });
 
 // Connect to electronic scale

@@ -8,6 +8,8 @@ const { setInterval } = require("timers");
 
 let user = "root";
 let pass = "pass";
+let cameraIp = "127.0.0.1";
+let camPort = 80;
 let accessToken = "";
 let stationID = "";
 let updatePeriod = 5; // minute count
@@ -31,6 +33,8 @@ try {
 
     user = settings.camera_user;
     pass = settings.camera_pass;
+    cameraIp = settings.camera_ip;
+    camPort = settings.camera_port;
     accessToken = settings.access_token;
     stationID = settings.station_id.toString();
     updatePeriod = settings.wheather_check_period; //minute count
@@ -237,8 +241,8 @@ async function reqWeatherflowData(station, acc_token) {
 }
 
 var co = new CamOverlayAPI({
-  "ip": "127.0.0.1",
-  "port": 80,
+  "ip": cameraIp,
+  "port": camPort,
   "auth": user + ":" + pass,
   //'serviceName': 'Wheather Flow',
   "serviceID": coServiceID,
