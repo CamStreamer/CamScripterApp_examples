@@ -1,0 +1,81 @@
+<html>
+<header>
+  <title>CamSwitcherVMD</title>
+  <link rel="stylesheet" href="bootstrap/bootstrap.min.css">
+</header>
+<body>
+  <nav class="navbar navbar-dark bg-dark">
+    <a class="navbar-brand" href="#">CamScripter</a>
+  </nav>
+
+  <div class="jumbotron">
+    <div class="container">
+      <h1 class="display-3">CamSwitcherVMD</h1>
+      <p>This script allows automatic switching between 2 cameras based on <a target="_blank" href="https://www.axis.com/products/axis-video-motion-detection">VMD 4</a> installed on both cameras. CamSwitcher App needs to be installed on Camera 1 and both cameras have to be added and present in the CamSwitcher App so this script can switch the view when motion is detected on any camera. If no motion is detected by VMD 4 ACAP, the script will switch between cameras in the set period.
+
+        This application allows switching two video streams based on the time period and motion detection (<a target="_blank" href="https://www.axis.com/products/axis-video-motion-detection">VMD 4</a> application is required on both cameras). CamSwitcher App has to be installed on camera 1 and both cameras have to be added to the CamSwitcher App via the user interface.</p>
+      <br />
+      <form class="myForm">
+        <div class="form-group">
+          <label for="minSwitchingPeriod">Minimum switching period [s]</label>
+          <input type="text" class="form-control" id="minSwitchingPeriod" placeholder="30">
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="messages" class="container"></div>
+
+  <div class="container">
+    <!-- Example row of columns -->
+    <div class="row">
+      <div class="col-md-6">
+        <h2>Camera 1 (CamSwitcher installed)</h2>
+        <form class="myForm">
+          <div class="form-group">
+            <label for="ipCam1">IP Address</label>
+            <input type="text" class="form-control" id="ipCam1" placeholder="192.168.100.20">
+          </div>
+          <div class="form-group">
+            <label for="userCam1">User</label>
+            <input type="text" class="form-control" id="userCam1" placeholder="root">
+          </div>
+          <div class="form-group">
+            <label for="passCam1">Password</label>
+            <input type="text" class="form-control" id="passCam1" placeholder="pass">
+          </div>
+          <div class="form-group">
+            <label for="playlistNiceNameCam1">CamSwitcher Camera Name</label>
+            <input type="text" class="form-control" id="playlistNiceNameCam1" placeholder="">
+          </div>
+        </form>
+      </div>
+      <div class="col-md-6">
+        <h2>Camera 2</h2>
+        <form class="myForm">
+          <div class="form-group">
+            <label for="ipCam2">IP Address</label>
+            <input type="text" class="form-control" id="ipCam2" placeholder="192.168.100.20">
+          </div>
+          <div class="form-group">
+            <label for="userCam2">User</label>
+            <input type="text" class="form-control" id="userCam2" placeholder="root">
+          </div>
+          <div class="form-group">
+            <label for="passCam2">Password</label>
+            <input type="text" class="form-control" id="passCam2" placeholder="pass">
+          </div>
+          <div class="form-group">
+            <label for="playlistNiceNameCam2">CamSwitcher Camera Name</label>
+            <input type="text" class="form-control" id="playlistNiceNameCam2" placeholder="">
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script type="text/javascript" src="jquery-2.2.4/jquery-2.2.4.min.js"></script>
+  <script type="text/javascript" src="bootstrap/bootstrap.min.js"></script>
+  <script type="text/javascript" src="index.js"></script>
+</body>
+</html>

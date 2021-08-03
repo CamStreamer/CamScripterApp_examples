@@ -1,0 +1,8 @@
+{
+  "package_name": "camSwitcherVMD",
+  "package_menu_name": "CamSwitcherVMD",
+  "package_version": "1.0.2",
+  "vendor": "Camstreamer s.r.o.",
+  "required_camscripter_version": "1.3.6",
+  "ui_link": "/local/camscripter/package/camSwitcherVMD/index.html"
+}
