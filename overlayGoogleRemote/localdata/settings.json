@@ -4,6 +4,8 @@
     "camera_ip": "127.0.0.1",
     "camera_port": 80,
     "remote_hide": true,
+    "list_name": "List1",
+    "api_key":"",
     "toggle_field": "E4",
     "sheet_addr": "",
     "refresh_rate": 3,

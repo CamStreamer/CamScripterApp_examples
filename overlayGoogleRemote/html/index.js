@@ -24,6 +24,8 @@ function createLayout(settings) {
   $('#camPort').val(settings.camera_port);
   $('#updateFreq').val(settings.refresh_rate);
   $('#overlayID').val(settings.overlay_id);
+  $('#listName').val(settings.list_name);
+  $('#apiKey').val(settings.api_key);
   $('#sheetAddr').val(settings.sheet_addr);
   $('#fieldContainer').html(genFields(settings.field_list.length));
   populateFields(settings.field_list);
@@ -94,6 +96,8 @@ function inputChanged() {
     'camera_ip': $('#camIP').val(),
     'camera_port': $('#camPort').val(),
     'refresh_rate': $('#updateFreq').val(),
+    'api_key': $('#apiKey').val(),
+    'list_name': $('#listName').val(),
     'overlay_id':$('#overlayID').val(),
     'sheet_addr': $('#sheetAddr').val(),
     'field_list': fields

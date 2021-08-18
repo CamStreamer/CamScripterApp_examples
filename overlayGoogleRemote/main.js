@@ -31,13 +31,8 @@ function run() {
     console.log('COAPI-Error: connection closed');
     process.exit(1);
   });
+  oneAppPeriod(co);
 
-  co.connect().then(async function(){
-    oneAppPeriod(co);
-  }, () => {
-    console.log('COAPI-Error: connection error');
-    process.exit(1);
-  });
 }
 
 function sendRequest(send_url, auth) {
@@ -87,17 +82,29 @@ function mapData(data){
   }
   return overlay_fields;
 }
-function findIn(field_name, field_list){
-  for (let f of field_list){
-    if (f.title["$t"] == field_name){
-      return f.content["$t"];
-    }
+function findIn(field_name, data){
+  let column = field_name.match(/[a-zA-Z]+/i)[0];
+  let row = field_name.match(/[0-9]+/i)[0];
+
+  let column_n = convertColumn(column.toLowerCase());
+  let row_n = parseInt(row) - 1;
+
+  return data[row_n][column_n];
+}
+
+function convertColumn(text){
+  let re_val = 0
+  for (let i = text.length-1; i >= 0; i--){
+    re_val += text.charCodeAt(i)-"a".charCodeAt(0);
+    re_val *= 27**(text.length - i - 1);
   }
+  return re_val;
 }
 
 async function requestSheet(doc_id) {
   try {
-    let api_url = "https://spreadsheets.google.com/feeds/cells/"+doc_id+"/1/public/full?alt=json";
+    let api_url = 'https://sheets.googleapis.com/v4/spreadsheets/' + doc_id + '/values/' + settings.list_name + '?alt=json&key=' + settings.api_key;
+    console.log("URL: " +  api_url);
     const data = await sendRequest(api_url, "");
     console.log("Data aquired!");
     return JSON.parse(data);
@@ -109,11 +116,15 @@ async function requestSheet(doc_id) {
 
 
 async function oneAppPeriod(co){
+  console.log("Starting Period")
+
   try{
     let enabled = await co.isEnabled()
     if (enabled) {
+      console.log("In enabled ")
+
       let data = await requestSheet(settings.sheet_addr);
-      let fields = mapData(data.feed.entry);
+      let fields = mapData(data.values);
       co.updateCGText(fields);
     }
   } catch(error){

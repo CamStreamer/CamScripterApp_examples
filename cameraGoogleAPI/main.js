@@ -93,19 +93,29 @@ function mapRequests(data){
   }
   return trigger_requests;
 }
-function findIn(field_name, field_list){
-  for (let f of field_list){
-    if (f.title["$t"] == field_name){
-      return f.content["$t"];
-    }
+function findIn(field_name, data){
+  let column = field_name.match(/[a-zA-Z]+/i)[0];
+  let row = field_name.match(/[0-9]+/i)[0];
+
+  let column_n = convertColumn(column.toLowerCase());
+  let row_n = parseInt(row) - 1;
+
+  return data[row_n][column_n];
+}
+
+function convertColumn(text){
+  let re_val = 0
+  for (let i = text.length-1; i >= 0; i--){
+    re_val += text.charCodeAt(i)-"a".charCodeAt(0);
+    re_val *= 27**(text.length - i - 1);
   }
+  return re_val;
 }
 
 async function requestSheet(doc_id) {
-  if (!doc_id) return null; //skip if no doc_id is provided
-
   try {
-    let api_url = "https://spreadsheets.google.com/feeds/cells/"+doc_id+"/1/public/full?alt=json";
+    let api_url = 'https://sheets.googleapis.com/v4/spreadsheets/' + doc_id + '/values/' + settings.list_name + '?alt=json&key=' + settings.api_key;
+    console.log("URL: " +  api_url);
     const data = await sendRequest(api_url, "");
     console.log("Data aquired!");
     return JSON.parse(data);
@@ -126,7 +136,7 @@ async function oneAppPeriod(co){
   try{
     let data = await requestSheet(settings.sheet_addr);
     if (data){
-      let requests = mapRequests(data.feed.entry);
+      let requests = mapRequests(data.values);
       fireRequests(requests);
     }
   } catch(error){
