@@ -41,9 +41,15 @@
                 <label for="accessToken">Google Sheet Endpoint Adress</label><br>
                 <div style="overflow-wrap: break-word;">
                 <small><i>
-                  Step 1: Create the Google Sheer and click <q>File</q> - <q>Publish to web</q> Publish sheet to the web: File > Publish to the web > Publish <br>
-                  Step 2: Share and allow editing your sheet with the people you want to change the values in the video remotely.<br>
-                  Step 3: Copy unique Google Sheet ID from sheet URL: e.g. <br>https://docs.google.com/spreadsheets/d/<b>abcde12345BpVoRMQv3J_6yFpSWuSwtRf5QnyqT_qyOI</b>/edit#gid=0<br> (the bold part)
+                  HOW TO SET UP CamOverlay Remote Control script<br>
+Step 1: Create the Google Sheet and click File > Publish to the web > Publish<br>
+Step 2: Share also publicly the sheet (via the Share button in the top right corner) so CamScripter can read from it and also allow editing your sheet with the people you want to change the values in the video remotely.<br>
+Step 3: Copy unique Google Sheet ID from sheet URL: e.g.
+https://docs.google.com/spreadsheets/d/<b>abcde12345BpVoRMQv3J_6yFpSWuSwtRf5QnyqT_qyOI</b>>/edit#gid=0 (the bold part) and Sheet name
+Step 4: Generate the Google Sheet API key on https://console.cloud.google.com/apis/credentials and copy and paste the API key. Please note, there are limits of requests per Google Account. Check Google Sheet API support for the current limits.<br>
+Step 5: Eneble Google Sheet API on https://console.cloud.google.com/apis/api/sheets.googleapis.com/overview<br>
+Step 6: Create the CamOverlay graphic fields connection with the Google Sheet cells and Save the settings.<br>
+PLEASE NOTE: CamScripter App will update the data only when a defined graphic overlay is enabled in the CamOverlay App.<br>
                 </i></small>
                 <input type="text" class="form-control" id="sheetAddr" placeholder="">
                 <div>
