@@ -6,7 +6,8 @@
     "remote_hide": true,
     "toggle_field": "E4",
     "sheet_addr": "",
-    "list_number": 1,
+    "list_name": "List1",
+    "api_key":"",
     "refresh_rate": 3,
     "field_list": [
         {
