@@ -1,0 +1,9 @@
+{
+  "camera_ip": "192.168.91.124",
+  "camera_port": 80,
+  "camera_user": "root",
+  "camera_pass": "alohomor",
+  "unit": "c",
+  "service_id": 1,
+  "field_name": "field1"
+}
