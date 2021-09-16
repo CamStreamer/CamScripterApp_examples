@@ -91,6 +91,11 @@ async function appRun() {
     baudRate: 115200,
   });
 
+  port_handle.on('close', ()=>{
+    console.log("Serial Error: connection closed");
+    process.exit(1);
+  });
+
   process.on("exit", () => {
     port_handle.close();
   });
