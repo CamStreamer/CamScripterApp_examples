@@ -4,7 +4,6 @@ const EventEmitter = require("events");
 const fs = require("fs");
 const CairoFrame = require("./CairoFrame");
 const CairoPainter = require("./CairoPainter");
-const utils = require("./utils");
 const MemoryManager = require("./utils");
 const { readJsonSync } = require("fs-extra");
 

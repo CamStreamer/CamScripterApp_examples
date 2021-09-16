@@ -1,5 +1,5 @@
 const { fork } = require("child_process");
-const HttpServer = require("./HttpServerClass");
+const HttpServer = require("camstreamerlib/HttpServer");
 const url = require("url");
 const { exit } = require("process");
 
