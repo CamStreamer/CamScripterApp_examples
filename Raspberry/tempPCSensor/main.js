@@ -24,7 +24,7 @@ const UNITS = { f: "°F", c: "°C" };
 const RATIOS = { f: [1.8, 32], c: [1, 0] }; //  relation to Celsius
 
 function temperature(num, unit_tag) {
-  r = RATIOS[unit_tag];
+  let r = RATIOS[unit_tag];
   return (num * r[0] + r[1]).toFixed(2) + " " + UNITS[unit_tag];
 }
 

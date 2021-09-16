@@ -15,10 +15,6 @@ let co;
 let layout;
 let mm;
 
-/*process.on("unhandledRejection", function (error) {
-        console.error('unhandledRejection', error.message);
-    }); */
-
 process.on("SIGTERM", async () => {
   widget.close();
   await device.close();
@@ -88,7 +84,6 @@ async function createLayout(resolution_w, resolution_h, mm, settings) {
     null,
     null
   );
-  console.log(await mm.image("bg"));
   layout.background.setBgImage(await mm.image("bg"), "fit");
   layout.start_time = new CairoFrame(
     35,
@@ -174,21 +169,18 @@ let aggregate_volume = getBaseVolume();
 async function appRun(settings) {
   let data = await device.send97Request(0xfe, Buffer.from("6081", "hex"));
   let now = Date.now();
-  if (true || data.ack === 0) {
+  if (data.ack === 0) {
     let cntr = parseCounterData(data.data);
     let volume = cntr / settings.k_factor;
     aggregate_volume += volume;
     setBaseVolume(aggregate_volume);
     let time_passed = (now - last_update) / 1000;
-    console.log(time_passed);
-    console.log(aggregate_volume);
+
+    console.log('Volume: ' + aggregate_volume.toString() + '/' + time_passed.toString() + 's');
 
     let date = new Date();
     let hours = date.getHours();
-    let minutes =
-      date.getMinutes().toString().length < 2
-        ? "0" + date.getMinutes()
-        : date.getMinutes();
+    let minutes = date.getMinutes().toString().padStart(2);
     layout.current_time.setText(hours + ":" + minutes);
     layout.current_beer.setBgImage(
       await mm.image(getBeerIndex(aggregate_volume)),
@@ -197,9 +189,10 @@ async function appRun(settings) {
     layout.agegrate.setText(aggregate_volume.toFixed(2) + " l");
     layout.beer_count.setText(Math.floor(aggregate_volume * 2).toString());
     layout.background.generateImage(co, 1);
+  } else {
+    console.log("ACK:" + data.ack);
   }
   last_update = now;
-  console.log("ACK:" + data.ack);
 }
 
 function getBeerIndex(liters) {
@@ -228,7 +221,7 @@ class TimeoutWidget extends EventEmitter {
   }
 
   _loadSettings() {
-    const data = fs.readFileSync(process.cwd() + "/localdata/settings.json");
+    const data = fs.readFileSync(process.env.PERSISTENT_DATA_PATH + "settings.json");
     this.settings = JSON.parse(data);
   }
 

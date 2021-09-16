@@ -4,7 +4,7 @@ const url = require("url");
 const { exit } = require("process");
 
 let http_server = new HttpServer();
-console.log("Hello World!");
+console.log("Starting Flowmeter Package...");
 http_server.on("error", function (err) {
   console.log(err);
 });

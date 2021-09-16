@@ -141,7 +141,7 @@ async function appRun() {
 }
 
 function temperature(num, unit_tag) {
-  r = RATIOS[unit_tag];
+  let r = RATIOS[unit_tag];
   return (num * r[0] + r[1]).toFixed(2) + " " + UNITS[unit_tag];
 }
 

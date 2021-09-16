@@ -2,7 +2,7 @@
     "camera_ip": "192.168.91.124",
     "camera_port": 80,
     "camera_user": "root",
-    "camera_pass": "alohomor",
+    "camera_pass": "",
     "unit": "c",
     "scale": 100,
     "coordinates": "top_left",
