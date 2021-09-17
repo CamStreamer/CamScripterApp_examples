@@ -175,8 +175,8 @@ async function appRun(settings) {
     setBaseVolume(aggregate_volume);
     let time_passed = (now - last_update) / 1000;
 
-    console.log('Volume: ' + aggregate_volume.toString() + '/' + time_passed.toString() + 's');
-
+    console.log('Flow: ' + volume.toString() + '/' + time_passed.toString() + 's');
+    console.log('Volume: ' + aggregate_volume.toString());
     let date = new Date();
     let hours = date.getHours();
     let minutes = date.getMinutes().toString().padStart(2);

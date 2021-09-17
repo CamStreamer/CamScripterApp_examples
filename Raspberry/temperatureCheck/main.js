@@ -100,7 +100,7 @@ async function appRun() {
     port_handle.close();
   });
 
-  console.log(our_port.path);
+  console.log("Using port: " + our_port.path);
 
   co.on("error", (err) => {
     console.log("COAPI-Error: " + err);
@@ -127,7 +127,7 @@ async function appRun() {
       if (line.match("compensate")) {
         return;
       }
-      console.log(line);
+      console.log("Caught: " + line);
       let numbers = parseFloat(line.match(/[0-9\.]+/));
       if (numbers > settings.threshold) {
         layout["base"].setBgImage(await mm.image("sad_face"));

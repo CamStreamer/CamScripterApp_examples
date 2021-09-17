@@ -43,7 +43,7 @@ async function onePeriod() {
       console.log("No data!");
     } else {
       temp = json_data[0]["internal temperature"];
-      console.log(temp);
+      console.log("Temperature: " + temp);
     }
 
     let fields = [
