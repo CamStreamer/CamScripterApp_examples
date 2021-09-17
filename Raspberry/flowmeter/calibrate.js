@@ -23,13 +23,13 @@ async function appRun(volume) {
 }
 
 function GetSettings() {
-  const data = fs.readFileSync("./localdata/settings.json");
+  const data = fs.readFileSync(process.env.PERSISTENT_DATA_PATH + "settings.json");
   return JSON.parse(data);
 }
 
 function SaveSettings(object) {
   fs.writeFileSync(
-    "./localdata/settings.json",
+    process.env.PERSISTENT_DATA_PATH + "settings.json",
     JSON.stringify(object),
     function (err) {
       if (err) throw err;
