@@ -7,7 +7,7 @@ function radioClickedCallback() {
 
 $(document).ready(function () {
   $.get(
-    "/local/camscripter/package/settings.cgi?package_name=temeperatureCheck&action=get",
+    "/local/camscripter/package/settings.cgi?package_name=k3ProSensor&action=get",
     function (settings) {
       $("#ipCam").val(settings.camera_ip);
       $("#portCam").val(settings.camera_port);
@@ -49,7 +49,7 @@ function inputChanged() {
     unit: unit,
   };
   $.post(
-    "/local/camscripter/package/settings.cgi?package_name=temeperatureCheck&action=set",
+    "/local/camscripter/package/settings.cgi?package_name=k3ProSensor&action=set",
     JSON.stringify(settings),
     function (data) {}
   );

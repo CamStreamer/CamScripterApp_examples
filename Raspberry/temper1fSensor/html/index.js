@@ -1,7 +1,7 @@
 let unit = 'c';
 $(document).ready(function() {
 
-  $.get('/local/camscripter/package/settings.cgi?package_name=tempPCSensor&action=get', function(settings) {
+  $.get('/local/camscripter/package/settings.cgi?package_name=temper1fSensor&action=get', function(settings) {
 
     $('#ipCam').val(settings.camera_ip);
     $('#portCam').val(settings.camera_port);
@@ -37,5 +37,5 @@ function inputChanged() {
     'field_name': $('#fieldName').val(),
     'unit': unit
   };
-  $.post('/local/camscripter/package/settings.cgi?package_name=tempPCSensor&action=set', JSON.stringify(settings), function(data) {});
+  $.post('/local/camscripter/package/settings.cgi?package_name=temper1fSensor&action=set', JSON.stringify(settings), function(data) {});
 }
