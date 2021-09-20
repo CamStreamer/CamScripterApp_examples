@@ -1,0 +1,109 @@
+<html>
+<header>
+  <title>K3 Pro Sensor</title>
+  <link rel="stylesheet" href="bootstrap/bootstrap.min.css">
+</header>
+<body>
+  <nav class="navbar navbar-dark bg-dark">
+    <a class="navbar-brand" href="#">CamScripter</a>
+  </nav>
+
+  <div class="jumbotron">
+    <div class="container">
+      <h1 class="display-3">K3 Pro Sensor</h1>
+      <div class="container">
+        <div class="row">
+          <div class="col-md-6">
+            <form class="myForm">
+              <div class="form-group">
+                <label for="ipCam">Camera IP</label>
+                <input type="text" class="form-control" id="ipCam" placeholder="127.0.0.1">
+              </div>
+              <div class="form-group">
+                <label for="portCam">Camera Port</label>
+                <input type="text" class="form-control" id="portCam" placeholder="80">
+              </div>
+              <div class="form-group">
+                <label for="userCam">Camera User</label>
+                <input type="text" class="form-control" id="userCam" placeholder="root">
+              </div>
+              <div class="form-group">
+                <label for="passCam">Camera Password</label>
+                <input type="password" class="form-control" id="passCam" placeholder="password" autocomplete="new-password">
+              </div>
+            </form>
+          </div>
+
+          <div class="col-md-6">
+            <form class="myForm">
+              <div class="form-group">
+                <label for="height">Units</label>
+                <div>
+                  <input type="radio" id="fahrnheit" name="u_select" class="unit" value="f">
+                  <label for="unit">Fahrnheit</label>
+                </div>
+                <div>
+                  <input type="radio" id="fahrnheit" name="u_select" class="unit" value="c" checked>
+                  <label for="unit">Celsius</label>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="width">Temperature Threshold (e.g. 36.8)</label>
+                <input type="text" class="form-control" id="threshold" placeholder="36.5">
+              </div>
+              <div class="form-group">
+                <label for="width">Scale [%]</label>
+                <input type="text" class="form-control" id="scale" placeholder="100">
+              </div>
+              <div class="form-group">
+                <label for="resolutions">Resolution</label>
+                <input type="text" class="form-control" id="resW" placeholder="1920">
+                <span>x</span>
+                <input type="text" class="form-control" id="resH" placeholder="1080">
+              </div>
+              <div class="form-group">
+                <label for="coordinates">Coordinates</label>
+                <select name="coordinates" class="form-control" id="coordinates">
+                  <option value="top_left" selected>Top Left</option>
+                  <option value="top_center">Top Center</option>
+                  <option value="top_right">Top Right</option>
+                  <option value="center_left">Left Center</option>
+                  <option value="center">Center</option>
+                  <option value="center_right">Right Center</option>
+                  <option value="bottom_left">Left Bottom</option>
+                  <option value="bottom_center">Center Bottom</option>
+                  <option value="bottom_right">Right Bottom</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="posX">Position X</label>
+                <div class="input-group">
+                  <input type="text" class="form-control" id="posX" placeholder="0">
+                  <div class="input-group-append">
+                    <span class="input-group-text" id="basic-addon1">px</span>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="posY">Position Y</label>
+                <div class="input-group">
+                  <input type="text" class="form-control" id="posY" placeholder="0">
+                  <div class="input-group-append">
+                    <span class="input-group-text" id="basic-addon2">px</span>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+  <script type="text/javascript" src="jquery-2.2.4/jquery-2.2.4.min.js"></script>
+  <script type="text/javascript" src="bootstrap/bootstrap.min.js"></script>
+  <script type="text/javascript" src="index.js"></script>
+</body>
+</html>

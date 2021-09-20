@@ -1,0 +1,14 @@
+{
+    "camera_ip": "192.168.91.124",
+    "camera_port": 80,
+    "camera_user": "root",
+    "camera_pass": "",
+    "unit": "c",
+    "scale": 100,
+    "coordinates": "top_left",
+    "pos_x": 0,
+    "pos_y": 0,
+    "threshold": 36.8,
+    "res_w": 1920,
+    "res_h": 1080
+}
