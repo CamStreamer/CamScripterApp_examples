@@ -1,5 +1,5 @@
 {
-  "name": "clockanalog",
+  "name": "@camstreamer/clock-analog",
   "version": "1.0.1",
   "description": "",
   "main": "main.js",

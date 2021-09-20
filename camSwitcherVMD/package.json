@@ -1,5 +1,5 @@
 {
-  "name": "camSwitcherVMD",
+  "name": "@camstreamer/cam-switcher-wmd",
   "version": "1.0.0",
   "description": "",
   "main": "main.js",
