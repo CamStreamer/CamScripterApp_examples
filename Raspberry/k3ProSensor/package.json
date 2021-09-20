@@ -1,5 +1,5 @@
 {
-  "name": "temp-pc-sensor",
+  "name": "@camstreamer/k3-pro-sensor",
   "version": "1.0.1",
   "description": "",
   "main": "main.js",
@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "camstreamerlib": "^1.2.6",
+    "serialport": "^9.2.0",
     "usb": "^1.7.0"
   }
 }

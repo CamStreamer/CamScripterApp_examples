@@ -1,5 +1,5 @@
 {
-  "name": "camoverlayapi",
+  "name": "@camstreamer/camoverlay-api",
   "version": "1.0.0",
   "description": "",
   "main": "main.js",

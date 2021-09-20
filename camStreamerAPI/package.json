@@ -1,5 +1,5 @@
 {
-  "name": "camstreamerapi",
+  "name": "@camstreamer/camstreamer-api",
   "version": "1.0.0",
   "description": "",
   "main": "main.js",

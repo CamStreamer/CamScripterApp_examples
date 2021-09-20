@@ -1,5 +1,5 @@
 {
-  "name": "twitter-statuses",
+  "name": "@camstreamer/twitter-statuses",
   "version": "1.0.1",
   "description": "",
   "main": "main.js",
