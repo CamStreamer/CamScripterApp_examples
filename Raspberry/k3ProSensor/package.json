@@ -10,7 +10,6 @@
   "license": "ISC",
   "dependencies": {
     "camstreamerlib": "^1.2.6",
-    "serialport": "^9.2.0",
-    "usb": "^1.7.0"
+    "serialport": "^9.2.0"
   }
 }
