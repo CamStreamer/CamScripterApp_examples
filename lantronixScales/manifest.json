@@ -1,0 +1,9 @@
+{
+  "package_name": "lanScale",
+  "package_menu_name": "Lantronix Scale Reader",
+  "package_version": "1.0.1",
+  "vendor": "Camstreamer s.r.o.",
+  "required_camscripter_version": "1.2.6",
+  "required_camscripter_rbi_version": "1.0.0",
+  "ui_link": "/local/camscripter/package/lanScale/index.html"
+}
