@@ -3,6 +3,12 @@ const fs = require("fs");
 VENDOR_ID = '0' + (0x0403).toString(16);
 PRODUCT_ID = (0x6001).toString(16);
 
+
+/*
+  Tests conection from ethernet to serial. Establish connection to proper port with netcat.
+  The script should print out string sent to the port.
+*/
+
 async function appRun() {
   let list = await SerialPort.list();
   console.log(JSON.stringify(list));
