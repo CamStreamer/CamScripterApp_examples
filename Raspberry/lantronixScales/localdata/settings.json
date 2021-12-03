@@ -1,0 +1,11 @@
+{
+    "camera_ip": "127.0.0.1",
+    "camera_port": 80,
+    "camera_user": "root",
+    "camera_pass": "",
+    "scale_ip": "192.168.90.82",
+    "scale_port": 10001,
+    "refresh_rate": 1000,
+    "value_field_name": "field1",
+    "unit_field_name": "field2"
+}

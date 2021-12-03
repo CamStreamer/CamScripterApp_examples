@@ -1,9 +1,6 @@
 $(document).ready(function() {
   $.get('/local/camscripter/package/settings.cgi?package_name=lanScale&action=get', (settings) => {
     console.log(settings);
-    if (Object.keys(settings).length == 0) {
-      settings = {"camera_user": "", "camera_port": 80, "camera_ip": "127.0.0.1", "camera_pass": "", "scale_ip": "", "scale_port": 10000, "service_id": "", "value_field_name": "", "unit_field_name": "", "refresh_rate": 300};
-    }
 
     $('#cameraUser').val(settings.camera_user);
     $('#camIP').val(settings.camera_ip);

@@ -8,7 +8,12 @@ let dataBuffer = '';
 // Read script configuration
 let settings = null;
 try {
-  let data = fs.readFileSync(process.env.PERSISTENT_DATA_PATH + 'settings.json');
+  let data;
+  if (!process.env.PERSISTENT_DATA_PATH){
+    data = fs.readFileSync('./localdata/settings.json');
+  }else{
+    data = fs.readFileSync(process.env.PERSISTENT_DATA_PATH + 'settings.json');
+  }
   settings = JSON.parse(data);
 } catch (err) {
   console.log('No settings file found');
@@ -16,7 +21,7 @@ try {
 }
 
 // Create camera client for http requests
-var cv = new CameraVapix({
+let cv = new CameraVapix({
   'protocol': 'http',
   'ip': settings.camera_ip,
   'port': settings.camera_port,
@@ -28,7 +33,7 @@ let client = new net.Socket();
 client.connect(settings.scale_port, settings.scale_ip, () => {
   console.log('Scale connected');
   setInterval(() => {
-    client.write(Buffer.from('1B70', 'hex'));
+    client.write(Buffer.from('1B700D0A', 'hex'));
   }, settings.refresh_rate);
 });
 
@@ -39,15 +44,15 @@ client.on('data', (data) => {
     return;
   }
   const weightData = dataBuffer.substring(0, messageEnd);
+  console.log(weightData);
   dataBuffer = '';
 
   if (prevWeightData != weightData) {
     prevWeightData = weightData;
 
-    // Parse weight and unit
-    const weight = prevWeightData.substring(0, 9);
-    const unit = prevWeightData.substring(9);
-
+    //Parse weight and unit
+    const weight = prevWeightData.substring(0, 9).trim();
+    const unit = prevWeightData.substring(9).trim();
     cv.vapixGet('/local/camoverlay/api/textAndBackground.cgi?service_id=' + settings.service_id + '&' +
       settings.value_field_name + '=' + weight + '&' +
       settings.unit_field_name + '=' + unit)
