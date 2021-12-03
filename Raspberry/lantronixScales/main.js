@@ -44,7 +44,6 @@ client.on('data', (data) => {
     return;
   }
   const weightData = dataBuffer.substring(0, messageEnd);
-  console.log(weightData);
   dataBuffer = '';
 
   if (prevWeightData != weightData) {
