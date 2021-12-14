@@ -1,9 +1,13 @@
 const net = require('net');
 const fs = require('fs');
 const CameraVapix = require('camstreamerlib/CameraVapix');
+const httpRequest = require('camstreamerlib/HTTPRequest');
+const { hostname } = require('os');
 
 let prevWeightData = null;
 let dataBuffer = '';
+
+
 
 // Read script configuration
 let settings = null;
@@ -20,6 +24,15 @@ try {
   return;
 }
 
+let milestone_prompt = async ()=>{
+  let options = {
+        method:'POST',
+        host: milestone_ip,
+        port: milestone_port
+
+    }
+  await httpRequest(options,settings.milestone_string);
+}
 // Create camera client for http requests
 let cv = new CameraVapix({
   'protocol': 'http',
@@ -48,7 +61,7 @@ client.on('data', (data) => {
 
   if (prevWeightData != weightData) {
     prevWeightData = weightData;
-
+    if (milestone_ip && milestone_port) milestone_prompt();
     //Parse weight and unit
     const weight = prevWeightData.substring(0, 9).trim();
     const unit = prevWeightData.substring(9).trim();

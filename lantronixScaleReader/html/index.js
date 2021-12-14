@@ -12,6 +12,9 @@ $(document).ready(function() {
     $('#valueFieldName').val(settings.value_field_name);
     $('#unitFieldName').val(settings.unit_field_name);
     $('#refreshRate').val(settings.refresh_rate);
+    $('#msString').val(settings.milestone_string);
+    $('#msIP').val(settings.milestone_ip);
+    $('#msPort').val(settings.milestone_port);
   });
 
   $(".form-control").change(inputChanged);
@@ -33,6 +36,9 @@ function inputChanged() {
     'service_id': $('#serviceId').val(),
     'value_field_name': $('#valueFieldName').val(),
     'unit_field_name': $('#unitFieldName').val(),
+    'milestone_ip': $('#msIP').val(),
+    'milestone_string': $('#msString').val(),
+    'milestone_port': $('#msPort').val(),
     'refresh_rate': parseInt($('#refreshRate').val())
   };
   $.post('/local/camscripter/package/settings.cgi?package_name=lanScale&action=set', JSON.stringify(settings), (data) => {});

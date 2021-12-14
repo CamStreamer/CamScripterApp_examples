@@ -8,5 +8,8 @@
     "refresh_rate": 1000,
     "service_id": 1,
     "value_field_name": "field1",
-    "unit_field_name": "field2"
+    "unit_field_name": "field2",
+    "milestone_ip": "",
+    "milestone_string": "",
+    "milestone_port": ""
 }
