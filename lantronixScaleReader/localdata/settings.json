@@ -9,7 +9,7 @@
     "service_id": 1,
     "value_field_name": "field1",
     "unit_field_name": "field2",
-    "milestone_ip": "",
-    "milestone_string": "",
-    "milestone_port": ""
+    "milestone_ip": "192.168.90.222",
+    "milestone_string": "scale",
+    "milestone_port": 1238
 }

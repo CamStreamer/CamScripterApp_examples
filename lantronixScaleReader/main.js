@@ -1,6 +1,7 @@
 const net = require('net');
 const fs = require('fs');
 const CameraVapix = require('camstreamerlib/CameraVapix');
+const http = require('http');
 const httpRequest = require('camstreamerlib/HTTPRequest');
 const { hostname } = require('os');
 
@@ -23,16 +24,10 @@ try {
   console.log('No settings file found');
   return;
 }
+let ms_client = new net.Socket();
 
-let milestone_prompt = async ()=>{
-  let options = {
-        method:'POST',
-        host: milestone_ip,
-        port: milestone_port
 
-    }
-  await httpRequest(options,settings.milestone_string);
-}
+
 // Create camera client for http requests
 let cv = new CameraVapix({
   'protocol': 'http',
@@ -40,11 +35,18 @@ let cv = new CameraVapix({
   'port': settings.camera_port,
   'auth': settings.camera_user + ':' + settings.camera_pass,
 });
-
+let milestone_connected = false;
 // Connect to electronic scale
 let client = new net.Socket();
 client.connect(settings.scale_port, settings.scale_ip, () => {
   console.log('Scale connected');
+  try{
+    ms_client.connect(settings.milestone_port, settings.milestone_ip,()=>{
+      milestone_connected = true;
+    });
+  }catch(e){
+    console.log('Milestone Error:' + e);
+  }
   setInterval(() => {
     client.write(Buffer.from('1B700D0A', 'hex'));
   }, settings.refresh_rate);
@@ -61,7 +63,7 @@ client.on('data', (data) => {
 
   if (prevWeightData != weightData) {
     prevWeightData = weightData;
-    if (milestone_ip && milestone_port) milestone_prompt();
+    if (milestone_connected) ms_client.write(Buffer.from(settings.milestone_string + "\r\n", "ascii"));
     //Parse weight and unit
     const weight = prevWeightData.substring(0, 9).trim();
     const unit = prevWeightData.substring(9).trim();
@@ -83,4 +85,8 @@ client.on('error', (err) => {
 client.on('close', () => {
   console.log('Scale connection closed');
   process.exit(0);
+});
+
+process.on('unhandledRejection', function (error) {
+  console.log('unhandledRejection', error.message);
 });

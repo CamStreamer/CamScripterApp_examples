@@ -38,7 +38,7 @@ function inputChanged() {
     'unit_field_name': $('#unitFieldName').val(),
     'milestone_ip': $('#msIP').val(),
     'milestone_string': $('#msString').val(),
-    'milestone_port': $('#msPort').val(),
+    'milestone_port': parseInt($('#msPort').val()),
     'refresh_rate': parseInt($('#refreshRate').val())
   };
   $.post('/local/camscripter/package/settings.cgi?package_name=lanScale&action=set', JSON.stringify(settings), (data) => {});
