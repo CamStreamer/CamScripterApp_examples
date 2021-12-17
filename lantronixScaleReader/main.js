@@ -36,6 +36,7 @@ let cv = new CameraVapix({
   'auth': settings.camera_user + ':' + settings.camera_pass,
 });
 let milestone_connected = false;
+let ms_protection_period = false;
 // Connect to electronic scale
 let client = new net.Socket();
 client.connect(settings.scale_port, settings.scale_ip, () => {
@@ -63,7 +64,13 @@ client.on('data', (data) => {
 
   if (prevWeightData != weightData) {
     prevWeightData = weightData;
-    if (milestone_connected) ms_client.write(Buffer.from(settings.milestone_string + "\r\n", "ascii"));
+    if (milestone_connected && !ms_protection_period){
+      let sep = Buffer.from(settings.milestone_separator);
+      console.log(sep.toString('hex'));
+      ms_client.write(Buffer.from(settings.milestone_string, "ascii") + sep);
+      ms_protection_period = true;
+      setTimeout(()=>{ms_protection_period = false}, settings.minimum_span * 1000)
+    }
     //Parse weight and unit
     const weight = prevWeightData.substring(0, 9).trim();
     const unit = prevWeightData.substring(9).trim();

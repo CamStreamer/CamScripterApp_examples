@@ -15,6 +15,8 @@ $(document).ready(function() {
     $('#msString').val(settings.milestone_string);
     $('#msIP').val(settings.milestone_ip);
     $('#msPort').val(settings.milestone_port);
+    $('#minimumSpan').val(settings.minimum_span);
+    $('#msSeparators').val(settings.milestone_separator.join(','));
   });
 
   $(".form-control").change(inputChanged);
@@ -39,7 +41,9 @@ function inputChanged() {
     'milestone_ip': $('#msIP').val(),
     'milestone_string': $('#msString').val(),
     'milestone_port': parseInt($('#msPort').val()),
-    'refresh_rate': parseInt($('#refreshRate').val())
+    'refresh_rate': parseInt($('#refreshRate').val()),
+    'minimum_span': parseInt($('#minimumSpan').val()),
+    'milestone_separator': $('#msSeparators').val().split(',').map(function(item){ return parseInt(item);})
   };
   $.post('/local/camscripter/package/settings.cgi?package_name=lanScale&action=set', JSON.stringify(settings), (data) => {});
 }

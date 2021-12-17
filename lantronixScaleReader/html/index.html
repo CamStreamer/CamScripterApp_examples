@@ -60,6 +60,16 @@
                 <label for="refreshRate">Refresh Rate (ms)</label>
                 <input type="text" class="form-control" id="refreshRate" placeholder="500">
               </div>
+            </form>
+          </div>
+          <div class="col-md-6">
+            <form class="myForm">
+              <div class="form-group">
+
+                <h2><img src="logo_milestone.png" > options</h2>
+                <p>You can define generic events to help Milestone VMS recognize specific strings in TCP or UDP packets from an external system. Based on a generic event, you can configure Management Client to trigger actions,
+                  for example to start recording, create bookmark, or alarms. More information find <a target="_blank" href="https://doc.milestonesys.com/latest/en-US/standard_features/sf_mc/sf_mcnodes/sf_5rulesandevents/mc_addagenericevent_rulesandevents.htm">here</a>.</p>
+              </div>
 
               <div class="form-group">
                 <label for="msString">Milestone IP</label>
@@ -72,6 +82,14 @@
               <div class="form-group">
                 <label for="msString">Milestone Event Trigger</label>
                 <input type="text" class="form-control" id="msString" placeholder="">
+              </div>
+              <div class="form-group">
+                <label for="msString">Separator Bytes</label>
+                <input type="text" class="form-control" id="msSeparators" placeholder="">
+              </div>
+              <div class="form-group">
+                <label for="msString">Minimum time between events [s]</label>
+                <input type="text" class="form-control" id="minimumSpan" placeholder="">
               </div>
             </form>
           </div>
