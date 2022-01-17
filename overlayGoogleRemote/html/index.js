@@ -1,6 +1,6 @@
 var fields = [];
 $(document).ready(function() {
-  $.get('/local/camscripter/package/settings.cgi?package_name=camoverlay_remote_ctrl&action=get', function(settings) {
+  $.get('/local/camscripter/package/settings.cgi?package_name=camoverlay_remote_ctr0&action=get', function(settings) {
     if (Object.keys(settings).length != 0) {
       createLayout(settings);
     } else {
@@ -38,6 +38,7 @@ function genFields(number) {
   let outputstring = "";
   for (let i = 0; i < number; i++){
     outputstring += "<div class=\"input-group\">";
+    outputstring += "<input type=\"text\" class=\"form-control\" id=fieldService"+i+" placeholder=\"0\">";
     outputstring += "<input type=\"text\" class=\"form-control\" id=fieldName"+i+" placeholder=\"0\">";
     outputstring += "<input type=\"text\" class=\"form-control\" id=fieldLocation"+i+" placeholder=\"0\">";
     outputstring += "</div>";
@@ -51,6 +52,8 @@ function populateFields(field_list){
   for (let i = 0; i < field_list.length; i++){
     $("#fieldName"+i).val(field_list[i]["name"]);
     $("#fieldLocation"+i).val(field_list[i]["field"]);
+    $("#fieldService"+i).val(field_list[i]["service"]);
+
   }
   field_count = field_list.length;
   fields = field_list;
@@ -61,7 +64,8 @@ function readTheFields(){
   for (let i = 0; i < field_count; i++){
     let field = {
       "name": $("#fieldName" + i).val(),
-      "field": $("#fieldLocation" + i).val()
+      "field": $("#fieldLocation" + i).val(),
+      "service": $("#fieldLocation" + i).val()
     };
     field_list.push(field);
   }
@@ -70,7 +74,7 @@ function readTheFields(){
 
 function addField(){
   field_count++;
-  fields.push({"name": "NewField", "field": "A1"});
+  fields.push({"name": "NewField", "field": "A1", "service": 1});
   $("#fieldContainer").html(genFields(field_count));
   populateFields(fields);
   $(".form-control").off();
@@ -102,5 +106,5 @@ function inputChanged() {
     'sheet_addr': $('#sheetAddr').val(),
     'field_list': fields
   };
-  $.post('/local/camscripter/package/settings.cgi?package_name=camoverlay_remote_ctrl&action=set', JSON.stringify(settings), function(data) {});
+  $.post('/local/camscripter/package/settings.cgi?package_name=camoverlay_remote_ctr0&action=set', JSON.stringify(settings), function(data) {});
 }
