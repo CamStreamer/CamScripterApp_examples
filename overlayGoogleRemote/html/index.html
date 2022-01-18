@@ -55,10 +55,6 @@ PLEASE NOTE: CamScripter App will update the data only when a defined graphic ov
                 <div>
               </div>
               <div class="form-group">
-                <label for="location">Overlay Service ID</label>
-                <input type="text" class="form-control" id="overlayID" placeholder="">
-              </div>
-              <div class="form-group">
                 <label for="location">List Name</label>
                 <input type="text" class="form-control" id="listName" placeholder="">
               </div>
@@ -71,15 +67,24 @@ PLEASE NOTE: CamScripter App will update the data only when a defined graphic ov
                 <input type="text" class="form-control" id="updateFreq" placeholder="1">
               </div>
               <div class="form-group">
-                <div>
-                  <span>CamOveraly Field ID</span><span style="text-align: right;float: right;">Google Sheet Cell</span>
-                </div>
+
+                <table style="width: 100%;">
+                  <tr>
+
+                    <td style="width: 33%;">CamOverlay Service ID</td>
+                    <td style="width: 33%;">CamOveraly Field ID</td>
+                    <td style="width: 33%">Google Sheet Cell</td>
+                  </tr>
+                </table>
+                <br>
+
                 <div id="fieldContainer">
                 </div>
                 <input type="button" id="addFieldBtn" value="+">
                 <input type="button" id="substractFieldBtn" value="-">
                 <input type="button" id="forceSaveBtn" value="Save All Fields" style="float: right;">
               </div>
+              <small>Note that the maximum number of specified services should not exceed 10.</small>
             </form>
           </div>
         </div>
