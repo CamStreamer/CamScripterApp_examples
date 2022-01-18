@@ -65,7 +65,7 @@ function readTheFields(){
     let field = {
       "name": $("#fieldName" + i).val(),
       "field": $("#fieldLocation" + i).val(),
-      "service": $("#fieldLocation" + i).val()
+      "service": $("#fieldService" + i).val()
     };
     field_list.push(field);
   }

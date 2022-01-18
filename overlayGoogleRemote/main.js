@@ -38,9 +38,9 @@ function run() {
 
   for (let i = 0; i < settings.field_list.length; i++) {
     let c_field = settings.field_list[i];
-    let serivce = c_field["service"];
+    let service = c_field["service"];
     if (!(service in c_overlays)) {
-      c_overlays[serivce] = getCOAPI(
+      c_overlays[service] = getCOAPI(
         settings.camera_ip,
         settings.camera_port,
         settings.camera_user + ":" + settings.camera_pass,
