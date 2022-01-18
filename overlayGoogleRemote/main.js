@@ -156,7 +156,6 @@ async function oneAppPeriod(overlays) {
     for (let service in overlays) {
       let enabled = await overlays[service].isEnabled();
       if (enabled) {
-        console.log("In enabled ");
         if (!fields){
          data = await requestSheet(settings.sheet_addr);
          fields = mapData(data.values);
