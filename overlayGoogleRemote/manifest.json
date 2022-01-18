@@ -1,6 +1,6 @@
 {
   "package_name": "camoverlay_remote_ctr0",
-  "package_menu_name": "CamOverlay Remote #0",
+  "package_menu_name": "CamOverlay Remote",
   "package_version": "1.0.0",
   "vendor": "Camstreamer s.r.o.",
   "required_camscripter_version": "1.2.3",
