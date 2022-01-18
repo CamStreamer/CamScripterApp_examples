@@ -4,7 +4,7 @@
     "camera_ip": "127.0.0.1",
     "camera_port": 80,
     "remote_hide": true,
-    "list_name": "List1",
+    "list_name": "Sheet1",
     "api_key":"",
     "toggle_field": "E4",
     "sheet_addr": "",
@@ -12,8 +12,8 @@
     "field_list": [
         {
             "name": "HOME",
-            "field": "B4"
+            "field": "B4",
+            "service": "1"
         }
-    ],
-    "overlay_id": 1
+    ]
 }

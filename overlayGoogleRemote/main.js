@@ -1,38 +1,54 @@
-const url = require('url');
-const fs = require('fs');
+const url = require("url");
+const fs = require("fs");
 const https = require("follow-redirects").https;
-const CamOverlayAPI = require('camstreamerlib/CamOverlayAPI');
+const CamOverlayAPI = require("camstreamerlib/CamOverlayAPI");
 
 var settings = null;
-var co = null;
+var c_overlays = {};
 var default_period_time = 1000;
+
+function getCOAPI(camera_ip, camera_port, camera_auth, overlay_id) {
+  let co = new CamOverlayAPI({
+    ip: camera_ip,
+    port: camera_port,
+    auth: camera_auth,
+    serviceID: parseInt(overlay_id),
+  });
+  co.on("error", (err) => {
+    console.log("COAPI" + overlay_id + "-Error: " + err);
+  });
+
+  co.on("close", () => {
+    console.log("COAPI" + overlay_id + "-Error: connection closed");
+    process.exit(1);
+  });
+
+  return co;
+}
 function run() {
   try {
-    var data = fs.readFileSync(process.env.PERSISTENT_DATA_PATH + 'settings.json');
+    var data = fs.readFileSync(
+      process.env.PERSISTENT_DATA_PATH + "settings.json"
+    );
     settings = JSON.parse(data);
   } catch (err) {
-    console.log('No settings file found');
+    console.log("No settings file found");
     return;
   }
 
-
-  co = new CamOverlayAPI({
-    'ip': settings.camera_ip,
-    'port': settings.camera_port,
-    'auth': settings.camera_user + ':' + settings.camera_pass,
-    'serviceID': settings.overlay_id
-  });
-
-  co.on('error', (err) => {
-    console.log('COAPI-Error: ' + err);
-  });
-
-  co.on('close', () => {
-    console.log('COAPI-Error: connection closed');
-    process.exit(1);
-  });
-  oneAppPeriod(co);
-
+  for (let i = 0; i < settings.field_list.length; i++) {
+    let c_field = settings.field_list[i];
+    let service = c_field["service"];
+    if (!(service in c_overlays)) {
+      c_overlays[service] = getCOAPI(
+        settings.camera_ip,
+        settings.camera_port,
+        settings.camera_user + ":" + settings.camera_pass,
+        service
+      );
+    }
+  }
+  oneAppPeriod(c_overlays);
 }
 
 function sendRequest(send_url, auth) {
@@ -43,19 +59,26 @@ function sendRequest(send_url, auth) {
       host: send_url.hostname,
       port: send_url.port,
       path: send_url.path,
-      headers: { "Authorization": auth },
-      timeout: 5000 //5s
+      headers: { Authorization: auth },
+      timeout: 5000, //5s
     };
     const req = https.request(options, (res) => {
       res.setEncoding("utf8");
       let data = "";
-      res.on('data', (chunk) => {
+      res.on("data", (chunk) => {
         data += chunk;
       });
 
       res.on("end", () => {
         if (res.statusCode != 200) {
-          reject(new Error("Server returned status code: " + res.statusCode + ", message: " + data));
+          reject(
+            new Error(
+              "Server returned status code: " +
+                res.statusCode +
+                ", message: " +
+                data
+            )
+          );
         } else {
           resolve(data);
         }
@@ -70,19 +93,23 @@ function sendRequest(send_url, auth) {
   });
 }
 
-function mapData(data){
-  let overlay_fields = [];
-  for (let i = 0; i < settings.field_list.length; i++){
+function mapData(data) {
+  let overlay_fields = {};
+  for (let i = 0; i < settings.field_list.length; i++) {
     let name = settings.field_list[i].name;
-    let value = findIn(settings.field_list[i].field,data);
-    overlay_fields.push({
-      "field_name": name,
-      "text": value
+    let value = findIn(settings.field_list[i].field, data);
+    let service = settings.field_list[i].service;
+    if (!(service in overlay_fields)) {
+      overlay_fields[service] = [];
+    }
+    overlay_fields[service].push({
+      field_name: name,
+      text: value,
     });
   }
   return overlay_fields;
 }
-function findIn(field_name, data){
+function findIn(field_name, data) {
   let column = field_name.match(/[a-zA-Z]+/i)[0];
   let row = field_name.match(/[0-9]+/i)[0];
 
@@ -92,19 +119,25 @@ function findIn(field_name, data){
   return data[row_n][column_n];
 }
 
-function convertColumn(text){
-  let re_val = 0
-  for (let i = text.length-1; i >= 0; i--){
-    re_val += text.charCodeAt(i)-"a".charCodeAt(0);
-    re_val *= 27**(text.length - i - 1);
+function convertColumn(text) {
+  let re_val = 0;
+  for (let i = text.length - 1; i >= 0; i--) {
+    re_val += text.charCodeAt(i) - "a".charCodeAt(0);
+    re_val *= 27 ** (text.length - i - 1);
   }
   return re_val;
 }
 
 async function requestSheet(doc_id) {
   try {
-    let api_url = 'https://sheets.googleapis.com/v4/spreadsheets/' + doc_id + '/values/' + settings.list_name + '?alt=json&key=' + settings.api_key;
-    console.log("URL: " +  api_url);
+    let api_url =
+      "https://sheets.googleapis.com/v4/spreadsheets/" +
+      doc_id +
+      "/values/" +
+      settings.list_name +
+      "?alt=json&key=" +
+      settings.api_key;
+    console.log("URL: " + api_url);
     const data = await sendRequest(api_url, "");
     console.log("Data aquired!");
     return JSON.parse(data);
@@ -114,28 +147,36 @@ async function requestSheet(doc_id) {
   }
 }
 
+async function oneAppPeriod(overlays) {
+  console.log("Starting Period");
 
-async function oneAppPeriod(co){
-  console.log("Starting Period")
-
-  try{
-    let enabled = await co.isEnabled()
-    if (enabled) {
-      console.log("In enabled ")
-
-      let data = await requestSheet(settings.sheet_addr);
-      let fields = mapData(data.values);
-      co.updateCGText(fields);
+  try {
+    let data = null;
+    let fields = null;
+    for (let service in overlays) {
+      let enabled = await overlays[service].isEnabled();
+      if (enabled) {
+        if (!fields){
+         data = await requestSheet(settings.sheet_addr);
+         fields = mapData(data.values);
+        }
+        let cf = fields[service];
+        overlays[service].updateCGText(cf);
+      }
     }
-  } catch(error){
+  } catch (error) {
     console.log(error);
   } finally {
-    setTimeout(oneAppPeriod, settings.refresh_rate * default_period_time, co);
+    setTimeout(
+      oneAppPeriod,
+      settings.refresh_rate * default_period_time,
+      overlays
+    );
   }
 }
 
-process.on('unhandledRejection', function (error) {
-  console.log('unhandledRejection', error.message);
+process.on("unhandledRejection", function (error) {
+  console.log("unhandledRejection", error.message);
 });
 
 run();
