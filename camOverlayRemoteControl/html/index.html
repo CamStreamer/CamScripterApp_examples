@@ -36,12 +36,9 @@
           </div>
 
           <div class="col-md-6">
-            <form class="myForm">
-              <div class="form-group">
-                <label for="accessToken">Google Sheet Endpoint Adress</label><br>
-                <div style="overflow-wrap: break-word;">
+            <div style="overflow-wrap: break-word;">
+                <h5>HOW TO SET UP CamOverlay Remote Control script</h5>
                 <small><i>
-                  HOW TO SET UP CamOverlay Remote Control script<br>
 Step 1: Create the Google Sheet and click File > Publish to the web > Publish<br>
 Step 2: Share also publicly the sheet (via the Share button in the top right corner) so CamScripter can read from it and also allow editing your sheet with the people you want to change the values in the video remotely.<br>
 Step 3: Copy unique Google Sheet ID from sheet URL: e.g.
@@ -50,16 +47,19 @@ Step 4: Generate the Google Sheet API key on https://console.cloud.google.com/ap
 Step 5: Eneble Google Sheet API on https://console.cloud.google.com/apis/api/sheets.googleapis.com/overview<br>
 Step 6: Create the CamOverlay graphic fields connection with the Google Sheet cells and Save the settings.<br>
 PLEASE NOTE: CamScripter App will update the data only when a defined graphic overlay is enabled in the CamOverlay App.<br>
-                </i></small>
+              </i></small>
+            <div>
+            <form class="myForm mt-3">
+              <div class="form-group">
+                <label for="sheetAddr">Unique Google Sheet ID from sheet URL</label>
                 <input type="text" class="form-control" id="sheetAddr" placeholder="">
-                <div>
               </div>
               <div class="form-group">
-                <label for="location">List Name</label>
+                <label for="listName">Sheet Name</label>
                 <input type="text" class="form-control" id="listName" placeholder="">
               </div>
               <div class="form-group">
-                <label for="location">API Key</label>
+                <label for="apiKey">API Key</label>
                 <input type="text" class="form-control" id="apiKey" placeholder="">
               </div>
               <div class="form-group">
@@ -67,10 +67,8 @@ PLEASE NOTE: CamScripter App will update the data only when a defined graphic ov
                 <input type="text" class="form-control" id="updateFreq" placeholder="1">
               </div>
               <div class="form-group">
-
                 <table style="width: 100%;">
                   <tr>
-
                     <td style="width: 33%;">CamOverlay Service ID</td>
                     <td style="width: 33%;">CamOveraly Field ID</td>
                     <td style="width: 33%">Google Sheet Cell</td>
