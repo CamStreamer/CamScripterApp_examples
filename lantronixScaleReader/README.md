@@ -1,4 +1,4 @@
-# Scale with Lantronix CZ
+# Scale with Lantronix
 Scripts values from scales via Lantronix device. The scales need to be prompted.
 
 ## Milestone
