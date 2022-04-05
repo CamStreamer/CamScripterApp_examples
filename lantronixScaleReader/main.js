@@ -9,7 +9,6 @@ let prevWeightData = null;
 let dataBuffer = '';
 
 
-
 // Read script configuration
 let settings = null;
 try {
