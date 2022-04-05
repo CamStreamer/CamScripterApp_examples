@@ -45,5 +45,4 @@ async function appRun() {
   port_handle.write(Buffer.from('700D0A', 'hex'));
 
 }
-
 appRun();
