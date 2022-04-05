@@ -39,7 +39,6 @@ async function appRun() {
   parser.on("data", function (data) {
     console.log(data.toString('utf-8'));
   });
-
 }
 
 appRun();
