@@ -40,12 +40,14 @@ let ms_protection_period = false;
 let client = new net.Socket();
 client.connect(settings.scale_port, settings.scale_ip, () => {
   console.log('Scale connected');
-  try{
-    ms_client.connect(settings.milestone_port, settings.milestone_ip,()=>{
-      milestone_connected = true;
-    });
-  }catch(e){
-    console.log('Milestone Error:' + e);
+  if (settings.milestone_ip.length) {
+    try{
+      ms_client.connect(settings.milestone_port, settings.milestone_ip,()=>{
+        milestone_connected = true;
+      });
+    }catch(e){
+      console.log('Milestone Error:' + e);
+    }
   }
   setInterval(() => {
     client.write(Buffer.from('1B700D0A', 'hex'));
