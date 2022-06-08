@@ -1,15 +1,22 @@
 {
   "name": "@camstreamer/lantronix-wr",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "",
   "main": "main.js",
+  "prettier": "@camstreamer/prettier-config",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "pretty": "prettier --write \"./*.{ts,js}\"",
+    "pretty:check": "prettier --check \"./*.{ts,js}\""
   },
   "author": "CamStreamer s.r.o",
   "license": "ISC",
   "dependencies": {
     "camstreamerlib": "^1.2.3",
     "serialport": "^9.2.5"
+  },
+  "devDependencies": {
+    "@camstreamer/prettier-config": "^2.0.4",
+    "prettier": "^2.3.2"
   }
 }
