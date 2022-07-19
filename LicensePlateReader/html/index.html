@@ -1,0 +1,122 @@
+<html>
+<header>
+    <title>License Plate Reader</title>
+    <link rel="stylesheet" href="bootstrap/bootstrap.min.css">
+</header>
+
+<body>
+    <nav class="navbar navbar-dark bg-dark">
+        <a class="navbar-brand" href="#">CamScripter</a>
+    </nav>
+
+    <div class="jumbotron">
+        <div class="container">
+            <h1 class="display-3">License Plate Reader</h1>
+            <p>Changes are saved automatically, you don't have to save them.</p>
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-6">
+                        <form class="myForm">
+                            <label>
+                                <h2>Axis License Plate Verifier camera</h2>
+                            </label>
+                            <div class="form-group">
+                                <label for="scIP">IP</label>
+                                <input type="text" class="form-control" id="scIP" placeholder="127.0.0.1">
+                            </div>
+                            <div class="form-group">
+                                <label for="scPort">Port</label>
+                                <input type="text" class="form-control" id="scPort" placeholder="80">
+                            </div>
+                            <div class="form-group">
+                                <label for="scUser">User</label>
+                                <input type="text" class="form-control" id="scUser" placeholder="root">
+                            </div>
+                            <div class="form-group">
+                                <label for="scPassword">Password</label>
+                                <input type="password" class="form-control" id="scPassword" placeholder="password">
+                            </div>
+                        </form>
+                    </div>
+                    <div class="col-md-6">
+                        <form class="myForm">
+                            <label>
+                                <h2>CamOverlay camera</h2>
+                            </label>
+                            <div class="form-group">
+                                <label for="tcIP">IP</label>
+                                <input type="text" class="form-control" id="tcIP" placeholder="127.0.0.1">
+                            </div>
+                            <div class="form-group">
+                                <label for="tcPort">Port</label>
+                                <input type="text" class="form-control" id="tcPort" placeholder="80">
+                            </div>
+                            <div class="form-group">
+                                <label for="tcUser">User</label>
+                                <input type="text" class="form-control" id="tcUser" placeholder="root">
+                            </div>
+                            <div class="form-group">
+                                <label for="tcPassword">Password</label>
+                                <input type="password" class="form-control" id="tcPassword" placeholder="password">
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <br>
+                <div class="row">
+                    <div class="col-md-6">
+                        <form class="myForm">
+                            <label>
+                                <h2>CamOverlay</h2>
+                            </label>
+                            <div class="form-group">
+                                <label for="serviceID">Service ID</label>
+                                <input type="text" class="form-control" id="serviceID">
+                            </div>
+                            <div class="form-group">
+                                <label for="lpFieldName">License Plate Field name</label>
+                                <input type="text" class="form-control" id="lpFieldName">
+                            </div>
+                            <div class="form-group">
+                                <label for="tsFieldName">Timestamp Field name</label>
+                                <input type="text" class="form-control" id="tsFieldName">
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="col-md-6">
+                        <form class="myForm">
+                            <label>
+                                <h2>Output format</h2>
+                            </label>
+                            <div class="form-group">
+                                <label for="timeFormat">Time format</label>
+                                <select class="form-control" name="timeFormat" id="timeFormat">
+                                    <option value="12" name="12">12-hour format (6:32 PM)</option>
+                                    <option value="24" name="24">24-hour format (18:32)</option>
+                                  </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="dateFormat">Date format</label>
+                                <select class="form-control" id="dateFormat">
+                                    <option>MM/DD/YYYY</option>
+                                    <option>DD/MM/YYYY</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="visibilityTime">Visibile for (seconds). Set 0 to stay until the next recognition.</label>
+                                <input type="number" min="0" class="form-control" id="visibilityTime">
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script type="text/javascript" src="jquery-2.2.4/jquery-2.2.4.min.js"></script>
+    <script type="text/javascript" src="bootstrap/bootstrap.min.js"></script>
+    <script type="text/javascript" src="index.js"></script>
+</body>
+
+</html>

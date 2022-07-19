@@ -1,0 +1,22 @@
+{
+    "sourceCamera":
+    {
+        "IP": "127.0.0.1",
+        "port": 80,
+        "user": "root",
+        "password": ""
+    },
+    "targetCamera":
+    {
+        "IP": "127.0.0.1",
+        "port": 80,
+        "user": "root",
+        "password": ""
+    },
+    "serviceID": "",
+    "lpFieldName": "",
+    "tsFieldName": "",
+    "timeFormat": "24",
+    "dateFormat": "MM/DD/YYYY", 
+    "visibilityTime": 10
+}

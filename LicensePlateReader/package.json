@@ -1,0 +1,17 @@
+{
+  "name": "LicensePlateReader",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "CamStreamer s.r.o",
+  "license": "ISC",
+  "dependencies": {
+    "camstreamerlib": "^1.5.0",
+    "crypto": "^1.0.1",
+    "digest": "^0.0.5",
+    "ws": "^8.8.0"
+  }
+}
