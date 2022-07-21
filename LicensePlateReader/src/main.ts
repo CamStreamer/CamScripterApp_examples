@@ -16,14 +16,14 @@ type Settings = {
     serviceID: number;
     lpFieldName: string;
     tsFieldName: string;
-    timeFormat: number;
+    timeFormat: string;
     dateFormat: string;
     visibilityTime: number;
 };
 
 type Format = {
     date: string;
-    time: number;
+    time: string;
 };
 
 let settings: Settings;
@@ -57,7 +57,7 @@ function dateFromTimestamp(timestamp: number, format: Format) {
     const second = date.getSeconds();
 
     let time: string;
-    if (format.time === 12) {
+    if (format.time === '12') {
         time = format_12(hour, minute, second);
     } else {
         time = format_24(hour, minute, second);
