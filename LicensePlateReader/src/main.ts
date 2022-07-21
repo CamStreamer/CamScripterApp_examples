@@ -1,6 +1,6 @@
 const fs = require('fs');
 const http = require('http');
-const CameraVapix = require('camstreamerlib/CameraVapix')
+const CameraVapix = require('camstreamerlib/CameraVapix');
 const CamOverlayAPI = require('camstreamerlib/CamOverlayAPI');
 
 type Camera = {
@@ -24,7 +24,7 @@ type Settings = {
 type Format = {
     date: string;
     time: number;
-}
+};
 
 let settings: Settings;
 
@@ -59,30 +59,26 @@ function dateFromTimestamp(timestamp: number, format: Format) {
     let time: string;
     if (format.time === 12) {
         time = format_12(hour, minute, second);
-    }
-    else {
+    } else {
         time = format_24(hour, minute, second);
     }
 
-    if (format.date === "DD/MM/YYYY") {
+    if (format.date === 'DD/MM/YYYY') {
         return `${time} ${day}/${month + 1}/${year}`;
-    }
-    else if (format.date === "MM/DD/YYYY") {
+    } else if (format.date === 'MM/DD/YYYY') {
         return `${time} ${month + 1}/${day}/${year}`;
-    }
-    else {
-        return "Unknown format";
+    } else {
+        return 'Unknown format';
     }
 }
 
 function sendEnabledRequest(enabledParameter: number) {
-    const options =
-    {
+    const options = {
         hostname: settings.targetCamera.IP,
         port: settings.targetCamera.port,
         path: `/local/camoverlay/api/enabled.cgi?id_${settings.serviceID}=${enabledParameter}`,
-        auth: settings.targetCamera.user + ":" + settings.targetCamera.password,
-        method: 'GET'
+        auth: settings.targetCamera.user + ':' + settings.targetCamera.password,
+        method: 'GET',
     };
 
     const req = http.request(options);
@@ -106,19 +102,17 @@ function showCamOverlay() {
 let timeoutID;
 async function displayInCamOverlay(data) {
     try {
-        const options =
-        {
+        const options = {
             ip: settings.targetCamera.IP,
             port: settings.targetCamera.port,
-            auth: settings.targetCamera.user + ":" + settings.targetCamera.password,
-            serviceID: settings.serviceID
+            auth: settings.targetCamera.user + ':' + settings.targetCamera.password,
+            serviceID: settings.serviceID,
         };
         const co = new CamOverlayAPI(options);
 
-        const format =
-        {
+        const format = {
             time: settings.timeFormat,
-            date: settings.dateFormat
+            date: settings.dateFormat,
         };
         const date = dateFromTimestamp(data.timestamp, format);
 
@@ -130,14 +124,14 @@ async function displayInCamOverlay(data) {
         if (coLicensePlate.length !== 0) {
             let field = {
                 field_name: coLicensePlate,
-                text: data.licensePlate
+                text: data.licensePlate,
             };
             fields.push(field);
         }
         if (coTimeStamp.length !== 0) {
             let field = {
                 field_name: coTimeStamp,
-                text: date
+                text: date,
             };
             fields.push(field);
         }
@@ -153,50 +147,46 @@ async function displayInCamOverlay(data) {
                 hideCamOverlay();
             }, 1000 * settings.visibilityTime);
         }
-    }
-    catch (error) {
+    } catch (error) {
         console.log('Camoverlay error: ', error);
     }
 }
 
 function onMessage(data) {
-    const outputData =
-    {
+    const outputData = {
         timestamp: data.timestamp,
-        licensePlate: data.message.data.text
+        licensePlate: data.message.data.text,
     };
     displayInCamOverlay(outputData);
 }
 
 function startCameraVapixLibraryWebsocket() {
-    const options =
-    {
+    const options = {
         ip: settings.sourceCamera.IP,
         port: settings.sourceCamera.port,
-        auth: `${settings.sourceCamera.user}:${settings.sourceCamera.password}`
+        auth: `${settings.sourceCamera.user}:${settings.sourceCamera.password}`,
     };
 
     const cv = new CameraVapix(options);
 
-    cv.on("eventsConnect", () => {
-        console.log("Websocket connected.");
+    cv.on('eventsConnect', () => {
+        console.log('Websocket connected.');
     });
-    cv.on("eventsDisconnect", (error) => {
+    cv.on('eventsDisconnect', (error) => {
         if (error === undefined) {
-            console.log("Websocket disconnected.");
+            console.log('Websocket disconnected.');
             process.exit(1);
-        }
-        else {
-            console.log("Websocket error: ", error);
+        } else {
+            console.log('Websocket error: ', error);
             process.exit(1);
         }
     });
 
-    cv.on("tnsaxis:CameraApplicationPlatform/ALPV.AllPlates", (data) => {
+    cv.on('tnsaxis:CameraApplicationPlatform/ALPV.AllPlates', (data) => {
         onMessage(data.params.notification);
     });
 
-    cv.eventsConnect("websocket");
+    cv.eventsConnect('websocket');
 }
 
 function main() {
@@ -204,8 +194,7 @@ function main() {
         const path = process.env.PERSISTENT_DATA_PATH;
         const data = fs.readFileSync(path + 'settings.json');
         settings = JSON.parse(data);
-    }
-    catch (error) {
+    } catch (error) {
         console.log('Error with Settings file: ', error);
         return;
     }
