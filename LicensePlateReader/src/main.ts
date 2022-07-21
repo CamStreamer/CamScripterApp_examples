@@ -36,15 +36,15 @@ function format_12(hour: number, minute: number, second: number) {
         hour = 12;
     }
 
-    const str_minute = minute < 10 ? '0' + minute : minute;
-    const str_second = second < 10 ? '0' + second : second;
-    return `${hour}:${str_minute}:${str_second} ${ampm}`;
+    const strMinute = minute < 10 ? '0' + minute : minute;
+    const strSecond = second < 10 ? '0' + second : second;
+    return `${hour}:${strMinute}:${strSecond} ${ampm}`;
 }
 
 function format_24(hour: number, minute: number, second: number) {
-    const str_minute = minute < 10 ? '0' + minute : minute;
-    const str_second = second < 10 ? '0' + second : second;
-    return `${hour}:${str_minute}:${str_second}`;
+    const strMinute = minute < 10 ? '0' + minute : minute;
+    const strSecond = second < 10 ? '0' + second : second;
+    return `${hour}:${strMinute}:${strSecond}`;
 }
 
 function dateFromTimestamp(timestamp: number, format: Format) {
