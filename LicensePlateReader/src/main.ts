@@ -3,7 +3,32 @@ const http = require('http');
 const CameraVapix = require('camstreamerlib/CameraVapix')
 const CamOverlayAPI = require('camstreamerlib/CamOverlayAPI');
 
-function format_12(hour, minute, second) {
+type Camera = {
+    IP: string;
+    port: number;
+    user: string;
+    password: string;
+};
+
+type Settings = {
+    sourceCamera: Camera;
+    targetCamera: Camera;
+    serviceID: number;
+    lpFieldName: string;
+    tsFieldName: string;
+    timeFormat: number;
+    dateFormat: string;
+    visibilityTime: number;
+};
+
+type Format = {
+    date: string;
+    time: number;
+}
+
+let settings: Settings;
+
+function format_12(hour: number, minute: number, second: number) {
     const ampm = hour >= 12 ? 'PM' : 'AM';
     hour = hour % 12;
 
@@ -11,18 +36,18 @@ function format_12(hour, minute, second) {
         hour = 12;
     }
 
-    minute = minute < 10 ? '0' + minute : minute;
-    second = second < 10 ? '0' + second : second;
-    return `${hour}:${minute}:${second} ${ampm}`;
+    const str_minute = minute < 10 ? '0' + minute : minute;
+    const str_second = second < 10 ? '0' + second : second;
+    return `${hour}:${str_minute}:${str_second} ${ampm}`;
 }
 
-function format_24(hour, minute, second) {
-    minute = minute < 10 ? '0' + minute : minute;
-    second = second < 10 ? '0' + second : second;
-    return `${hour}:${minute}:${second}`;
+function format_24(hour: number, minute: number, second: number) {
+    const str_minute = minute < 10 ? '0' + minute : minute;
+    const str_second = second < 10 ? '0' + second : second;
+    return `${hour}:${str_minute}:${str_second}`;
 }
 
-function dateFromTimestamp(timestamp, format) {
+function dateFromTimestamp(timestamp: number, format: Format) {
     const date = new Date(timestamp);
     const year = date.getFullYear();
     const month = date.getMonth();
@@ -31,8 +56,8 @@ function dateFromTimestamp(timestamp, format) {
     const minute = date.getMinutes();
     const second = date.getSeconds();
 
-    let time;
-    if (format.time === "12") {
+    let time: string;
+    if (format.time === 12) {
         time = format_12(hour, minute, second);
     }
     else {
@@ -50,7 +75,7 @@ function dateFromTimestamp(timestamp, format) {
     }
 }
 
-function sendEnabledRequest(settings, enabledParameter) {
+function sendEnabledRequest(enabledParameter: number) {
     const options =
     {
         hostname: settings.targetCamera.IP,
@@ -68,18 +93,18 @@ function sendEnabledRequest(settings, enabledParameter) {
 }
 
 let isCamOverlayVisible = false;
-function hideCamOverlay(settings) {
+function hideCamOverlay() {
     isCamOverlayVisible = false;
-    sendEnabledRequest(settings, 0);
+    sendEnabledRequest(0);
 }
 
-function showCamOverlay(settings) {
+function showCamOverlay() {
     isCamOverlayVisible = true;
-    sendEnabledRequest(settings, 1);
+    sendEnabledRequest(1);
 }
 
 let timeoutID;
-async function displayInCamOverlay(settings, data) {
+async function displayInCamOverlay(data) {
     try {
         const options =
         {
@@ -118,14 +143,14 @@ async function displayInCamOverlay(settings, data) {
         }
 
         if (!isCamOverlayVisible) {
-            showCamOverlay(settings);
+            showCamOverlay();
         }
         await co.updateCGText(fields);
         clearTimeout(timeoutID);
 
         if (settings.visibilityTime > 0) {
             timeoutID = setTimeout(() => {
-                hideCamOverlay(settings);
+                hideCamOverlay();
             }, 1000 * settings.visibilityTime);
         }
     }
@@ -134,16 +159,16 @@ async function displayInCamOverlay(settings, data) {
     }
 }
 
-function onMessage(settings, data) {
+function onMessage(data) {
     const outputData =
     {
         timestamp: data.timestamp,
         licensePlate: data.message.data.text
     };
-    displayInCamOverlay(settings, outputData);
+    displayInCamOverlay(outputData);
 }
 
-function startCameraVapixLibraryWebsocket(settings) {
+function startCameraVapixLibraryWebsocket() {
     const options =
     {
         ip: settings.sourceCamera.IP,
@@ -168,14 +193,13 @@ function startCameraVapixLibraryWebsocket(settings) {
     });
 
     cv.on("tnsaxis:CameraApplicationPlatform/ALPV.AllPlates", (data) => {
-        onMessage(settings, data.params.notification);
+        onMessage(data.params.notification);
     });
 
     cv.eventsConnect("websocket");
 }
 
 function main() {
-    let settings = null;
     try {
         const path = process.env.PERSISTENT_DATA_PATH;
         const data = fs.readFileSync(path + 'settings.json');
@@ -185,7 +209,7 @@ function main() {
         console.log('Error with Settings file: ', error);
         return;
     }
-    startCameraVapixLibraryWebsocket(settings);
+    startCameraVapixLibraryWebsocket();
 }
 
 process.on('unhandledRejection', function (error) {
