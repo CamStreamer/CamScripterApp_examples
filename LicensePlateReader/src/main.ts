@@ -1,9 +1,34 @@
 const fs = require('fs');
 const http = require('http');
-const CameraVapix = require('camstreamerlib/CameraVapix')
+const CameraVapix = require('camstreamerlib/CameraVapix');
 const CamOverlayAPI = require('camstreamerlib/CamOverlayAPI');
 
-function format_12(hour, minute, second) {
+type Camera = {
+    IP: string;
+    port: number;
+    user: string;
+    password: string;
+};
+
+type Settings = {
+    sourceCamera: Camera;
+    targetCamera: Camera;
+    serviceID: number;
+    lpFieldName: string;
+    tsFieldName: string;
+    timeFormat: string;
+    dateFormat: string;
+    visibilityTime: number;
+};
+
+type Format = {
+    date: string;
+    time: string;
+};
+
+let settings: Settings;
+
+function format_12(hour: number, minute: number, second: number) {
     const ampm = hour >= 12 ? 'PM' : 'AM';
     hour = hour % 12;
 
@@ -11,18 +36,18 @@ function format_12(hour, minute, second) {
         hour = 12;
     }
 
-    minute = minute < 10 ? '0' + minute : minute;
-    second = second < 10 ? '0' + second : second;
-    return `${hour}:${minute}:${second} ${ampm}`;
+    const strMinute = minute < 10 ? '0' + minute : minute;
+    const strSecond = second < 10 ? '0' + second : second;
+    return `${hour}:${strMinute}:${strSecond} ${ampm}`;
 }
 
-function format_24(hour, minute, second) {
-    minute = minute < 10 ? '0' + minute : minute;
-    second = second < 10 ? '0' + second : second;
-    return `${hour}:${minute}:${second}`;
+function format_24(hour: number, minute: number, second: number) {
+    const strMinute = minute < 10 ? '0' + minute : minute;
+    const strSecond = second < 10 ? '0' + second : second;
+    return `${hour}:${strMinute}:${strSecond}`;
 }
 
-function dateFromTimestamp(timestamp, format) {
+function dateFromTimestamp(timestamp: number, format: Format) {
     const date = new Date(timestamp);
     const year = date.getFullYear();
     const month = date.getMonth();
@@ -31,33 +56,29 @@ function dateFromTimestamp(timestamp, format) {
     const minute = date.getMinutes();
     const second = date.getSeconds();
 
-    let time;
-    if (format.time === "12") {
+    let time: string;
+    if (format.time === '12') {
         time = format_12(hour, minute, second);
-    }
-    else {
+    } else {
         time = format_24(hour, minute, second);
     }
 
-    if (format.date === "DD/MM/YYYY") {
+    if (format.date === 'DD/MM/YYYY') {
         return `${time} ${day}/${month + 1}/${year}`;
-    }
-    else if (format.date === "MM/DD/YYYY") {
+    } else if (format.date === 'MM/DD/YYYY') {
         return `${time} ${month + 1}/${day}/${year}`;
-    }
-    else {
-        return "Unknown format";
+    } else {
+        return 'Unknown format';
     }
 }
 
-function sendEnabledRequest(settings, enabledParameter) {
-    const options =
-    {
+function sendEnabledRequest(enabledParameter: number) {
+    const options = {
         hostname: settings.targetCamera.IP,
         port: settings.targetCamera.port,
         path: `/local/camoverlay/api/enabled.cgi?id_${settings.serviceID}=${enabledParameter}`,
-        auth: settings.targetCamera.user + ":" + settings.targetCamera.password,
-        method: 'GET'
+        auth: settings.targetCamera.user + ':' + settings.targetCamera.password,
+        method: 'GET',
     };
 
     const req = http.request(options);
@@ -68,32 +89,30 @@ function sendEnabledRequest(settings, enabledParameter) {
 }
 
 let isCamOverlayVisible = false;
-function hideCamOverlay(settings) {
+function hideCamOverlay() {
     isCamOverlayVisible = false;
-    sendEnabledRequest(settings, 0);
+    sendEnabledRequest(0);
 }
 
-function showCamOverlay(settings) {
+function showCamOverlay() {
     isCamOverlayVisible = true;
-    sendEnabledRequest(settings, 1);
+    sendEnabledRequest(1);
 }
 
 let timeoutID;
-async function displayInCamOverlay(settings, data) {
+async function displayInCamOverlay(data) {
     try {
-        const options =
-        {
+        const options = {
             ip: settings.targetCamera.IP,
             port: settings.targetCamera.port,
-            auth: settings.targetCamera.user + ":" + settings.targetCamera.password,
-            serviceID: settings.serviceID
+            auth: settings.targetCamera.user + ':' + settings.targetCamera.password,
+            serviceID: settings.serviceID,
         };
         const co = new CamOverlayAPI(options);
 
-        const format =
-        {
+        const format = {
             time: settings.timeFormat,
-            date: settings.dateFormat
+            date: settings.dateFormat,
         };
         const date = dateFromTimestamp(data.timestamp, format);
 
@@ -105,87 +124,81 @@ async function displayInCamOverlay(settings, data) {
         if (coLicensePlate.length !== 0) {
             let field = {
                 field_name: coLicensePlate,
-                text: data.licensePlate
+                text: data.licensePlate,
             };
             fields.push(field);
         }
         if (coTimeStamp.length !== 0) {
             let field = {
                 field_name: coTimeStamp,
-                text: date
+                text: date,
             };
             fields.push(field);
         }
 
         if (!isCamOverlayVisible) {
-            showCamOverlay(settings);
+            showCamOverlay();
         }
         await co.updateCGText(fields);
         clearTimeout(timeoutID);
 
         if (settings.visibilityTime > 0) {
             timeoutID = setTimeout(() => {
-                hideCamOverlay(settings);
+                hideCamOverlay();
             }, 1000 * settings.visibilityTime);
         }
-    }
-    catch (error) {
+    } catch (error) {
         console.log('Camoverlay error: ', error);
     }
 }
 
-function onMessage(settings, data) {
-    const outputData =
-    {
+function onMessage(data) {
+    const outputData = {
         timestamp: data.timestamp,
-        licensePlate: data.message.data.text
+        licensePlate: data.message.data.text,
     };
-    displayInCamOverlay(settings, outputData);
+    displayInCamOverlay(outputData);
 }
 
-function startCameraVapixLibraryWebsocket(settings) {
-    const options =
-    {
+function startCameraVapixLibraryWebsocket() {
+    const options = {
         ip: settings.sourceCamera.IP,
         port: settings.sourceCamera.port,
-        auth: `${settings.sourceCamera.user}:${settings.sourceCamera.password}`
+        auth: `${settings.sourceCamera.user}:${settings.sourceCamera.password}`,
     };
 
     const cv = new CameraVapix(options);
 
-    cv.on("eventsConnect", () => {
-        console.log("Websocket connected.");
+    cv.on('eventsConnect', () => {
+        console.log('Websocket connected.');
     });
-    cv.on("eventsDisconnect", (error) => {
+    cv.on('eventsDisconnect', (error) => {
         if (error === undefined) {
-            console.log("Websocket disconnected.");
+            console.log('Websocket disconnected.');
             process.exit(1);
-        }
-        else {
-            console.log("Websocket error: ", error);
+        } else {
+            console.log('Websocket error: ', error);
             process.exit(1);
         }
     });
 
-    cv.on("tnsaxis:CameraApplicationPlatform/ALPV.AllPlates", (data) => {
-        onMessage(settings, data.params.notification);
+    cv.on('tnsaxis:CameraApplicationPlatform/ALPV.AllPlates', (data) => {
+        onMessage(data.params.notification);
     });
 
-    cv.eventsConnect("websocket");
+    cv.eventsConnect('websocket');
 }
 
 function main() {
-    let settings = null;
     try {
         const path = process.env.PERSISTENT_DATA_PATH;
         const data = fs.readFileSync(path + 'settings.json');
         settings = JSON.parse(data);
-    }
-    catch (error) {
+    } catch (error) {
         console.log('Error with Settings file: ', error);
         return;
     }
-    startCameraVapixLibraryWebsocket(settings);
+    startCameraVapixLibraryWebsocket();
 }
 
 process.on('unhandledRejection', function (error) {
