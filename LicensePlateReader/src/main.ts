@@ -1,7 +1,7 @@
-const fs = require('fs');
-const http = require('http');
-const CameraVapix = require('camstreamerlib/CameraVapix');
-const CamOverlayAPI = require('camstreamerlib/CamOverlayAPI');
+import * as fs from 'fs';
+import * as http from 'http';
+import { CameraVapix } from 'camstreamerlib/CameraVapix';
+import { CamOverlayAPI } from 'camstreamerlib/CamOverlayAPI';
 
 type Camera = {
     IP: string;
@@ -192,7 +192,7 @@ function startCameraVapixLibraryWebsocket() {
 function main() {
     try {
         const path = process.env.PERSISTENT_DATA_PATH;
-        const data = fs.readFileSync(path + 'settings.json');
+        const data: any = fs.readFileSync(path + 'settings.json');
         settings = JSON.parse(data);
     } catch (error) {
         console.log('Error with Settings file: ', error);

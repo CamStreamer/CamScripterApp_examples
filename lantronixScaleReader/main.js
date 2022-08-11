@@ -1,7 +1,7 @@
-const net = require('net');
 const fs = require('fs');
-const CameraVapix = require('camstreamerlib/CameraVapix');
+const net = require('net');
 const https = require('https');
+const { CameraVapix } = require('camstreamerlib/CameraVapix');
 
 let prevWeightData = null;
 let dataBuffer = '';
@@ -70,9 +70,9 @@ scaleClient.on('data', (data) => {
             cameraVapix
                 .vapixGet(
                     '/local/camoverlay/api/customGraphics.cgi?' +
-                        `service_id=${settings.service_id}&` +
-                        `${settings.value_field_name}=${weight}&` +
-                        `${settings.unit_field_name}=${unit}`
+                    `service_id=${settings.service_id}&` +
+                    `${settings.value_field_name}=${weight}&` +
+                    `${settings.unit_field_name}=${unit}`
                 )
                 .then(
                     (response) => {
