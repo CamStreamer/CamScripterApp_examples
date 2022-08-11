@@ -7,7 +7,7 @@ function clockRun() {
     var co = new CamOverlayAPI({
         'ip': '127.0.0.1', // use 127.0.0.1 because CamOverlay is running on the same camera as CamScripter
         'port': 80,        // http port - mind that the camera could use different port
-        'auth': 'root:pass2',  // please change the username / password to access http interface of the camera (sure there should be some configuration parameter in production version)
+        'auth': 'root:pass',  // please change the username / password to access http interface of the camera (sure there should be some configuration parameter in production version)
         'serviceName': 'Digital Clock', // use some unique name, new CamOverlay service will be created (is visible in CamOverlay UI)
         'camera': 0 // destination video channel (default is 0)
     });

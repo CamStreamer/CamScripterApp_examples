@@ -5,7 +5,7 @@ function createImage() {
     var co = new CamOverlayAPI({
         'ip': '127.0.0.1',
         'port': 80,
-        'auth': 'root:pass2',
+        'auth': 'root:pass',
         'serviceName': 'Drawing Test',
         'serviceID': -1
     });

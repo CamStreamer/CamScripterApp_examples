@@ -9,7 +9,7 @@
   "author": "CamStreamer s.r.o",
   "license": "ISC",
   "dependencies": {
-    "camstreamerlib": "^1.2.3",
+    "camstreamerlib": "^1.6.2",
     "twitter": "^1.7.1"
   }
 }

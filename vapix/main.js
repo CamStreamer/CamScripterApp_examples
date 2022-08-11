@@ -5,7 +5,7 @@ var cv = new CameraVapix({
     'protocol': 'http',
     'ip': '127.0.0.1',
     'port': 80,
-    'auth': 'root:pass2',
+    'auth': 'root:pass',
 });
 
 function testParams() {
