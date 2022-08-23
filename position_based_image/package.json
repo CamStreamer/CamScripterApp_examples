@@ -1,0 +1,32 @@
+{
+  "name": "position_based_image",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/main.ts",
+  "scripts": {
+    "clean": "rimraf dist/*; rm -f position_based_image.zip",
+    "build": "npm-run-all clean tsc",
+    "tsc": "tsc",
+    "pretty": "prettier --write \"./src/*.{ts,tsx}\"",
+    "pretty:check": "prettier --check \"./src/*.{ts,tsx}\"",
+    "test": "echo \\\"Error: no test specified\\\" && exit 1",
+    "nur": "node dist/main.js",
+    "try": "npm run build; clear; npm run nur",
+    "zip": "npm run build; node node_modules/camstreamerlib/CreatePackage -i",
+    "z": "node node_modules/camstreamerlib/CreatePackage -i"
+  },
+  "author": "CamStreamer s.r.o",
+  "license": "ISC",
+  "dependencies": {
+    "camstreamerlib": "^1.7.1",
+    "mqtt": "^4.3.7",
+    "typescript": "^4.7.4"
+  },
+  "devDependencies": {
+    "@camstreamer/prettier-config": "^2.0.4",
+    "@types/node": "^18.0.6",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^2.7.1",
+    "rimraf": "^3.0.2"
+  }
+}
