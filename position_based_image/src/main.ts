@@ -77,6 +77,8 @@ function serverResponseParse(data: Buffer): Coordinates {
       return { latitude: lat, longitude: lon };
     }
   }
+
+  return null;
 }
 
 function getServiceID(actualCoordinates: Coordinates) {
@@ -99,24 +101,18 @@ function serverConnect() {
 
     client.on("data", (data) => {
       const coor = serverResponseParse(data);
-      const id = getServiceID(coor);
 
-      if (id !== lastServiceID) {
-        cos[lastServiceID]?.setEnabled(false);
-        cos[id]?.setEnabled(true);
-        lastServiceID = id;
+      if (coor !== null) {
+        const id = getServiceID(coor);
+
+        if (id !== lastServiceID) {
+          cos[lastServiceID]?.setEnabled(false);
+          cos[id]?.setEnabled(true);
+          lastServiceID = id;
+        }
       }
 
-      client.end(
-        "Server received data : " +
-          data +
-          ", send back to client data size : " +
-          client.bytesWritten
-      );
-    });
-
-    client.on("end", () => {
-      console.log("Client disconnect.");
+      client.end();
     });
 
     client.on("timeout", () => {
@@ -165,6 +161,7 @@ async function main() {
       console.log(
         `Cannot connect to CamOverlay service with ID ${area.serviceID} (${error})`
       );
+      return;
     }
   }
   serverConnect();
