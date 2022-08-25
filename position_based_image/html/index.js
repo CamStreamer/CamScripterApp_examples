@@ -51,7 +51,9 @@ function addAreaFormHTML(area = null)
     number += 1;
     const ids = ["coordinates", "radius", "serviceID"];
     const texts = ["GPS coordinates (copy from Google Maps)", "radius (m)", "service ID"];
-    const placeholders = ["50.054877509994405, 14.375785127748992", "400", "0"]
+    const placeholders = ["50.054877509994405, 14.375785127748992", "400", "0"];
+    const values = [`${area?.coordinates.latitude}, ${area?.coordinates.longitude}`,
+                    area?.radius, area?.serviceID];
     const form = document.createElement("form");
     $(form).addClass("form-group");
     $(form).addClass("flex");
@@ -59,7 +61,7 @@ function addAreaFormHTML(area = null)
     const areaForm = {};
     for (let i = 0; i < 3; i++)
     {
-        let id = ids[i].concat(number);
+        let id = `${ids[i]}${number}`;
         const label = document.createElement("label");
         $(label).attr("for", id);
         $(label).text(texts[i]);
@@ -70,6 +72,10 @@ function addAreaFormHTML(area = null)
         $(input).attr("placeholder", placeholders[i]);
         $(input).addClass("form-control");
         $(input).change(inputChanged);
+        if (area != null)
+        {
+            $(input).val(values[i]);
+        }
 
         const div = document.createElement("div");
         $(div).addClass(ids[i]);
@@ -80,12 +86,6 @@ function addAreaFormHTML(area = null)
         areaForm[ids[i]] = input;
     }
 
-    if (area != null)
-    {
-        $(`#coordinates${number}`).val(`${area.coordinates.latitude}, ${area.coordinates.longitude}`);
-        $(`#radius${number}`).val(area["radius"]);
-        $(`#serviceID${number}`).val(area["serviceID"]);
-    }
 
     const button = document.createElement("button");
     $(button).attr("type", "button");

@@ -1,5 +1,5 @@
 import * as fs from "fs";
-import * as mqtt from "mqtt";
+import * as net from "net";
 import {CamOverlayAPI} from "camstreamerlib/CamOverlayAPI";
 
 type Camera = 
@@ -29,12 +29,17 @@ type Settings =
     }[]
 }
 
+function deg2rad(angle: number)
+{
+    return angle * Math.PI / 180;
+}
+
 function calculateDistance(a: Coordinates, b: Coordinates)
 {
-    let aLatRad = a.latitude * Math.PI / 180;
-    let aLonRad = a.longitude * Math.PI / 180;
-    let bLatRad = b.latitude * Math.PI / 180;
-    let bLonRad = b.longitude * Math.PI / 180;
+    let aLatRad = deg2rad(a.latitude);
+    let aLonRad = deg2rad(a.longitude);
+    let bLatRad = deg2rad(b.latitude);
+    let bLonRad = deg2rad(b.longitude);
 
     let sinDiffLat = Math.sin((aLatRad - bLatRad) / 2);
     let sinDiffLon = Math.sin((aLonRad - bLonRad) / 2);
@@ -45,86 +50,42 @@ function calculateDistance(a: Coordinates, b: Coordinates)
     return 2000 * 6371 * Math.asin(Math.sqrt(c));
 }
 
-function mqttConnect(settings)
+function serverResponseParse(data: Buffer): Coordinates
 {
-    //console.log(settings)
-    const url = `mqtt://${"192.168.90.79"}:${"1883"}`
-    const options = 
-    {
-        clean: true,
-        connectTimeout: 4000,
-        username: "admin",
-        password: "NetRex2022",
-        reconnectPeriod: 1000
-    }
+    let lines = data.toString().split("\r\n");
     
-    const client = mqtt.connect(url, options);
-    
-    client.on('connect', function() 
+    for (const line of lines) 
     {
-        console.log("MQTT connected.");
-        
-        client.subscribe('coordinates', function (error) 
+        let items = line.split(",");
+        if (items.length >= 7 && items[0] === "$GPRMC" && items[3] !== "" && items[4] !== "" && items[5] !== "" && items[6] !== "")
         {
-            if (error !== null)
+            let lat = Number.parseFloat(items[3]) / 100;
+            let lon = Number.parseFloat(items[5]) / 100;
+
+            let latD = Math.floor(lat);
+            let latM = ((lat - Math.floor(lat)) * 100) / 60;
+            lat = latD + latM;
+
+            let lonD = Math.floor(lon);
+            let lonM = ((lon - Math.floor(lon)) * 100) / 60;
+            lon = lonD + lonM;
+
+            if (items[4] == "S")
             {
-                console.log("Connection failed: ", error);
+                lat *= -1;
             }
-            else
+            if (items[6] == "W")
             {
-                console.log("Subscribed successfully.");
-                client.publish("request", undefined, undefined, (error, packet) =>
-                {
-                    console.log("1_", error);
-                    console.log("2_", packet);
-                })
+                lon *= -1;
             }
-        })
-    })
-
-    client.on('message', function(topic, message)
-    {
-        console.log("MESSAGE");
-        console.log("3_", topic);
-        console.log("4_", message.toString())
-        client.end()
-      })
-
-    client.on('error', function(error)
-    {
-        console.log("! Error: ", error);
-        client.end()
-    })
-}
-
-// TEMPORARY
-const coor: Coordinates[] =
-[
-    {
-        latitude: 50.0689464,
-        longitude: 14.4347592
-    },
-    {
-        latitude: 50.0563672,
-        longitude: 14.3752942
-    },
-    {
-        latitude: 50.1019472,
-        longitude: 14.3928689
+            return {latitude: lat, longitude: lon};
+        }
     }
-]
-
-let last = -1;
-function getCoordinates()
-{
-    last = (last + 1) % 3;
-    return coor[last];
 }
 
-function getServiceID()
+function getServiceID(actualCoordinates: Coordinates)
 {
     let lowestServiceID = Number.POSITIVE_INFINITY;
-    let actualCoordinates = getCoordinates();
 
     for (let area of settings.areas)
     {
@@ -135,11 +96,52 @@ function getServiceID()
             lowestServiceID = area.serviceID;
         }
     }
-    console.log(lowestServiceID)
     return lowestServiceID;
 }
 
-let lastServiceID: number;
+function serverConnect()
+{
+    const server = net.createServer((client) => 
+    {
+        client.setEncoding('utf-8');
+        client.setTimeout(1000);
+
+        client.on('data', (data) =>
+        {
+            const coor = serverResponseParse(data);
+            const id = getServiceID(coor);
+            cos[lastServiceID].setEnabled(false);
+            cos[id].setEnabled(true);
+            lastServiceID = id;
+            client.end('Server received data : ' + data + ', send back to client data size : ' + client.bytesWritten);
+        });
+
+        client.on('end', () =>
+        {
+            console.log('Client disconnect.');
+        });
+
+        client.on('timeout',  () =>
+        {
+            console.log('Client request time out.');
+        })
+    });
+
+    server.listen(10110, () =>
+    {
+        server.on('close', () =>
+        {
+            console.log('TCP server socket is closed.');
+        });
+
+        server.on('error', (error) =>
+        {
+            console.log(JSON.stringify(error));
+        });
+    });
+}
+
+let lastServiceID = -1;
 let settings: Settings;
 let cos: Record<number, CamOverlayAPI> = {};
 
@@ -168,14 +170,8 @@ function main()
         co.setEnabled(false);
         cos[area.serviceID] = co;
     }
-    
-    setInterval(()=>
-    {
-        console.log(lastServiceID)
-        cos[lastServiceID]?.setEnabled(false);
-        lastServiceID = getServiceID() + 1
-        cos[lastServiceID].setEnabled(true);
-    }, 3000);
+
+    serverConnect();
 }
 
 main();
