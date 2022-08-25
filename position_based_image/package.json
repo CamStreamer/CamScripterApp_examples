@@ -17,7 +17,6 @@
   "license": "ISC",
   "dependencies": {
     "camstreamerlib": "^1.7.1",
-    "mqtt": "^4.3.7",
     "typescript": "^4.7.4"
   },
   "devDependencies": {

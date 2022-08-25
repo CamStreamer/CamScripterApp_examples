@@ -110,9 +110,14 @@ function serverConnect()
         {
             const coor = serverResponseParse(data);
             const id = getServiceID(coor);
-            cos[lastServiceID].setEnabled(false);
-            cos[id].setEnabled(true);
-            lastServiceID = id;
+
+            if (id !== lastServiceID)
+            {
+                cos[lastServiceID]?.setEnabled(false);
+                cos[id]?.setEnabled(true);
+                lastServiceID = id;
+            }
+            
             client.end('Server received data : ' + data + ', send back to client data size : ' + client.bytesWritten);
         });
 
@@ -145,7 +150,7 @@ let lastServiceID = -1;
 let settings: Settings;
 let cos: Record<number, CamOverlayAPI> = {};
 
-function main()
+async function main()
 {
     try {
         const path = "./localdata/"//process.env.PERSISTENT_DATA_PATH;
@@ -165,13 +170,21 @@ function main()
             auth: `${settings.targetCamera.user}:${settings.targetCamera.password}`,
             serviceID: area.serviceID
         }
-        const co = new CamOverlayAPI(options);
-        co.connect();
-        co.setEnabled(false);
-        cos[area.serviceID] = co;
+        try { 
+            const co = new CamOverlayAPI(options);
+            await co.connect();
+            await co.setEnabled(false);
+            cos[area.serviceID] = co;
+        } catch (error) {
+            console.log(`Cannot connect to CamOverlay service with ID ${area.serviceID} (${error})`)
+        }
     }
-
     serverConnect();
 }
+
+process.on("unhandledRejection", (reason) => {
+    console.log(reason);
+    process.exit(1);
+})
 
 main();
