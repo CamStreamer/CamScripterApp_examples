@@ -18,8 +18,7 @@ $(document).ready(function () {
         $('#mUser').val(settings.modem.user);
         $('#mPassword').val(settings.modem.password);
 
-        for (let area of settings.areas)
-        {
+        for (let area of settings.areas) {
             addAreaFormHTML(area);
         }
     });
@@ -31,13 +30,11 @@ $(document).ready(function () {
     });
 });
 
-function addNewPosition_Click()
-{
+function addNewPosition_Click() {
     addAreaFormHTML();
 }
 
-function removePosition_Click()
-{
+function removePosition_Click() {
     const index = buttons.indexOf(this);
     areaForms.splice(index, 1);
     buttons.splice(index, 1);
@@ -46,21 +43,19 @@ function removePosition_Click()
 }
 
 let number = 0;
-function addAreaFormHTML(area = null)
-{
+function addAreaFormHTML(area = null) {
     number += 1;
     const ids = ["coordinates", "radius", "serviceID"];
     const texts = ["GPS coordinates (copy from Google Maps)", "radius (m)", "service ID"];
     const placeholders = ["50.054877509994405, 14.375785127748992", "400", "0"];
     const values = [`${area?.coordinates.latitude}, ${area?.coordinates.longitude}`,
-                    area?.radius, area?.serviceID];
+    area?.radius, area?.serviceID];
     const form = document.createElement("form");
     $(form).addClass("form-group");
     $(form).addClass("flex");
 
     const areaForm = {};
-    for (let i = 0; i < 3; i++)
-    {
+    for (let i = 0; i < 3; i++) {
         let id = `${ids[i]}${number}`;
         const label = document.createElement("label");
         $(label).attr("for", id);
@@ -72,8 +67,7 @@ function addAreaFormHTML(area = null)
         $(input).attr("placeholder", placeholders[i]);
         $(input).addClass("form-control");
         $(input).change(inputChanged);
-        if (area != null)
-        {
+        if (area != null) {
             $(input).val(values[i]);
         }
 
@@ -81,7 +75,7 @@ function addAreaFormHTML(area = null)
         $(div).addClass(ids[i]);
         $(div).addClass("form-group");
         $(div).append(label, input);
-        
+
         $(form).append(div);
         areaForm[ids[i]] = input;
     }
@@ -131,12 +125,11 @@ function inputChanged() {
         areas: []
     };
 
-    for (let area of areaForms)
-    {
+    for (let area of areaForms) {
         const splitedCoordinates = $(area.coordinates).val().split(",");
         const areaValues =
         {
-            coordinates: 
+            coordinates:
             {
                 latitude: splitedCoordinates[0].trim(),
                 longitude: splitedCoordinates[1].trim()
