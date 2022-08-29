@@ -100,7 +100,7 @@ function inputChanged() {
         sourceCamera:
         {
             IP: $('#scIP').val(),
-            port: $('#scPort').val(),
+            port: Number.parseInt($('#scPort').val()),
             user: $('#scUser').val(),
             password: $('#scPassword').val()
         },
@@ -108,7 +108,7 @@ function inputChanged() {
         targetCamera:
         {
             IP: $('#tcIP').val(),
-            port: $('#tcPort').val(),
+            port: Number.parseInt($('#tcPort').val()),
             user: $('#tcUser').val(),
             password: $('#tcPassword').val()
         },
@@ -121,9 +121,15 @@ function inputChanged() {
         const eventValues =
         {
             eventName: $(event.eventName).val(),
-            serviceID: $(event.serviceID).val(),
-            duration: $(event.duration).val()
-        }
+            serviceID: Number.parseInt($(event.serviceID).val())
+        };
+
+        const duration = $(event.duration).val().split(":");
+        const hours = Number.parseInt(duration[0]);
+        const minutes = Number.parseInt(duration[1]);
+        const seconds = Number.parseInt(duration[2]);
+        eventValues.duration = (3600 * hours + 60 * minutes + seconds) * 1000;
+
         settings.events.push(eventValues);
     }
     

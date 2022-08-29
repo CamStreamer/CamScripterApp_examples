@@ -16,8 +16,18 @@
     "events":
     [
         {
-            "eventName": "",
-            "serviceID": "",
+            "eventName": "tnsaxis:CameraApplicationPlatform/SED_Alert/Glassbreak",
+            "serviceID": 1,
+            "duration": 0
+        },
+        {
+            "eventName": "tnsaxis:CameraApplicationPlatform/SED_Alert/Gunshot",
+            "serviceID": 2,
+            "duration": 0
+        },
+        {
+            "eventName": "tnsaxis:CameraApplicationPlatform/SED_Alert/Scream",
+            "serviceID": 3,
             "duration": 0
         }
     ]
