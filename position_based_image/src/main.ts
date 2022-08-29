@@ -81,6 +81,23 @@ function serverResponseParse(data: Buffer): Coordinates {
   return null;
 }
 
+async function synchroniseCamOverlay()
+{
+    for (let sid in cos)
+    {
+        let id = Number.parseInt(sid);
+        let isEnabled = await cos[id].isEnabled()
+        if (!isEnabled && id == lastServiceID)
+        {
+            cos[id].setEnabled(true);
+        }
+        else if (isEnabled && id != lastServiceID)
+        {
+            cos[id].setEnabled(false);
+        }
+    }
+}
+
 function getServiceID(actualCoordinates: Coordinates) {
   let lowestServiceID = Number.POSITIVE_INFINITY;
 
@@ -105,11 +122,8 @@ function serverConnect() {
       if (coor !== null) {
         const id = getServiceID(coor);
 
-        if (id !== lastServiceID) {
-          cos[lastServiceID]?.setEnabled(false);
-          cos[id]?.setEnabled(true);
-          lastServiceID = id;
-        }
+        lastServiceID = id;
+        synchroniseCamOverlay();
       }
 
       client.end();
@@ -128,6 +142,8 @@ function serverConnect() {
     server.on("error", (error) => {
       console.log(JSON.stringify(error));
     });
+
+    setInterval(synchroniseCamOverlay, 60000);
   });
 }
 
