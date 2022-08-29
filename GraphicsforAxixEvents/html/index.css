@@ -1,0 +1,38 @@
+#leftInputs
+{
+    margin-right: 20px;
+    max-width: 40%;
+}
+.flex
+{
+    display: flex;
+    gap: 8px;
+}
+.eventName
+{
+    width: 80%;
+}
+.serviceID
+{
+    width: 30%;
+}
+.duration
+{
+    width: 50%;
+}
+label
+{
+    margin-left: 0.5rem;
+}
+.removeEvent
+{
+    height: 50%;
+    margin-top: 32px;
+    margin-left: 0.5rem;
+
+}
+
+#info
+{
+    margin-top: 16px;
+}

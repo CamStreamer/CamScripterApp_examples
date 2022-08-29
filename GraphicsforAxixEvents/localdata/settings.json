@@ -1,0 +1,24 @@
+{
+    "sourceCamera":
+    {
+        "IP": "192.168.91.157",
+        "port": 80,
+        "user": "root",
+        "password": "pass2"
+    },
+    "targetCamera":
+    {
+        "IP": "192.168.91.157",
+        "port": 80,
+        "user": "root",
+        "password": "pass2"
+    },
+    "events":
+    [
+        {
+            "eventName": "",
+            "serviceID": "",
+            "duration": 0
+        }
+    ]
+}
