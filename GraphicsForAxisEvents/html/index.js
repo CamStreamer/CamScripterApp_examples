@@ -13,8 +13,7 @@ $(document).ready(function () {
         $('#tcUser').val(settings.targetCamera.user);
         $('#tcPassword').val(settings.targetCamera.password);
 
-        for (let event of settings.events)
-        {
+        for (let event of settings.events) {
             addEventFormHTML(event);
         }
     });
@@ -26,13 +25,11 @@ $(document).ready(function () {
     });
 });
 
-function addNewEvent_Click()
-{
+function addNewEvent_Click() {
     addEventFormHTML();
 }
 
-function removeEvent_Click()
-{
+function removeEvent_Click() {
     const index = buttons.indexOf(this);
     eventForms.splice(index, 1);
     buttons.splice(index, 1);
@@ -41,8 +38,7 @@ function removeEvent_Click()
 }
 
 let number = 0;
-function addEventFormHTML(event = null)
-{
+function addEventFormHTML(event = null) {
     number += 1;
     const ids = ["eventName", "serviceID", "duration"];
     const texts = ["event name", "service ID", "duration (hh:mm:ss)"];
@@ -52,8 +48,7 @@ function addEventFormHTML(event = null)
     $(form).addClass("flex");
 
     const eventForm = {};
-    for (let i = 0; i < 3; i++)
-    {
+    for (let i = 0; i < 3; i++) {
         let id = ids[i].concat(number);
         const label = document.createElement("label");
         $(label).attr("for", id);
@@ -65,9 +60,8 @@ function addEventFormHTML(event = null)
         $(input).attr("placeholder", placeholders[i]);
         $(input).addClass("form-control");
         $(input).change(inputChanged);
-        
-        if (event != null)
-        {
+
+        if (event != null) {
             $(input).val(event[ids[i]]);
         }
 
@@ -75,7 +69,7 @@ function addEventFormHTML(event = null)
         $(div).addClass(ids[i]);
         $(div).addClass("form-group");
         $(div).append(label, input);
-        
+
         $(form).append(div);
         eventForm[ids[i]] = input;
     }
@@ -116,8 +110,7 @@ function inputChanged() {
         events: []
     };
 
-    for (let event of eventForms)
-    {
+    for (let event of eventForms) {
         const eventValues =
         {
             eventName: $(event.eventName).val(),
@@ -132,6 +125,6 @@ function inputChanged() {
 
         settings.events.push(eventValues);
     }
-    
+
     $.post('/local/camscripter/package/settings.cgi?package_name=graphics_for_axix_events&action=set', JSON.stringify(settings));
 }
