@@ -1,9 +1,9 @@
 {
-  "package_name": "graphics_for_axix_events",
-  "package_menu_name": "Graphics for Axix events",
+  "package_name": "graphics_for_axis_events",
+  "package_menu_name": "Graphics for Axis events",
   "package_version": "1.0.0",
   "vendor": "Camstreamer s.r.o.",
   "required_camscripter_version": "1.2.3",
   "required_camscripter_rbi_version": "1.0.0",
-  "ui_link": "/local/camscripter/package/graphics_for_axix_events/index.html"
+  "ui_link": "/local/camscripter/package/graphics_for_axis_events/index.html"
 }
