@@ -1,6 +1,6 @@
 {
   "package_name": "position_based_image",
-  "package_menu_name": "Position based image",
+  "package_menu_name": "Position Based Image",
   "package_version": "1.0.0",
   "vendor": "Camstreamer s.r.o.",
   "required_camscripter_version": "1.2.3",

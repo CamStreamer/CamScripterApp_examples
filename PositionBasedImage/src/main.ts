@@ -81,21 +81,16 @@ function serverResponseParse(data: Buffer): Coordinates {
   return null;
 }
 
-async function synchroniseCamOverlay()
-{
-    for (let sid in cos)
-    {
-        let id = Number.parseInt(sid);
-        let isEnabled = await cos[id].isEnabled()
-        if (!isEnabled && id == lastServiceID)
-        {
-            cos[id].setEnabled(true);
-        }
-        else if (isEnabled && id != lastServiceID)
-        {
-            cos[id].setEnabled(false);
-        }
+async function synchroniseCamOverlay() {
+  for (let sid in cos) {
+    let id = Number.parseInt(sid);
+    let isEnabled = await cos[id].isEnabled();
+    if (!isEnabled && id == lastServiceID) {
+      cos[id].setEnabled(true);
+    } else if (isEnabled && id != lastServiceID) {
+      cos[id].setEnabled(false);
     }
+  }
 }
 
 function getServiceID(actualCoordinates: Coordinates) {
