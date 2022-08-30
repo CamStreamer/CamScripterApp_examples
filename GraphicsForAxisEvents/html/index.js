@@ -19,17 +19,17 @@ $(document).ready(function () {
     });
 
     $(".form-control").change(inputChanged);
-    $("#addNewEvent").click(addNewEvent_Click);
+    $("#addNewEvent").click(addNewEventClick);
     $(".myForm").submit(function () {
         return false;
     });
 });
 
-function addNewEvent_Click() {
+function addNewEventClick() {
     addEventFormHTML();
 }
 
-function removeEvent_Click() {
+function removeEventClick() {
     const index = buttons.indexOf(this);
     eventForms.splice(index, 1);
     buttons.splice(index, 1);
@@ -41,7 +41,7 @@ let number = 0;
 function addEventFormHTML(event = null) {
     number += 1;
     const ids = ["eventName", "serviceID", "duration"];
-    const texts = ["event name", "service ID", "duration (hh:mm:ss)"];
+    const texts = ["Event Name", "Service ID", "Duration (hh:mm:ss)"];
     const placeholders = ["name of event", "0", "00:00:00"]
     const form = document.createElement("form");
     $(form).addClass("form-group");
@@ -80,7 +80,7 @@ function addEventFormHTML(event = null) {
     $(button).addClass("btn-danger");
     $(button).addClass("removeEvent");
     $(button).text("X");
-    $(button).click(removeEvent_Click);
+    $(button).click(removeEventClick);
     $(form).append($(button));
 
     buttons.push(button);
@@ -122,6 +122,11 @@ function inputChanged() {
         const minutes = Number.parseInt(duration[1]);
         const seconds = Number.parseInt(duration[2]);
         eventValues.duration = (3600 * hours + 60 * minutes + seconds) * 1000;
+
+        if (Number.isNaN(eventValues.duration.isNan()))
+        {
+            eventValues.duration = 0;
+        }
 
         settings.events.push(eventValues);
     }

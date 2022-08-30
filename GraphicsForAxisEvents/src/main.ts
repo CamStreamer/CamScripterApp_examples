@@ -24,19 +24,27 @@ type Event = {
   eventName: string;
   duration: number;
   co: CamOverlayAPI;
+  lastTimeout: NodeJS.Timeout;
 };
 
-let cv: CameraVapix;
 let settings: Settings;
 
 function onEventMessage(event: Event) {
   event.co.setEnabled(true);
-  setTimeout(() => {
-    event.co.setEnabled(false);
-  }, event.duration);
+  if (event.duration >= 1)
+  {
+    if (event.lastTimeout !== null)
+    {
+        clearTimeout(event.lastTimeout);
+    }
+    event.lastTimeout = setTimeout(() => {
+        event.co.setEnabled(false);
+        event.lastTimeout = null
+      }, event.duration);
+  }
 }
 
-async function reserveEventMessages() {
+async function reserveEventMessages(cv: CameraVapix) {
   for (let event of settings.events) {
     const options = {
       ip: settings.targetCamera.IP,
@@ -54,6 +62,7 @@ async function reserveEventMessages() {
           eventName: event.eventName,
           duration: event.duration,
           co: co,
+          lastTimeout: null
         };
         onEventMessage(e);
       });
@@ -87,7 +96,7 @@ async function main() {
     auth: `${settings.targetCamera.user}:${settings.targetCamera.password}`,
   };
 
-  cv = new CameraVapix(options);
+  const cv = new CameraVapix(options);
   cv.on("eventsDisconnect", (error) => {
     if (error == undefined) {
       console.log("Websocket disconnected.");
@@ -97,7 +106,7 @@ async function main() {
     process.exit(1);
   });
 
-  await reserveEventMessages();
+  await reserveEventMessages(cv);
   cv.eventsConnect("websocket");
 }
 
