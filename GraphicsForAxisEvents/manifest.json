@@ -1,6 +1,6 @@
 {
   "package_name": "graphics_for_axis_events",
-  "package_menu_name": "Graphics for Axis events",
+  "package_menu_name": "Graphics for Axis Events",
   "package_version": "1.0.0",
   "vendor": "Camstreamer s.r.o.",
   "required_camscripter_version": "1.2.3",
