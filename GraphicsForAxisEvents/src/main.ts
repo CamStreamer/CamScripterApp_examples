@@ -27,8 +27,6 @@ type Event = {
   lastTimeout: NodeJS.Timeout;
 };
 
-let settings: Settings;
-
 function onEventMessage(event: Event) {
   event.co.setEnabled(true);
   if (event.duration >= 1) {
@@ -42,7 +40,19 @@ function onEventMessage(event: Event) {
   }
 }
 
-async function reserveEventMessages(cv: CameraVapix) {
+function getSettings() {
+  try {
+    const path = "./localdata/"; //process.env.PERSISTENT_DATA_PATH;
+    const data = fs.readFileSync(path + "settings.json");
+    return JSON.parse(data.toString());
+  } catch (error) {
+    console.log("Error with Settings file: ", error);
+    process.exit(1);
+  }
+}
+
+async function prepareCamOverlay(settings: Settings) {
+  const cos: Record<number, CamOverlayAPI> = {};
   for (let event of settings.events) {
     const options = {
       ip: settings.targetCamera.IP,
@@ -54,16 +64,7 @@ async function reserveEventMessages(cv: CameraVapix) {
       const co = new CamOverlayAPI(options);
       await co.connect();
       await co.setEnabled(false);
-
-      cv.on(event.eventName, () => {
-        const e = {
-          eventName: event.eventName,
-          duration: event.duration,
-          co: co,
-          lastTimeout: null,
-        };
-        onEventMessage(e);
-      });
+      cos[event.serviceID] = co;
     } catch (error) {
       console.log(
         `Cannot connect to CamOverlay service with ID ${event.serviceID} (${error})`
@@ -71,22 +72,13 @@ async function reserveEventMessages(cv: CameraVapix) {
       process.exit(1);
     }
   }
+  return cos;
 }
 
-function getSettings() {
-  try {
-    const path = process.env.PERSISTENT_DATA_PATH;
-    const data = fs.readFileSync(path + "settings.json");
-    return JSON.parse(data.toString());
-  } catch (error) {
-    console.log("Error with Settings file: ", error);
-    process.exit(1);
-  }
-}
-
-async function main() {
-  settings = getSettings();
-
+async function subscribeEventMessages(
+  settings: Settings,
+  cos: Record<number, CamOverlayAPI>
+) {
   const options = {
     protocol: "http",
     ip: settings.targetCamera.IP,
@@ -104,8 +96,24 @@ async function main() {
     process.exit(1);
   });
 
-  await reserveEventMessages(cv);
+  for (let event of settings.events) {
+    cv.on(event.eventName, () => {
+      const e = {
+        eventName: event.eventName,
+        duration: event.duration,
+        co: cos[event.serviceID],
+        lastTimeout: null,
+      };
+      onEventMessage(e);
+    });
+  }
   cv.eventsConnect("websocket");
+}
+
+async function main() {
+  const settings = getSettings();
+  const cos = await prepareCamOverlay(settings);
+  subscribeEventMessages(settings, cos);
 }
 
 process.on("unhandledRejection", (reason) => {

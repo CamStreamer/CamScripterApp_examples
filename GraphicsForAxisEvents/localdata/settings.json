@@ -1,34 +1,24 @@
 {
     "sourceCamera":
     {
-        "IP": "192.168.91.157",
+        "IP": "127.0.0.1",
         "port": 80,
         "user": "root",
-        "password": "pass2"
+        "password": ""
     },
     "targetCamera":
     {
-        "IP": "192.168.91.157",
+        "IP": "127.0.0.1",
         "port": 80,
         "user": "root",
-        "password": "pass2"
+        "password": ""
     },
     "events":
     [
         {
-            "eventName": "tnsaxis:CameraApplicationPlatform/SED_Alert/Glassbreak",
-            "serviceID": 1,
-            "duration": 0
-        },
-        {
-            "eventName": "tnsaxis:CameraApplicationPlatform/SED_Alert/Gunshot",
-            "serviceID": 2,
-            "duration": 0
-        },
-        {
-            "eventName": "tnsaxis:CameraApplicationPlatform/SED_Alert/Scream",
-            "serviceID": 3,
-            "duration": 0
+            "eventName": "",
+            "serviceID": "",
+            "duration": ""
         }
     ]
 }

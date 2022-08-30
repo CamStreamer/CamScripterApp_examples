@@ -2,7 +2,7 @@ const eventForms = [];
 const buttons = [];
 
 $(document).ready(function () {
-    $.get('/local/camscripter/package/settings.cgi?package_name=graphics_for_axix_events&action=get', function (settings) {
+    $.get('/local/camscripter/package/settings.cgi?package_name=graphics_for_axis_events&action=get', function (settings) {
         $('#scIP').val(settings.sourceCamera.IP);
         $('#scPort').val(settings.sourceCamera.port);
         $('#scUser').val(settings.sourceCamera.user);
@@ -123,12 +123,12 @@ function inputChanged() {
         const seconds = Number.parseInt(duration[2]);
         eventValues.duration = (3600 * hours + 60 * minutes + seconds) * 1000;
 
-        if (Number.isNaN(eventValues.duration.isNan())) {
+        if (Number.isNaN(eventValues.duration)) {
             eventValues.duration = 0;
         }
 
         settings.events.push(eventValues);
     }
 
-    $.post('/local/camscripter/package/settings.cgi?package_name=graphics_for_axix_events&action=set', JSON.stringify(settings));
+    $.post('/local/camscripter/package/settings.cgi?package_name=graphics_for_axis_events&action=set', JSON.stringify(settings));
 }
