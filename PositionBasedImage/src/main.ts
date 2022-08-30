@@ -112,20 +112,19 @@ function serverConnect() {
 
     let dataBuffer = Buffer.alloc(0);
     client.on("data", (data) => {
-        dataBuffer = Buffer.concat([dataBuffer, data]);
+      dataBuffer = Buffer.concat([dataBuffer, data]);
 
-        let lines = data.toString().split("\r\n");
-        lines.pop();
-        const coor = serverResponseParse(lines);
-        dataBuffer = Buffer.from(lines[lines.length - 1]);
+      let lines = data.toString().split("\r\n");
+      lines.pop();
+      const coor = serverResponseParse(lines);
+      dataBuffer = Buffer.from(lines[lines.length - 1]);
 
       if (coor !== null) {
         const id = getServiceID(coor);
 
-        if (id != lastServiceID)
-        {
-            lastServiceID = id;
-            synchroniseCamOverlay();
+        if (id != lastServiceID) {
+          lastServiceID = id;
+          synchroniseCamOverlay();
         }
       }
     });
