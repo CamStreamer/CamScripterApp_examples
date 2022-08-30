@@ -15,15 +15,17 @@ type Coordinates = {
 };
 
 type Settings = {
-  sourceCamera: Camera;
   targetCamera: Camera;
-  modem: Camera;
   areas: {
     coordinates: Coordinates;
     radius: number;
     serviceID: number;
   }[];
 };
+
+let lastServiceID = -1;
+let settings: Settings;
+let cos: Record<number, CamOverlayAPI> = {};
 
 function deg2rad(angle: number) {
   return (angle * Math.PI) / 180;
@@ -44,8 +46,8 @@ function calculateDistance(a: Coordinates, b: Coordinates) {
   return 2000 * 6371 * Math.asin(Math.sqrt(c));
 }
 
-function serverResponseParse(data: Buffer): Coordinates {
-  let lines = data.toString().split("\r\n");
+function serverResponseParse(lines: string[]): Coordinates {
+  let returnValue = null;
 
   for (const line of lines) {
     let items = line.split(",");
@@ -74,16 +76,15 @@ function serverResponseParse(data: Buffer): Coordinates {
       if (items[6] == "W") {
         lon *= -1;
       }
-      return { latitude: lat, longitude: lon };
+      returnValue = { latitude: lat, longitude: lon };
     }
   }
-
-  return null;
+  return returnValue;
 }
 
 async function synchroniseCamOverlay() {
-  for (let sid in cos) {
-    let id = Number.parseInt(sid);
+  for (let idString in cos) {
+    let id = Number.parseInt(idString);
     let isEnabled = await cos[id].isEnabled();
     if (!isEnabled && id == lastServiceID) {
       cos[id].setEnabled(true);
@@ -98,7 +99,7 @@ function getServiceID(actualCoordinates: Coordinates) {
 
   for (let area of settings.areas) {
     let distance = calculateDistance(actualCoordinates, area.coordinates);
-
+console.log(distance)
     if (distance <= area.radius && area.serviceID < lowestServiceID) {
       lowestServiceID = area.serviceID;
     }
@@ -108,43 +109,49 @@ function getServiceID(actualCoordinates: Coordinates) {
 
 function serverConnect() {
   const server = net.createServer((client) => {
-    client.setEncoding("utf-8");
-    client.setTimeout(1000);
+    client.setTimeout(30000);
 
+    let dataBuffer = Buffer.alloc(0);
     client.on("data", (data) => {
-      const coor = serverResponseParse(data);
+        dataBuffer = Buffer.concat([dataBuffer, data]);
+
+        let lines = data.toString().split("\r\n");
+        lines.slice(lines.length).pop();
+        const coor = serverResponseParse(lines);
+        dataBuffer = Buffer.from(lines[lines.length - 1]);
 
       if (coor !== null) {
         const id = getServiceID(coor);
 
-        lastServiceID = id;
-        synchroniseCamOverlay();
+        if (id != lastServiceID)
+        {
+            lastServiceID = id;
+            synchroniseCamOverlay();
+        }
       }
-
-      client.end();
     });
 
     client.on("timeout", () => {
       console.log("Client request time out.");
+      client.end();
+      process.exit(1);
     });
   });
 
   server.listen(10110, () => {
     server.on("close", () => {
       console.log("TCP server socket is closed.");
+      process.exit(1);
     });
 
     server.on("error", (error) => {
       console.log(JSON.stringify(error));
+      process.exit(1);
     });
 
     setInterval(synchroniseCamOverlay, 60000);
   });
 }
-
-let lastServiceID = -1;
-let settings: Settings;
-let cos: Record<number, CamOverlayAPI> = {};
 
 async function main() {
   try {

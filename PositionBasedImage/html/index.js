@@ -3,20 +3,10 @@ const buttons = [];
 
 $(document).ready(function () {
     $.get('/local/camscripter/package/settings.cgi?package_name=position_based_image&action=get', function (settings) {
-        $('#scIP').val(settings.sourceCamera.IP);
-        $('#scPort').val(settings.sourceCamera.port);
-        $('#scUser').val(settings.sourceCamera.user);
-        $('#scPassword').val(settings.sourceCamera.password);
-
         $('#tcIP').val(settings.targetCamera.IP);
         $('#tcPort').val(settings.targetCamera.port);
         $('#tcUser').val(settings.targetCamera.user);
         $('#tcPassword').val(settings.targetCamera.password);
-
-        $('#mIP').val(settings.modem.IP);
-        $('#mPort').val(settings.modem.port);
-        $('#mUser').val(settings.modem.user);
-        $('#mPassword').val(settings.modem.password);
 
         for (let area of settings.areas) {
             addAreaFormHTML(area);
@@ -24,17 +14,17 @@ $(document).ready(function () {
     });
 
     $(".form-control").change(inputChanged);
-    $("#addNewPosition").click(addNewPosition_Click);
+    $("#addNewPosition").click(addNewPositionClick);
     $(".myForm").submit(function () {
         return false;
     });
 });
 
-function addNewPosition_Click() {
+function addNewPositionClick() {
     addAreaFormHTML();
 }
 
-function removePosition_Click() {
+function removePositionClick() {
     const index = buttons.indexOf(this);
     areaForms.splice(index, 1);
     buttons.splice(index, 1);
@@ -87,7 +77,7 @@ function addAreaFormHTML(area = null) {
     $(button).addClass("btn-danger");
     $(button).addClass("removePosition");
     $(button).text("X");
-    $(button).click(removePosition_Click);
+    $(button).click(removePositionClick);
     $(form).append($(button));
 
     buttons.push(button);
@@ -98,28 +88,12 @@ function addAreaFormHTML(area = null) {
 function inputChanged() {
     let settings =
     {
-        sourceCamera:
-        {
-            IP: $('#scIP').val(),
-            port: $('#scPort').val(),
-            user: $('#scUser').val(),
-            password: $('#scPassword').val()
-        },
-
         targetCamera:
         {
             IP: $('#tcIP').val(),
             port: $('#tcPort').val(),
             user: $('#tcUser').val(),
             password: $('#tcPassword').val()
-        },
-
-        modem:
-        {
-            IP: $('#mIP').val(),
-            port: $('#mPort').val(),
-            user: $('#mUser').val(),
-            password: $('#mPassword').val()
         },
 
         areas: []

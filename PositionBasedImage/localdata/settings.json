@@ -1,11 +1,4 @@
 {
-    "sourceCamera":
-    {
-        "IP": "192.168.91.157",
-        "port": 80,
-        "user": "root",
-        "password": "pass2"
-    },
     "targetCamera":
     {
         "IP": "192.168.91.157",
@@ -13,20 +6,13 @@
         "user": "root",
         "password": "pass2"
     },
-    "modem":
-    {
-        "IP": "",
-        "port": "",
-        "user": "",
-        "password": ""
-    },
     "areas":
     [
         {
             "coordinates":
             {
-                "latitude": "50.0696144",
-                "longitude": "14.4348692"
+                "latitude": "50.066506",
+                "longitude": "14.397909"
             },
             "radius": "200",
             "serviceID": "1"
