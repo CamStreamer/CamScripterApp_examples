@@ -16,7 +16,7 @@ type Settings = {
   events: {
     eventName: string;
     serviceID: number;
-    duration: number;
+    duration: string;
   }[];
 };
 
@@ -97,10 +97,20 @@ async function subscribeEventMessages(
   });
 
   for (let event of settings.events) {
+    const time = event.duration.split(":");
+    const hours = Number.parseInt(time[0]);
+    const minutes = Number.parseInt(time[1]);
+    const seconds = Number.parseInt(time[2]);
+
+    let duration = (3600 * hours + 60 * minutes + seconds) * 1000;
+    if (Number.isNaN(duration)) {
+      duration = 0;
+    }
+
     cv.on(event.eventName, () => {
       const e = {
         eventName: event.eventName,
-        duration: event.duration,
+        duration: duration,
         co: cos[event.serviceID],
         lastTimeout: null,
       };

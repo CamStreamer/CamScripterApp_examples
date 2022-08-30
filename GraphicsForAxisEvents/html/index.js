@@ -114,18 +114,9 @@ function inputChanged() {
         const eventValues =
         {
             eventName: $(event.eventName).val(),
-            serviceID: Number.parseInt($(event.serviceID).val())
+            serviceID: Number.parseInt($(event.serviceID).val()),
+            duration: $(event.duration).val()
         };
-
-        const duration = $(event.duration).val().split(":");
-        const hours = Number.parseInt(duration[0]);
-        const minutes = Number.parseInt(duration[1]);
-        const seconds = Number.parseInt(duration[2]);
-        eventValues.duration = (3600 * hours + 60 * minutes + seconds) * 1000;
-
-        if (Number.isNaN(eventValues.duration)) {
-            eventValues.duration = 0;
-        }
 
         settings.events.push(eventValues);
     }
