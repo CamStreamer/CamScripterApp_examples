@@ -123,8 +123,7 @@ function inputChanged() {
         const seconds = Number.parseInt(duration[2]);
         eventValues.duration = (3600 * hours + 60 * minutes + seconds) * 1000;
 
-        if (Number.isNaN(eventValues.duration.isNan()))
-        {
+        if (Number.isNaN(eventValues.duration.isNan())) {
             eventValues.duration = 0;
         }
 

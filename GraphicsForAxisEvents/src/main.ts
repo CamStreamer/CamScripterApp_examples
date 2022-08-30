@@ -31,16 +31,14 @@ let settings: Settings;
 
 function onEventMessage(event: Event) {
   event.co.setEnabled(true);
-  if (event.duration >= 1)
-  {
-    if (event.lastTimeout !== null)
-    {
-        clearTimeout(event.lastTimeout);
+  if (event.duration >= 1) {
+    if (event.lastTimeout !== null) {
+      clearTimeout(event.lastTimeout);
     }
     event.lastTimeout = setTimeout(() => {
-        event.co.setEnabled(false);
-        event.lastTimeout = null
-      }, event.duration);
+      event.co.setEnabled(false);
+      event.lastTimeout = null;
+    }, event.duration);
   }
 }
 
@@ -62,7 +60,7 @@ async function reserveEventMessages(cv: CameraVapix) {
           eventName: event.eventName,
           duration: event.duration,
           co: co,
-          lastTimeout: null
+          lastTimeout: null,
         };
         onEventMessage(e);
       });
