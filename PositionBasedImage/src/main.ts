@@ -99,7 +99,6 @@ function getServiceID(actualCoordinates: Coordinates) {
 
   for (let area of settings.areas) {
     let distance = calculateDistance(actualCoordinates, area.coordinates);
-console.log(distance)
     if (distance <= area.radius && area.serviceID < lowestServiceID) {
       lowestServiceID = area.serviceID;
     }
@@ -116,7 +115,7 @@ function serverConnect() {
         dataBuffer = Buffer.concat([dataBuffer, data]);
 
         let lines = data.toString().split("\r\n");
-        lines.slice(lines.length).pop();
+        lines.pop();
         const coor = serverResponseParse(lines);
         dataBuffer = Buffer.from(lines[lines.length - 1]);
 
