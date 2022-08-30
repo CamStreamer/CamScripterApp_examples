@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Graphics for Axis Events</title>
+    <link rel="stylesheet" href="bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="index.css">
+</head>
+
+<body>
+    <nav class="navbar navbar-dark bg-dark">
+        <a class="navbar-brand" href="#">CamScripter</a>
+    </nav>
+
+    <div class="jumbotron">
+        <div class="container">
+            <h1 class="display-3">Graphics for Axis Events</h1>
+            <p>Changes are saved automatically, you don't have to save them.</p>
+            <div class="row">
+                <div class="col-md-4">
+                    <form class="myForm">
+                        <h2>Axis Events Camera</h2>
+                        <div class="form-group">
+                            <label for="scIP">IP</label>
+                            <input type="text" class="form-control" id="scIP" placeholder="127.0.0.1">
+                        </div>
+                        <div class="form-group">
+                            <label for="scPort">Port</label>
+                            <input type="text" class="form-control" id="scPort" placeholder="80">
+                        </div>
+                        <div class="form-group">
+                            <label for="scUser">User</label>
+                            <input type="text" class="form-control" id="scUser" placeholder="root">
+                        </div>
+                        <div class="form-group">
+                            <label for="scPassword">Password</label>
+                            <input type="password" class="form-control" id="scPassword" placeholder="password">
+                        </div>
+                    </form>
+                    <br>
+                    <form class="myForm">
+                        <h2>CamOverlay App Camera</h2>
+                        <div class="form-group">
+                            <label for="tcIP">IP</label>
+                            <input type="text" class="form-control" id="tcIP" placeholder="127.0.0.1">
+                        </div>
+                        <div class="form-group">
+                            <label for="tcPort">Port</label>
+                            <input type="text" class="form-control" id="tcPort" placeholder="80">
+                        </div>
+                        <div class="form-group">
+                            <label for="tcUser">User</label>
+                            <input type="text" class="form-control" id="tcUser" placeholder="root">
+                        </div>
+                        <div class="form-group">
+                            <label for="tcPassword">Password</label>
+                            <input type="password" class="form-control" id="tcPassword" placeholder="password">
+                        </div>
+                    </form>
+                </div>
+                <div class="col-md-1"></div>
+                <div class="col-md-7">
+                    <h2>List of Events</h2>
+                    <label>
+                        Insert the full path to the event, e.g. tnsaxis:CameraApplicationPlatform/AppName/AlertName, which can be
+                        found via the <a href="https://www.axis.com/developer-community/axis-metadata-monitor" target="blank">Axis Metadata Monitor</a>
+                    </label>
+                    <div id="list"></div>
+                    <button id="addNewEvent" class="btn btn-primary">Add new event</button>
+                    <label id="info">
+                        <p>Duration is used both for solid-state events and stateless events.
+                            If you want to show the graphics the whole time when solid-state
+                            events are active, do not fill duration.</p>
+
+                        <p>If the solid-state event is activated with duration, the graphics
+                            are again shown after going back to state 0 and new state 1.</p>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="jquery-2.2.4/jquery-2.2.4.min.js"></script>
+    <script type="text/javascript" src="bootstrap/bootstrap.min.js"></script>
+    <script type="text/javascript" src="index.js"></script>
+</body>
+
+</html>
