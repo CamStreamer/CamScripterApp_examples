@@ -36,7 +36,7 @@ let number = 0;
 function addAreaFormHTML(area = null) {
     number += 1;
     const ids = ["coordinates", "radius", "serviceIDs"];
-    const texts = ["GPS coordinates (copy from Google Maps)", "Radius (m)", "Service ID"];
+    const texts = ["GPS coordinates (copy from Google Maps)", "Radius (m)", "Service IDs"];
     const placeholders = ["50.054877509994405, 14.375785127748992", "400", "0"];
     const values = [`${area?.coordinates.latitude}, ${area?.coordinates.longitude}`,
     area?.radius, ""];
