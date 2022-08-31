@@ -42,10 +42,7 @@ function addAreaFormHTML(area = null) {
     area?.radius, ""];
 
     if (area != null) {
-        for (let id of area.serviceIDs) {
-            values[2] += id.toString() + ", ";
-        }
-        values[2] = values[2].slice(0, values[2].length - 2);
+        values[2] = area.serviceIDs.join(", ");
     }
 
     const form = document.createElement("form");
@@ -127,8 +124,8 @@ function inputChanged() {
                 latitude: splitedCoordinates[0].trim(),
                 longitude: splitedCoordinates[1].trim()
             },
-            radius: radius,
-            serviceIDs: serviceIDs
+            radius,
+            serviceIDs
         }
         settings.areas.push(areaValues);
     }

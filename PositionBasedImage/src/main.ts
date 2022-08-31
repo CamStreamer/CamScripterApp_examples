@@ -88,7 +88,7 @@ async function synchroniseCamOverlay() {
     let isEnabled = await cos[id].isEnabled();
     if (!isEnabled && activeServices.includes(id)) {
       cos[id].setEnabled(true);
-    } else if (isEnabled && activeServices.includes(id)) {
+    } else if (isEnabled && !activeServices.includes(id)) {
       cos[id].setEnabled(false);
     }
   }
@@ -97,7 +97,7 @@ async function synchroniseCamOverlay() {
 function isEqual(a: number[], b: number[]) {
   let equal = a.length == b.length;
   if (equal) {
-    for (let i = 0; i < a.length; i++) {
+    for (let i = 0; i < a.length && equal; i++) {
       equal = equal && a[i] == b[i];
     }
   }
@@ -183,7 +183,7 @@ async function main() {
       ip: settings.targetCamera.IP,
       port: settings.targetCamera.port,
       auth: `${settings.targetCamera.user}:${settings.targetCamera.password}`,
-      serviceID: serviceID,
+      serviceID,
     };
     try {
       const co = new CamOverlayAPI(options);
