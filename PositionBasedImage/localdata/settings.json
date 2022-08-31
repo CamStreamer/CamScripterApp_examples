@@ -11,10 +11,10 @@
         {
             "coordinates":
             {
-                "latitude": "",
-                "longitude": ""
+                "latitude": 0,
+                "longitude": 0
             },
-            "radius": "",
+            "radius": 100,
             "serviceIDs": []
         }
     ]

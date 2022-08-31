@@ -105,11 +105,13 @@ function inputChanged() {
     };
 
     for (let area of areaForms) {
-        const radius = $(area.radius).val();
+        const radius = Number.parseInt($(area.radius).val());
         const serviceIDs = $(area.serviceIDs).val().split(",");
         const splitedCoordinates = $(area.coordinates).val().split(",");
+        const latitude = Number.parseFloat(splitedCoordinates[0]);
+        const longitude = Number.parseFloat(splitedCoordinates[1]);
 
-        if (radius == "" || serviceIDs[0] == "" || splitedCoordinates.length != 2) {
+        if (Number.isNaN(radius) || serviceIDs[0] == "" || splitedCoordinates.length != 2 || Number.isNaN(latitude) || Number.isNaN(longitude)) {
             continue;
         }
 
@@ -121,8 +123,8 @@ function inputChanged() {
         {
             coordinates:
             {
-                latitude: splitedCoordinates[0].trim(),
-                longitude: splitedCoordinates[1].trim()
+                latitude,
+                longitude
             },
             radius,
             serviceIDs
