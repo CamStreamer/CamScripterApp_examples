@@ -19,11 +19,11 @@ type Settings = {
   areas: {
     coordinates: Coordinates;
     radius: number;
-    serviceID: number;
+    serviceIDs: number[];
   }[];
 };
 
-let lastServiceID = -1;
+let activeServices: number[] = [];
 let settings: Settings;
 let cos: Record<number, CamOverlayAPI> = {};
 
@@ -86,24 +86,32 @@ async function synchroniseCamOverlay() {
   for (let idString in cos) {
     let id = Number.parseInt(idString);
     let isEnabled = await cos[id].isEnabled();
-    if (!isEnabled && id == lastServiceID) {
+    if (!isEnabled && activeServices.includes(id)) {
       cos[id].setEnabled(true);
-    } else if (isEnabled && id != lastServiceID) {
+    } else if (isEnabled && activeServices.includes(id)) {
       cos[id].setEnabled(false);
     }
   }
 }
 
-function getServiceID(actualCoordinates: Coordinates) {
-  let lowestServiceID = Number.POSITIVE_INFINITY;
-
-  for (let area of settings.areas) {
-    let distance = calculateDistance(actualCoordinates, area.coordinates);
-    if (distance <= area.radius && area.serviceID < lowestServiceID) {
-      lowestServiceID = area.serviceID;
+function isEqual(a: number[], b: number[]) {
+  let equal = a.length == b.length;
+  if (equal) {
+    for (let i = 0; i < a.length; i++) {
+      equal = equal && a[i] == b[i];
     }
   }
-  return lowestServiceID;
+  return equal;
+}
+
+function getServiceIDs(actualCoordinates: Coordinates) {
+  for (let area of settings.areas) {
+    let distance = calculateDistance(actualCoordinates, area.coordinates);
+    if (distance <= area.radius) {
+      return area.serviceIDs.sort();
+    }
+  }
+  return [];
 }
 
 function serverConnect() {
@@ -120,10 +128,10 @@ function serverConnect() {
       dataBuffer = Buffer.from(lines[lines.length - 1]);
 
       if (coor !== null) {
-        const id = getServiceID(coor);
+        const ids = getServiceIDs(coor);
 
-        if (id != lastServiceID) {
-          lastServiceID = id;
+        if (!isEqual(ids, activeServices)) {
+          activeServices = ids;
           synchroniseCamOverlay();
         }
       }
@@ -161,23 +169,30 @@ async function main() {
     return;
   }
 
+  let serviceIDs: number[] = [];
   for (let area of settings.areas) {
+    area.serviceIDs.sort();
+
+    for (let serviceID of area.serviceIDs) {
+      serviceIDs.push(serviceID);
+    }
+  }
+
+  for (let serviceID of serviceIDs) {
     const options = {
       ip: settings.targetCamera.IP,
       port: settings.targetCamera.port,
       auth: `${settings.targetCamera.user}:${settings.targetCamera.password}`,
-      serviceID: area.serviceID,
+      serviceID: serviceID,
     };
     try {
       const co = new CamOverlayAPI(options);
       await co.connect();
       await co.setEnabled(false);
-      cos[area.serviceID] = co;
+      cos[serviceID] = co;
     } catch (error) {
-      console.log(
-        `Cannot connect to CamOverlay service with ID ${area.serviceID} (${error})`
-      );
-      return;
+      console.log(`Cannot connect to CamOverlay service with ID ${serviceID}`);
+      console.log(error);
     }
   }
   serverConnect();

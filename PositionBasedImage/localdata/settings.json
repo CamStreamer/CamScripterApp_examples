@@ -1,39 +1,21 @@
 {
     "targetCamera":
     {
-        "IP": "192.168.91.157",
+        "IP": "127.0.0.1",
         "port": 80,
         "user": "root",
-        "password": "pass2"
+        "password": ""
     },
     "areas":
     [
         {
             "coordinates":
             {
-                "latitude": "50.066506",
-                "longitude": "14.397909"
+                "latitude": "",
+                "longitude": ""
             },
-            "radius": "200",
-            "serviceID": "1"
-        },
-        {
-            "coordinates":
-            {
-                "latitude": "50.054877509994405",
-                "longitude": "14.375785127748992"
-            },
-            "radius": "500",
-            "serviceID": "2"
-        },
-        {
-            "coordinates":
-            {
-                "latitude": "50.0998250",
-                "longitude": "14.3962556"
-            },
-            "radius": "600",
-            "serviceID": "3"
+            "radius": "",
+            "serviceIDs": []
         }
     ]
 }

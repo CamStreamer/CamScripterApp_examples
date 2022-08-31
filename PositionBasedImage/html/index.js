@@ -35,11 +35,19 @@ function removePositionClick() {
 let number = 0;
 function addAreaFormHTML(area = null) {
     number += 1;
-    const ids = ["coordinates", "radius", "serviceID"];
-    const texts = ["GPS coordinates (copy from Google Maps)", "radius (m)", "service ID"];
+    const ids = ["coordinates", "radius", "serviceIDs"];
+    const texts = ["GPS coordinates (copy from Google Maps)", "Radius (m)", "Service ID"];
     const placeholders = ["50.054877509994405, 14.375785127748992", "400", "0"];
     const values = [`${area?.coordinates.latitude}, ${area?.coordinates.longitude}`,
-    area?.radius, area?.serviceID];
+    area?.radius, ""];
+
+    if (area != null) {
+        for (let id of area.serviceIDs) {
+            values[2] += id.toString() + ", ";
+        }
+        values[2] = values[2].slice(0, values[2].length - 2);
+    }
+
     const form = document.createElement("form");
     $(form).addClass("form-group");
     $(form).addClass("flex");
@@ -100,7 +108,18 @@ function inputChanged() {
     };
 
     for (let area of areaForms) {
+        const radius = $(area.radius).val();
+        const serviceIDs = $(area.serviceIDs).val().split(",");
         const splitedCoordinates = $(area.coordinates).val().split(",");
+
+        if (radius == "" || serviceIDs[0] == "" || splitedCoordinates.length != 2) {
+            continue;
+        }
+
+        for (let i = 0; i < serviceIDs.length; i++) {
+            serviceIDs[i] = Number.parseInt(serviceIDs[i]);
+        }
+
         const areaValues =
         {
             coordinates:
@@ -108,8 +127,8 @@ function inputChanged() {
                 latitude: splitedCoordinates[0].trim(),
                 longitude: splitedCoordinates[1].trim()
             },
-            radius: $(area.radius).val(),
-            serviceID: $(area.serviceID).val()
+            radius: radius,
+            serviceIDs: serviceIDs
         }
         settings.areas.push(areaValues);
     }
