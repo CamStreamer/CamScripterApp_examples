@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Position Based Image</title>
+    <link rel="stylesheet" href="bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="index.css">
+</head>
+
+<body>
+    <nav class="navbar navbar-dark bg-dark">
+        <a class="navbar-brand" href="#">CamScripter</a>
+    </nav>
+
+    <div class="jumbotron">
+        <div class="container">
+            <h1 class="display-3">Position Based Image</h1>
+            <p>Changes are saved automatically, you don't have to save them.</p>
+            <p><b>SmartFlex modem configuration</b> - go to modem settings > Customization > Router
+                Apps > GPS > Global. The modem will then push GPS data directly to the camera.</p>
+
+            <div class="row">
+                <div class="col-md-4">
+                    <form class="myForm">
+                        <h2>CamOverlay App Camera</h2>
+                        <div class="form-group">
+                            <label for="tcIP">IP</label>
+                            <input type="text" class="form-control" id="tcIP" placeholder="127.0.0.1">
+                        </div>
+                        <div class="form-group">
+                            <label for="tcPort">Port</label>
+                            <input type="text" class="form-control" id="tcPort" placeholder="80">
+                        </div>
+                        <div class="form-group">
+                            <label for="tcUser">User</label>
+                            <input type="text" class="form-control" id="tcUser" placeholder="root">
+                        </div>
+                        <div class="form-group">
+                            <label for="tcPassword">Password</label>
+                            <input type="password" class="form-control" id="tcPassword" placeholder="password">
+                        </div>
+                    </form>
+                </div>
+                <div class="col-md-1"></div>
+                <div class="col-md-7">
+                    <h2>List of positions</h2>
+                    <p>If the areas intersect, the graphics from the line with the lower number is displayed.<br>
+                       If you use multiple service IDs, separate them with a comma.</p>
+                    <div id="list"></div>
+                    <button id="addNewPosition" class="btn btn-primary">Add new position</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="jquery-2.2.4/jquery-2.2.4.min.js"></script>
+    <script type="text/javascript" src="bootstrap/bootstrap.min.js"></script>
+    <script type="text/javascript" src="index.js"></script>
+</body>
+
+</html>

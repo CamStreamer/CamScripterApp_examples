@@ -1,0 +1,29 @@
+#leftInputs
+{
+    margin-right: 20px;
+    max-width: 40%;
+}
+.flex
+{
+    display: flex;
+    gap: 8px;
+}
+.coordinates
+{
+    width: 100%;
+}
+.radius, .serviceID
+{
+    width: 30%;
+}
+label
+{
+    margin-left: 0.5rem;
+}
+.removePosition 
+{
+    height: 50%;
+    margin-top: 32px;
+    margin-left: 0.5rem;
+
+}

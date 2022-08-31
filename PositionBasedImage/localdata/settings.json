@@ -1,0 +1,21 @@
+{
+    "targetCamera":
+    {
+        "IP": "127.0.0.1",
+        "port": 80,
+        "user": "root",
+        "password": ""
+    },
+    "areas":
+    [
+        {
+            "coordinates":
+            {
+                "latitude": 0,
+                "longitude": 0
+            },
+            "radius": 100,
+            "serviceIDs": []
+        }
+    ]
+}
