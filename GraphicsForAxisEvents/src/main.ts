@@ -57,7 +57,7 @@ function onStatefulEvent(event: Event, state: boolean) {
 
 function getSettings() {
   try {
-    const path = "./localdata/"; //process.env.PERSISTENT_DATA_PATH;
+    const path = process.env.PERSISTENT_DATA_PATH;
     const data = fs.readFileSync(path + "settings.json");
     return JSON.parse(data.toString());
   } catch (error) {
