@@ -27,7 +27,7 @@ type Event = {
   lastTimeout: NodeJS.Timeout;
 };
 
-function onEventMessage(event: Event) {
+function onStatelessEvent(event: Event) {
   event.co.setEnabled(true);
   if (event.duration >= 1) {
     if (event.lastTimeout !== null) {
@@ -37,6 +37,24 @@ function onEventMessage(event: Event) {
       event.co.setEnabled(false);
       event.lastTimeout = null;
     }, event.duration);
+  }
+}
+
+function onStatefulEvent(event: Event, state: boolean) {
+  if (event.duration >= 1) {
+    console.log("ss: aktivováno");
+    event.co.setEnabled(true);
+    if (event.lastTimeout !== null) {
+      clearTimeout(event.lastTimeout);
+    }
+    event.lastTimeout = setTimeout(() => {
+      console.log("ss: deaktivováno");
+      event.co.setEnabled(false);
+      event.lastTimeout = null;
+    }, event.duration);
+  } else {
+    console.log("ss: změněno");
+    event.co.setEnabled(state);
   }
 }
 
@@ -75,6 +93,10 @@ async function prepareCamOverlay(settings: Settings) {
   return cos;
 }
 
+function isStateful(eventData) {
+  return eventData.state !== undefined;
+}
+
 async function subscribeEventMessages(
   settings: Settings,
   cos: Record<number, CamOverlayAPI>
@@ -107,14 +129,19 @@ async function subscribeEventMessages(
       duration = 0;
     }
 
-    cv.on(event.eventName, () => {
+    cv.on(event.eventName, (data) => {
+      const eventData = data.params.notification.message.data;
       const e = {
         eventName: event.eventName,
         duration: duration,
         co: cos[event.serviceID],
         lastTimeout: null,
       };
-      onEventMessage(e);
+      if (isStateful(eventData)) {
+        onStatefulEvent(e, eventData.state === 1);
+      } else {
+        onStatelessEvent(e);
+      }
     });
   }
   cv.eventsConnect("websocket");
