@@ -88,17 +88,17 @@ function addEventFormHTML(event = null) {
     $(invertConditionLabel).addClass("form-check-label");
     $(invertConditionLabel).append(invertConditionCheckbox, "Invert Condition");
 
-    const button = document.createElement("button");
-    $(button).attr("type", "button");
-    $(button).addClass("btn");
-    $(button).addClass("btn-danger");
-    $(button).addClass("removeEvent");
-    $(button).text("X");
-    $(button).click(removeEventClick);
+    const removeButton = document.createElement("button");
+    $(removeButton).attr("type", "button");
+    $(removeButton).addClass("btn");
+    $(removeButton).addClass("btn-danger");
+    $(removeButton).addClass("removeEvent");
+    $(removeButton).text("X");
+    $(removeButton).click(removeEventClick);
 
-    $(form).append(invertConditionLabel, button);
+    $(form).append(invertConditionLabel, removeButton);
 
-    buttons.push(button);
+    buttons.push(removeButton);
     eventForms.push(eventForm);
     $("#list").append(form);
 }
