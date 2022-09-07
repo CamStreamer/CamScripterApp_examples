@@ -10,19 +10,25 @@
 }
 .eventName
 {
-    width: 80%;
+    width: 30%;
 }
 .serviceID
 {
-    width: 30%;
+    width: 20%;
 }
 .duration
 {
-    width: 50%;
+    width: 30%;
 }
 label
 {
     margin-left: 0.5rem;
+}
+.form-check-label
+{
+    margin-top: 38px;
+    margin-left: 24px;
+    width: 20%;
 }
 .removeEvent
 {

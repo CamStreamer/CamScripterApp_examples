@@ -74,19 +74,19 @@ function addEventFormHTML(event = null) {
         eventForm[ids[i]] = input;
     }
 
-    const checkbox = document.createElement("input");
-    $(checkbox).attr("id", "invert" + number);
-    $(checkbox).attr("type", "checkbox");
-    $(checkbox).addClass("form-check-input");
-    $(checkbox).change(inputChanged);
-    eventForm["invert"] = checkbox;
+    const invertConditionCheckbox = document.createElement("input");
+    $(invertConditionCheckbox).attr("id", "invert" + number);
+    $(invertConditionCheckbox).attr("type", "checkbox");
+    $(invertConditionCheckbox).addClass("form-check-input");
+    $(invertConditionCheckbox).change(inputChanged);
+    eventForm["invert"] = invertConditionCheckbox;
     if (event?.invert) {
-        $(checkbox).prop("checked", true);
+        $(invertConditionCheckbox).prop("checked", true);
     }
 
-    const label = document.createElement("label");
-    $(label).addClass("form-check-label");
-    $(label).append(checkbox, "Invert condition");
+    const invertConditionLabel = document.createElement("label");
+    $(invertConditionLabel).addClass("form-check-label");
+    $(invertConditionLabel).append(invertConditionCheckbox, "Invert Condition");
 
     const button = document.createElement("button");
     $(button).attr("type", "button");
@@ -96,7 +96,7 @@ function addEventFormHTML(event = null) {
     $(button).text("X");
     $(button).click(removeEventClick);
 
-    $(form).append(label, button);
+    $(form).append(invertConditionLabel, button);
 
     buttons.push(button);
     eventForms.push(eventForm);
