@@ -17,6 +17,7 @@ type Settings = {
     eventName: string;
     serviceID: number;
     duration: string;
+    invert: boolean;
   }[];
 };
 
@@ -40,16 +41,18 @@ function onStatelessEvent(event: Event) {
   }
 }
 
-function onStatefulEvent(event: Event, state: boolean) {
+function onStatefulEvent(event: Event, state: boolean, invert: boolean) {
   if (event.duration >= 1) {
-    event.co.setEnabled(true);
-    if (event.lastTimeout !== null) {
-      clearTimeout(event.lastTimeout);
+    if (state !== invert) {
+      event.co.setEnabled(true);
+      if (event.lastTimeout !== null) {
+        clearTimeout(event.lastTimeout);
+      }
+      event.lastTimeout = setTimeout(() => {
+        event.co.setEnabled(false);
+        event.lastTimeout = null;
+      }, event.duration);
     }
-    event.lastTimeout = setTimeout(() => {
-      event.co.setEnabled(false);
-      event.lastTimeout = null;
-    }, event.duration);
   } else {
     event.co.setEnabled(state);
   }
@@ -135,7 +138,7 @@ async function subscribeEventMessages(
         lastTimeout: null,
       };
       if (isStateful(eventData)) {
-        onStatefulEvent(e, eventData.state === "1");
+        onStatefulEvent(e, eventData.state === "1", event.invert);
       } else {
         onStatelessEvent(e);
       }

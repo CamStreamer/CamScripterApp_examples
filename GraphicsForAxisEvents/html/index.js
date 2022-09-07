@@ -74,6 +74,20 @@ function addEventFormHTML(event = null) {
         eventForm[ids[i]] = input;
     }
 
+    const checkbox = document.createElement("input");
+    $(checkbox).attr("id", "invert" + number);
+    $(checkbox).attr("type", "checkbox");
+    $(checkbox).addClass("form-check-input");
+    $(checkbox).change(inputChanged);
+    eventForm["invert"] = checkbox;
+    if (event?.invert) {
+        $(checkbox).prop("checked", true);
+    }
+
+    const label = document.createElement("label");
+    $(label).addClass("form-check-label");
+    $(label).append(checkbox, "Invert condition");
+
     const button = document.createElement("button");
     $(button).attr("type", "button");
     $(button).addClass("btn");
@@ -81,7 +95,8 @@ function addEventFormHTML(event = null) {
     $(button).addClass("removeEvent");
     $(button).text("X");
     $(button).click(removeEventClick);
-    $(form).append($(button));
+
+    $(form).append(label, button);
 
     buttons.push(button);
     eventForms.push(eventForm);
@@ -115,7 +130,8 @@ function inputChanged() {
         {
             eventName: $(event.eventName).val(),
             serviceID: Number.parseInt($(event.serviceID).val()),
-            duration: $(event.duration).val()
+            duration: $(event.duration).val(),
+            invert: $(event.invert).prop('checked')
         };
 
         settings.events.push(eventValues);

@@ -18,7 +18,8 @@
         {
             "eventName": "",
             "serviceID": "",
-            "duration": ""
+            "duration": "",
+            "invert": false
         }
     ]
 }
