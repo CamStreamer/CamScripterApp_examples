@@ -8,34 +8,42 @@
     display: flex;
     gap: 8px;
 }
-.eventName
-{
-    width: 30%;
-}
-.serviceID
-{
-    width: 20%;
-}
-.duration
-{
-    width: 30%;
-}
 label
 {
     margin-left: 0.5rem;
+}
+.eventName
+{
+    width: 35%;
+}
+.serviceID
+{
+    width: 10%;
+}
+.duration
+{
+    width: 20%;
+}
+.stateName
+{
+    width: 12%;
+}
+.controls
+{
+    width: 23%;
 }
 .form-check-label
 {
     margin-top: 38px;
     margin-left: 24px;
-    width: 20%;
 }
 .removeEvent
 {
-    height: 50%;
-    margin-top: 32px;
-    margin-left: 0.5rem;
-
+    margin-top: 1px;
+    margin-left: 1rem;
+    width: 42px;
+    height: 42px;
+    border-width: 0px;
 }
 #info
 {

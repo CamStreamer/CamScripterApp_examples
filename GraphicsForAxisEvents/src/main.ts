@@ -17,6 +17,7 @@ type Settings = {
     eventName: string;
     serviceID: number;
     duration: string;
+    stateName: string;
     invert: boolean;
   }[];
 };
@@ -54,7 +55,7 @@ function onStatefulEvent(event: Event, state: boolean, invert: boolean) {
       }, event.duration);
     }
   } else {
-    event.co.setEnabled(state);
+    event.co.setEnabled(state !== invert);
   }
 }
 
@@ -93,8 +94,8 @@ async function prepareCamOverlay(settings: Settings) {
   return cos;
 }
 
-function isStateful(eventData) {
-  return eventData.state !== undefined;
+function isStateful(eventData, stateName: string) {
+  return eventData[stateName] !== undefined;
 }
 
 async function subscribeEventMessages(
@@ -137,8 +138,8 @@ async function subscribeEventMessages(
         co: cos[event.serviceID],
         lastTimeout: null,
       };
-      if (isStateful(eventData)) {
-        onStatefulEvent(e, eventData.state === "1", event.invert);
+      if (isStateful(eventData, event.stateName)) {
+        onStatefulEvent(e, eventData[event.stateName] === "1", event.invert);
       } else {
         onStatelessEvent(e);
       }
