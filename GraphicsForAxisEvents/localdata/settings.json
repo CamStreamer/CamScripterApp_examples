@@ -19,6 +19,7 @@
             "eventName": "",
             "serviceID": "",
             "duration": "",
+            "stateName": "",
             "invert": false
         }
     ]

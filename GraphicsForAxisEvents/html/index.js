@@ -33,22 +33,22 @@ function removeEventClick() {
     const index = buttons.indexOf(this);
     eventForms.splice(index, 1);
     buttons.splice(index, 1);
-    $(this).parent().remove();
+    $(this).parents("form").remove();
     inputChanged();
 }
 
 let number = 0;
 function addEventFormHTML(event = null) {
     number += 1;
-    const ids = ["eventName", "serviceID", "duration"];
-    const texts = ["Event Name", "Service ID", "Duration (hh:mm:ss)"];
-    const placeholders = ["name of event", "0", "00:00:00"]
+    const ids = ["eventName", "serviceID", "duration", "stateName"];
+    const texts = ["Event Name", "Service ID", "Duration (hh:mm:ss)", "State Name"];
+    const placeholders = ["name of event", "0", "00:00:00", "name of state"];
     const form = document.createElement("form");
     $(form).addClass("form-group");
     $(form).addClass("flex");
 
     const eventForm = {};
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < ids.length; i++) {
         let id = ids[i].concat(number);
         const label = document.createElement("label");
         $(label).attr("for", id);
@@ -96,7 +96,12 @@ function addEventFormHTML(event = null) {
     $(removeButton).text("X");
     $(removeButton).click(removeEventClick);
 
-    $(form).append(invertConditionLabel, removeButton);
+    const group = document.createElement("div");
+    $(group).addClass("controls");
+    $(group).addClass("form-group");
+    $(group).append(invertConditionLabel, removeButton);
+
+    $(form).append(group);
 
     buttons.push(removeButton);
     eventForms.push(eventForm);
@@ -131,6 +136,7 @@ function inputChanged() {
             eventName: $(event.eventName).val(),
             serviceID: Number.parseInt($(event.serviceID).val()),
             duration: $(event.duration).val(),
+            stateName: $(event.stateName).val(),
             invert: $(event.invert).prop('checked')
         };
 
