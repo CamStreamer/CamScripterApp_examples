@@ -1,18 +1,23 @@
 {
   "name": "@camstreamer/lantronix-wr",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "",
   "main": "main.js",
   "prettier": "@camstreamer/prettier-config",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "pretty": "prettier --write \"./*.{ts,js}\"",
-    "pretty:check": "prettier --check \"./*.{ts,js}\""
+    "pretty:check": "prettier --check \"./*.{ts,js}\"",
+    "in:prod": "npm install -production",
+    "in:all": "npm install",
+    "zip:package": "node node_modules/camstreamerlib/CreatePackage -i",
+    "zip": "npm-run-all in:prod zip:package in:all"
   },
   "author": "CamStreamer s.r.o",
   "license": "ISC",
   "dependencies": {
-    "camstreamerlib": "^1.6.2",
+    "camstreamerlib": "^1.7.3",
+    "npm-run-all": "^4.1.5",
     "serialport": "^9.2.5"
   },
   "devDependencies": {
