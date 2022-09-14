@@ -253,7 +253,7 @@ async function openMap() {
 
 async function main() {
     try {
-        const path = './localdata/'; //process.env.PERSISTENT_DATA_PATH;
+        const path = process.env.PERSISTENT_DATA_PATH;
         const data = fs.readFileSync(path + 'settings.json');
         settings = JSON.parse(data.toString());
 
