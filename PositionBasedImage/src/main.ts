@@ -1,5 +1,7 @@
 import * as fs from "fs";
 import * as net from "net";
+import * as https from "https";
+import { URLSearchParams } from "url";
 import { CamOverlayAPI } from "camstreamerlib/CamOverlayAPI";
 
 type Camera = {
@@ -16,6 +18,14 @@ type Coordinates = {
 
 type Settings = {
   targetCamera: Camera;
+  width: number;
+  height: number;
+  zoomLevel: number;
+  updatePeriod: number;
+  positionX: number;
+  positionY: number;
+  APIkey: string;
+  enbleMapCO: boolean,
   areas: {
     coordinates: Coordinates;
     radius: number;
@@ -26,6 +36,7 @@ type Settings = {
 let activeServices: number[] = [];
 let settings: Settings;
 let cos: Record<number, CamOverlayAPI> = {};
+let mapCO: CamOverlayAPI;
 
 function deg2rad(angle: number) {
   return (angle * Math.PI) / 180;
@@ -78,6 +89,10 @@ function serverResponseParse(lines: string[]): Coordinates {
       }
       returnValue = { latitude: lat, longitude: lon };
     }
+  }
+  if (returnValue != null)
+  {
+    lastCoordinates = returnValue;
   }
   return returnValue;
 }
@@ -159,11 +174,93 @@ function serverConnect() {
   });
 }
 
+let lastCoordinates: Coordinates;
+function getMapImage()
+{
+    return new Promise<Buffer>((resolve, reject) =>
+    {
+        const params = {
+            zoom: settings.zoomLevel.toString(),
+            size: `${settings.height}x${settings.width}`,
+            key:  settings.APIkey,
+            markers: `${lastCoordinates.latitude},${lastCoordinates.longitude}`,
+          };
+        
+          const path = "/maps/api/staticmap?" + new URLSearchParams(params).toString();
+          const options = {
+            host: "maps.googleapis.com",
+            port: 443,
+            path: path,
+          };
+        
+          let dataBuffer = Buffer.alloc(0);
+            let request = https.request(options, (response) =>
+            {
+                response.on('data', (chunk) => {
+                    dataBuffer = Buffer.concat([dataBuffer, chunk]);
+                });
+                response.on('end', () => {
+                    resolve(dataBuffer);
+                });
+            });
+            request.on('error', (err) => {
+                reject(err);
+            });
+            request.end();
+    })
+}
+
+async function synchroniseMap() {
+    if (lastCoordinates == null)
+    {
+        return;
+    }
+    try {
+        let buffer = await getMapImage();
+
+        const image = (await mapCO.uploadImageData(buffer) as any).var;
+        let surface = (await mapCO.cairo('cairo_image_surface_create', 'CAIRO_FORMAT_ARGB32', settings.width, settings.height) as any).var;
+        let cairo = (await mapCO.cairo('cairo_create', surface) as any).var;
+    
+        mapCO.cairo('cairo_set_source_surface', cairo, image, 0.0, 0.0);
+        mapCO.cairo('cairo_paint', cairo);
+        mapCO.showCairoImageAbsolute(surface, settings.positionX, settings.positionY, settings.width, settings.height);
+        mapCO.cairo('cairo_surface_destroy', surface);
+        mapCO.cairo('cairo_destroy', cairo);
+    } catch (e) {
+        console.log(e);
+  }
+}
+
+async function openMap()
+{
+    const options =
+    {
+        ip: settings.targetCamera.IP,
+        port: settings.targetCamera.port,
+        auth: settings.targetCamera.user + ':' + settings.targetCamera.password,
+        serviceName: 'Position Based Image',
+    }
+    mapCO = new CamOverlayAPI(options);
+    mapCO.on("error", (error)=>
+    {
+        console.log(error);
+        process.exit(1);
+    });
+    await mapCO.connect();
+
+    setInterval(synchroniseMap, 1000 * settings.updatePeriod);
+}
+
 async function main() {
   try {
     const path = "./localdata/"; //process.env.PERSISTENT_DATA_PATH;
     const data = fs.readFileSync(path + "settings.json");
     settings = JSON.parse(data.toString());
+
+    if (settings.updatePeriod == null || settings.updatePeriod < 1) {
+      settings.updatePeriod = 4;
+    }
   } catch (error) {
     console.log("Error with Settings file: ", error);
     return;
@@ -195,6 +292,11 @@ async function main() {
       console.log(error);
     }
   }
+  if (settings.enbleMapCO)
+  {
+    await openMap();
+  }
+  
   serverConnect();
 }
 

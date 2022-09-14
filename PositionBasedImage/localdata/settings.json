@@ -6,6 +6,16 @@
         "user": "root",
         "password": ""
     },
+
+    "width": "",
+    "height": "",
+    "zoomLevel": "",
+    "updatePeriod": 4,
+    "positionX": "",
+    "positionY": "",
+    "APIkey": "",
+    "enbleMapCO": false,
+
     "areas":
     [
         {

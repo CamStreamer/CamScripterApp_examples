@@ -8,12 +8,22 @@ $(document).ready(function () {
         $('#tcUser').val(settings.targetCamera.user);
         $('#tcPassword').val(settings.targetCamera.password);
 
+        $('#width').val(settings.width);
+        $('#height').val(settings.height);
+        $('#zoomLevel').val(settings.zoomLevel);
+        $('#updatePeriod').val(settings.updatePeriod);
+        $('#positionX').val(settings.positionX);
+        $('#positionY').val(settings.positionY);
+        $('#enbleMapCO').prop("checked", settings.enbleMapCO);
+        $('#APIkey').val(settings.APIkey);
+
         for (let area of settings.areas) {
             addAreaFormHTML(area);
         }
     });
 
     $(".form-control").change(inputChanged);
+    $(".form-check-input").change(inputChanged);
     $("#addNewPosition").click(addNewPositionClick);
     $(".myForm").submit(function () {
         return false;
@@ -100,6 +110,15 @@ function inputChanged() {
             user: $('#tcUser').val(),
             password: $('#tcPassword').val()
         },
+
+        width: Number.parseInt($('#width').val()),
+        height: Number.parseInt($('#height').val()),
+        zoomLevel: Number.parseInt($('#zoomLevel').val()),
+        updatePeriod: Number.parseInt($('#updatePeriod').val()),
+        positionX: Number.parseInt($('#positionX').val()),
+        positionY: Number.parseInt($('#positionY').val()),
+        enbleMapCO: $('#enbleMapCO').prop('checked'),
+        APIkey: $('#APIkey').val(),
 
         areas: []
     };
