@@ -205,10 +205,10 @@ function getMapImage() {
 }
 
 async function synchroniseMap() {
-    if (lastCoordinates == null) {
-        return;
-    }
     try {
+        if (lastCoordinates == null) {
+            return;
+        }
         const buffer = await getMapImage();
 
         const image = ((await mapCO.uploadImageData(buffer)) as any).var;

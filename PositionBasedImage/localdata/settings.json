@@ -7,12 +7,12 @@
         "password": ""
     },
 
-    "width": "",
-    "height": "",
+    "width": 400,
+    "height": 300,
     "zoomLevel": "",
     "updatePeriod": 4,
-    "positionX": "",
-    "positionY": "",
+    "positionX": 10,
+    "positionY": 10,
     "APIkey": "",
     "enableMapCO": false,
 
