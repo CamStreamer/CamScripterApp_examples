@@ -35,7 +35,7 @@ type Settings = {
 
 let activeServices: number[] = [];
 let settings: Settings;
-let cos: Record<number, CamOverlayAPI> = {};
+const cos: Record<number, CamOverlayAPI> = {};
 let mapCO: CamOverlayAPI;
 
 function deg2rad(angle: number) {
@@ -43,17 +43,17 @@ function deg2rad(angle: number) {
 }
 
 function calculateDistance(a: Coordinates, b: Coordinates) {
-  let aLatRad = deg2rad(a.latitude);
-  let aLonRad = deg2rad(a.longitude);
-  let bLatRad = deg2rad(b.latitude);
-  let bLonRad = deg2rad(b.longitude);
+    const aLatRad = deg2rad(a.latitude);
+    const aLonRad = deg2rad(a.longitude);
+    const bLatRad = deg2rad(b.latitude);
+    const bLonRad = deg2rad(b.longitude);
 
-  let sinDiffLat = Math.sin((aLatRad - bLatRad) / 2);
-  let sinDiffLon = Math.sin((aLonRad - bLonRad) / 2);
-  let aCosLat = Math.cos(aLatRad);
-  let bCosLat = Math.cos(bLatRad);
+    const sinDiffLat = Math.sin((aLatRad - bLatRad) / 2);
+    const sinDiffLon = Math.sin((aLonRad - bLonRad) / 2);
+    const aCosLat = Math.cos(aLatRad);
+    const bCosLat = Math.cos(bLatRad);
 
-  let c = Math.pow(sinDiffLat, 2) + aCosLat * bCosLat * Math.pow(sinDiffLon, 2);
+    const c = Math.pow(sinDiffLat, 2) + aCosLat * bCosLat * Math.pow(sinDiffLon, 2);
   return 2000 * 6371 * Math.asin(Math.sqrt(c));
 }
 
@@ -61,7 +61,7 @@ function serverResponseParse(lines: string[]): Coordinates {
   let returnValue = null;
 
   for (const line of lines) {
-    let items = line.split(",");
+    const items = line.split(",");
     if (
       items.length >= 7 &&
       items[0] === "$GPRMC" &&
@@ -73,12 +73,12 @@ function serverResponseParse(lines: string[]): Coordinates {
       let lat = Number.parseFloat(items[3]) / 100;
       let lon = Number.parseFloat(items[5]) / 100;
 
-      let latD = Math.floor(lat);
-      let latM = ((lat - Math.floor(lat)) * 100) / 60;
+      const latD = Math.floor(lat);
+      const latM = ((lat - Math.floor(lat)) * 100) / 60;
       lat = latD + latM;
 
-      let lonD = Math.floor(lon);
-      let lonM = ((lon - Math.floor(lon)) * 100) / 60;
+      const lonD = Math.floor(lon);
+      const lonM = ((lon - Math.floor(lon)) * 100) / 60;
       lon = lonD + lonM;
 
       if (items[4] == "S") {
@@ -94,9 +94,9 @@ function serverResponseParse(lines: string[]): Coordinates {
 }
 
 async function synchroniseCamOverlay() {
-  for (let idString in cos) {
-    let id = Number.parseInt(idString);
-    let isEnabled = await cos[id].isEnabled();
+  for (const idString in cos) {
+    const id = Number.parseInt(idString);
+    const isEnabled = await cos[id].isEnabled();
     if (!isEnabled && activeServices.includes(id)) {
       cos[id].setEnabled(true);
     } else if (isEnabled && !activeServices.includes(id)) {
@@ -116,8 +116,8 @@ function isEqual(a: number[], b: number[]) {
 }
 
 function getServiceIDs(actualCoordinates: Coordinates) {
-  for (let area of settings.areas) {
-    let distance = calculateDistance(actualCoordinates, area.coordinates);
+  for (const area of settings.areas) {
+    const distance = calculateDistance(actualCoordinates, area.coordinates);
     if (distance <= area.radius) {
       return area.serviceIDs.sort();
     }
@@ -133,7 +133,7 @@ function serverConnect() {
     client.on("data", (data) => {
       dataBuffer = Buffer.concat([dataBuffer, data]);
 
-      let lines = data.toString().split("\r\n");
+      const lines = data.toString().split("\r\n");
       lines.pop();
       const coor = serverResponseParse(lines);
       dataBuffer = Buffer.from(lines[lines.length - 1]);
@@ -191,7 +191,7 @@ function getMapImage()
           };
         
           let dataBuffer = Buffer.alloc(0);
-            let request = https.request(options, (response) =>
+          const request = https.request(options, (response) =>
             {
                 response.on('data', (chunk) => {
                     dataBuffer = Buffer.concat([dataBuffer, chunk]);
@@ -213,19 +213,24 @@ async function synchroniseMap() {
         return;
     }
     try {
-        let buffer = await getMapImage();
+        const buffer = await getMapImage();
 
         const image = (await mapCO.uploadImageData(buffer) as any).var;
-        let surface = (await mapCO.cairo('cairo_image_surface_create', 'CAIRO_FORMAT_ARGB32', settings.width, settings.height) as any).var;
-        let cairo = (await mapCO.cairo('cairo_create', surface) as any).var;
+        const surface = (await mapCO.cairo('cairo_image_surface_create', 'CAIRO_FORMAT_ARGB32', settings.width, settings.height) as any).var;
+        const cairo = (await mapCO.cairo('cairo_create', surface) as any).var;
     
         mapCO.cairo('cairo_set_source_surface', cairo, image, 0.0, 0.0);
         mapCO.cairo('cairo_paint', cairo);
         mapCO.showCairoImageAbsolute(surface, settings.positionX, settings.positionY, settings.width, settings.height);
+        mapCO.cairo('cairo_surface_destroy', image);
         mapCO.cairo('cairo_surface_destroy', surface);
         mapCO.cairo('cairo_destroy', cairo);
     } catch (e) {
         console.log(e);
+  }
+  finally
+  {
+    setTimeout(synchroniseMap, 1000 * settings.updatePeriod);
   }
 }
 
@@ -245,8 +250,7 @@ async function openMap()
         process.exit(1);
     });
     await mapCO.connect();
-
-    setInterval(synchroniseMap, 1000 * settings.updatePeriod);
+    synchroniseMap();
 }
 
 async function main() {
@@ -263,16 +267,16 @@ async function main() {
     return;
   }
 
-  let serviceIDs: number[] = [];
-  for (let area of settings.areas) {
+  const serviceIDs: number[] = [];
+  for (const area of settings.areas) {
     area.serviceIDs.sort();
 
-    for (let serviceID of area.serviceIDs) {
+    for (const serviceID of area.serviceIDs) {
       serviceIDs.push(serviceID);
     }
   }
 
-  for (let serviceID of serviceIDs) {
+  for (const serviceID of serviceIDs) {
     const options = {
       ip: settings.targetCamera.IP,
       port: settings.targetCamera.port,
