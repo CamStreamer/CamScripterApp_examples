@@ -2,6 +2,7 @@
   "name": "position_based_image",
   "version": "1.1.0",
   "description": "",
+  "prettier": "@camstreamer/prettier-config",
   "main": "src/main.ts",
   "scripts": {
     "clean": "rimraf dist/*; rm -f position_based_image.zip",

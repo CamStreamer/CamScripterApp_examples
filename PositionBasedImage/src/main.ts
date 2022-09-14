@@ -25,7 +25,7 @@ type Settings = {
   positionX: number;
   positionY: number;
   APIkey: string;
-  enbleMapCO: boolean,
+  enableMapCO: boolean,
   areas: {
     coordinates: Coordinates;
     radius: number;
@@ -90,10 +90,6 @@ function serverResponseParse(lines: string[]): Coordinates {
       returnValue = { latitude: lat, longitude: lon };
     }
   }
-  if (returnValue != null)
-  {
-    lastCoordinates = returnValue;
-  }
   return returnValue;
 }
 
@@ -143,6 +139,7 @@ function serverConnect() {
       dataBuffer = Buffer.from(lines[lines.length - 1]);
 
       if (coor !== null) {
+        lastCoordinates = coor;
         const ids = getServiceIDs(coor);
 
         if (!isEqual(ids, activeServices)) {
@@ -292,7 +289,7 @@ async function main() {
       console.log(error);
     }
   }
-  if (settings.enbleMapCO)
+  if (settings.enableMapCO)
   {
     await openMap();
   }

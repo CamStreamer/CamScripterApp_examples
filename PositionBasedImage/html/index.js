@@ -14,7 +14,7 @@ $(document).ready(function () {
         $('#updatePeriod').val(settings.updatePeriod);
         $('#positionX').val(settings.positionX);
         $('#positionY').val(settings.positionY);
-        $('#enbleMapCO').prop("checked", settings.enbleMapCO);
+        $('#enableMapCO').prop("checked", settings.enableMapCO);
         $('#APIkey').val(settings.APIkey);
 
         for (let area of settings.areas) {
@@ -117,7 +117,7 @@ function inputChanged() {
         updatePeriod: Number.parseInt($('#updatePeriod').val()),
         positionX: Number.parseInt($('#positionX').val()),
         positionY: Number.parseInt($('#positionY').val()),
-        enbleMapCO: $('#enbleMapCO').prop('checked'),
+        enableMapCO: $('#enableMapCO').prop('checked'),
         APIkey: $('#APIkey').val(),
 
         areas: []
