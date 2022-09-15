@@ -25,6 +25,7 @@ type Settings = {
     positionX: number;
     positionY: number;
     APIkey: string;
+    tolerance: number;
     enableMapCO: boolean;
     streamWidth: number;
     streamHeight: number;
@@ -141,7 +142,7 @@ function serverConnect() {
             dataBuffer = Buffer.from(lines[lines.length - 1]);
 
             if (coor !== null) {
-                lastCoordinates = coor;
+                actualCoordinates = coor;
                 const ids = getServiceIDs(coor);
 
                 if (!isEqual(ids, activeServices)) {
@@ -173,15 +174,16 @@ function serverConnect() {
     });
 }
 
-let lastCoordinates: Coordinates;
+let actualCoordinates: Coordinates = null;
+let lastCoordinates: Coordinates = null;
 function getMapImage() {
     return new Promise<Buffer>((resolve, reject) => {
         const params = {
-            center: `${lastCoordinates.latitude},${lastCoordinates.longitude}`,
+            center: `${actualCoordinates.latitude},${actualCoordinates.longitude}`,
             zoom: settings.zoomLevel.toString(),
             size: `${settings.width}x${settings.height}`,
             key: settings.APIkey,
-            markers: `${lastCoordinates.latitude},${lastCoordinates.longitude}`,
+            markers: `${actualCoordinates.latitude},${actualCoordinates.longitude}`,
         };
 
         const path = '/maps/api/staticmap?' + new URLSearchParams(params).toString();
@@ -209,9 +211,13 @@ function getMapImage() {
 
 async function synchroniseMap() {
     try {
-        if (lastCoordinates == null) {
+        if (
+            actualCoordinates == null ||
+            (lastCoordinates != null && calculateDistance(lastCoordinates, actualCoordinates) < settings.tolerance)
+        ) {
             return;
         }
+        lastCoordinates = actualCoordinates;
         const buffer = await getMapImage();
 
         const image = ((await mapCO.uploadImageData(buffer)) as any).var;
@@ -227,7 +233,13 @@ async function synchroniseMap() {
 
         mapCO.cairo('cairo_set_source_surface', cairo, image, 0, 0);
         mapCO.cairo('cairo_paint', cairo);
-        mapCO.showCairoImageAbsolute(surface, settings.positionX, settings.positionY, settings.streamWidth, settings.streamHeight);
+        mapCO.showCairoImageAbsolute(
+            surface,
+            settings.positionX,
+            settings.positionY,
+            settings.streamWidth,
+            settings.streamHeight
+        );
         mapCO.cairo('cairo_surface_destroy', image);
         mapCO.cairo('cairo_surface_destroy', surface);
         mapCO.cairo('cairo_destroy', cairo);

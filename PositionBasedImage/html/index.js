@@ -16,6 +16,7 @@ $(document).ready(function () {
         $('#positionY').val(settings.positionY);
         $('#enableMapCO').prop("checked", settings.enableMapCO);
         $('#APIkey').val(settings.APIkey);
+        $('#tolerance').val(settings.tolerance);
         $('#streamWidth').val(settings.streamWidth);
         $('#streamHeight').val(settings.streamHeight);
 
@@ -121,11 +122,18 @@ function inputChanged() {
         positionY: Number.parseInt($('#positionY').val()),
         enableMapCO: $('#enableMapCO').prop('checked'),
         APIkey: $('#APIkey').val(),
+        tolerance: Number.parseInt($('#tolerance').val()),
         streamWidth: Number.parseInt($('#streamWidth').val()),
         streamHeight: Number.parseInt($('#streamHeight').val()),
 
         areas: []
     };
+
+    if (settings.tolerance == undefined || Number.isNaN(settings.tolerance))
+    {
+        settings.tolerance = 0;
+        $('#tolerance').val(0);
+    }
 
     for (let area of areaForms) {
         const radius = Number.parseInt($(area.radius).val());

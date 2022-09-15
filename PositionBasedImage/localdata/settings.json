@@ -14,6 +14,7 @@
     "positionX": 10,
     "positionY": 10,
     "APIkey": "",
+    "tolerance": 2,
     "enableMapCO": false,
     "streamWidth": 1920,
     "streamHeight": 1080,
