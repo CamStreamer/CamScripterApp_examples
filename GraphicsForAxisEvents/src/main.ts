@@ -29,14 +29,20 @@ type Event = {
     lastTimeout: NodeJS.Timeout;
 };
 
+async function setEnabledIfNecessary(co: CamOverlayAPI, enabled: boolean) {
+    if ((await co.isEnabled()) !== enabled) {
+        co.setEnabled(enabled);
+    }
+}
+
 function onStatelessEvent(event: Event) {
-    event.co.setEnabled(true);
+    setEnabledIfNecessary(event.co, true);
     if (event.duration >= 1) {
         if (event.lastTimeout !== null) {
             clearTimeout(event.lastTimeout);
         }
         event.lastTimeout = setTimeout(() => {
-            event.co.setEnabled(false);
+            setEnabledIfNecessary(event.co, false);
             event.lastTimeout = null;
         }, event.duration);
     }
@@ -45,17 +51,17 @@ function onStatelessEvent(event: Event) {
 function onStatefulEvent(event: Event, state: boolean, invert: boolean) {
     if (event.duration >= 1) {
         if (state !== invert) {
-            event.co.setEnabled(true);
+            setEnabledIfNecessary(event.co, true);
             if (event.lastTimeout !== null) {
                 clearTimeout(event.lastTimeout);
             }
             event.lastTimeout = setTimeout(() => {
-                event.co.setEnabled(false);
+                setEnabledIfNecessary(event.co, false);
                 event.lastTimeout = null;
             }, event.duration);
         }
     } else {
-        event.co.setEnabled(state !== invert);
+        setEnabledIfNecessary(event.co, state !== invert);
     }
 }
 

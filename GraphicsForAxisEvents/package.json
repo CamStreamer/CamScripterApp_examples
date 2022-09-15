@@ -11,7 +11,7 @@
     "pretty": "prettier --write \"./src/*.{ts,tsx}\"",
     "pretty:check": "prettier --check \"./src/*.{ts,tsx}\"",
     "test": "echo \\\"Error: no test specified\\\" && exit 1",
-    "try": "npm run build; node dist/main.js",
+    "try": "npm run build; PERSISTENT_DATA_PATH=\"./localdata/\" node dist/main.js",
     "in:prod": "npm install -production",
     "in:all": "npm install",
     "zip:package": "node node_modules/camstreamerlib/CreatePackage -i",
