@@ -263,7 +263,11 @@ async function openMap() {
         process.exit(1);
     });
     await mapCO.connect();
-    synchroniseMap();
+    if (settings.enableMapCO) {
+        synchroniseMap();
+    } else {
+        mapCO.removeImage();
+    }
 }
 
 async function main() {
@@ -306,10 +310,7 @@ async function main() {
             console.log(error);
         }
     }
-    if (settings.enableMapCO) {
-        await openMap();
-    }
-
+    await openMap();
     serverConnect();
 }
 
