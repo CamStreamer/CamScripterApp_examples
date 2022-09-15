@@ -40,6 +40,64 @@
                             <input type="password" class="form-control" id="tcPassword" placeholder="password">
                         </div>
                     </form>
+                    <br>
+                    <form class="myForm">
+                        <h2>Map Settings</h2>
+                        <div class="form-group">
+                            <label class="form-check-label">
+                                <input class="form-check-input" id="enableMapCO" type="checkbox">
+                                Enable map in the CamOverlay service.
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label for="APIkey">
+                                Google Maps API key <br> (Visit <a href="https://console.cloud.google.com/" target="_blank">Google Developer Console</a>, 
+                                enable <a href="https://console.cloud.google.com/apis/library/browse?filter=category:maps" target="_blank">Maps Static API</a>, and create an 
+                                <a href="https://console.cloud.google.com/apis/credentials" target="_blank">API key</a>).
+                            </label>
+                            <input type="text" class="form-control" id="APIkey">
+                        </div>
+                        <div class="form-group">
+                            <label for="tolerance">GPS tolerance in meters (saves API quota)</label>
+                            <input type="number" class="form-control" id="tolerance">
+                        </div>
+                        <div class="form-group">
+                            <label for="width">Width (px)</label>
+                            <input type="number" class="form-control" id="width">
+                        </div>
+                        <div class="form-group">
+                            <label for="height">Height (px)</label>
+                            <input type="number" class="form-control" id="height">
+                        </div>
+                        <div class="form-group">
+                            <label for="zoomLevel">Zoom Level</label>
+                            <input type="number" class="form-control" id="zoomLevel">
+                        </div>
+                        <div class="form-group">
+                            <label for="updatePeriod">Update Period [s]</label>
+                            <input type="number" class="form-control" id="updatePeriod">
+                        </div>
+                    </form>
+                    <br>
+                    <form class="myForm">
+                        <h2>Overlay Position</h2>
+                        <div class="form-group">
+                            <label for="positionX">Position X</label>
+                            <input type="number" class="form-control" id="positionX">
+                        </div>
+                        <div class="form-group">
+                            <label for="positionY">Position Y</label>
+                            <input type="number" class="form-control" id="positionY">
+                        </div>
+                        <div class="form-group">
+                            <label for="streamWidth">Stream Width</label>
+                            <input type="number" class="form-control" id="streamWidth">
+                        </div>
+                        <div class="form-group">
+                            <label for="streamHeight">Stream Height</label>
+                            <input type="number" class="form-control" id="streamHeight">
+                        </div>
+                    </form>
                 </div>
                 <div class="col-md-1"></div>
                 <div class="col-md-7">

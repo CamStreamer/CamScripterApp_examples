@@ -6,6 +6,19 @@
         "user": "root",
         "password": ""
     },
+
+    "width": 400,
+    "height": 300,
+    "zoomLevel": 15,
+    "updatePeriod": 4,
+    "positionX": 10,
+    "positionY": 10,
+    "APIkey": "",
+    "tolerance": 2,
+    "enableMapCO": false,
+    "streamWidth": 1920,
+    "streamHeight": 1080,
+
     "areas":
     [
         {

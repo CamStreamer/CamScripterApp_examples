@@ -8,12 +8,25 @@ $(document).ready(function () {
         $('#tcUser').val(settings.targetCamera.user);
         $('#tcPassword').val(settings.targetCamera.password);
 
+        $('#width').val(settings.width);
+        $('#height').val(settings.height);
+        $('#zoomLevel').val(settings.zoomLevel);
+        $('#updatePeriod').val(settings.updatePeriod);
+        $('#positionX').val(settings.positionX);
+        $('#positionY').val(settings.positionY);
+        $('#enableMapCO').prop("checked", settings.enableMapCO);
+        $('#APIkey').val(settings.APIkey);
+        $('#tolerance').val(settings.tolerance);
+        $('#streamWidth').val(settings.streamWidth);
+        $('#streamHeight').val(settings.streamHeight);
+
         for (let area of settings.areas) {
             addAreaFormHTML(area);
         }
     });
 
     $(".form-control").change(inputChanged);
+    $(".form-check-input").change(inputChanged);
     $("#addNewPosition").click(addNewPositionClick);
     $(".myForm").submit(function () {
         return false;
@@ -101,8 +114,26 @@ function inputChanged() {
             password: $('#tcPassword').val()
         },
 
+        width: Number.parseInt($('#width').val()),
+        height: Number.parseInt($('#height').val()),
+        zoomLevel: Number.parseInt($('#zoomLevel').val()),
+        updatePeriod: Number.parseInt($('#updatePeriod').val()),
+        positionX: Number.parseInt($('#positionX').val()),
+        positionY: Number.parseInt($('#positionY').val()),
+        enableMapCO: $('#enableMapCO').prop('checked'),
+        APIkey: $('#APIkey').val(),
+        tolerance: Number.parseInt($('#tolerance').val()),
+        streamWidth: Number.parseInt($('#streamWidth').val()),
+        streamHeight: Number.parseInt($('#streamHeight').val()),
+
         areas: []
     };
+
+    if (settings.tolerance == undefined || Number.isNaN(settings.tolerance))
+    {
+        settings.tolerance = 0;
+        $('#tolerance').val(0);
+    }
 
     for (let area of areaForms) {
         const radius = Number.parseInt($(area.radius).val());
