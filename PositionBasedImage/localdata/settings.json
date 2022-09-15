@@ -9,12 +9,14 @@
 
     "width": 400,
     "height": 300,
-    "zoomLevel": "",
+    "zoomLevel": 15,
     "updatePeriod": 4,
     "positionX": 10,
     "positionY": 10,
     "APIkey": "",
     "enableMapCO": false,
+    "streamWidth": 1920,
+    "streamHeight": 1080,
 
     "areas":
     [

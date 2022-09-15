@@ -16,6 +16,8 @@ $(document).ready(function () {
         $('#positionY').val(settings.positionY);
         $('#enableMapCO').prop("checked", settings.enableMapCO);
         $('#APIkey').val(settings.APIkey);
+        $('#streamWidth').val(settings.streamWidth);
+        $('#streamHeight').val(settings.streamHeight);
 
         for (let area of settings.areas) {
             addAreaFormHTML(area);
@@ -119,6 +121,8 @@ function inputChanged() {
         positionY: Number.parseInt($('#positionY').val()),
         enableMapCO: $('#enableMapCO').prop('checked'),
         APIkey: $('#APIkey').val(),
+        streamWidth: Number.parseInt($('#streamWidth').val()),
+        streamHeight: Number.parseInt($('#streamHeight').val()),
 
         areas: []
     };

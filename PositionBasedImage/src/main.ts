@@ -26,6 +26,8 @@ type Settings = {
     positionY: number;
     APIkey: string;
     enableMapCO: boolean;
+    streamWidth: number;
+    streamHeight: number;
     areas: {
         coordinates: Coordinates;
         radius: number;
@@ -175,8 +177,9 @@ let lastCoordinates: Coordinates;
 function getMapImage() {
     return new Promise<Buffer>((resolve, reject) => {
         const params = {
+            center: `${lastCoordinates.latitude},${lastCoordinates.longitude}`,
             zoom: settings.zoomLevel.toString(),
-            size: `${settings.height}x${settings.width}`,
+            size: `${settings.width}x${settings.height}`,
             key: settings.APIkey,
             markers: `${lastCoordinates.latitude},${lastCoordinates.longitude}`,
         };
@@ -222,9 +225,9 @@ async function synchroniseMap() {
         ).var;
         const cairo = ((await mapCO.cairo('cairo_create', surface)) as any).var;
 
-        mapCO.cairo('cairo_set_source_surface', cairo, image, 0.0, 0.0);
+        mapCO.cairo('cairo_set_source_surface', cairo, image, 0, 0);
         mapCO.cairo('cairo_paint', cairo);
-        mapCO.showCairoImageAbsolute(surface, settings.positionX, settings.positionY, settings.width, settings.height);
+        mapCO.showCairoImageAbsolute(surface, settings.positionX, settings.positionY, settings.streamWidth, settings.streamHeight);
         mapCO.cairo('cairo_surface_destroy', image);
         mapCO.cairo('cairo_surface_destroy', surface);
         mapCO.cairo('cairo_destroy', cairo);
