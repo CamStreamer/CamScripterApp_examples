@@ -47,16 +47,13 @@ function onStatelessEvent(event: Event) {
 function onStatefulEvent(event: Event, state: boolean, invert: boolean) {
     if (event.duration >= 1) {
         if (state !== invert) {
-            console.log("enable");
             services[event.serviceID].setEnabled(true);
             if (timeouts[event.serviceID] !== null) {
-                console.log("clear");
                 clearTimeout(timeouts[event.serviceID]);
             }
             timeouts[event.serviceID] = setTimeout(() => {
                 services[event.serviceID].setEnabled(false);
                 timeouts[event.serviceID] = null;
-                console.log("disable");
             }, event.duration);
         }
     } else {
