@@ -25,25 +25,21 @@ type Settings = {
 type Event = {
     eventName: string;
     duration: number;
-    co: CamOverlayAPI;
-    lastTimeout: NodeJS.Timeout;
+    serviceID: number;
 };
 
-async function setEnabledIfNecessary(co: CamOverlayAPI, enabled: boolean) {
-    if ((await co.isEnabled()) !== enabled) {
-        co.setEnabled(enabled);
-    }
-}
+const timeouts: Record<number, NodeJS.Timeout> = {};
+const services: Record<number, CamOverlayAPI> = {};
 
 function onStatelessEvent(event: Event) {
-    setEnabledIfNecessary(event.co, true);
+    services[event.serviceID].setEnabled(true);
     if (event.duration >= 1) {
-        if (event.lastTimeout !== null) {
-            clearTimeout(event.lastTimeout);
+        if (timeouts[event.serviceID] != null) {
+            clearTimeout(timeouts[event.serviceID]);
         }
-        event.lastTimeout = setTimeout(() => {
-            setEnabledIfNecessary(event.co, false);
-            event.lastTimeout = null;
+        timeouts[event.serviceID] = setTimeout(() => {
+            services[event.serviceID].setEnabled(false);
+            timeouts[event.serviceID] = null;
         }, event.duration);
     }
 }
@@ -51,17 +47,20 @@ function onStatelessEvent(event: Event) {
 function onStatefulEvent(event: Event, state: boolean, invert: boolean) {
     if (event.duration >= 1) {
         if (state !== invert) {
-            setEnabledIfNecessary(event.co, true);
-            if (event.lastTimeout !== null) {
-                clearTimeout(event.lastTimeout);
+            console.log("enable");
+            services[event.serviceID].setEnabled(true);
+            if (timeouts[event.serviceID] !== null) {
+                console.log("clear");
+                clearTimeout(timeouts[event.serviceID]);
             }
-            event.lastTimeout = setTimeout(() => {
-                setEnabledIfNecessary(event.co, false);
-                event.lastTimeout = null;
+            timeouts[event.serviceID] = setTimeout(() => {
+                services[event.serviceID].setEnabled(false);
+                timeouts[event.serviceID] = null;
+                console.log("disable");
             }, event.duration);
         }
     } else {
-        setEnabledIfNecessary(event.co, state !== invert);
+        services[event.serviceID].setEnabled(state !== invert);
     }
 }
 
@@ -77,7 +76,6 @@ function getSettings() {
 }
 
 async function prepareCamOverlay(settings: Settings) {
-    const cos: Record<number, CamOverlayAPI> = {};
     for (let event of settings.events) {
         const options = {
             ip: settings.targetCamera.IP,
@@ -89,20 +87,19 @@ async function prepareCamOverlay(settings: Settings) {
             const co = new CamOverlayAPI(options);
             await co.connect();
             await co.setEnabled(false);
-            cos[event.serviceID] = co;
+            services[event.serviceID] = co;
         } catch (error) {
             console.log(`Cannot connect to CamOverlay service with ID ${event.serviceID} (${error})`);
             process.exit(1);
         }
     }
-    return cos;
 }
 
 function isStateful(eventData, stateName: string) {
     return eventData[stateName] !== undefined;
 }
 
-async function subscribeEventMessages(settings: Settings, cos: Record<number, CamOverlayAPI>) {
+async function subscribeEventMessages(settings: Settings) {
     const options = {
         protocol: 'http',
         ip: settings.targetCamera.IP,
@@ -136,8 +133,7 @@ async function subscribeEventMessages(settings: Settings, cos: Record<number, Ca
             const e = {
                 eventName: event.eventName,
                 duration: duration,
-                co: cos[event.serviceID],
-                lastTimeout: null,
+                serviceID: event.serviceID
             };
             if (isStateful(eventData, event.stateName)) {
                 onStatefulEvent(e, eventData[event.stateName] === '1', event.invert);
@@ -151,8 +147,8 @@ async function subscribeEventMessages(settings: Settings, cos: Record<number, Ca
 
 async function main() {
     const settings = getSettings();
-    const cos = await prepareCamOverlay(settings);
-    subscribeEventMessages(settings, cos);
+    await prepareCamOverlay(settings);
+    subscribeEventMessages(settings);
 }
 
 process.on('unhandledRejection', (reason) => {
