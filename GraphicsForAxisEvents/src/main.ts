@@ -58,7 +58,7 @@ function onStatefulEvent(event: Event, state: boolean, invert: boolean) {
                     services[event.serviceID].setEnabled(false);
                     timeouts[event.serviceID] = null;
                 }, event.duration);
-            } else if (timeouts[event.serviceID] !== null) {
+            } else if (timeouts[event.serviceID] != null) {
                 services[event.serviceID].setEnabled(false);
                 clearTimeout(timeouts[event.serviceID]);
             }
