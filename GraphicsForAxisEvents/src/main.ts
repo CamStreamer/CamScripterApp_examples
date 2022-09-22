@@ -44,17 +44,21 @@ function onStatelessEvent(event: Event) {
     }
 }
 
+const lastState: Record<string, boolean> = {};
 function onStatefulEvent(event: Event, state: boolean, invert: boolean) {
     if (event.duration >= 1) {
-        if (state !== invert) {
-            services[event.serviceID].setEnabled(true);
-            if (timeouts[event.serviceID] !== null) {
-                clearTimeout(timeouts[event.serviceID]);
+        if (state !== lastState[event.eventName]) {
+            lastState[event.eventName] = state;
+            if (state !== invert) {
+                services[event.serviceID].setEnabled(true);
+                if (timeouts[event.serviceID] !== null) {
+                    clearTimeout(timeouts[event.serviceID]);
+                }
+                timeouts[event.serviceID] = setTimeout(() => {
+                    services[event.serviceID].setEnabled(false);
+                    timeouts[event.serviceID] = null;
+                }, event.duration);
             }
-            timeouts[event.serviceID] = setTimeout(() => {
-                services[event.serviceID].setEnabled(false);
-                timeouts[event.serviceID] = null;
-            }, event.duration);
         }
     } else {
         services[event.serviceID].setEnabled(state !== invert);
@@ -130,7 +134,7 @@ async function subscribeEventMessages(settings: Settings) {
             const e = {
                 eventName: event.eventName,
                 duration: duration,
-                serviceID: event.serviceID
+                serviceID: event.serviceID,
             };
             if (isStateful(eventData, event.stateName)) {
                 onStatefulEvent(e, eventData[event.stateName] === '1', event.invert);
