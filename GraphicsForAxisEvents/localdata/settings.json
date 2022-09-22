@@ -18,7 +18,9 @@
         {
             "eventName": "",
             "serviceID": "",
-            "duration": ""
+            "duration": "",
+            "stateName": "",
+            "invert": false
         }
     ]
 }

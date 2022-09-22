@@ -16,7 +16,7 @@
             <h1 class="display-3">Graphics for Axis Events</h1>
             <p>Changes are saved automatically, you don't have to save them.</p>
             <div class="row">
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <form class="myForm">
                         <h2>Axis Events Camera</h2>
                         <div class="form-group">
@@ -36,7 +36,8 @@
                             <input type="password" class="form-control" id="scPassword" placeholder="password">
                         </div>
                     </form>
-                    <br>
+                </div>
+                <div class="col-md-6">
                     <form class="myForm">
                         <h2>CamOverlay App Camera</h2>
                         <div class="form-group">
@@ -57,21 +58,20 @@
                         </div>
                     </form>
                 </div>
-                <div class="col-md-1"></div>
-                <div class="col-md-7">
+                <div class="col-md-12">
                     <h2>List of Events</h2>
                     <label>
-                        Insert the full path to the event, e.g. tnsaxis:CameraApplicationPlatform/AppName/AlertName, which can be
-                        found via the <a href="https://www.axis.com/developer-community/axis-metadata-monitor" target="blank">Axis Metadata Monitor</a>
+                        Insert the full path to the event, e.g. tnsaxis:CameraApplicationPlatform/AppName/AlertName, which can be found via the 
+                        <a href="https://www.axis.com/developer-community/axis-metadata-monitor" target="blank">Axis Metadata Monitor</a>.<br>
+                        Stateful events turn on the graphics in state 1. Check "Invert Condition" for the opposite behavior.
                     </label>
                     <div id="list"></div>
                     <button id="addNewEvent" class="btn btn-primary">Add new event</button>
                     <label id="info">
-                        <p>Duration is used both for solid-state events and stateless events.
-                            If you want to show the graphics the whole time when solid-state
+                        <p>Duration is used both for stateful events and stateless events.
+                            If you want to show the graphics the whole time when stateful
                             events are active, do not fill duration.</p>
-
-                        <p>If the solid-state event is activated with duration, the graphics
+                        <p>If the stateful event is activated with duration, the graphics
                             are again shown after going back to state 0 and new state 1.</p>
                     </label>
                 </div>
