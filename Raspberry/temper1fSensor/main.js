@@ -11,7 +11,7 @@ try {
     settings = JSON.parse(data);
 } catch (err) {
     console.log("No settings file found");
-    return;
+    process.exit(1);
 }
 
 let co = new CamOverlayAPI({
@@ -39,22 +39,26 @@ async function onePeriod() {
             }
         );
         child.stdout.on("data", async (data) => {
-            let temp = null;
-            let json_data = JSON.parse(data.toString("utf-8"));
-            if (!json_data[0]) {
-                console.log("No data!");
-            } else {
-                temp = json_data[0]["internal temperature"];
-                console.log("Temperature: " + temp);
-            }
+            try {
+                let temp = null;
+                let json_data = JSON.parse(data.toString("utf-8"));
+                if (!json_data[0]) {
+                    console.log("No data!");
+                } else {
+                    temp = json_data[0]["internal temperature"];
+                    console.log("Temperature: " + temp);
+                }
 
-            let fields = [
-                {
-                    field_name: settings.field_name,
-                    text: temp ? temperature(temp, settings.unit) : "No Data",
-                },
-            ];
-            await co.updateCGText(fields);
+                let fields = [
+                    {
+                        field_name: settings.field_name,
+                        text: temp ? temperature(temp, settings.unit) : "No Data",
+                    },
+                ];
+                await co.updateCGText(fields);
+            } catch (error) {
+                console.error(error);
+            }
         });
         child.on("close", () => {
             console.log("measured!");
