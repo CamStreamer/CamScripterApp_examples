@@ -1,8 +1,8 @@
 {
   "package_name": "k3ProSensor",
   "package_menu_name": "K3 Pro Sensor",
-  "package_version": "1.0.1",
+  "package_version": "1.0.2",
   "vendor": "Camstreamer s.r.o.",
-  "required_camscripter_version": "1.2.3",
+  "required_camscripter_rbi_version": "1.2.8",
   "ui_link": "/local/camscripter/package/k3ProSensor/index.html"
 }

@@ -6,15 +6,16 @@ const CairoPainter = require('./CairoPainter');
 const { https } = require("follow-redirects");
 const { CamOverlayAPI } = require('camstreamerlib/CamOverlayAPI');
 
+let settings = null;
+let co = null;
+let frames = {};
+let cam_width = null;
+let cam_height = null;
+let fonts = {};
 
-var settings = null;
-var co = null;
-var frames = {};
-var cam_width = null;
-var cam_height = null;
 function run() {
     try {
-        var data = fs.readFileSync(process.env.PERSISTENT_DATA_PATH + 'settings.json');
+        const data = fs.readFileSync(process.env.PERSISTENT_DATA_PATH + 'settings.json');
         settings = JSON.parse(data);
         let resolution = settings.resolution.split("x");
         cam_width = parseInt(resolution[0]);
@@ -24,7 +25,6 @@ function run() {
         return;
     }
 
-
     co = new CamOverlayAPI({
         'ip': settings.camera_ip,
         'port': settings.camera_port,
@@ -33,23 +33,23 @@ function run() {
     });
 
     co.on('error', (err) => {
-        console.log('COAPI-Error: ' + err);
+        console.error('COAPI-Error', err);
     });
 
     co.on('close', () => {
-        console.log('COAPI-Error: connection closed');
+        console.error('COAPI-Error: connection closed');
         process.exit(1);
     });
 
-    co.connect().then(async function () {
-        uploadCodeImages(co, codes);
+    co.connect().then(async () => {
+        await uploadCodeImages(co, codes);
         await uploadFont(co, "OpenSans-Regular.ttf");
         await uploadFont(co, "ComicSans.ttf");
         frames = genLayout(cam_width, cam_height);
         oneAppPeriod(co, frames);
         setInterval(oneAppPeriod, 5000, co, frames);
     }, () => {
-        console.log('COAPI-Error: connection error');
+        console.error('COAPI-Error: connection error');
         process.exit(1);
     });
 }
@@ -57,12 +57,13 @@ function run() {
 function sendRequest(send_url, auth) {
     return new Promise((resolve, reject) => {
         send_url = url.parse(send_url);
-        let options = {
+        const options = {
             method: "GET",
             host: send_url.hostname,
             port: send_url.port,
             path: send_url.path,
             headers: { "Authorization": auth },
+            rejectUnauthorized: false,
             timeout: 5000 //5s
         };
         const req = https.request(options, (res) => {
@@ -89,37 +90,25 @@ function sendRequest(send_url, auth) {
     });
 }
 
-var fonts = {};
-
 async function uploadCodeImages(co, codes) {
     for (let c in codes) {
-        const image_data = await uploadImage(process.env.PERSISTENT_DATA_PATH + "images/" + codes[c].img_file, co, "fit");
+        const image_data = await uploadImage("images/" + codes[c].img_file, co, "fit");
         codes[c].image = image_data;
     }
 }
 
 function uploadImage(fileName, co) {
-    var imgData = fs.readFileSync(fileName);
-    const promise = co.uploadImageData(imgData);
-    return promise;
+    const imgData = fs.readFileSync(fileName);
+    return co.uploadImageData(imgData);
 }
 
 async function uploadFont(co, name) {
-    const f = await loadTTF(co, process.env.PERSISTENT_DATA_PATH + "fonts/" + name);
-    fonts[name] = f;
-    console.log(JSON.stringify(fonts));
-}
-function loadTTF(co, fileName) {
-    var promise = new Promise(function (resolve, reject) {
-        var imgData = fs.readFileSync(fileName);
-        co.uploadFontData(imgData).then(function (fontRes) {
-            resolve(fontRes.var);
-        });
-    });
-    return promise;
+    const imgData = fs.readFileSync("fonts/" + name);
+    const fontRes = await co.uploadFontData(imgData)
+    fonts[name] = fontRes.var;
 }
 
-var codes = {
+const codes = {
     "good": {
         "text": "Good",
         "img_file": "Good.png",
@@ -211,30 +200,25 @@ async function requestAQI(location, acc_token) {
     try {
         let api_url = "https://api.waqi.info/feed/" + location + "/?token=" + acc_token;
         const data = await sendRequest(api_url, "");
-        console.log("Data aquired!");
         return JSON.parse(data);
     } catch (error) {
         console.log("Cannot get data form AQI");
         console.log(error);
     }
 }
-var period_count = 0;
-var data = {};
+
 async function oneAppPeriod(co, layout) {
     try {
-        if (period_count % settings.update_frequency * 12 == 0) {
-            data = await requestAQI(settings.location, settings.access_token);
-            period_count = 0;
-        }
+        const data = await requestAQI(settings.location, settings.access_token);
         mapData(data, layout);
         frames.background.generateImage(co, settings.scale / 100);
     } catch (error) {
-        console.log(error);
+        console.error(error);
     }
 }
 
-process.on('unhandledRejection', function (error) {
-    console.log('unhandledRejection', error.message);
+process.on('unhandledRejection', (error) => {
+    console.error('unhandledRejection', error.message);
 });
 
 run();

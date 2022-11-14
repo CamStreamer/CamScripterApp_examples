@@ -1,13 +1,13 @@
 {
   "name": "@camstreamer/k3-pro-sensor",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "",
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "in:prod": "npm install -production",
     "in:all": "npm install",
-    "zip:package": "node node_modules/camstreamerlib/CreatePackage -i",
+    "zip:package": "node node_modules/camstreamerlib/CreatePackage",
     "zip": "npm-run-all in:prod zip:package in:all"
   },
   "author": "CamStreamer s.r.o",
