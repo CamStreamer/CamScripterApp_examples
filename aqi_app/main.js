@@ -63,7 +63,6 @@ function sendRequest(send_url, auth) {
             port: send_url.port,
             path: send_url.path,
             headers: { "Authorization": auth },
-            rejectUnauthorized: false,
             timeout: 5000 //5s
         };
         const req = https.request(options, (res) => {
@@ -202,7 +201,7 @@ async function requestAQI(location, acc_token) {
         const data = await sendRequest(api_url, "");
         return JSON.parse(data);
     } catch (error) {
-        console.log("Cannot get data form AQI");
+        console.log("Cannot get data from AQI");
         console.log(error);
     }
 }
