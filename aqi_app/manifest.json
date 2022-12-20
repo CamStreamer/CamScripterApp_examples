@@ -3,7 +3,7 @@
   "package_menu_name": "Air Quality Index App",
   "package_version": "1.0.0",
   "vendor": "Camstreamer s.r.o.",
-  "required_camscripter_version": "1.2.3",
+  "required_camscripter_version": "1.4.7",
   "required_camscripter_rbi_version": "1.0.0",
   "ui_link": "/local/camscripter/package/aqi/index.html"
 }
