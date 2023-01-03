@@ -88,7 +88,7 @@ export class TempSensorReader {
         if (vendorId == 0x413d && productId == 0x2107) {
             return true;
         }
-        if (vendorId == 0x1a86 && productId == 0x5523) {
+        if (vendorId == 0x1a86 && (productId == 0x5523 || productId == 0xe025)) {
             return true;
         }
         return false;
@@ -122,14 +122,14 @@ export class TempSensorReader {
                 temp: this.parseBytes(2, 256.0, dataBytes),
                 humidity: 0,
             };
-        } else if (firmware.indexOf('TEMPerGold_V3.1') !== -1) {
+        } else if (firmware.indexOf('TEMPerGold_V3.') !== -1) {
             const dataBytes = await this.readWithTimeout(fd, 8, 200);
             return {
                 firmware,
                 temp: this.parseBytes(2, 100.0, dataBytes),
                 humidity: 0,
             };
-        } else if (firmware.indexOf('TEMPerX_V3.1') !== -1 || firmware.indexOf('TEMPerX_V3.3') !== -1) {
+        } else if (firmware.indexOf('TEMPerX_V3.') !== -1 || firmware.indexOf('TEMPer1F_V3.') !== -1) {
             const dataBytes = await this.readWithTimeout(fd, 16, 200);
             if (dataBytes.length >= 16) {
                 // Both internal and external sensors exist
