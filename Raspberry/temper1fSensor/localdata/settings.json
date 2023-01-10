@@ -5,5 +5,12 @@
     "camera_pass": "",
     "unit": "c",
     "service_id": 1,
-    "field_name": "field1"
+    "field_name": "field1",
+    "acs_ip": "",
+    "acs_user": "",
+    "acs_pass": "",
+    "acs_source_key": "",
+    "acs_condition_delay": 0,
+    "acs_condition_operator": 1,
+    "acs_condition_value": 10
 }
