@@ -4,6 +4,7 @@ import { TempSensorReader } from './TempSensorReader';
 import { CamOverlayAPI } from 'camstreamerlib/CamOverlayAPI';
 
 let sensorReader: TempSensorReader = null;
+let acsSendTimestamp: number = null;
 let acsConditionTimer: NodeJS.Timeout = null;
 
 let settings = null;
@@ -33,6 +34,8 @@ const acsConfigured =
 let co: CamOverlayAPI = null;
 if (coConfigured) {
     co = new CamOverlayAPI({
+        tls: settings.acs_protocol !== 'http',
+        tlsInsecure: settings.acs_protocol === 'https_insecure',
         ip: settings.camera_ip,
         port: settings.camera_port,
         auth: settings.camera_user + ':' + settings.camera_pass,
@@ -87,20 +90,30 @@ function convertTemperature(num: number, unitTag: string): number {
 
 function checkCondtionAndSendAcsEvent(temperature: number) {
     if (isConditionActive(temperature)) {
-        if (!acsConditionTimer) {
-            acsConditionTimer = setTimeout(
-                () => sendAcsEventTimerCallback(temperature),
-                settings.acs_condition_delay * 1000
-            );
+        if (acsConditionTimer) {
+            if (
+                acsSendTimestamp &&
+                settings.acs_repeat_after !== 0 &&
+                Date.now() - acsSendTimestamp >= settings.acs_repeat_after * 1000
+            ) {
+                clearTimeout(acsConditionTimer);
+                sendAcsEventTimerCallback(temperature);
+            }
+        } else {
+            const timerTime = settings.acs_condition_delay * 1000;
+            acsConditionTimer = setTimeout(() => sendAcsEventTimerCallback(temperature), timerTime);
         }
     } else if (acsConditionTimer) {
+        acsSendTimestamp = null;
         clearTimeout(acsConditionTimer);
+        acsConditionTimer = null;
     }
 }
 
 async function sendAcsEventTimerCallback(temperature: number) {
     try {
         await sendAcsEvent(temperature);
+        acsSendTimestamp = Date.now();
     } catch (err) {
         console.error('ACS error:', err);
         acsConditionTimer = setTimeout(() => sendAcsEventTimerCallback(temperature), 5000);
@@ -163,7 +176,7 @@ function sendAcsEvent(temperature: number) {
                 if (res.statusCode == 200) {
                     resolve();
                 } else {
-                    reject();
+                    reject(new Error(`status code: ${res.statusCode}`));
                 }
             }
         );
