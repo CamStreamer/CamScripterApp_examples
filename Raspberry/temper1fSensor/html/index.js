@@ -8,6 +8,7 @@ $(document).ready(function () {
         $('#cameraPass').val(settings.camera_pass);
         $('#serviceId').val(settings.service_id);
         $('#fieldName').val(settings.field_name);
+        $('#acsProtocol').val(settings.acs_protocol);
         $('#acsIP').val(settings.acs_ip);
         $('#acsWinUser').val(settings.acs_user);
         $('#acsWinPass').val(settings.acs_pass);
@@ -15,6 +16,7 @@ $(document).ready(function () {
         $('#acsConditionDelay').val(settings.acs_condition_delay ?? 0);
         $('#acsConditionOperator').val(settings.acs_condition_operator ?? 1);
         $('#acsConditionValue').val(settings.acs_condition_value ?? 10);
+        $('#acsRepeatAfter').val(settings.acs_repeat_after ?? 30);
         unit = settings.unit;
         unitChanged();
     });
@@ -45,6 +47,7 @@ function inputChanged() {
         camera_pass: $('#cameraPass').val(),
         service_id: $('#serviceId').val(),
         field_name: $('#fieldName').val(),
+        acs_protocol: $('#acsProtocol').val(),
         acs_ip: $('#acsIP').val(),
         acs_user: $('#acsWinUser').val(),
         acs_pass: $('#acsWinPass').val(),
@@ -52,6 +55,7 @@ function inputChanged() {
         acs_condition_delay: parseInt($('#acsConditionDelay').val()),
         acs_condition_operator: parseInt($('#acsConditionOperator').val()),
         acs_condition_value: parseFloat($('#acsConditionValue').val()),
+        acs_repeat_after: parseInt($('#acsRepeatAfter').val()),
     };
     $.post(
         '/local/camscripter/package/settings.cgi?package_name=temper1fSensor&action=set',

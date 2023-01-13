@@ -116,6 +116,14 @@
               <div class="row">
                 <div class="col-md-6">
                   <div class="form-group">
+                    <label for="acsProtocol">Protocol</label>
+                    <select class="form-control" id="acsProtocol">
+                      <option value="http">HTTP</option>
+                      <option value="https" >HTTPS</option>
+                      <option value="https_insecure">HTTPS (insecure)</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
                     <label for="acsIP">Axis Camera Station IP</label>
                     <input type="text" class="form-control" id="acsIP" placeholder="">
                   </div>
@@ -137,8 +145,8 @@
               </div>
             </form>
 
-            <div><strong>When do you want to be notified?</strong></div>
-            <form class="myForm form-inline">
+            <div>When do you want to be notified?</div>
+            <form class="myForm form-inline mt-3">
               <select class="form-control mr-3" id="acsConditionDelay">
                 <option value="0">Immediately</option>
                 <option value="120">After 2 minutes</option>
@@ -163,6 +171,12 @@
               </select>
               <input type="text" class="form-control mr-1" id="acsConditionValue" placeholder="">
               <div id="acsConditionUnit">&#176;C</div>
+            </form>
+            <form class="myForm mt-3">
+              <div class="form-group">
+                <label for="acsRepeatAfter">Repeat Notification After (s)</label>
+                <input type="text" class="form-control" id="acsRepeatAfter" placeholder="">
+              </div>
             </form>
           </div>
         </div>
