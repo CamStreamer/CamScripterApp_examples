@@ -19,6 +19,7 @@ export type CameraSettings = {
 };
 
 export type CamOverlaySettings = {
+    cameraList: number[];
     coordSystem: CoordSystem;
     posX: number;
     posY: number;
@@ -36,6 +37,8 @@ export type HtmlToOverlayOptions = {
 export class HtmlToOverlay {
     private browser: Browser;
     private page: Page;
+    private startTimer: NodeJS.Timeout;
+    private screenshotTimer: NodeJS.Timeout;
     private co: CamOverlayAPI;
     private coConnected = false;
 
@@ -44,27 +47,34 @@ export class HtmlToOverlay {
     async start() {
         console.log('Start overlay: ' + this.options.configName);
         await this.startBrowser();
-        this.takeScreenshot();
     }
 
     async stop() {
         console.log('Stop overlay: ' + this.options.configName);
         await this.browser.close();
+        clearTimeout(this.startTimer);
+        clearTimeout(this.screenshotTimer);
     }
 
     private async startBrowser() {
-        this.browser = await puppeteer.launch({
-            executablePath: '/usr/bin/chromium-browser',
-            args: ['--no-sandbox', '--disable-setuid-sandbox'],
-            ignoreHTTPSErrors: true,
-        });
-        this.page = await this.browser.newPage();
-        await this.page.setViewport({
-            width: this.options.imageSettings.renderWidth,
-            height: this.options.imageSettings.renderHeight,
-        });
-        console.log('Go to: ' + this.options.imageSettings.url);
-        await this.page.goto(this.options.imageSettings.url);
+        try {
+            this.browser = await puppeteer.launch({
+                executablePath: '/usr/bin/chromium-browser',
+                args: ['--no-sandbox', '--disable-setuid-sandbox'],
+                ignoreHTTPSErrors: true,
+            });
+            this.page = await this.browser.newPage();
+            await this.page.setViewport({
+                width: this.options.imageSettings.renderWidth,
+                height: this.options.imageSettings.renderHeight,
+            });
+            console.log('Go to: ' + this.options.imageSettings.url);
+            await this.page.goto(this.options.imageSettings.url);
+
+            this.takeScreenshot();
+        } catch (err) {
+            this.startTimer = setTimeout(() => this.startBrowser(), 5000);
+        }
     }
 
     private async takeScreenshot() {
@@ -99,7 +109,7 @@ export class HtmlToOverlay {
         } catch (err) {
             console.error(err);
         } finally {
-            setTimeout(() => this.takeScreenshot(), sleepTime);
+            this.screenshotTimer = setTimeout(() => this.takeScreenshot(), sleepTime);
         }
     }
 
@@ -113,6 +123,7 @@ export class HtmlToOverlay {
                 port: this.options.cameraSettings.port,
                 auth: this.options.cameraSettings.user + ':' + this.options.cameraSettings.pass,
                 serviceName,
+                camera: this.options.coSettings.cameraList,
             });
 
             this.co.on('open', (err) => {

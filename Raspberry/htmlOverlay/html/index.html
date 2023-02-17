@@ -4,6 +4,7 @@
   <title>HTML Overlay</title>
   <link rel="icon" type="image/x-icon" href="logo_cs.ico">
   <link rel="stylesheet" href="bootstrap/bootstrap.min.css">
+  <link rel="stylesheet" href="bootstrap/bootstrap-select.min.css">
 </head>
 <body>
   <nav class="navbar navbar-dark bg-dark">
@@ -133,6 +134,20 @@
             <div class="row">
               <div class="col-md-6">
                 <div class="form-group">
+                  <label for="cameraList">View Area(s)</label>
+                  <select class="selectpicker form-control" id="cameraList" multiple></select>
+                </div>
+                <div class="form-group">
+                  <label for="streamWidth">Stream Width</label>
+                  <input type="text" class="form-control" id="streamWidth" placeholder="1920">
+                </div>
+                <div class="form-group">
+                  <label for="streamHeight">Stream Height</label>
+                  <input type="text" class="form-control" id="streamHeight" placeholder="1080">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
                   <label for="coordSystem">Coordinate System</label>
                   <select name="coordSystem" class="form-control" id="coordSystem">
                     <option value="top_left" selected>Top Left</option>
@@ -158,16 +173,6 @@
                       <span class="input-group-text">px</span>
                     </div>
                   </div>
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="streamWidth">Stream Width</label>
-                  <input type="text" class="form-control" id="streamWidth" placeholder="1920">
-                </div>
-                <div class="form-group">
-                  <label for="streamHeight">Stream Height</label>
-                  <input type="text" class="form-control" id="streamHeight" placeholder="1080">
                 </div>
               </div>
             </div>
@@ -223,7 +228,8 @@
   </div>
 
   <script src="jquery-2.2.4/jquery-2.2.4.min.js"></script>
-  <script src="bootstrap/bootstrap.min.js"></script>
+  <script src="bootstrap/bootstrap.bundle.min.js"></script>
+  <script src="bootstrap/bootstrap-select.min.js"></script>
   <script src="index.js"></script>
 </body>
 </html>

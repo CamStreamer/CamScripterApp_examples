@@ -1,55 +1,100 @@
 import * as fs from 'fs';
+import { URL } from 'url';
 import { HtmlToOverlay, HtmlToOverlayOptions } from './htmlToOverlay';
+import { HttpServer } from 'camstreamerlib/HttpServer';
+import { CameraVapix } from 'camstreamerlib/CameraVapix';
 
-let settingsList = null;
-try {
-    const data = fs.readFileSync(process.env.PERSISTENT_DATA_PATH + 'settings.json');
-    settingsList = JSON.parse(data.toString());
-} catch (err) {
-    console.log('No settings file found');
-    process.exit(1);
-}
-
-if (settingsList.length === 0) {
-    console.log('Application is not configured.');
-    process.exit(1);
-}
-
+let settingsList = [];
 const overlayList: HtmlToOverlay[] = [];
-function start() {
-    settingsList.forEach(async (settings: HtmlToOverlayOptions) => {
-        startOverlay(settings);
-    });
-}
 
-async function startOverlay(settings: HtmlToOverlayOptions) {
+const httpServer = new HttpServer();
+httpServer.onRequest('/getChannelList.cgi', async (req, res) => {
     try {
+        const url = new URL(req.url, 'http://tmp.com');
+        const protocol = url.searchParams.get('protocol');
+        const ip = url.searchParams.get('ip');
+        const port = parseInt(url.searchParams.get('port'));
+        const user = url.searchParams.get('user');
+        const pass = url.searchParams.get('pass');
+
+        let channelList: { index: number; name: string }[] = [];
+        if (protocol.length && ip.length && !isNaN(port) && user.length && pass.length) {
+            const cv = new CameraVapix({
+                tls: protocol !== 'http',
+                tlsInsecure: protocol === 'https_insecure',
+                ip,
+                port,
+                auth: user + ':' + pass,
+            });
+            const imageConfigListRes = await cv.getParameterGroup('Image');
+
+            let i = 0;
+            while (imageConfigListRes[`root.Image.I${i}.Enabled`] !== undefined) {
+                if (imageConfigListRes[`root.Image.I${i}.Enabled`] === 'yes') {
+                    channelList.push({ index: i, name: imageConfigListRes[`root.Image.I${i}.Name`] });
+                }
+                i++;
+            }
+        }
+
+        res.statusCode = 200;
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.end(JSON.stringify(channelList));
+    } catch (err) {
+        console.error(err);
+        res.statusCode = 500;
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.end(err.message);
+    }
+});
+
+function start() {
+    settingsList = readConfiguration();
+
+    settingsList.forEach((settings: HtmlToOverlayOptions) => {
         if (
             settings.imageSettings.url.length &&
             settings.cameraSettings.ip.length &&
             settings.cameraSettings.user.length &&
-            settings.cameraSettings.pass.length
+            settings.cameraSettings.pass.length &&
+            settings.coSettings.cameraList.length
         ) {
             const htmlOvl = new HtmlToOverlay(settings);
-            await htmlOvl.start();
+            htmlOvl.start();
             overlayList.push(htmlOvl);
         }
+    });
+}
+
+function readConfiguration() {
+    try {
+        const data = fs.readFileSync(process.env.PERSISTENT_DATA_PATH + 'settings.json');
+        return JSON.parse(data.toString());
     } catch (err) {
-        console.error(settings.configName, err);
-        setTimeout(() => startOverlay(settings), 10000);
+        console.log('No configuration found');
+        return [];
     }
 }
 
-process.on('SIGINT', cleanExit);
-process.on('SIGTERM', cleanExit);
+async function stop() {
+    settingsList = [];
 
-function cleanExit() {
-    console.log('App exit');
     overlayList.forEach(async (htmlOverlay) => {
         await htmlOverlay.stop();
     });
-    process.exit();
+    overlayList.splice(0, overlayList.length);
 }
+
+process.on('SIGINT', async () => {
+    console.log('Reload configuration');
+    await stop();
+    start();
+});
+
+process.on('SIGTERM', () => {
+    console.log('App exit');
+    process.exit();
+});
 
 console.log('App started');
 start();

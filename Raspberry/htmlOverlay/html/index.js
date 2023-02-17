@@ -24,14 +24,14 @@ function renderTabs() {
     $('#navTab').html(tabsHtml);
     $('#navTab a').unbind().on('click', tabClicked);
     $('#navTab a:first').tab('show');
-    $('#tabs').show(400, ()=> {
+    $('#tabs').show(400, () => {
         $('.form-control').change(inputChanged);
         $('.myForm').submit(function () {
             return false;
         });
 
         $('#deleteConfigBtn').on('click', removeTab);
-    })
+    });
 }
 
 function getConfigurationTabHtml(sequenceNum, configName) {
@@ -110,6 +110,8 @@ function renderActiveTabContent() {
     $('#posY').val(coSettings.posY);
     $('#streamWidth').val(coSettings.streamWidth);
     $('#streamHeight').val(coSettings.streamHeight);
+
+    renderCameraPicker(config);
 }
 
 function getDefaultConfiguration(sequenceNum) {
@@ -129,6 +131,7 @@ function getDefaultConfiguration(sequenceNum) {
             pass: '',
         },
         coSettings: {
+            cameraList: [0],
             coordSystem: 'bottom_left',
             posX: 0,
             posY: 0,
@@ -138,10 +141,48 @@ function getDefaultConfiguration(sequenceNum) {
     };
 }
 
-function inputChanged() {
-    if (activeTabNum < configList.length) {
-        $(`#tab_${activeTabNum}`).text($('#configName').val());
+async function renderCameraPicker(config) {
+    try {
+        const channelList = await getChannelList(config);
 
+        const cameraSelect = $('#cameraList');
+        cameraSelect.selectpicker();
+        cameraSelect.empty();
+
+        const selectedValues = [];
+        for (var i = 0; i < channelList.length; i++) {
+            cameraSelect.append(`<option value="${channelList[i].index}">${channelList[i].name}</option>`);
+            if (config.coSettings?.cameraList?.includes(channelList[i].index)) {
+                selectedValues.push(channelList[i].index);
+            }
+        }
+        cameraSelect.val(selectedValues);
+        cameraSelect.selectpicker('refresh');
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+async function getChannelList(config) {
+    return new Promise((resolve, reject) => {
+        const params = {
+            protocol: config.cameraSettings.protocol,
+            ip: config.cameraSettings.ip,
+            port: config.cameraSettings.port,
+            user: config.cameraSettings.user,
+            pass: config.cameraSettings.pass,
+        };
+        $.get(`/local/camscripter/proxy/htmlOverlay/getChannelList.cgi`, params, (data) => {
+            resolve(JSON.parse(data));
+        }).fail(() => {
+            console.log('Could not get channel list from the camera');
+            resolve([]);
+        });
+    });
+}
+
+function inputChanged(input) {
+    if (activeTabNum < configList.length) {
         configList[activeTabNum] = {
             configName: $('#configName').val(),
             imageSettings: {
@@ -158,6 +199,10 @@ function inputChanged() {
                 pass: $('#cameraPass').val(),
             },
             coSettings: {
+                cameraList:
+                    $('#cameraList')
+                        .val()
+                        ?.map((camera) => parseInt(camera)) || [],
                 coordSystem: $('#coordSystem').val(),
                 posX: parseInt($('#posX').val()),
                 posY: parseInt($('#posY').val()),
@@ -165,11 +210,17 @@ function inputChanged() {
                 streamHeight: parseInt($('#streamHeight').val()),
             },
         };
-    }
 
-    $.post(
-        '/local/camscripter/package/settings.cgi?package_name=htmlOverlay&action=set',
-        encodeURIComponent(JSON.stringify(configList)),
-        (data) => {}
-    );
+        $(`#tab_${activeTabNum}`).text(configList[activeTabNum].configName);
+
+        if (input && input.target.id !== 'cameraList') {
+            renderCameraPicker(configList[activeTabNum]);
+        }
+
+        $.post(
+            '/local/camscripter/package/settings.cgi?package_name=htmlOverlay&action=set',
+            encodeURIComponent(JSON.stringify(configList)),
+            (data) => {}
+        );
+    }
 }

@@ -15,6 +15,7 @@
             "pass": ""
         },
         "coSettings": {
+            "cameraList": [0],
             "coordSystem": "bottom_left",
             "posX": 0,
             "posY": 0,
