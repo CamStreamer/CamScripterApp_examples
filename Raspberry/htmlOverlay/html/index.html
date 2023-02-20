@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>HTML Overlay</title>
+  <link rel="icon" type="image/x-icon" href="logo_cs.ico">
+  <link rel="stylesheet" href="bootstrap/bootstrap.min.css">
+  <link rel="stylesheet" href="bootstrap/bootstrap-select.min.css">
+</head>
+<body>
+  <nav class="navbar navbar-dark bg-dark">
+    <span>
+      <a class="navbar-brand" href="#"><img src="logo_cs.png" style="height: 25px; margin-bottom: 4px;" alt=""> CamScripter</a>
+    </span>
+  </nav>
+
+  <div class="jumbotron">
+    <div class="container">
+      <h1 class="display-4">HTML Overlay</h1>
+      <p>This package converts HTML webpage to an image and sends the image to the CamOverlay application.</p>
+      <p>
+        The package requires <a href="https://www.chromium.org/chromium-projects/" target="_blank">Chromium</a> and node.js version 14 or newer.<br>
+        Chromium installation: <code>sudo apt install chromium-browser</code>.<br>
+        Node.js upgrade:
+        <ul>
+            <li><code>sudo npm install -g n</code></li>
+            <li><code>sudo n latest</code></li>
+            <li><code>sudo systemctl restart camscripter.service</code></li>
+        </ul>
+      </p>
+      <p>Changes are saved automatically, you don't have to save them.</p>
+    </div>
+  </div>
+
+  <div id="tabs" class="container" style="display: none">
+    <nav>
+      <div class="nav nav-tabs" id="navTab" role="tablist"></div>
+    </nav>
+    <div class="tab-content" id="nav-tabContent">
+      <div class="tab-pane border border-top-0" id="navContent" role="tabpanel">
+        <div class="container pt-3">
+          <form class="myForm">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="configName">Configuration Name</label>
+                  <input type="text" class="form-control" id="configName" placeholder="Overlay 1">
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="container pt-3">
+          <h4>HTLM Image Settings</h4>
+          <form class="myForm">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="imageUrl">Image URL</label>
+                  <input type="text" class="form-control" id="imageUrl" placeholder="https://www.google.com/">
+                </div>
+                <div class="form-group">
+                  <label for="refreshRate">Refresh Rate</label>
+                  <div class="input-group">
+                    <input type="text" class="form-control" id="refreshRate" placeholder="1000">
+                    <div class="input-group-append">
+                      <span class="input-group-text">ms</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="renderWidth">Width</label>
+                  <div class="input-group">
+                    <input type="text" class="form-control" id="renderWidth" placeholder="500">
+                    <div class="input-group-append">
+                      <span class="input-group-text">px</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="renderHeight">Height</label>
+                  <div class="input-group">
+                    <input type="text" class="form-control" id="renderHeight" placeholder="300">
+                    <div class="input-group-append">
+                      <span class="input-group-text">px</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <div class="container pt-3">
+          <h4>Camera Connection Settings</h4>
+          <form class="myForm">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="cameraProtocol">Protocol</label>
+                  <select class="form-control" id="cameraProtocol">
+                    <option value="http">HTTP</option>
+                    <option value="https" >HTTPS</option>
+                    <option value="https_insecure">HTTPS (insecure)</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="cameraIP">Camera IP</label>
+                  <input type="text" class="form-control" id="cameraIP" placeholder="127.0.0.1">
+                </div>
+                <div class="form-group">
+                  <label for="cameraPort">Camera Port</label>
+                  <input type="text" class="form-control" id="cameraPort" placeholder="80">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="cameraUser">Camera User</label>
+                  <input type="text" class="form-control" id="cameraUser" placeholder="root">
+                </div>
+                <div class="form-group">
+                  <label for="cameraPass">Camera Pass</label>
+                  <input type="password" class="form-control" id="cameraPass" placeholder="">
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <div class="container pt-3">
+          <h4>CamOverlay Settings</h4>
+          <form class="myForm">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="cameraList">View Area(s)</label>
+                  <select class="selectpicker form-control" id="cameraList" multiple></select>
+                </div>
+                <div class="form-group">
+                  <label for="streamWidth">Stream Width</label>
+                  <input type="text" class="form-control" id="streamWidth" placeholder="1920">
+                </div>
+                <div class="form-group">
+                  <label for="streamHeight">Stream Height</label>
+                  <input type="text" class="form-control" id="streamHeight" placeholder="1080">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="coordSystem">Coordinate System</label>
+                  <select name="coordSystem" class="form-control" id="coordSystem">
+                    <option value="top_left" selected>Top Left</option>
+                    <option value="top_right">Top Right</option>
+                    <option value="bottom_left">Left Bottom</option>
+                    <option value="bottom_right">Right Bottom</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="posX">Position X</label>
+                  <div class="input-group">
+                    <input type="text" class="form-control" id="posX" placeholder="">
+                    <div class="input-group-append">
+                      <span class="input-group-text">px</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="posY">Position Y</label>
+                  <div class="input-group">
+                    <input type="text" class="form-control" id="posY" placeholder="">
+                    <div class="input-group-append">
+                      <span class="input-group-text">px</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <form class="myForm">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="col-md-12 text-right">
+                <button type="button" class="btn btn btn-outline-danger" data-toggle="modal" data-target="#deleteConfirmModal">
+                  Delete Configuration
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+
+        <div>
+          <br>
+        </div>
+
+      </div>
+
+      <div class="tab-pane fade border border-top-0 text-center pt-3" id="navContentEmpty" role="tabpanel">
+        <p>No Configuration Found</p>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <br>
+  </div>
+
+  <div id="deleteConfirmModal" class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Delete Configuration</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure you want to delete the configuration?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" id="deleteConfigBtn" class="btn btn-primary" data-dismiss="modal">Delete</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="jquery-2.2.4/jquery-2.2.4.min.js"></script>
+  <script src="bootstrap/bootstrap.bundle.min.js"></script>
+  <script src="bootstrap/bootstrap-select.min.js"></script>
+  <script src="index.js"></script>
+</body>
+</html>

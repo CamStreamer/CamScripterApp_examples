@@ -1,0 +1,26 @@
+[
+    {
+        "configName": "HtmlOverlay1",
+        "imageSettings": {
+            "url": "",
+            "renderWidth": 500,
+            "renderHeight": 300,
+            "refreshRate": 500
+        },
+        "cameraSettings": {
+            "protocol": "http",
+            "ip": "",
+            "port": 80,
+            "user": "root",
+            "pass": ""
+        },
+        "coSettings": {
+            "cameraList": [0],
+            "coordSystem": "bottom_left",
+            "posX": 0,
+            "posY": 0,
+            "streamWidth": 1920,
+            "streamHeight": 1080
+        }
+    }
+]
