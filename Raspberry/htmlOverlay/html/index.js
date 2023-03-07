@@ -143,11 +143,12 @@ function getDefaultConfiguration(sequenceNum) {
 
 async function renderCameraPicker(config) {
     try {
-        const channelList = await getChannelList(config);
-
         const cameraSelect = $('#cameraList');
         cameraSelect.selectpicker();
         cameraSelect.empty();
+        cameraSelect.selectpicker('refresh');
+
+        const channelList = await getChannelList(config);
 
         const selectedValues = [];
         for (var i = 0; i < channelList.length; i++) {
@@ -164,21 +165,47 @@ async function renderCameraPicker(config) {
 }
 
 async function getChannelList(config) {
-    return new Promise((resolve, reject) => {
-        const params = {
-            protocol: config.cameraSettings.protocol,
-            ip: config.cameraSettings.ip,
-            port: config.cameraSettings.port,
-            user: config.cameraSettings.user,
-            pass: config.cameraSettings.pass,
-        };
-        $.get(`/local/camscripter/proxy/htmlOverlay/getChannelList.cgi`, params, (data) => {
-            resolve(JSON.parse(data));
-        }).fail(() => {
-            console.log('Could not get channel list from the camera');
-            resolve([]);
-        });
+    return new Promise((resolve) => {
+        $.ajax({
+            url: '/local/camscripter/proxy.cgi',
+            beforeSend: (xhr) => {
+                xhr.setRequestHeader('x-target-camera-protocol', config.cameraSettings.protocol);
+                xhr.setRequestHeader('x-target-camera-ip', config.cameraSettings.ip);
+                xhr.setRequestHeader('x-target-camera-port', config.cameraSettings.port);
+                xhr.setRequestHeader('x-target-camera-user', config.cameraSettings.user);
+                xhr.setRequestHeader('x-target-camera-pass', config.cameraSettings.pass);
+                xhr.setRequestHeader('x-target-camera-path', '/axis-cgi/param.cgi?action=list&group=root.Image');
+            },
+        })
+            .done((responseData) => {
+                const params = parseParamsData(responseData);
+                let channelList = [];
+                let i = 0;
+                while (params[`root.Image.I${i}.Enabled`] !== undefined) {
+                    if (params[`root.Image.I${i}.Enabled`] === 'yes') {
+                        channelList.push({ index: i, name: params[`root.Image.I${i}.Name`] });
+                    }
+                    i++;
+                }
+                resolve(channelList);
+            })
+            .fail(() => {
+                console.log('Could not get channel list from the camera');
+                resolve([]);
+            });
     });
+}
+
+function parseParamsData(data) {
+    let params = {};
+    const lines = data.split('\n');
+    lines.forEach((line) => {
+        const sepPos = line.indexOf('=');
+        if (sepPos !== -1 && sepPos + 1 < line.length) {
+            params[line.substring(0, sepPos)] = line.substring(sepPos + 1);
+        }
+    });
+    return params;
 }
 
 function inputChanged(input) {
