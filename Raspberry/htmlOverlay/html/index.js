@@ -244,10 +244,10 @@ function inputChanged(input) {
             renderCameraPicker(configList[activeTabNum]);
         }
 
-        $.post(
-            '/local/camscripter/package/settings.cgi?package_name=htmlOverlay&action=set',
-            encodeURIComponent(JSON.stringify(configList)),
-            (data) => {}
-        );
+        $.ajax('/local/camscripter/package/settings.cgi?package_name=htmlOverlay&action=set', {
+            data: JSON.stringify(configList),
+            contentType: 'application/json',
+            type: 'POST',
+        });
     }
 }
