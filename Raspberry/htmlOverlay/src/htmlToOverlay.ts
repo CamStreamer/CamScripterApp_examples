@@ -28,6 +28,7 @@ export type CamOverlaySettings = {
 };
 
 export type HtmlToOverlayOptions = {
+    enabled: boolean;
     configName: string;
     imageSettings: ImageSettings;
     cameraSettings: CameraSettings;
@@ -39,21 +40,39 @@ export class HtmlToOverlay {
     private page: Page;
     private startTimer: NodeJS.Timeout;
     private screenshotTimer: NodeJS.Timeout;
+    private removeImageTimer: NodeJS.Timeout;
     private co: CamOverlayAPI;
     private coConnected = false;
+    private takeScreenshotPromise;
 
     constructor(private options: HtmlToOverlayOptions) {}
 
     async start() {
-        console.log('Start overlay: ' + this.options.configName);
-        await this.startBrowser();
+        if (this.options.enabled) {
+            console.log('Start overlay: ' + this.options.configName);
+            await this.startBrowser();
+        } else {
+            this.removeImage();
+            this.removeImageTimer = setInterval(() => this.removeImage(), 300_000);
+        }
     }
 
     async stop() {
         console.log('Stop overlay: ' + this.options.configName);
-        await this.browser.close();
+        if (this.takeScreenshotPromise) {
+            await this.takeScreenshotPromise;
+        }
+
         clearTimeout(this.startTimer);
         clearTimeout(this.screenshotTimer);
+        clearTimeout(this.removeImageTimer);
+
+        if (this.browser) {
+            await this.browser.close();
+        }
+        if (this.coConnected) {
+            await this.removeImage();
+        }
     }
 
     private async startBrowser() {
@@ -62,6 +81,8 @@ export class HtmlToOverlay {
                 executablePath: '/usr/bin/chromium-browser',
                 args: ['--no-sandbox', '--disable-setuid-sandbox'],
                 ignoreHTTPSErrors: true,
+                handleSIGINT: false,
+                handleSIGTERM: false,
             });
             this.page = await this.browser.newPage();
             await this.page.setViewport({
@@ -71,7 +92,7 @@ export class HtmlToOverlay {
             console.log('Go to: ' + this.options.imageSettings.url);
             await this.page.goto(this.options.imageSettings.url);
 
-            this.takeScreenshot();
+            this.takeScreenshotPromise = this.takeScreenshot();
         } catch (err) {
             this.startTimer = setTimeout(() => this.startBrowser(), 5000);
         }
@@ -94,7 +115,7 @@ export class HtmlToOverlay {
                     this.options.coSettings.streamWidth,
                     this.options.coSettings.streamHeight
                 );
-                this.co.showCairoImageAbsolute(
+                await this.co.showCairoImageAbsolute(
                     surface,
                     pos.x,
                     pos.y,
@@ -109,7 +130,15 @@ export class HtmlToOverlay {
         } catch (err) {
             console.error(err);
         } finally {
-            this.screenshotTimer = setTimeout(() => this.takeScreenshot(), sleepTime);
+            this.screenshotTimer = setTimeout(() => {
+                this.takeScreenshotPromise = this.takeScreenshot();
+            }, sleepTime);
+        }
+    }
+
+    private async removeImage() {
+        if (await this.startCamOverlayConnection()) {
+            await this.co.removeImage();
         }
     }
 

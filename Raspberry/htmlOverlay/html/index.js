@@ -12,7 +12,7 @@ $(document).ready(function () {
 function renderTabs() {
     let tabsHtml = '';
     for (let i = 0; i < configList.length; i++) {
-        tabsHtml += getConfigurationTabHtml(i, configList[i].configName);
+        tabsHtml += getConfigurationTabHtml(i, configList[i].enabled, configList[i].configName);
     }
     tabsHtml +=
         ` <a class="nav-item nav-link"` +
@@ -25,42 +25,59 @@ function renderTabs() {
     $('#navTab a').unbind().on('click', tabClicked);
     $('#navTab a:first').tab('show');
     $('#tabs').show(400, () => {
-        $('.form-control').change(inputChanged);
+        $('.form-control:not(#cameraList,[class^="dropdown"])').change(inputChanged);
         $('.myForm').submit(function () {
             return false;
         });
-
+        $('#cameraList').on('changed.bs.select', cameraPickerChanged);
         $('#deleteConfigBtn').on('click', removeTab);
     });
+    $('[id^="enabledToogle_"]').bootstrapToggle();
 }
 
-function getConfigurationTabHtml(sequenceNum, configName) {
+function getConfigurationTabHtml(sequenceNum, enabled, configName) {
+    const toogleChecked = enabled ? 'checked' : '';
+    const toogle = `<input id="enabledToogle_${sequenceNum}" type="checkbox" ${toogleChecked} data-toggle="toggle" data-size="xs"></input>`;
     return (
         ` <a class="nav-item nav-link"` +
         ` id="tab_${sequenceNum}"` +
         ' data-toggle="tab"' +
         ' href="#navContent"' +
         ' role="tab"' +
-        ` aria-controls="navContent">${configName}</a>`
+        ` aria-controls="navContent"><span id="tabText_${sequenceNum}">${configName}</span> ${toogle}</a>`
     );
 }
 
 function tabClicked(event) {
     event.preventDefault();
 
+    if (event.target.id.length === 0) {
+        // Enabled toogle
+        const tabId = event.target.closest('a[id^=tab_]').id;
+        const tabSequenceNum = parseInt(tabId.substring(4));
+        configList[tabSequenceNum].enabled = !(configList[tabSequenceNum].enabled ?? true);
+        $(`#enabledToogle_${tabSequenceNum}`).bootstrapToggle(configList[tabSequenceNum].enabled ? 'on' : 'off');
+        saveConfiguration();
+        return false;
+    }
+
     if (event.target.id.indexOf('plus') !== -1) {
-        const newConfig = getDefaultConfiguration(configList.length + 1);
-        $(`#tab_plus`).before(getConfigurationTabHtml(configList.length, newConfig.configName));
+        const newConfig = getDefaultConfiguration(findUnusedHtmlOverlayId());
+        $(`#tab_plus`).before(getConfigurationTabHtml(configList.length, newConfig.enabled, newConfig.configName));
         $(`#tab_${activeTabNum}`).tab('show');
         $(`#tab_${activeTabNum}`).focus();
         $('#navTab a').unbind().on('click', tabClicked);
+        $('[id^="enabledToogle_"]').bootstrapToggle();
         configList.push(newConfig);
         renderActiveTabContent();
-        inputChanged();
+        saveConfiguration();
     } else {
-        activeTabNum = parseInt(event.target.id.substring(4));
+        const tabId = event.target.closest('a[id^=tab_]').id;
+        activeTabNum = parseInt(tabId.substring(4));
         renderActiveTabContent();
     }
+
+    return true;
 }
 
 function removeTab() {
@@ -70,7 +87,7 @@ function removeTab() {
     resetTabIds();
     activeTabNum = 0;
     renderActiveTabContent();
-    inputChanged();
+    saveConfiguration();
 }
 
 function resetTabIds() {
@@ -80,6 +97,24 @@ function resetTabIds() {
             v.id = `tab_${k}`;
         }
     });
+}
+
+function findUnusedHtmlOverlayId() {
+    const configIds = [];
+    configList.forEach((config) => {
+        if (config.configName.indexOf('HtmlOverlay') === 0) {
+            const id = parseInt(config.configName.substring(11));
+            if (!isNaN(id)) {
+                configIds.push(id);
+            }
+        }
+    });
+
+    let id = 1;
+    while (configIds.indexOf(id) !== -1) {
+        id++;
+    }
+    return id;
 }
 
 function renderActiveTabContent() {
@@ -114,9 +149,10 @@ function renderActiveTabContent() {
     renderCameraPicker(config);
 }
 
-function getDefaultConfiguration(sequenceNum) {
+function getDefaultConfiguration(overlayId) {
     return {
-        configName: `HtmlOverlay${sequenceNum}`,
+        enabled: true,
+        configName: `HtmlOverlay${overlayId}`,
         imageSettings: {
             url: '',
             renderWidth: 500,
@@ -131,7 +167,7 @@ function getDefaultConfiguration(sequenceNum) {
             pass: '',
         },
         coSettings: {
-            cameraList: [0],
+            cameraList: null,
             coordSystem: 'bottom_left',
             posX: 0,
             posY: 0,
@@ -141,13 +177,17 @@ function getDefaultConfiguration(sequenceNum) {
     };
 }
 
-async function renderCameraPicker(config) {
+async function renderCameraPicker() {
     try {
+        if (activeTabNum >= configList.length) {
+            return;
+        }
+
         const cameraSelect = $('#cameraList');
         cameraSelect.selectpicker();
         cameraSelect.empty();
-        cameraSelect.selectpicker('refresh');
 
+        const config = configList[activeTabNum];
         const channelList = await getChannelList(config);
 
         const selectedValues = [];
@@ -157,15 +197,21 @@ async function renderCameraPicker(config) {
                 selectedValues.push(channelList[i].index);
             }
         }
+        if (!config.coSettings?.cameraList && channelList.length) {
+            selectedValues.push(channelList[0].index);
+        }
+
         cameraSelect.val(selectedValues);
         cameraSelect.selectpicker('refresh');
+        cameraPickerChanged();
     } catch (err) {
         console.error(err);
+        $('#cameraList').selectpicker('refresh');
     }
 }
 
 async function getChannelList(config) {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
         $.ajax({
             url: '/local/camscripter/proxy.cgi',
             beforeSend: (xhr) => {
@@ -189,9 +235,8 @@ async function getChannelList(config) {
                 }
                 resolve(channelList);
             })
-            .fail(() => {
-                console.log('Could not get channel list from the camera');
-                resolve([]);
+            .fail((xhr, status, err) => {
+                reject(`Could not get channel list from the camera, status: ${status}`);
             });
     });
 }
@@ -208,9 +253,30 @@ function parseParamsData(data) {
     return params;
 }
 
-function inputChanged(input) {
+function inputChanged() {
+    saveConfiguration();
+    renderCameraPicker();
+
+    if (activeTabNum < configList.length) {
+        $(`#tabText_${activeTabNum}`).text(configList[activeTabNum].configName);
+    }
+}
+
+function cameraPickerChanged() {
+    if (activeTabNum < configList.length) {
+        const selected = $('#cameraList').val();
+        const newCameraList = selected?.map((camera) => parseInt(camera)) || [];
+        if (JSON.stringify(configList[activeTabNum].coSettings.cameraList) !== JSON.stringify(newCameraList)) {
+            configList[activeTabNum].coSettings.cameraList = newCameraList;
+            saveConfiguration();
+        }
+    }
+}
+
+function saveConfiguration() {
     if (activeTabNum < configList.length) {
         configList[activeTabNum] = {
+            enabled: configList[activeTabNum].enabled ?? true,
             configName: $('#configName').val(),
             imageSettings: {
                 url: $('#imageUrl').val(),
@@ -226,10 +292,7 @@ function inputChanged(input) {
                 pass: $('#cameraPass').val(),
             },
             coSettings: {
-                cameraList:
-                    $('#cameraList')
-                        .val()
-                        ?.map((camera) => parseInt(camera)) || [],
+                cameraList: configList[activeTabNum].coSettings.cameraList,
                 coordSystem: $('#coordSystem').val(),
                 posX: parseInt($('#posX').val()),
                 posY: parseInt($('#posY').val()),
@@ -237,12 +300,6 @@ function inputChanged(input) {
                 streamHeight: parseInt($('#streamHeight').val()),
             },
         };
-
-        $(`#tab_${activeTabNum}`).text(configList[activeTabNum].configName);
-
-        if (input && input.target.id !== 'cameraList') {
-            renderCameraPicker(configList[activeTabNum]);
-        }
 
         $.ajax('/local/camscripter/package/settings.cgi?package_name=htmlOverlay&action=set', {
             data: JSON.stringify(configList),

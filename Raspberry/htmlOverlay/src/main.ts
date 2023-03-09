@@ -13,13 +13,18 @@ function start() {
             settings.cameraSettings.ip.length &&
             settings.cameraSettings.user.length &&
             settings.cameraSettings.pass.length &&
-            settings.coSettings.cameraList.length
+            settings.coSettings.cameraList?.length
         ) {
             const htmlOvl = new HtmlToOverlay(settings);
             htmlOvl.start();
             overlayList.push(htmlOvl);
         }
     });
+
+    if (overlayList.length === 0) {
+        console.log('No configured HTML overlay found');
+        setTimeout(() => {}, 300_000); // Prevent app from exiting
+    }
 }
 
 function readConfiguration() {
@@ -32,13 +37,21 @@ function readConfiguration() {
     }
 }
 
+async function stopAllPackages() {
+    for (const overlay of overlayList) {
+        await overlay.stop();
+    }
+}
+
 process.on('SIGINT', async () => {
-    console.log('Reload configuration');
+    console.log('App exit - configuration changed');
+    await stopAllPackages();
     process.exit();
 });
 
-process.on('SIGTERM', () => {
+process.on('SIGTERM', async () => {
     console.log('App exit');
+    await stopAllPackages();
     process.exit();
 });
 
