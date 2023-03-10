@@ -14,7 +14,7 @@
   "license": "ISC",
   "dependencies": {
     "camstreamerlib": "^1.7.4",
-    "follow-redirects": "^1.13.0",
+    "follow-redirects": "^1.14.8",
     "xmlhttprequest": "^1.8.0"
   },
   "devDependencies": {
