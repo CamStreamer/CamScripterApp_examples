@@ -187,8 +187,12 @@ async function renderCameraPicker() {
         cameraSelect.selectpicker();
         cameraSelect.empty();
 
+        const activeTabBackup = activeTabNum;
         const config = configList[activeTabNum];
         const channelList = await getChannelList(config);
+        if (activeTabBackup !== activeTabNum) {
+            return;
+        }
 
         const selectedValues = [];
         for (var i = 0; i < channelList.length; i++) {
