@@ -20,7 +20,7 @@
     "author": "CamStreamer s.r.o",
     "license": "ISC",
     "dependencies": {
-        "camstreamerlib": "^1.8.2",
+        "camstreamerlib": "^1.8.3",
         "puppeteer-core": "^19.7.0"
     },
     "devDependencies": {
