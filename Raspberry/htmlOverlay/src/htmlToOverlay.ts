@@ -36,6 +36,7 @@ export type HtmlToOverlayOptions = {
 };
 
 export class HtmlToOverlay {
+    private stopped = false;
     private browser: Browser;
     private page: Page;
     private startTimer: NodeJS.Timeout;
@@ -48,6 +49,7 @@ export class HtmlToOverlay {
     constructor(private options: HtmlToOverlayOptions) {}
 
     async start() {
+        this.stopped = false;
         if (this.options.enabled) {
             console.log('Start overlay: ' + this.options.configName);
             await this.startBrowser();
@@ -59,6 +61,7 @@ export class HtmlToOverlay {
 
     async stop() {
         console.log('Stop overlay: ' + this.options.configName);
+        this.stopped = true;
         if (this.takeScreenshotPromise) {
             await this.takeScreenshotPromise;
         }
@@ -77,6 +80,10 @@ export class HtmlToOverlay {
 
     private async startBrowser() {
         try {
+            if (this.browser) {
+                await this.browser.close();
+            }
+
             this.browser = await puppeteer.launch({
                 executablePath: '/usr/bin/chromium-browser',
                 args: ['--no-sandbox', '--disable-setuid-sandbox'],
@@ -84,7 +91,20 @@ export class HtmlToOverlay {
                 handleSIGINT: false,
                 handleSIGTERM: false,
             });
+            this.browser.on('disconnected', () => {
+                console.log('Browser disconnected');
+                this.restartBrowser();
+            });
+
             this.page = await this.browser.newPage();
+            this.page.on('error', (err) => {
+                console.log('Page error', err);
+                this.restartBrowser();
+            });
+            this.page.on('close', () => {
+                console.log('Page closed');
+                this.restartBrowser();
+            });
             await this.page.setViewport({
                 width: this.options.imageSettings.renderWidth,
                 height: this.options.imageSettings.renderHeight,
@@ -94,6 +114,12 @@ export class HtmlToOverlay {
 
             this.takeScreenshotPromise = this.takeScreenshot();
         } catch (err) {
+            this.restartBrowser();
+        }
+    }
+
+    private restartBrowser() {
+        if (!this.stopped) {
             this.startTimer = setTimeout(() => this.startBrowser(), 5000);
         }
     }
@@ -155,7 +181,8 @@ export class HtmlToOverlay {
                 camera: this.options.coSettings.cameraList,
             });
 
-            this.co.on('open', (err) => {
+            this.co.on('open', () => {
+                console.log('COAPI: connected');
                 this.coConnected = true;
             });
 
