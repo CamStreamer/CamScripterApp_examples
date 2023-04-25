@@ -38,9 +38,11 @@ function readConfiguration() {
 }
 
 async function stopAllPackages() {
+    let promises: Promise<void>[] = [];
     for (const overlay of overlayList) {
-        await overlay.stop();
+        promises.push(overlay.stop());
     }
+    await Promise.all(promises);
 }
 
 process.on('SIGINT', async () => {
