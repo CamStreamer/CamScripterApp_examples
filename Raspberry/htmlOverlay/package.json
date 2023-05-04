@@ -1,6 +1,6 @@
 {
     "name": "@camstreamer/htmloverlay",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "description": "",
     "prettier": "@camstreamer/prettier-config",
     "main": "main.js",
@@ -15,12 +15,12 @@
         "in:prod": "npm install --production",
         "in:all": "npm install",
         "zip:package": "node node_modules/camstreamerlib/CreatePackage -i",
-        "zip": "npm-run-all build zip:package"
+        "zip": "npm-run-all build in:prod zip:package in:all"
     },
     "author": "CamStreamer s.r.o",
     "license": "ISC",
     "dependencies": {
-        "camstreamerlib": "^1.8.4",
+        "camstreamerlib": "^1.8.6",
         "puppeteer-core": "^19.7.0"
     },
     "devDependencies": {

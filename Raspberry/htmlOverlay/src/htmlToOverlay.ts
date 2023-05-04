@@ -44,6 +44,7 @@ export class HtmlToOverlay {
     private removeImageTimer: NodeJS.Timeout;
     private co: CamOverlayAPI;
     private coConnected = false;
+    private coDowntimeTimer: NodeJS.Timeout;
     private takeScreenshotPromise;
 
     constructor(private options: HtmlToOverlayOptions) {}
@@ -169,7 +170,7 @@ export class HtmlToOverlay {
     }
 
     private async startCamOverlayConnection() {
-        if (!this.coConnected) {
+        if (!this.coConnected && !this.coDowntimeTimer) {
             const serviceName = this.options.configName.length ? this.options.configName : 'htmlOverlay';
             this.co = new CamOverlayAPI({
                 tls: this.options.cameraSettings.protocol !== 'http',
@@ -188,6 +189,9 @@ export class HtmlToOverlay {
 
             this.co.on('error', (err) => {
                 console.log('COAPI-Error: ' + err);
+                this.coDowntimeTimer = setTimeout(() => {
+                    this.coDowntimeTimer = undefined;
+                }, 5000);
             });
 
             this.co.on('close', () => {
