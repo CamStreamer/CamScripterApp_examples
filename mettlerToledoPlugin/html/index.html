@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Mettler Toledo Plugin</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="stylesheet" href="bootstrap/bootstrap.min.css">
+    <style>
+        .form-control::-webkit-input-placeholder {
+            opacity: 0.5;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-dark bg-dark">
+        <span>
+            <a class="navbar-brand" href="#"><img src="logo_cs.png"
+                    style="height: 25px; margin-bottom: 4px;" alt=""> CamScripter</a>
+        </span>
+    </nav>
+
+    <div class="jumbotron">
+        <div class="container text-center" id="title" style="display: none">
+            <img src="mt-logo-top-01.svg" alt="">
+            <h1 class="display-4">Mettler Toledo Plugin</h1>
+            <p>This script works on Mettler Toledo scales supporting the SICS protocol.</p>
+            <p>Changes are saved automatically, you don't have to save them.</p>
+        </div>
+    </div>
+
+    <div class="container" id="tabs" style="display: none">
+        <div id="accordionScaleSettings">
+            <div class="card">
+                <div class="card-header d-flex align-items-center" id="headingScaleSettings" style="height: 87px;">
+                    <button class="btn" style="background-color: transparent;" data-toggle="collapse"
+                        data-target="#collapseScaleSettings" aria-expanded="false"
+                        aria-controls="collapseScaleSettings">
+                        <img src="scale-50.png" alt=""> Scale Settings
+                    </button>
+                </div>
+                <div id="collapseScaleSettings" class="collapse" aria-labelledby="headingScaleSettings"
+                    data-parent="#accordionScaleSettings">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <form class="myForm">
+                                    <div class="form-group">
+                                        <label for="scaleIP">Scale IP</label>
+                                        <input type="text" class="form-control" id="scaleIP" placeholder="192.168.1.1">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="scalePort">Scale Port</label>
+                                        <input type="text" class="form-control" id="scalePort" placeholder="4305">
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="col-md-6">
+                                <form class="myForm">
+                                    <div class="form-group">
+                                        <label for="scaleDataType">Scale Data</label>
+                                        <select name="scaleDataType" class="form-control" id="scaleDataType">
+                                            <option value="weight" selected>Weight</option>
+                                            <option value="pcs">Number of Pieces</option>
+                                        </select>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="accordionCamOverlay">
+            <div class="card">
+                <div class="card-header d-flex align-items-center" id="headingCamOverlay" style="height: 87px;">
+                    <button class="btn" style="background-color: transparent;" data-toggle="collapse"
+                        data-target="#collapseCamOverlay" aria-expanded="false" aria-controls="collapseCamOverlay">
+                        <img src="logo_cs.png" alt=""> CamOverlay App Integration
+                    </button>
+                </div>
+                <div id="collapseCamOverlay" class="collapse" aria-labelledby="headingCamOverlay"
+                    data-parent="#accordionCamOverlay">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <form class="myForm">
+                                    <div class="form-group">
+                                        <label for="cameraIP">Camera IP</label>
+                                        <input type="text" class="form-control" id="cameraIP" placeholder="127.0.0.1">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="cameraPort">Camera Port</label>
+                                        <input type="text" class="form-control" id="cameraPort" placeholder="80">
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="col-md-6">
+                                <form class="myForm">
+                                    <div class="form-group">
+                                        <label for="cameraUser">Camera User</label>
+                                        <input type="text" class="form-control" id="cameraUser" placeholder="">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="cameraPass">Camera Pass</label>
+                                        <input type="password" class="form-control" id="cameraPass" placeholder="">
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="row mt-4">
+                            <div class="col-md-12">
+                                <form class="myForm">
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="widgetTypeOptions"
+                                            id="generatedWidget" value="generated" checked>
+                                        <label class="form-check-label" for="generatedWidget">Generated Widget</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="widgetTypeOptions"
+                                            id="customGraphicsWidget" value="customGraphics">
+                                        <label class="form-check-label" for="customGraphicsWidget">Custom Graphics
+                                            Widget</label>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="container" id="generatedWidgetSettings">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <form class="myForm">
+                                        <div class="form-group">
+                                            <label for="widgetCoordSystem">Coordinate System</label>
+                                            <select name="coordinates" class="form-control" id="widgetCoordSystem">
+                                                <option value="top_left" selected>Top Left</option>
+                                                <option value="top_right">Top Right</option>
+                                                <option value="bottom_left">Left Bottom</option>
+                                                <option value="bottom_right">Right Bottom</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="widgetPosX">Position X</label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" id="widgetPosX" placeholder="0">
+                                                <div class="input-group-append">
+                                                    <span class="input-group-text">px</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="widgetPosY">Position Y</label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" id="widgetPosY" placeholder="0">
+                                                <div class="input-group-append">
+                                                    <span class="input-group-text">px</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="col-md-6">
+                                    <form class="myForm">
+                                        <div class="form-group">
+                                            <label for="widgetStreamWidth">Stream Width</label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" id="widgetStreamWidth"
+                                                    placeholder="1920">
+                                                <div class="input-group-append">
+                                                    <span class="input-group-text">px</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="widgetStreamHeight">Stream Height</label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" id="widgetStreamHeight"
+                                                    placeholder="1080">
+                                                <div class="input-group-append">
+                                                    <span class="input-group-text">px</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="widgetScale">Scale <small>(1=100%, 2=200%, 0.5=50%)</small></label>
+                                            <input type="text" class="form-control" id="widgetScale" placeholder="1.0">
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="container" id="customGraphicsSettings">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <form class="myForm">
+                                        <div class="form-group">
+                                            <label for="cgServiceId">Service ID</label>
+                                            <input type="text" class="form-control" id="cgServiceId" placeholder="">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="cgFieldName">Field Name</label>
+                                            <input type="text" class="form-control" id="cgFieldName"
+                                                placeholder="field1">
+                                        </div>
+                                        <div class="form-group invisible">
+                                            <label for="fillerField">Filler Label</label>
+                                            <input type="text" class="form-control" id="fillerField" placeholder="">
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="accordionAcs">
+            <div class="card">
+                <div class="card-header d-flex align-items-center" id="headingACS" style="height: 87px;">
+                    <button class="btn" style="background-color: transparent;" data-toggle="collapse"
+                        data-target="#collapseACS" aria-expanded="false" aria-controls="collapseACS">
+                        <img src="logo_axis.png" alt="">&nbsp;&nbsp;Axis Camera Station
+                    </button>
+                </div>
+                <div id="collapseACS" class="collapse" aria-labelledby="headingACS" data-parent="#accordionAcs">
+                    <div class="card-body">
+                        <form class="myForm">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="acsProtocol">Protocol</label>
+                                        <select class="form-control" id="acsProtocol">
+                                            <option value="http">HTTP</option>
+                                            <option value="https">HTTPS</option>
+                                            <option value="https_insecure">HTTPS (insecure)</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="acsIP">Axis Camera Station IP</label>
+                                        <input type="text" class="form-control" id="acsIP" placeholder="">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="acsSourceKey">Source Key</label>
+                                        <input type="text" class="form-control" id="acsSourceKey" placeholder="">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="acsWinUser">Windows User Name</label>
+                                        <input type="text" class="form-control" id="acsWinUser" placeholder="">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="acsWinPass">Windows User Password</label>
+                                        <input type="password" class="form-control" id="acsWinPass" placeholder="">
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div>
+        <br>
+    </div>
+
+    <script src="jquery-2.2.4/jquery-2.2.4.min.js"></script>
+    <script src="bootstrap/bootstrap.min.js"></script>
+    <script src="index.js"></script>
+</body>
+
+</html>
