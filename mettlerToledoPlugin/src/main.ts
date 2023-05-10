@@ -216,8 +216,8 @@ async function initCamOverlay() {
 }
 
 async function drawWidget(weightInfo: WeightInfo) {
-    const widgetWidth = 720 * settings.widget_scale;
-    const widgetHeight = 192 * settings.widget_scale;
+    const widgetWidth = Math.round(720 * settings.widget_scale);
+    const widgetHeight = Math.round(192 * settings.widget_scale);
 
     const surfaceResponse = (await co.cairo(
         'cairo_image_surface_create',
