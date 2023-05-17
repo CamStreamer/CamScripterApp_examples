@@ -1,16 +1,10 @@
 import * as fs from 'fs';
 
-import {
-    TApiQueryParams,
-    TDataResults,
-    TOtherDataByTimestamps,
-    TWaterAirTempBarPressureApiData,
-    TWindsApiData,
-    isNextTideData,
-    isWaterLevelData,
-} from './types';
+import { TApiQueryParams, TDataResults, isNextTideData, isWaterLevelData } from './types';
 import {
     TEndpoints,
+    TOtherDataByTimestamp,
+    namedResults,
     parseNextTideData,
     parseTypedJsonByEndpoint,
     parseWaterLevelData,
@@ -58,36 +52,38 @@ const main = async () => {
 
     try {
         const dataToFetch = prepareAllDataFetch(queryParams);
-        const results = (await Promise.all(Object.values(dataToFetch))).map((dataStr, index) =>
-            parseTypedJsonByEndpoint(
-                dataStr,
-                (Object.keys(dataToFetch) as unknown as Exclude<TEndpoints, 'waterLevel'>[])[index]
-            )
+        const resultsArray = (await Promise.all(Object.values(dataToFetch))).map((dataStr, index) =>
+            parseTypedJsonByEndpoint(dataStr, (Object.keys(dataToFetch) as unknown as TEndpoints[])[index])
         ) as TDataResults;
 
-        const latestWaterLevelData = parseWaterLevelData(results[0]);
+        resultsArray.reduce((acc, curr, index) => {
+            acc[Object.keys(namedResults)[index]] = curr;
+            return acc;
+        }, namedResults);
+
+        const latestWaterLevelData = parseWaterLevelData(namedResults['waterLevel']);
         const latestTimestamp = Date.parse(latestWaterLevelData.data.t);
 
-        const otherDataByTimestamp = results
-            .filter(
-                (resObj): resObj is TWaterAirTempBarPressureApiData | TWindsApiData =>
-                    !isNextTideData(resObj) && !isWaterLevelData(resObj)
-            )
-            .map((resObj) => {
-                const dataArr: Array<typeof resObj.data[number]> = resObj.data;
-                const data = dataArr.find((d) => Date.parse(d.t) === latestTimestamp);
-                return data;
-            }) as TOtherDataByTimestamps;
+        const otherDataByTimestamp = {} as TOtherDataByTimestamp;
+        for (const [endpoint, dataObj] of Object.entries(namedResults)) {
+            if (isNextTideData(dataObj) || isWaterLevelData(dataObj)) {
+                continue;
+            }
+            const dataArr: Array<typeof dataObj.data[number]> = dataObj.data;
+            otherDataByTimestamp[endpoint as TEndpoints] = dataArr.find((d) => Date.parse(d.t) === latestTimestamp);
+        }
 
-        const resultingString = `${settings.location_name},${latestWaterLevelData.metadata.lat}N${
+        const textToDisplay = `${settings.location_name},${latestWaterLevelData.metadata.lat}N${
             latestWaterLevelData.metadata.lon
         }W,${latestWaterLevelData.data.t},Water level:${latestWaterLevelData.data.v} ft Above ${
             defaultApiParams.datum
-        },${parseNextTideData(results[1].predictions)},Water Temp:${otherDataByTimestamp[0].v}F,Air Temp:${
-            otherDataByTimestamp[1].v
-        }F,Barometric Pressure:${otherDataByTimestamp[2].v} mb,Winds: ${otherDataByTimestamp[3].s} kts from ${
-            otherDataByTimestamp[3].dr
-        },Gusting to: ${otherDataByTimestamp[3].g} kts from ${otherDataByTimestamp[3].dr}`;
+        },${parseNextTideData(namedResults['nextTide'].predictions)},Water Temp:${
+            otherDataByTimestamp['waterTemp'].v
+        }F,Air Temp:${otherDataByTimestamp['airTemp'].v}F,Barometric Pressure:${
+            otherDataByTimestamp['barometricPressure'].v
+        } mb,Winds: ${otherDataByTimestamp['winds'].s} kts from ${otherDataByTimestamp['winds'].dr},Gusting to: ${
+            otherDataByTimestamp['winds'].g
+        } kts from ${otherDataByTimestamp['winds'].dr}`;
 
         initializeCamOverlay({
             ...coBasicSettings,
@@ -99,8 +95,8 @@ const main = async () => {
         });
 
         Promise.all([
-            updateInfoTickerText(settings.it_service_id, resultingString),
-            updateCustomGraphicsText(settings.cg_service_id, resultingString, settings.cg_field_name),
+            updateInfoTickerText(settings.it_service_id, textToDisplay),
+            updateCustomGraphicsText(settings.cg_service_id, textToDisplay, settings.cg_field_name),
         ]);
     } catch (e) {
         console.error(e);

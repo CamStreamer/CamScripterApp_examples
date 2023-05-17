@@ -69,10 +69,3 @@ export type TDataResults = [
     TWaterAirTempBarPressureApiData,
     TWindsApiData
 ];
-
-export type TOtherDataByTimestamps = [
-    TWaterAirTempBarPressureApiData['data'][number],
-    TWaterAirTempBarPressureApiData['data'][number],
-    TWaterAirTempBarPressureApiData['data'][number],
-    TWindsApiData['data'][number]
-];

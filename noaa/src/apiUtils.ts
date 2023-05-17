@@ -28,7 +28,7 @@ const API_ENDPOINTS = {
 export type TEndpoints = keyof typeof API_ENDPOINTS;
 type TDataPromises = Record<TEndpoints, Promise<string>>;
 
-type TParsedDataType<T> = T extends 'waterLevel'
+export type TParsedDataType<T> = T extends 'waterLevel'
     ? TWaterLevelApiData
     : T extends 'nextTide'
     ? TNextTideApiData
@@ -36,10 +36,33 @@ type TParsedDataType<T> = T extends 'waterLevel'
     ? TWindsApiData
     : TWaterAirTempBarPressureApiData;
 
+export type TNamedDataResults = {
+    waterLevel: TWaterLevelApiData | null;
+    nextTide: TNextTideApiData | null;
+    waterTemp: TWaterAirTempBarPressureApiData | null;
+    airTemp: TWaterAirTempBarPressureApiData | null;
+    barometricPressure: TWaterAirTempBarPressureApiData | null;
+    winds: TWindsApiData | null;
+};
+
+export type TOtherDataByTimestamp = {
+    waterTemp: TWaterAirTempBarPressureApiData['data'][number];
+    airTemp: TWaterAirTempBarPressureApiData['data'][number];
+    barometricPressure: TWaterAirTempBarPressureApiData['data'][number];
+    winds: TWindsApiData['data'][number];
+};
+
+export const namedResults: TNamedDataResults = {
+    waterLevel: null,
+    nextTide: null,
+    waterTemp: null,
+    airTemp: null,
+    barometricPressure: null,
+    winds: null,
+};
+
 export const parseTypedJsonByEndpoint = <T extends TEndpoints>(jsonString: string, endpoint: T) =>
     JSON.parse(jsonString) as TParsedDataType<T>;
-
-//export const getWaterLevelData = async (queryParams: TApiQueryParams) => await fetchApiData('waterLevel', queryParams);
 
 export const parseWaterLevelData = (data: TWaterLevelApiData) => {
     const latestData = data.data.reduce((acc, curr) => {
@@ -52,13 +75,10 @@ export const parseWaterLevelData = (data: TWaterLevelApiData) => {
 };
 
 export const prepareAllDataFetch = (queryParams: TApiQueryParams): TDataPromises =>
-    (['waterLevel', 'nextTide', 'waterTemp', 'airTemp', 'barometricPressure', 'winds'] as const).reduce(
-        (obj, endpoint) => {
-            obj[endpoint] = fetchApiData(endpoint, queryParams);
-            return obj;
-        },
-        {} as TDataPromises
-    );
+    (Object.keys(namedResults) as unknown as TEndpoints[]).reduce((obj, endpoint) => {
+        obj[endpoint] = fetchApiData(endpoint, queryParams);
+        return obj;
+    }, {} as TDataPromises);
 
 export const parseNextTideData = (predictions: TNextTideApiData['predictions']) =>
     predictions.reduce((acc, curr) => {
