@@ -82,6 +82,7 @@ export class HtmlToOverlay {
     private async startBrowser() {
         try {
             if (this.browser) {
+                this.browser.removeAllListeners();
                 await this.browser.close();
             }
 
@@ -121,6 +122,7 @@ export class HtmlToOverlay {
 
     private restartBrowser() {
         if (!this.stopped) {
+            clearTimeout(this.startTimer);
             this.startTimer = setTimeout(() => this.startBrowser(), 5000);
         }
     }
