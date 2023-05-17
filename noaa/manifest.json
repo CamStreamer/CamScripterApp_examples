@@ -1,7 +1,8 @@
 {
-  "package_name": "noaa",
-  "package_menu_name": "NOA Weather FP",
-  "package_version": "1.0.0",
-  "vendor": "Camstreamer s.r.o.",
-  "required_camscripter_version": "1.4.7"
+    "package_name": "noaa",
+    "package_menu_name": "NOA Weather FP",
+    "package_version": "1.0.0",
+    "vendor": "Camstreamer s.r.o.",
+    "required_camscripter_version": "1.4.7",
+    "ui_link": "/local/camscripter/package/noaa/index.html"
 }
