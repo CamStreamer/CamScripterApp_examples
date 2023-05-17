@@ -1,5 +1,4 @@
 import * as fs from 'fs';
-import * as util from 'util';
 
 import {
     TApiQueryParams,
@@ -17,6 +16,9 @@ import {
     parseWaterLevelData,
     prepareAllDataFetch,
 } from './apiUtils';
+import { initializeCamOverlay, updateCustomGraphicsText, updateInfoTickerText } from './coIntegration';
+
+import { CamOverlayOptions } from 'camstreamerlib/CamOverlayAPI';
 
 // extract in case it will be dynamic in the future
 const defaultApiParams: Omit<TApiQueryParams, 'stationId'> = {
@@ -35,21 +37,24 @@ try {
     process.exit(1);
 }
 
-process.on('SIGINT', async () => {
-    console.log('Configuration changed');
-    process.exit();
-});
-
-process.on('SIGTERM', async () => {
-    console.log('App exit');
-    process.exit();
-});
+const coBasicSettings: CamOverlayOptions = {
+    ip: settings.camera_ip === '' ? undefined : settings.camera_ip,
+    port: settings.camera_port === '' ? undefined : settings.camera_port,
+    auth:
+        settings.camera_user === '' || settings.camera_pass === ''
+            ? undefined
+            : `${settings.camera_user}:${settings.camera_pass}`,
+};
 
 const main = async () => {
     const queryParams: TApiQueryParams = {
         ...defaultApiParams,
         stationId: settings.station_id,
     };
+
+    if (Object.values(coBasicSettings).some((val) => val === undefined)) {
+        return;
+    }
 
     try {
         const dataToFetch = prepareAllDataFetch(queryParams);
@@ -83,6 +88,20 @@ const main = async () => {
         }F,Barometric Pressure:${otherDataByTimestamp[2].v} mb,Winds: ${otherDataByTimestamp[3].s} kts from ${
             otherDataByTimestamp[3].dr
         },Gusting to: ${otherDataByTimestamp[3].g} kts from ${otherDataByTimestamp[3].dr}`;
+
+        initializeCamOverlay({
+            ...coBasicSettings,
+            serviceID: settings.it_service_id,
+        });
+        initializeCamOverlay({
+            ...coBasicSettings,
+            serviceID: settings.cg_service_id,
+        });
+
+        Promise.all([
+            updateInfoTickerText(settings.it_service_id, resultingString),
+            updateCustomGraphicsText(settings.cg_service_id, resultingString, settings.cg_field_name),
+        ]);
     } catch (e) {
         console.error(e);
         process.exit();
