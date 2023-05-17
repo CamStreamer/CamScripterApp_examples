@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 
-import { TApiQueryParams, TDataResults, isNextTideData, isWaterLevelData } from './types';
+import { TApiQueryParams, TDataResults, TSettings, isNextTideData, isWaterLevelData } from './types';
 import {
     TEndpoints,
     TOtherDataByTimestamp,
@@ -10,8 +10,8 @@ import {
     parseWaterLevelData,
     prepareAllDataFetch,
 } from './apiUtils';
-import { initializeCamOverlay, updateCustomGraphicsText, updateInfoTickerText } from './coIntegration';
 
+import { CamOverlayIntegration } from './CamOverlayIntegration';
 import { CamOverlayOptions } from 'camstreamerlib/CamOverlayAPI';
 import { promisify } from 'util';
 
@@ -25,7 +25,7 @@ const defaultApiParams: Omit<TApiQueryParams, 'stationId'> = {
     datum: 'MLLW',
 };
 
-let settings = null;
+let settings: TSettings;
 try {
     const data = fs.readFileSync(process.env.PERSISTENT_DATA_PATH + 'settings.json');
     settings = JSON.parse(data.toString());
@@ -35,23 +35,33 @@ try {
 }
 
 const coBasicSettings: CamOverlayOptions = {
-    ip: settings.camera_ip === '' ? undefined : settings.camera_ip,
-    port: settings.camera_port === '' ? undefined : settings.camera_port,
+    ip: settings.camera_ip,
+    port: settings.camera_port,
     auth:
-        settings.camera_user === '' || settings.camera_pass === ''
-            ? undefined
+        settings.camera_user === null || settings.camera_pass === null || settings.camera_pass === ''
+            ? null
             : `${settings.camera_user}:${settings.camera_pass}`,
 };
+
+if (Object.values(coBasicSettings).some((val) => val === null)) {
+    console.log('CamOverlay service was not set.');
+    process.exit();
+}
+
+const camOverlayApiIntegration = new CamOverlayIntegration(coBasicSettings);
+
+if (settings.it_service_id !== null) {
+    camOverlayApiIntegration.initializeInfoTickerCamOverlayApi(settings.it_service_id);
+}
+if (settings.cg_service_id !== null) {
+    camOverlayApiIntegration.initializeInfoTickerCamOverlayApi(settings.cg_service_id);
+}
 
 const main = async () => {
     const queryParams: TApiQueryParams = {
         ...defaultApiParams,
         stationId: settings.station_id,
     };
-
-    if (Object.values(coBasicSettings).some((val) => val === undefined)) {
-        return;
-    }
 
     try {
         const dataToFetch = prepareAllDataFetch(queryParams);
@@ -88,23 +98,18 @@ const main = async () => {
             otherDataByTimestamp['winds'].g
         } kts from ${otherDataByTimestamp['winds'].dr}`;
 
-        initializeCamOverlay({
-            ...coBasicSettings,
-            serviceID: settings.it_service_id,
-        });
-        initializeCamOverlay({
-            ...coBasicSettings,
-            serviceID: settings.cg_service_id,
-        });
-
         await Promise.all([
-            updateInfoTickerText(settings.it_service_id, textToDisplay),
-            updateCustomGraphicsText(settings.cg_service_id, textToDisplay, settings.cg_field_name),
+            camOverlayApiIntegration.updateInfoTickerText(settings.it_service_id, textToDisplay),
+            camOverlayApiIntegration.updateCustomGraphicsText(
+                settings.cg_service_id,
+                textToDisplay,
+                settings.cg_field_name
+            ),
         ]);
 
         await setTimeoutPromise(settings.data_refresh_rate_s * 1000);
     } catch (e) {
-        console.error(e);
+        console.error('error', e);
         process.exit();
     }
 };

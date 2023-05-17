@@ -1,3 +1,18 @@
+export type TSettings = Readonly<
+    Partial<{
+        station_id: number;
+        location_name: string;
+        camera_ip: string;
+        camera_port: number;
+        camera_user: string;
+        camera_pass: string;
+        cg_service_id: number;
+        cg_field_name: string;
+        it_service_id: number;
+        data_refresh_rate_s: number;
+    }>
+>;
+
 export type TApiQueryParams = {
     stationId: number;
     date: 'today';
