@@ -13,6 +13,9 @@ import {
 import { initializeCamOverlay, updateCustomGraphicsText, updateInfoTickerText } from './coIntegration';
 
 import { CamOverlayOptions } from 'camstreamerlib/CamOverlayAPI';
+import { promisify } from 'util';
+
+const setTimeoutPromise = promisify(setTimeout);
 
 // extract in case it will be dynamic in the future
 const defaultApiParams: Omit<TApiQueryParams, 'stationId'> = {
@@ -94,10 +97,12 @@ const main = async () => {
             serviceID: settings.cg_service_id,
         });
 
-        Promise.all([
+        await Promise.all([
             updateInfoTickerText(settings.it_service_id, textToDisplay),
             updateCustomGraphicsText(settings.cg_service_id, textToDisplay, settings.cg_field_name),
         ]);
+
+        await setTimeoutPromise(settings.data_refresh_rate_s * 1000);
     } catch (e) {
         console.error(e);
         process.exit();
