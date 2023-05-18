@@ -61,21 +61,26 @@ export class HtmlToOverlay {
     }
 
     async stop() {
-        console.log('Stop overlay: ' + this.options.configName);
-        this.stopped = true;
-        if (this.takeScreenshotPromise) {
-            await this.takeScreenshotPromise;
-        }
+        try {
+            console.log('Stop overlay: ' + this.options.configName);
+            this.stopped = true;
 
-        clearTimeout(this.startTimer);
-        clearTimeout(this.screenshotTimer);
-        clearTimeout(this.removeImageTimer);
+            if (this.takeScreenshotPromise) {
+                await this.takeScreenshotPromise;
+            }
 
-        if (this.browser) {
-            await this.browser.close();
-        }
-        if (this.coConnected) {
-            await this.removeImage();
+            clearTimeout(this.startTimer);
+            clearTimeout(this.screenshotTimer);
+            clearTimeout(this.removeImageTimer);
+
+            if (this.browser) {
+                await this.browser.close();
+            }
+            if (this.coConnected) {
+                await this.removeImage();
+            }
+        } catch (err) {
+            console.log('Stop overlay: ' + this.options.configName, err);
         }
     }
 
@@ -157,7 +162,7 @@ export class HtmlToOverlay {
                 sleepTime = Math.max(5, sleepTime - endTime + startTime);
             }
         } catch (err) {
-            console.error(err);
+            console.error(this.options.configName, err);
         } finally {
             this.screenshotTimer = setTimeout(() => {
                 this.takeScreenshotPromise = this.takeScreenshot();
@@ -166,8 +171,12 @@ export class HtmlToOverlay {
     }
 
     private async removeImage() {
-        if (await this.startCamOverlayConnection()) {
-            await this.co.removeImage();
+        try {
+            if (await this.startCamOverlayConnection()) {
+                await this.co.removeImage();
+            }
+        } catch (err) {
+            console.log('Remove overlay: ' + this.options.configName, err);
         }
     }
 
@@ -185,19 +194,19 @@ export class HtmlToOverlay {
             });
 
             this.co.on('open', () => {
-                console.log('COAPI: connected');
+                console.log(`COAPI: ${this.options.configName}: connected`);
                 this.coConnected = true;
             });
 
             this.co.on('error', (err) => {
-                console.log('COAPI-Error: ' + err);
+                console.log(`COAPI-Error: ${this.options.configName}:`, err.message);
                 this.coDowntimeTimer = setTimeout(() => {
                     this.coDowntimeTimer = undefined;
                 }, 5000);
             });
 
             this.co.on('close', () => {
-                console.log('COAPI-Error: connection closed');
+                console.log(`COAPI-Error: ${this.options.configName}: connection closed`);
                 this.coConnected = false;
             });
 
