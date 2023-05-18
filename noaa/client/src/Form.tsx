@@ -15,9 +15,9 @@ type FormData = {
     cameraPort: number;
     cameraUser: string;
     cameraPass: string;
-    cgServiceId: number | null;
-    cgFieldName: string | null;
-    itServiceId: number | null;
+    cgServiceId: number;
+    cgFieldName: string;
+    itServiceId: number;
     dataRefreshRateS: number;
 };
 
@@ -29,7 +29,7 @@ const errorDefaultValues: FormData = {
     cameraUser: 'root',
     cameraPass: '',
     cgServiceId: 0,
-    cgFieldName: '',
+    cgFieldName: 'field1',
     itServiceId: 0,
     dataRefreshRateS: 120,
 };
@@ -60,18 +60,6 @@ export const Form = (props: Props) => {
         reset,
     } = useForm<FormData>({
         mode: 'onChange',
-        defaultValues: {
-            stationId: 0,
-            locationName: '',
-            cameraIp: '',
-            cameraPort: 80,
-            cameraUser: '',
-            cameraPass: '',
-            cgServiceId: 0,
-            cgFieldName: '',
-            itServiceId: 0,
-            dataRefreshRateS: 120,
-        },
     });
 
     useEffect(() => {

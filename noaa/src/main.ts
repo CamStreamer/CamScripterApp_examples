@@ -36,10 +36,10 @@ try {
 }
 
 const coBasicSettings: CamOverlayOptions = {
-    ip: settings.camera_ip,
+    ip: settings.camera_ip === '' ? null : settings.camera_ip,
     port: settings.camera_port,
     auth:
-        settings.camera_user === null || settings.camera_pass === null || settings.camera_pass === ''
+        settings.camera_user === '' || settings.camera_pass === ''
             ? null
             : `${settings.camera_user}:${settings.camera_pass}`,
 };
