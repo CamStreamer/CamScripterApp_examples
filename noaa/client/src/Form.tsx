@@ -42,6 +42,8 @@ type TSnackData = {
 const TRANSITION_PROPS_LARGE: SnackbarOrigin = { vertical: 'bottom', horizontal: 'right' };
 const TRANSITION_PROPS_SMALL: SnackbarOrigin = { vertical: 'top', horizontal: 'center' };
 
+const SNACK_TIMEOUT = 5000;
+
 export const Form = (props: Props) => {
     const [fetchingDefaultValues, setFetchingDefaultValues] = useState(true);
     const [submitting, setSubmitting] = useState(false);
@@ -105,7 +107,7 @@ export const Form = (props: Props) => {
                 errorMessageTimeoutRef.current = setTimeout(() => {
                     setSnackData(null);
                     errorMessageTimeoutRef.current = null;
-                }, 6000);
+                }, SNACK_TIMEOUT);
             } finally {
                 setFetchingDefaultValues(false);
             }
@@ -146,7 +148,7 @@ export const Form = (props: Props) => {
             errorMessageTimeoutRef.current = setTimeout(() => {
                 setSnackData(null);
                 errorMessageTimeoutRef.current = null;
-            }, 6000);
+            }, SNACK_TIMEOUT);
         } catch (e) {
             console.error('Error while submitting data: ', e);
             setSnackData({
@@ -159,7 +161,7 @@ export const Form = (props: Props) => {
             errorMessageTimeoutRef.current = setTimeout(() => {
                 setSnackData(null);
                 errorMessageTimeoutRef.current = null;
-            }, 6000);
+            }, SNACK_TIMEOUT);
         } finally {
             setSubmitting(false);
         }
@@ -182,7 +184,15 @@ export const Form = (props: Props) => {
                     <Slide {...props} direction={matchesSmallScreen ? 'down' : 'up'} />
                 )}
             >
-                <Alert severity={snackData?.type}>{snackData && snackData.message}</Alert>
+                <Alert
+                    severity={snackData?.type}
+                    variant="filled"
+                    onClose={() => {
+                        setSnackData(null);
+                    }}
+                >
+                    {snackData && snackData.message}
+                </Alert>
             </Snackbar>
             <Grid container rowSpacing={2} direction="column" style={style.formContent}>
                 <Grid item>
