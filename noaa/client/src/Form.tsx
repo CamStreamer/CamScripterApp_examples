@@ -1,4 +1,4 @@
-import { Alert, Slide, SlideProps, Snackbar, Typography, useMediaQuery } from '@mui/material';
+import { Alert, Slide, SlideProps, Snackbar, SnackbarOrigin, Typography, useMediaQuery } from '@mui/material';
 import React, { useEffect, useRef, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
@@ -38,6 +38,9 @@ type TSnackData = {
     type: 'error' | 'success';
     message: string;
 };
+
+const TRANSITION_PROPS_LARGE: SnackbarOrigin = { vertical: 'bottom', horizontal: 'right' };
+const TRANSITION_PROPS_SMALL: SnackbarOrigin = { vertical: 'top', horizontal: 'center' };
 
 export const Form = (props: Props) => {
     const [fetchingDefaultValues, setFetchingDefaultValues] = useState(true);
@@ -174,8 +177,10 @@ export const Form = (props: Props) => {
         <form onSubmit={handleSubmit(onSubmit)} style={style.form}>
             <Snackbar
                 open={!!snackData}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                TransitionComponent={(props: SlideProps) => <Slide {...props} direction="up" />}
+                anchorOrigin={matchesSmallScreen ? TRANSITION_PROPS_SMALL : TRANSITION_PROPS_LARGE}
+                TransitionComponent={(props: SlideProps) => (
+                    <Slide {...props} direction={matchesSmallScreen ? 'down' : 'up'} />
+                )}
             >
                 <Alert severity={snackData?.type}>{snackData && snackData.message}</Alert>
             </Snackbar>
