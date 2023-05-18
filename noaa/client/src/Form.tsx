@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import { Alert, Slide, SlideProps, Snackbar, Typography, useMediaQuery } from '@mui/material';
+import React, { useEffect, useRef, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { Typography, useMediaQuery } from '@mui/material';
 
 import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -21,9 +21,29 @@ type FormData = {
     dataRefreshRateS: number;
 };
 
+const errorDefaultValues: FormData = {
+    stationId: 8658163,
+    locationName: 'Johnnie Mercers Fishing Pier',
+    cameraIp: '127.0.0.1',
+    cameraPort: 80,
+    cameraUser: 'root',
+    cameraPass: '',
+    cgServiceId: 0,
+    cgFieldName: '',
+    itServiceId: 0,
+    dataRefreshRateS: 120,
+};
+
+type TNetworkError = {
+    message: string;
+};
+
 export const Form = (props: Props) => {
     const [fetchingDefaultValues, setFetchingDefaultValues] = useState(true);
     const [submitting, setSubmitting] = useState(false);
+    const [networkError, setNetworkError] = useState<null | TNetworkError>(null);
+
+    const errorMessageTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     const matchesSmallScreen = useMediaQuery('(max-width:390px)');
 
@@ -51,21 +71,39 @@ export const Form = (props: Props) => {
     useEffect(() => {
         (async () => {
             setFetchingDefaultValues(true);
-            const resp = await fetch('/local/camscripter/package/settings.cgi?package_name=noaa&action=get');
-            const data: TServerData = await resp.json();
-            reset({
-                stationId: data.station_id,
-                locationName: data.location_name,
-                cameraIp: data.camera_ip,
-                cameraPort: data.camera_port,
-                cameraUser: data.camera_user,
-                cameraPass: data.camera_pass,
-                cgServiceId: data.cg_service_id,
-                cgFieldName: data.cg_field_name,
-                itServiceId: data.it_service_id,
-                dataRefreshRateS: data.data_refresh_rate_s,
-            });
-            setFetchingDefaultValues(false);
+            let response: Response;
+            let data: TServerData;
+            try {
+                response = await fetch('/local/camscripter/package/settings.cgi?package_name=noaa&action=get');
+                data = await response.json();
+                reset({
+                    stationId: data.station_id,
+                    locationName: data.location_name,
+                    cameraIp: data.camera_ip,
+                    cameraPort: data.camera_port,
+                    cameraUser: data.camera_user,
+                    cameraPass: data.camera_pass,
+                    cgServiceId: data.cg_service_id,
+                    cgFieldName: data.cg_field_name,
+                    itServiceId: data.it_service_id,
+                    dataRefreshRateS: data.data_refresh_rate_s,
+                });
+            } catch (e) {
+                console.error('Error while fetching default values: ', e);
+                setNetworkError({
+                    message: 'Error fetching default data. Using backup data.',
+                });
+                reset(errorDefaultValues);
+                if (errorMessageTimeoutRef.current) {
+                    clearTimeout(errorMessageTimeoutRef.current);
+                }
+                errorMessageTimeoutRef.current = setTimeout(() => {
+                    setNetworkError(null);
+                    errorMessageTimeoutRef.current = null;
+                }, 6000);
+            } finally {
+                setFetchingDefaultValues(false);
+            }
         })();
     }, [reset]);
 
@@ -83,14 +121,30 @@ export const Form = (props: Props) => {
             data_refresh_rate_s: data.dataRefreshRateS,
         };
         setSubmitting(true);
-        await fetch('/local/camscripter/package/settings.cgi?package_name=noaa&action=set', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(toPost),
-        });
-        setSubmitting(false);
+        try {
+            const res = await fetch('/local/camscripter/package/settings.cgi?package_name=noaa&action=set', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(toPost),
+            });
+            if (!res.ok) throw new Error(`${res.status}: ${res.statusText}`);
+        } catch (e) {
+            console.error('Error while submitting data: ', e);
+            setNetworkError({
+                message: 'Error submitting data.',
+            });
+            if (errorMessageTimeoutRef.current) {
+                clearTimeout(errorMessageTimeoutRef.current);
+            }
+            errorMessageTimeoutRef.current = setTimeout(() => {
+                setNetworkError(null);
+                errorMessageTimeoutRef.current = null;
+            }, 6000);
+        } finally {
+            setSubmitting(false);
+        }
     };
 
     if (fetchingDefaultValues) {
@@ -103,6 +157,13 @@ export const Form = (props: Props) => {
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} style={style.form}>
+            <Snackbar
+                open={!!networkError}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                TransitionComponent={(props: SlideProps) => <Slide {...props} direction="up" />}
+            >
+                <Alert severity="error">{networkError && networkError.message}</Alert>
+            </Snackbar>
             <Grid container rowSpacing={2} direction="column" style={style.formContent}>
                 <Grid item>
                     <TextField
