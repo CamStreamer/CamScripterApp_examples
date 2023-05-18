@@ -11,3 +11,7 @@ declare type TServerData = {
     it_service_id: number;
     data_refresh_rate_s: number;
 };
+declare type TSnackData = {
+    type: 'error' | 'success';
+    message: string;
+};

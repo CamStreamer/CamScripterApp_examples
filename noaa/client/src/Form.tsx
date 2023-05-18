@@ -1,13 +1,14 @@
-import { Alert, Slide, SlideProps, Snackbar, SnackbarOrigin, Typography, useMediaQuery } from '@mui/material';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
+import { Typography, useMediaQuery } from '@mui/material';
 
 import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 import Grid from '@mui/material/Grid';
+import { InfoSnackbar } from './InfoSnackbar';
 import TextField from '@mui/material/TextField';
+import { useSnackbar } from './useSnackbar';
 
-type Props = {};
 type FormData = {
     stationId: number;
     locationName: string;
@@ -34,22 +35,10 @@ const errorDefaultValues: FormData = {
     dataRefreshRateS: 120,
 };
 
-type TSnackData = {
-    type: 'error' | 'success';
-    message: string;
-};
-
-const TRANSITION_PROPS_LARGE: SnackbarOrigin = { vertical: 'bottom', horizontal: 'right' };
-const TRANSITION_PROPS_SMALL: SnackbarOrigin = { vertical: 'top', horizontal: 'center' };
-
-const SNACK_TIMEOUT = 5000;
-
-export const Form = (props: Props) => {
+export const Form = () => {
     const [fetchingDefaultValues, setFetchingDefaultValues] = useState(true);
     const [submitting, setSubmitting] = useState(false);
-    const [snackData, setSnackData] = useState<null | TSnackData>(null);
-
-    const errorMessageTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const { snackbarData, displaySnackbar, closeSnackbar } = useSnackbar();
 
     const matchesSmallScreen = useMediaQuery('(max-width:390px)');
 
@@ -60,9 +49,11 @@ export const Form = (props: Props) => {
         reset,
     } = useForm<FormData>({
         mode: 'onChange',
+        defaultValues: errorDefaultValues,
     });
 
     useEffect(() => {
+        let skip = false;
         (async () => {
             setFetchingDefaultValues(true);
             let response: Response;
@@ -70,6 +61,9 @@ export const Form = (props: Props) => {
             try {
                 response = await fetch('/local/camscripter/package/settings.cgi?package_name=noaa&action=get');
                 data = await response.json();
+
+                if (skip) return;
+
                 reset({
                     stationId: data.station_id,
                     locationName: data.location_name,
@@ -83,24 +77,22 @@ export const Form = (props: Props) => {
                     dataRefreshRateS: data.data_refresh_rate_s,
                 });
             } catch (e) {
+                if (skip) return;
+
                 console.error('Error while fetching default values: ', e);
-                setSnackData({
+                displaySnackbar({
                     type: 'error',
                     message: 'Error fetching default data. Using backup data.',
                 });
-                reset(errorDefaultValues);
-                if (errorMessageTimeoutRef.current) {
-                    clearTimeout(errorMessageTimeoutRef.current);
-                }
-                errorMessageTimeoutRef.current = setTimeout(() => {
-                    setSnackData(null);
-                    errorMessageTimeoutRef.current = null;
-                }, SNACK_TIMEOUT);
             } finally {
                 setFetchingDefaultValues(false);
             }
         })();
-    }, [reset]);
+
+        return () => {
+            skip = true;
+        };
+    }, [reset, displaySnackbar]);
 
     const onSubmit: SubmitHandler<FormData> = async (data) => {
         const toPost: TServerData = {
@@ -126,30 +118,16 @@ export const Form = (props: Props) => {
             });
             if (!res.ok) throw new Error(`${res.status}: ${res.statusText}`);
 
-            setSnackData({
+            displaySnackbar({
                 type: 'success',
                 message: 'Settings successfully saved.',
             });
-            if (errorMessageTimeoutRef.current) {
-                clearTimeout(errorMessageTimeoutRef.current);
-            }
-            errorMessageTimeoutRef.current = setTimeout(() => {
-                setSnackData(null);
-                errorMessageTimeoutRef.current = null;
-            }, SNACK_TIMEOUT);
         } catch (e) {
             console.error('Error while submitting data: ', e);
-            setSnackData({
+            displaySnackbar({
                 type: 'error',
                 message: 'Error submitting data.',
             });
-            if (errorMessageTimeoutRef.current) {
-                clearTimeout(errorMessageTimeoutRef.current);
-            }
-            errorMessageTimeoutRef.current = setTimeout(() => {
-                setSnackData(null);
-                errorMessageTimeoutRef.current = null;
-            }, SNACK_TIMEOUT);
         } finally {
             setSubmitting(false);
         }
@@ -165,23 +143,11 @@ export const Form = (props: Props) => {
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} style={style.form}>
-            <Snackbar
-                open={!!snackData}
-                anchorOrigin={matchesSmallScreen ? TRANSITION_PROPS_SMALL : TRANSITION_PROPS_LARGE}
-                TransitionComponent={(props: SlideProps) => (
-                    <Slide {...props} direction={matchesSmallScreen ? 'down' : 'up'} />
-                )}
-            >
-                <Alert
-                    severity={snackData?.type}
-                    variant="filled"
-                    onClose={() => {
-                        setSnackData(null);
-                    }}
-                >
-                    {snackData && snackData.message}
-                </Alert>
-            </Snackbar>
+            <InfoSnackbar
+                isSmallScreen={matchesSmallScreen}
+                snackbarData={snackbarData}
+                closeSnackbar={closeSnackbar}
+            />
             <Grid container rowSpacing={2} direction="column" style={style.formContent}>
                 <Grid item>
                     <TextField

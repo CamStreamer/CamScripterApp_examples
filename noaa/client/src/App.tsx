@@ -16,10 +16,8 @@ export const App = () => {
 
 const style: TStyleSheet = {
     container: {
-        //backgroundColor: '#fff',
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
-        //alignItems: 'center',
     },
 };
