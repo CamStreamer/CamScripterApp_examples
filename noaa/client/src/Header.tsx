@@ -7,7 +7,9 @@ type Props = {};
 export const Header = (props: Props) => {
     return (
         <Box style={style.box}>
-            <Typography variant="h2">NOA Weather FP</Typography>
+            <Typography variant="h2" style={style.title}>
+                NOA Weather FP
+            </Typography>
         </Box>
     );
 };
@@ -17,5 +19,8 @@ const style: TStyleSheet = {
         display: 'grid',
         placeItems: 'center',
         paddingBlock: '4rem',
+    },
+    title: {
+        fontSize: 'clamp(1.75rem, 7vw ,3.75rem)',
     },
 };

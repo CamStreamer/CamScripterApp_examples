@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
+import { Typography, useMediaQuery } from '@mui/material';
 
 import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
-import { Typography } from '@mui/material';
 
 type Props = {};
 type FormData = {
@@ -24,6 +24,9 @@ type FormData = {
 export const Form = (props: Props) => {
     const [fetchingDefaultValues, setFetchingDefaultValues] = useState(true);
     const [submitting, setSubmitting] = useState(false);
+
+    const matchesSmallScreen = useMediaQuery('(max-width:390px)');
+
     const {
         register,
         handleSubmit,
@@ -155,7 +158,7 @@ export const Form = (props: Props) => {
                         type="submit"
                         variant="contained"
                         disabled={Object.keys(errors).length > 0 || submitting}
-                        style={style.button}
+                        style={matchesSmallScreen ? style.buttonSmallScreen : style.button}
                     >
                         {submitting ? <CircularProgress size={20} /> : <Typography>Submit</Typography>}
                     </Button>
@@ -168,7 +171,7 @@ export const Form = (props: Props) => {
 const style: TStyleSheet = {
     formContent: {
         paddingBottom: '16px',
-        width: '50%',
+        width: 'clamp(350px, 50%, 1000px)',
     },
     form: {
         width: '100%',
@@ -177,6 +180,10 @@ const style: TStyleSheet = {
     },
     button: {
         width: '33%',
+        height: '40px',
+    },
+    buttonSmallScreen: {
+        width: '100%',
         height: '40px',
     },
 };
