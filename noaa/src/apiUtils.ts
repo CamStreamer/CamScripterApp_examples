@@ -8,6 +8,8 @@ import {
     TWindsApiData,
 } from './types';
 
+import { NetworkError } from './errors';
+
 const API_PATH = 'https://api.tidesandcurrents.noaa.gov/api/prod/datagetter';
 
 const API_ENDPOINTS = {
@@ -97,11 +99,18 @@ const fetchApiData = async (urlEndpoint: keyof typeof API_ENDPOINTS, queryParams
                     data.push(chunk);
                 });
                 res.on('end', () => {
-                    resolve(Buffer.concat(data).toString());
+                    const response = Buffer.concat(data).toString();
+                    if (!(res.statusCode >= 200 && res.statusCode < 300)) {
+                        reject(
+                            `API returned with error. Status: ${res.statusCode}, ${res.statusMessage}. Response from server: ${response}`
+                        );
+                    } else {
+                        resolve(response);
+                    }
                 });
             })
             .on('error', (e) => {
-                reject(e);
+                reject(new NetworkError(`NETWORK ERROR: ${e}`));
             });
     });
 };

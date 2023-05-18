@@ -13,6 +13,7 @@ import {
 
 import { CamOverlayIntegration } from './CamOverlayIntegration';
 import { CamOverlayOptions } from 'camstreamerlib/CamOverlayAPI';
+import { NetworkError } from './errors';
 import { promisify } from 'util';
 
 const setTimeoutPromise = promisify(setTimeout);
@@ -108,9 +109,12 @@ const main = async () => {
         ]);
 
         await setTimeoutPromise(settings.data_refresh_rate_s * 1000);
-    } catch (e) {
+    } catch (e: unknown) {
         console.error('error', e);
-        process.exit();
+        if (e instanceof NetworkError) {
+            process.exit();
+        }
+        await setTimeoutPromise(settings.data_refresh_rate_s * 1000);
     }
 };
 
