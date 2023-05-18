@@ -1,9 +1,11 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
 import Button from '@mui/material/Button';
+import CircularProgress from '@mui/material/CircularProgress';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
+import { Typography } from '@mui/material';
 
 type Props = {};
 type FormData = {
@@ -20,6 +22,8 @@ type FormData = {
 };
 
 export const Form = (props: Props) => {
+    const [fetchingDefaultValues, setFetchingDefaultValues] = useState(true);
+    const [submitting, setSubmitting] = useState(false);
     const {
         register,
         handleSubmit,
@@ -29,13 +33,13 @@ export const Form = (props: Props) => {
         mode: 'onChange',
         defaultValues: {
             stationId: 0,
-            locationName: 'a',
-            cameraIp: 'a',
+            locationName: '',
+            cameraIp: '',
             cameraPort: 80,
-            cameraUser: 'a',
-            cameraPass: 'a',
+            cameraUser: '',
+            cameraPass: '',
             cgServiceId: 0,
-            cgFieldName: 'a',
+            cgFieldName: '',
             itServiceId: 0,
             dataRefreshRateS: 120,
         },
@@ -43,6 +47,7 @@ export const Form = (props: Props) => {
 
     useEffect(() => {
         (async () => {
+            setFetchingDefaultValues(true);
             const resp = await fetch('/local/camscripter/package/settings.cgi?package_name=noaa&action=get');
             const data: TServerData = await resp.json();
             reset({
@@ -57,6 +62,7 @@ export const Form = (props: Props) => {
                 itServiceId: data.it_service_id,
                 dataRefreshRateS: data.data_refresh_rate_s,
             });
+            setFetchingDefaultValues(false);
         })();
     }, [reset]);
 
@@ -73,6 +79,7 @@ export const Form = (props: Props) => {
             it_service_id: data.itServiceId,
             data_refresh_rate_s: data.dataRefreshRateS,
         };
+        setSubmitting(true);
         await fetch('/local/camscripter/package/settings.cgi?package_name=noaa&action=set', {
             method: 'POST',
             headers: {
@@ -80,11 +87,20 @@ export const Form = (props: Props) => {
             },
             body: JSON.stringify(toPost),
         });
+        setSubmitting(false);
     };
 
+    if (fetchingDefaultValues) {
+        return (
+            <Grid container justifyContent="center" alignItems="center" height="50%">
+                <CircularProgress size={100} />
+            </Grid>
+        );
+    }
+
     return (
-        <form onSubmit={handleSubmit(onSubmit)}>
-            <Grid container rowSpacing={2} direction="column">
+        <form onSubmit={handleSubmit(onSubmit)} style={style.form}>
+            <Grid container rowSpacing={2} direction="column" style={style.formContent}>
                 <Grid item>
                     <TextField
                         type="number"
@@ -135,11 +151,32 @@ export const Form = (props: Props) => {
                     />
                 </Grid>
                 <Grid item>
-                    <Button type="submit" variant="contained" disabled={Object.keys(errors).length > 0}>
-                        Submit
+                    <Button
+                        type="submit"
+                        variant="contained"
+                        disabled={Object.keys(errors).length > 0 || submitting}
+                        style={style.button}
+                    >
+                        {submitting ? <CircularProgress size={20} /> : <Typography>Submit</Typography>}
                     </Button>
                 </Grid>
             </Grid>
         </form>
     );
+};
+
+const style: TStyleSheet = {
+    formContent: {
+        paddingBottom: '16px',
+        width: '50%',
+    },
+    form: {
+        width: '100%',
+        display: 'flex',
+        justifyContent: 'center',
+    },
+    button: {
+        width: '33%',
+        height: '40px',
+    },
 };
