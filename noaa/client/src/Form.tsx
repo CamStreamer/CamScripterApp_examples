@@ -34,14 +34,15 @@ const errorDefaultValues: FormData = {
     dataRefreshRateS: 120,
 };
 
-type TNetworkError = {
+type TSnackData = {
+    type: 'error' | 'success';
     message: string;
 };
 
 export const Form = (props: Props) => {
     const [fetchingDefaultValues, setFetchingDefaultValues] = useState(true);
     const [submitting, setSubmitting] = useState(false);
-    const [networkError, setNetworkError] = useState<null | TNetworkError>(null);
+    const [snackData, setSnackData] = useState<null | TSnackData>(null);
 
     const errorMessageTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -90,7 +91,8 @@ export const Form = (props: Props) => {
                 });
             } catch (e) {
                 console.error('Error while fetching default values: ', e);
-                setNetworkError({
+                setSnackData({
+                    type: 'error',
                     message: 'Error fetching default data. Using backup data.',
                 });
                 reset(errorDefaultValues);
@@ -98,7 +100,7 @@ export const Form = (props: Props) => {
                     clearTimeout(errorMessageTimeoutRef.current);
                 }
                 errorMessageTimeoutRef.current = setTimeout(() => {
-                    setNetworkError(null);
+                    setSnackData(null);
                     errorMessageTimeoutRef.current = null;
                 }, 6000);
             } finally {
@@ -130,16 +132,29 @@ export const Form = (props: Props) => {
                 body: JSON.stringify(toPost),
             });
             if (!res.ok) throw new Error(`${res.status}: ${res.statusText}`);
+
+            setSnackData({
+                type: 'success',
+                message: 'Settings successfully saved.',
+            });
+            if (errorMessageTimeoutRef.current) {
+                clearTimeout(errorMessageTimeoutRef.current);
+            }
+            errorMessageTimeoutRef.current = setTimeout(() => {
+                setSnackData(null);
+                errorMessageTimeoutRef.current = null;
+            }, 6000);
         } catch (e) {
             console.error('Error while submitting data: ', e);
-            setNetworkError({
+            setSnackData({
+                type: 'error',
                 message: 'Error submitting data.',
             });
             if (errorMessageTimeoutRef.current) {
                 clearTimeout(errorMessageTimeoutRef.current);
             }
             errorMessageTimeoutRef.current = setTimeout(() => {
-                setNetworkError(null);
+                setSnackData(null);
                 errorMessageTimeoutRef.current = null;
             }, 6000);
         } finally {
@@ -158,11 +173,11 @@ export const Form = (props: Props) => {
     return (
         <form onSubmit={handleSubmit(onSubmit)} style={style.form}>
             <Snackbar
-                open={!!networkError}
+                open={!!snackData}
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                 TransitionComponent={(props: SlideProps) => <Slide {...props} direction="up" />}
             >
-                <Alert severity="error">{networkError && networkError.message}</Alert>
+                <Alert severity={snackData?.type}>{snackData && snackData.message}</Alert>
             </Snackbar>
             <Grid container rowSpacing={2} direction="column" style={style.formContent}>
                 <Grid item>
