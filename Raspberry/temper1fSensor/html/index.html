@@ -1,195 +1,213 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <title>TEMPer1F Sensor</title>
-  <link rel="icon" type="image/x-icon" href="logo_cs.ico">
-  <link rel="stylesheet" href="bootstrap/bootstrap.min.css">
+    <title>TEMPer1F Sensor</title>
+    <link rel="icon" type="image/x-icon" href="logo_cs.ico">
+    <link rel="stylesheet" href="bootstrap/bootstrap.min.css">
 </head>
+
 <body>
-  <nav class="navbar navbar-dark bg-dark">
-    <span>
-      <a class="navbar-brand" href="#"><img src="logo_cs.png" style="height: 25px; margin-bottom: 4px;" alt=""> CamScripter</a>
-    </span>
-  </nav>
+    <nav class="navbar navbar-dark bg-dark">
+        <span>
+            <a class="navbar-brand" href="#"><img src="logo_cs.png" style="height: 25px; margin-bottom: 4px;" alt="">
+                CamScripter</a>
+        </span>
+    </nav>
 
-  <div class="jumbotron">
+    <div class="jumbotron">
+        <div class="container">
+            <h1 class="display-4">TEMPer1F Sensor</h1>
+            <p>Changes are saved automatically, you don't have to save them.</p>
+        </div>
+    </div>
+
     <div class="container">
-      <h1 class="display-4">TEMPer1F Sensor</h1>
-      <p>Changes are saved automatically, you don't have to save them.</p>
-    </div>
-  </div>
-
-  <div class="container">
-    <div id="accordionTemper">
-      <div class="card">
-        <div class="card-header" id="headingTemper">
-          <button class="btn" style="background-color: transparent;" data-toggle="collapse" data-target="#collapseTemper" aria-expanded="false" aria-controls="collapseTemper">
-            <img src="temperature.png" alt=""> Temperature Settings
-          </button>
-        </div>
-        <div id="collapseTemper" class="collapse" aria-labelledby="headingTemper" data-parent="#accordionTemper">
-          <div class="card-body">
-            <div class="row">
-              <div class="col-md-6">
-                <form class="myForm">
-                  <div class="form-group">
-                    <label for="celsius">Units</label>
-                    <div>
-                      <input type="radio" id="celsius" name="u_select" class="unit" value="c" checked>
-                      <label for="celsius">Celsius</label>
-                    </div>
-                    <div>
-                      <input type="radio" id="fahrenheit" name="u_select" class="unit" value="f">
-                      <label for="fahrenheit">Fahrenheit</label>
-                    </div>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="container">
-    <div id="accordionCamOverlay">
-      <div class="card">
-        <div class="card-header" id="headingCamOverlay">
-          <button class="btn" style="background-color: transparent;" data-toggle="collapse" data-target="#collapseCamOverlay" aria-expanded="false" aria-controls="collapseCamOverlay">
-            <img src="logo_cs.png" alt=""> CamOverlay App Integration
-          </button>
-        </div>
-        <div id="collapseCamOverlay" class="collapse" aria-labelledby="headingCamOverlay" data-parent="#accordionCamOverlay">
-          <div class="card-body">
-            <div class="row">
-              <div class="col-md-6">
-                <form class="myForm">
-                  <div class="form-group">
-                    <label for="cameraIP">Camera IP</label>
-                    <input type="text" class="form-control" id="cameraIP" placeholder="127.0.0.1">
-                  </div>
-                  <div class="form-group">
-                    <label for="cameraPort">Camera Port</label>
-                    <input type="text" class="form-control" id="cameraPort" placeholder="80">
-                  </div>
-                  <div class="form-group">
-                    <label for="cameraUser">Camera User</label>
-                    <input type="text" class="form-control" id="cameraUser" placeholder="">
-                  </div>
-                  <div class="form-group">
-                    <label for="cameraPass">Camera Pass</label>
-                    <input type="password" class="form-control" id="cameraPass" placeholder="">
-                  </div>
-                </form>
-              </div>
-              <div class="col-md-6">
-                <form class="myForm">
-                  <div class="form-group">
-                    <label for="serviceId">Service ID</label>
-                    <input type="text" class="form-control" id="serviceId" placeholder="1">
-                  </div>
-                  <div class="form-group">
-                    <label for="fieldName">Field Name</label>
-                    <input type="text" class="form-control" id="fieldName" placeholder="field1">
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="container">
-    <div id="accordionAcs">
-      <div class="card">
-        <div class="card-header" id="headingACS">
-          <button class="btn" style="background-color: transparent;" data-toggle="collapse" data-target="#collapseACS" aria-expanded="false" aria-controls="collapseACS">
-            <img src="logo_axis.png" alt="">&nbsp;&nbsp;Axis Camera Station
-          </button>
-        </div>
-        <div id="collapseACS" class="collapse" aria-labelledby="headingACS" data-parent="#accordionAcs">
-          <div class="card-body">
-            <form class="myForm">
-              <div class="row">
-                <div class="col-md-6">
-                  <div class="form-group">
-                    <label for="acsProtocol">Protocol</label>
-                    <select class="form-control" id="acsProtocol">
-                      <option value="http">HTTP</option>
-                      <option value="https" >HTTPS</option>
-                      <option value="https_insecure">HTTPS (insecure)</option>
-                    </select>
-                  </div>
-                  <div class="form-group">
-                    <label for="acsIP">Axis Camera Station IP</label>
-                    <input type="text" class="form-control" id="acsIP" placeholder="">
-                  </div>
-                  <div class="form-group">
-                    <label for="acsSourceKey">Source Key</label>
-                    <input type="text" class="form-control" id="acsSourceKey" placeholder="">
-                  </div>
+        <div id="accordionTemper">
+            <div class="card">
+                <div class="card-header" id="headingTemper">
+                    <button class="btn" style="background-color: transparent;" data-toggle="collapse"
+                        data-target="#collapseTemper" aria-expanded="false" aria-controls="collapseTemper">
+                        <img src="temperature.png" alt=""> Temperature Settings
+                    </button>
                 </div>
-                <div class="col-md-6">
-                  <div class="form-group">
-                    <label for="acsWinUser">Windows User Name</label>
-                    <input type="text" class="form-control" id="acsWinUser" placeholder="">
-                  </div>
-                  <div class="form-group">
-                    <label for="acsWinPass">Windows User Password</label>
-                    <input type="password" class="form-control" id="acsWinPass" placeholder="">
-                  </div>
+                <div id="collapseTemper" class="collapse" aria-labelledby="headingTemper"
+                    data-parent="#accordionTemper">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <form class="myForm">
+                                    <div class="form-group">
+                                        <label for="celsius">Units</label>
+                                        <div>
+                                            <input type="radio" id="celsius" name="u_select" class="unit" value="c"
+                                                checked>
+                                            <label for="celsius">Celsius</label>
+                                        </div>
+                                        <div>
+                                            <input type="radio" id="fahrenheit" name="u_select" class="unit" value="f">
+                                            <label for="fahrenheit">Fahrenheit</label>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-              </div>
-            </form>
-
-            <div>When do you want to be notified?</div>
-            <form class="myForm form-inline mt-3">
-              <select class="form-control mr-3" id="acsConditionDelay">
-                <option value="0">Immediately</option>
-                <option value="120">After 2 minutes</option>
-                <option value="300">After 5 minutes</option>
-                <option value="600">After 10 minutes</option>
-                <option value="1800">After 30 minutes</option>
-                <option value="3600">After 1 hour</option>
-                <option value="10800">After 3 hours</option>
-                <option value="21600">After 6 hours</option>
-                <option value="43200">After 12 hours</option>
-                <option value="86400">After 1 day</option>
-              </select>
-              <div class="mr-3">
-                when temperature
-              </div>
-              <select class="form-control mr-1" id="acsConditionOperator">
-                <option value="0">=</option>
-                <option value="1">&#62;</option>
-                <option value="2">&#60;</option>
-                <option value="3">&#62;=</option>
-                <option value="4">&#60;=</option>
-              </select>
-              <input type="text" class="form-control mr-1" id="acsConditionValue" placeholder="">
-              <div id="acsConditionUnit">&#176;C</div>
-            </form>
-            <form class="myForm mt-3">
-              <div class="form-group">
-                <label for="acsRepeatAfter">Repeat Notification After (s)</label>
-                <input type="text" class="form-control" id="acsRepeatAfter" placeholder="">
-              </div>
-            </form>
-          </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
 
-  <div>
-    <br>
-  </div>
+    <div class="container">
+        <div id="accordionCamOverlay">
+            <div class="card">
+                <div class="card-header" id="headingCamOverlay">
+                    <button class="btn" style="background-color: transparent;" data-toggle="collapse"
+                        data-target="#collapseCamOverlay" aria-expanded="false" aria-controls="collapseCamOverlay">
+                        <img src="logo_cs.png" alt=""> CamOverlay App Integration
+                    </button>
+                </div>
+                <div id="collapseCamOverlay" class="collapse" aria-labelledby="headingCamOverlay"
+                    data-parent="#accordionCamOverlay">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <form class="myForm">
+                                    <div class="form-group">
+                                        <label for="cameraProtocol">Protocol</label>
+                                        <select class="form-control" id="cameraProtocol">
+                                            <option value="http">HTTP</option>
+                                            <option value="https">HTTPS</option>
+                                            <option value="https_insecure">HTTPS (insecure)</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="cameraIP">Camera IP</label>
+                                        <input type="text" class="form-control" id="cameraIP" placeholder="127.0.0.1">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="cameraPort">Camera Port</label>
+                                        <input type="text" class="form-control" id="cameraPort" placeholder="80">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="cameraUser">Camera User</label>
+                                        <input type="text" class="form-control" id="cameraUser" placeholder="">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="cameraPass">Camera Pass</label>
+                                        <input type="password" class="form-control" id="cameraPass" placeholder="">
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="col-md-6">
+                                <form class="myForm">
+                                    <div class="form-group">
+                                        <label for="serviceId">Service ID</label>
+                                        <input type="text" class="form-control" id="serviceId" placeholder="1">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="fieldName">Field Name</label>
+                                        <input type="text" class="form-control" id="fieldName" placeholder="field1">
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-  <script src="jquery-2.2.4/jquery-2.2.4.min.js"></script>
-  <script src="bootstrap/bootstrap.min.js"></script>
-  <script src="index.js"></script>
+    <div class="container">
+        <div id="accordionAcs">
+            <div class="card">
+                <div class="card-header" id="headingACS">
+                    <button class="btn" style="background-color: transparent;" data-toggle="collapse"
+                        data-target="#collapseACS" aria-expanded="false" aria-controls="collapseACS">
+                        <img src="logo_axis.png" alt="">&nbsp;&nbsp;Axis Camera Station
+                    </button>
+                </div>
+                <div id="collapseACS" class="collapse" aria-labelledby="headingACS" data-parent="#accordionAcs">
+                    <div class="card-body">
+                        <form class="myForm">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="acsProtocol">Protocol</label>
+                                        <select class="form-control" id="acsProtocol">
+                                            <option value="http">HTTP</option>
+                                            <option value="https">HTTPS</option>
+                                            <option value="https_insecure">HTTPS (insecure)</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="acsIP">Axis Camera Station IP</label>
+                                        <input type="text" class="form-control" id="acsIP" placeholder="">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="acsSourceKey">Source Key</label>
+                                        <input type="text" class="form-control" id="acsSourceKey" placeholder="">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="acsWinUser">Windows User Name</label>
+                                        <input type="text" class="form-control" id="acsWinUser" placeholder="">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="acsWinPass">Windows User Password</label>
+                                        <input type="password" class="form-control" id="acsWinPass" placeholder="">
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+
+                        <div>When do you want to be notified?</div>
+                        <form class="myForm form-inline mt-3">
+                            <select class="form-control mr-3" id="acsConditionDelay">
+                                <option value="0">Immediately</option>
+                                <option value="120">After 2 minutes</option>
+                                <option value="300">After 5 minutes</option>
+                                <option value="600">After 10 minutes</option>
+                                <option value="1800">After 30 minutes</option>
+                                <option value="3600">After 1 hour</option>
+                                <option value="10800">After 3 hours</option>
+                                <option value="21600">After 6 hours</option>
+                                <option value="43200">After 12 hours</option>
+                                <option value="86400">After 1 day</option>
+                            </select>
+                            <div class="mr-3">
+                                when temperature
+                            </div>
+                            <select class="form-control mr-1" id="acsConditionOperator">
+                                <option value="0">=</option>
+                                <option value="1">&#62;</option>
+                                <option value="2">&#60;</option>
+                                <option value="3">&#62;=</option>
+                                <option value="4">&#60;=</option>
+                            </select>
+                            <input type="text" class="form-control mr-1" id="acsConditionValue" placeholder="">
+                            <div id="acsConditionUnit">&#176;C</div>
+                        </form>
+                        <form class="myForm mt-3">
+                            <div class="form-group">
+                                <label for="acsRepeatAfter">Repeat Notification After (s)</label>
+                                <input type="text" class="form-control" id="acsRepeatAfter" placeholder="">
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div>
+        <br>
+    </div>
+
+    <script src="jquery-2.2.4/jquery-2.2.4.min.js"></script>
+    <script src="bootstrap/bootstrap.min.js"></script>
+    <script src="index.js"></script>
 </body>
+
 </html>

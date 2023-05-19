@@ -1,4 +1,5 @@
 {
+    "camera_protocol": "http",
     "camera_ip": "",
     "camera_port": 80,
     "camera_user": "root",
