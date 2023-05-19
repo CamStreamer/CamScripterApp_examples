@@ -59,6 +59,7 @@ const style: TStyleSheet = {
         overflow: 'hidden',
         margin: 0,
     },
+    expandMore: {},
 };
 
 interface ExpandMoreProps extends IconButtonProps {
