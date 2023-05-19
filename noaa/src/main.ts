@@ -36,15 +36,15 @@ try {
 }
 
 const coBasicSettings: CamOverlayOptions = {
-    ip: settings.camera_ip === '' ? null : settings.camera_ip,
+    ip: settings.camera_ip,
     port: settings.camera_port,
     auth:
         settings.camera_user === '' || settings.camera_pass === ''
-            ? null
+            ? ''
             : `${settings.camera_user}:${settings.camera_pass}`,
 };
 
-if (Object.values(coBasicSettings).some((val) => val === null)) {
+if (Object.values(coBasicSettings).some((val) => val === '')) {
     console.log('CamOverlay service was not set.');
     process.exit();
 }
@@ -93,7 +93,7 @@ const main = async () => {
             defaultApiParams.datum
         },${parseNextTideData(namedResults['nextTide'].predictions)},Water Temp:${
             otherDataByTimestamp['waterTemp'].v
-        }F,Air Temp:${otherDataByTimestamp['airTemp'].v}F,Barometric Pressure:${
+        }\xB0F,Air Temp:${otherDataByTimestamp['airTemp'].v}\xB0F,Barometric Pressure:${
             otherDataByTimestamp['barometricPressure'].v
         } mb,Winds: ${otherDataByTimestamp['winds'].s} kts from ${otherDataByTimestamp['winds'].dr},Gusting to: ${
             otherDataByTimestamp['winds'].g
