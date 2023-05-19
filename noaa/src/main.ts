@@ -35,19 +35,18 @@ try {
     process.exit(1);
 }
 
-const coBasicSettings: CamOverlayOptions = {
-    ip: settings.camera_ip,
-    port: settings.camera_port,
-    auth:
-        settings.camera_user === '' || settings.camera_pass === ''
-            ? ''
-            : `${settings.camera_user}:${settings.camera_pass}`,
-};
+const REFRESH_TIMEOUT_MS = settings.data_refresh_rate_s * 1000;
 
-if (Object.values(coBasicSettings).some((val) => val === '')) {
+if (settings.camera_ip === '' || settings.camera_user === '' || settings.camera_pass === '') {
     console.log('CamOverlay service was not set.');
     process.exit();
 }
+
+const coBasicSettings: CamOverlayOptions = {
+    ip: settings.camera_ip,
+    port: settings.camera_port,
+    auth: `${settings.camera_user}:${settings.camera_pass}`,
+};
 
 const camOverlayApiIntegration = new CamOverlayIntegration(coBasicSettings);
 
@@ -103,14 +102,14 @@ const main = async () => {
                 settings.cg_field_name
             ),
         ]);
-
-        await setTimeoutPromise(settings.data_refresh_rate_s * 1000);
     } catch (e: unknown) {
         console.error('error', e);
         if (e instanceof NetworkError) {
             process.exit();
         }
-        await setTimeoutPromise(settings.data_refresh_rate_s * 1000);
+    } finally {
+        await setTimeoutPromise(REFRESH_TIMEOUT_MS);
+        main();
     }
 };
 
