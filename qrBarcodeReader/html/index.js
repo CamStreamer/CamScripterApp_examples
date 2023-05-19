@@ -1,5 +1,6 @@
 $(document).ready(() => {
     $.get('/local/camscripter/package/settings.cgi?package_name=qrBarcodeReader&action=get', (settings) => {
+        $('#cameraProtocol').val(settings.camera_protocol);
         $('#cameraIP').val(settings.camera_ip);
         $('#cameraPort').val(settings.camera_port);
         $('#cameraUser').val(settings.camera_user);
@@ -19,6 +20,7 @@ $(document).ready(() => {
         $('#acsSourceKey').val(settings.acs_source_key);
     });
 
+    $('#cameraProtocol').change(protocolChanged);
     $('.form-control').change(inputChanged);
     $('.myForm').submit(() => {
         return false;
@@ -29,8 +31,14 @@ $(document).ready(() => {
     });
 });
 
+function protocolChanged() {
+    const port = $('#cameraProtocol').val() === 'http' ? 80 : 443;
+    $('#cameraPort').val(port);
+}
+
 function inputChanged() {
     const settings = {
+        camera_protocol: $('#cameraProtocol').val(),
         camera_ip: $('#cameraIP').val(),
         camera_port: parseInt($('#cameraPort').val()),
         camera_user: $('#cameraUser').val(),
