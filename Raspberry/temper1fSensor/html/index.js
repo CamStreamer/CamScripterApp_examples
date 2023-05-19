@@ -2,6 +2,7 @@ let unit = 'c';
 $(document).ready(function () {
     $.get('/local/camscripter/package/settings.cgi?package_name=temper1fSensor&action=get', (settings) => {
         $('input[name=u_select][value=' + settings.unit + ']').prop('checked', true);
+        $('#cameraProtocol').val(settings.camera_protocol);
         $('#cameraIP').val(settings.camera_ip);
         $('#cameraPort').val(settings.camera_port);
         $('#cameraUser').val(settings.camera_user);
@@ -21,12 +22,18 @@ $(document).ready(function () {
         unitChanged();
     });
 
+    $('#cameraProtocol').change(protocolChanged);
     $('.form-control').change(inputChanged);
     $('.unit').click(radioClickedCallback);
     $('.myForm').submit(function () {
         return false;
     });
 });
+
+function protocolChanged() {
+    const port = $('#cameraProtocol').val() === 'http' ? 80 : 443;
+    $('#cameraPort').val(port);
+}
 
 function radioClickedCallback() {
     unit = $(this).val();
@@ -41,6 +48,7 @@ function unitChanged() {
 function inputChanged() {
     const settings = {
         unit: unit,
+        camera_protocol: $('#cameraProtocol').val(),
         camera_ip: $('#cameraIP').val(),
         camera_port: $('#cameraPort').val(),
         camera_user: $('#cameraUser').val(),

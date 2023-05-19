@@ -184,6 +184,8 @@ async function displayGraphics(weightInfo: WeightInfo) {
 async function initCamOverlay() {
     if (!coConnected) {
         co = new CamOverlayAPI({
+            tls: settings.camera_protocol !== 'http',
+            tlsInsecure: settings.camera_protocol === 'https_insecure',
             ip: settings.camera_ip,
             port: settings.camera_port,
             auth: settings.camera_user + ':' + settings.camera_pass,

@@ -4,6 +4,7 @@ $(document).ready(() => {
         $('#scaleIP').val(settings.scale_ip);
         $('#scalePort').val(settings.scale_port);
         $('#scaleDataType').val(settings.scale_data_type);
+        $('#cameraProtocol').val(settings.camera_protocol);
         $('#cameraIP').val(settings.camera_ip);
         $('#cameraPort').val(settings.camera_port);
         $('#cameraUser').val(settings.camera_user);
@@ -48,7 +49,14 @@ function renderWidgetForm() {
         $('#customGraphicsSettings').show();
         $('#generatedWidgetSettings').hide();
     }
-    $('.form-control').off().change(inputChanged);
+    $('.form-control').off();
+    $('#cameraProtocol').change(protocolChanged);
+    $('.form-control').change(inputChanged);
+}
+
+function protocolChanged() {
+    const port = $('#cameraProtocol').val() === 'http' ? 80 : 443;
+    $('#cameraPort').val(port);
 }
 
 function inputChanged() {
@@ -56,6 +64,7 @@ function inputChanged() {
         scale_ip: $('#scaleIP').val(),
         scale_port: parseInt($('#scalePort').val()),
         scale_data_type: $('#scaleDataType').val(),
+        camera_protocol: $('#cameraProtocol').val(),
         camera_ip: $('#cameraIP').val(),
         camera_port: parseInt($('#cameraPort').val()),
         camera_user: $('#cameraUser').val(),

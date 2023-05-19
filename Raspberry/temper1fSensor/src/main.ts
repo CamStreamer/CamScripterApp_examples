@@ -34,8 +34,8 @@ const acsConfigured =
 let co: CamOverlayAPI = null;
 if (coConfigured) {
     co = new CamOverlayAPI({
-        tls: settings.acs_protocol !== 'http',
-        tlsInsecure: settings.acs_protocol === 'https_insecure',
+        tls: settings.camera_protocol !== 'http',
+        tlsInsecure: settings.camera_protocol === 'https_insecure',
         ip: settings.camera_ip,
         port: settings.camera_port,
         auth: settings.camera_user + ':' + settings.camera_pass,
