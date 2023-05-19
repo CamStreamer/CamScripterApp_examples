@@ -51,12 +51,8 @@ if (Object.values(coBasicSettings).some((val) => val === '')) {
 
 const camOverlayApiIntegration = new CamOverlayIntegration(coBasicSettings);
 
-if (settings.it_service_id !== null) {
-    camOverlayApiIntegration.initializeInfoTickerCamOverlayApi(settings.it_service_id);
-}
-if (settings.cg_service_id !== null) {
-    camOverlayApiIntegration.initializeInfoTickerCamOverlayApi(settings.cg_service_id);
-}
+camOverlayApiIntegration.initializeInfoTickerCamOverlayApi(settings.it_service_id);
+camOverlayApiIntegration.initializeCustomGraphicsCamOverlayApi(settings.cg_service_id);
 
 const main = async () => {
     const queryParams: TApiQueryParams = {

@@ -18,31 +18,17 @@ export class CamOverlayIntegration {
         this._initializeCamOverlayApi(serviceID);
     }
 
-    nitializeCustomGraphicsCamOverlayApi(serviceID: number) {
+    initializeCustomGraphicsCamOverlayApi(serviceID: number) {
         this._initializeCamOverlayApi(serviceID);
     }
 
     async updateInfoTickerText(serviceID: number, text: string) {
-        if (!this._camOverlayApiInstances.has(this._options.serviceID)) {
-            console.log(`Infoticker with service id: ${serviceID} does not exist`);
-            return;
-        }
-        try {
-            await this._camOverlayApiInstances.get(serviceID).updateInfoticker(text);
-        } catch (e) {
-            console.error(`Could not update infoticker service text. Service id: ${serviceID}. Error: `, e);
-        }
+        if (!this._camOverlayApiInstances.has(this._options.serviceID)) return;
+        return await this._camOverlayApiInstances.get(serviceID).updateInfoticker(text);
     }
 
     async updateCustomGraphicsText(serviceID: number, field: string, text: string) {
-        if (!this._camOverlayApiInstances.has(this._options.serviceID)) {
-            console.log(`Custom graphics with service id: ${serviceID} does not exist`);
-            return;
-        }
-        try {
-            await this._camOverlayApiInstances.get(serviceID).updateCGText([{ field_name: field, text }]);
-        } catch (e) {
-            console.error(`Could not update custom graphics service text. Service id: ${serviceID}. Error: `, e);
-        }
+        if (!this._camOverlayApiInstances.has(this._options.serviceID)) return;
+        return await this._camOverlayApiInstances.get(serviceID).updateCGText([{ field_name: field, text }]);
     }
 }
