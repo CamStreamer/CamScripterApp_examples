@@ -8,6 +8,7 @@
         "clean": "rimraf dist/*;",
         "start-server": "PERSISTENT_DATA_PATH=\"./localdata/\" ts-node src/main.ts",
         "build": "npm-run-all clean tsc",
+        "start-client": "cd client-ui && npm run start && cd ..",
         "build-client": "cd client-ui && npm run build && cd ..",
         "build-all": "npm-run-all build build-client",
         "tsc": "tsc",

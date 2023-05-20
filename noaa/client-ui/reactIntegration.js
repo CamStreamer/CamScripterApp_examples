@@ -38,7 +38,7 @@ const getReactHTMLCode = async () => {
         const filePromises = fileNames.map((file) => readFile(mainPath + file));
         const codes = await Promise.all(filePromises);
 
-        await writeFile('../html/js/react.min.js', codes.join(';\n'));
+        await writeFile('../html/assets/js/react.min.js', codes.join(';\n'));
 
         console.log('SUCCESS');
     } catch (e) {
