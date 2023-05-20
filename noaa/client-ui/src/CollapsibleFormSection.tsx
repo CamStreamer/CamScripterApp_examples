@@ -23,7 +23,9 @@ export const CollapsibleFormSection = ({ label, children }: Props) => {
         <Stack spacing={expanded ? 2 : 0}>
             {/* <Divider orientation="horizontal" textAlign="left"> */}
             <span style={style.textWrapper} onClick={() => setExpanded((prev) => !prev)}>
-                <Typography textTransform="uppercase">{label}</Typography>
+                <Typography textTransform="uppercase" className="text">
+                    {label}
+                </Typography>
                 <ExpandMore expand={expanded} aria-expanded={expanded} aria-label="show more">
                     <ExpandMoreIcon />
                 </ExpandMore>

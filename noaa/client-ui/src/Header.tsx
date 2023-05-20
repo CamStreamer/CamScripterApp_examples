@@ -6,7 +6,7 @@ export const Header = () => {
     return (
         <Box style={style.box}>
             <img style={style.img} src="./assets/images/noaa_digital_logo.svg" alt="logo" />
-            <Typography variant="h2" style={style.title}>
+            <Typography variant="h2" style={style.title} className="text">
                 NOA Weather FP
             </Typography>
         </Box>
@@ -17,7 +17,6 @@ const style: TStyleSheet = {
     box: {
         display: 'grid',
         placeItems: 'center',
-        paddingBlock: '4rem',
         gap: '1rem',
     },
     title: {

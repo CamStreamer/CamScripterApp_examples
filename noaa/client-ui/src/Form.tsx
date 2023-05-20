@@ -1,11 +1,11 @@
-import { Collapse, Typography, useMediaQuery } from '@mui/material';
+import { Typography, useMediaQuery } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
 import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
-import Divider from '@mui/material/Divider';
-import { ExpandLess } from '@mui/icons-material';
+import Fade from '@mui/material/Fade';
+
 import Grid from '@mui/material/Grid';
 import { InfoSnackbar } from './InfoSnackbar';
 import Stack from '@mui/material/Stack';
@@ -39,8 +39,12 @@ const errorDefaultValues: FormData = {
     dataRefreshRateS: 120,
 };
 
-export const Form = () => {
-    const [fetchingDefaultValues, setFetchingDefaultValues] = useState(true);
+type Props = {
+    isFormInitialized: boolean;
+    setIsFormInitialized: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
+export const Form = ({ isFormInitialized, setIsFormInitialized }: Props) => {
     const [submitting, setSubmitting] = useState(false);
     const { snackbarData, displaySnackbar, closeSnackbar } = useSnackbar();
 
@@ -59,7 +63,7 @@ export const Form = () => {
     useEffect(() => {
         let skip = false;
         (async () => {
-            setFetchingDefaultValues(true);
+            setIsFormInitialized(false);
             let response: Response;
             let data: TServerData;
             try {
@@ -89,14 +93,14 @@ export const Form = () => {
                     message: 'Error fetching default data. Using backup data.',
                 });
             } finally {
-                setFetchingDefaultValues(false);
+                setIsFormInitialized(true);
             }
         })();
 
         return () => {
             skip = true;
         };
-    }, [reset, displaySnackbar]);
+    }, [reset, displaySnackbar, setIsFormInitialized]);
 
     const onSubmit: SubmitHandler<FormData> = async (data) => {
         const toPost: TServerData = {
@@ -137,116 +141,117 @@ export const Form = () => {
         }
     };
 
-    if (fetchingDefaultValues) {
+    if (!isFormInitialized) {
         return (
-            <Grid container justifyContent="center" alignItems="center" height="50%">
-                <CircularProgress size={100} />
+            <Grid container justifyContent="center" alignItems="center">
+                <CircularProgress size={70} />
             </Grid>
         );
     }
 
-    console.log(errors);
-
     return (
-        <form onSubmit={handleSubmit(onSubmit)} style={style.form}>
-            <InfoSnackbar
-                isSmallScreen={matchesSmallScreen}
-                snackbarData={snackbarData}
-                closeSnackbar={closeSnackbar}
-            />
-            <Stack spacing={2} style={style.formContent}>
-                <Grid container rowSpacing={2} direction="column">
-                    <Typography textTransform="uppercase">Api settings</Typography>
-                    <Grid item>
-                        <TextField
-                            type="number"
-                            label="Station ID"
-                            fullWidth
-                            error={!!errors.stationId}
-                            helperText={
-                                errors.stationId &&
-                                (errors.stationId?.type === 'required'
-                                    ? 'Station ID is required'
-                                    : 'Station ID has at least 7 digits')
-                            }
-                            {...register('stationId', { required: true, minLength: 7 })}
-                        />
-                    </Grid>
-                    <Grid item>
-                        <TextField type="text" label="Location name" fullWidth {...register('locationName')} />
-                    </Grid>
-                </Grid>
-                <CollapsibleFormSection label={'Camera settings'}>
+        <Fade in={isFormInitialized} timeout={1000}>
+            <form onSubmit={handleSubmit(onSubmit)} style={style.form}>
+                <InfoSnackbar
+                    isSmallScreen={matchesSmallScreen}
+                    snackbarData={snackbarData}
+                    closeSnackbar={closeSnackbar}
+                />
+                <Stack spacing={2} style={style.formContent}>
                     <Grid container rowSpacing={2} direction="column">
+                        <Typography textTransform="uppercase" className="text">
+                            Api settings
+                        </Typography>
                         <Grid item>
-                            <TextField type="text" label="Camera IP" fullWidth {...register('cameraIp')} />
+                            <TextField
+                                type="number"
+                                label="Station ID"
+                                fullWidth
+                                error={!!errors.stationId}
+                                helperText={
+                                    errors.stationId &&
+                                    (errors.stationId?.type === 'required'
+                                        ? 'Station ID is required'
+                                        : 'Station ID has at least 7 digits')
+                                }
+                                {...register('stationId', { required: true, minLength: 7 })}
+                            />
                         </Grid>
                         <Grid item>
-                            <TextField type="number" label="Camera port" fullWidth {...register('cameraPort')} />
-                        </Grid>
-                        <Grid item>
-                            <TextField type="text" label="Camera username" fullWidth {...register('cameraUser')} />
-                        </Grid>
-                        <Grid item>
-                            <TextField type="text" label="Camera password" fullWidth {...register('cameraPass')} />
+                            <TextField type="text" label="Location name" fullWidth {...register('locationName')} />
                         </Grid>
                     </Grid>
-                </CollapsibleFormSection>
-                <CollapsibleFormSection label={'Camoverlay integration'}>
-                    <Grid container rowSpacing={2} direction="column">
-                        <Grid item>
-                            <TextField
-                                type="number"
-                                label="Custom graphics service ID"
-                                fullWidth
-                                {...register('cgServiceId')}
-                            />
+                    <CollapsibleFormSection label={'Camera settings'}>
+                        <Grid container rowSpacing={2} direction="column">
+                            <Grid item>
+                                <TextField type="text" label="Camera IP" fullWidth {...register('cameraIp')} />
+                            </Grid>
+                            <Grid item>
+                                <TextField type="number" label="Camera port" fullWidth {...register('cameraPort')} />
+                            </Grid>
+                            <Grid item>
+                                <TextField type="text" label="Camera username" fullWidth {...register('cameraUser')} />
+                            </Grid>
+                            <Grid item>
+                                <TextField type="text" label="Camera password" fullWidth {...register('cameraPass')} />
+                            </Grid>
                         </Grid>
-                        <Grid item>
-                            <TextField
-                                type="text"
-                                label="Custom graphics field name"
-                                fullWidth
-                                {...register('cgFieldName')}
-                            />
+                    </CollapsibleFormSection>
+                    <CollapsibleFormSection label={'Camoverlay integration'}>
+                        <Grid container rowSpacing={2} direction="column">
+                            <Grid item>
+                                <TextField
+                                    type="number"
+                                    label="Custom graphics service ID"
+                                    fullWidth
+                                    {...register('cgServiceId')}
+                                />
+                            </Grid>
+                            <Grid item>
+                                <TextField
+                                    type="text"
+                                    label="Custom graphics field name"
+                                    fullWidth
+                                    {...register('cgFieldName')}
+                                />
+                            </Grid>
+                            <Grid item>
+                                <TextField
+                                    type="number"
+                                    label="Infoticker service ID"
+                                    fullWidth
+                                    {...register('itServiceId')}
+                                />
+                            </Grid>
+                            <Grid item>
+                                <TextField
+                                    type="number"
+                                    label="Data refresh rate (seconds)"
+                                    fullWidth
+                                    error={!!errors.dataRefreshRateS}
+                                    helperText={errors.dataRefreshRateS && 'The minimum rate is 60 seconds'}
+                                    {...register('dataRefreshRateS', { min: 60 })}
+                                />
+                            </Grid>
                         </Grid>
-                        <Grid item>
-                            <TextField
-                                type="number"
-                                label="Infoticker service ID"
-                                fullWidth
-                                {...register('itServiceId')}
-                            />
-                        </Grid>
-                        <Grid item>
-                            <TextField
-                                type="number"
-                                label="Data refresh rate (seconds)"
-                                fullWidth
-                                error={!!errors.dataRefreshRateS}
-                                helperText={errors.dataRefreshRateS && 'The minimum rate is 60 seconds'}
-                                {...register('dataRefreshRateS', { min: 60 })}
-                            />
-                        </Grid>
-                    </Grid>
-                </CollapsibleFormSection>
-                <Button
-                    type="submit"
-                    variant="contained"
-                    disabled={Object.keys(errors).length > 0 || submitting}
-                    style={matchesSmallScreen ? style.buttonSmallScreen : style.button}
-                >
-                    {submitting ? <CircularProgress size={20} /> : <Typography>Submit</Typography>}
-                </Button>
-            </Stack>
-        </form>
+                    </CollapsibleFormSection>
+                    <Button
+                        type="submit"
+                        variant="contained"
+                        disabled={Object.keys(errors).length > 0 || submitting}
+                        style={matchesSmallScreen ? style.buttonSmallScreen : style.button}
+                    >
+                        {submitting ? <CircularProgress size={20} /> : <Typography>Submit</Typography>}
+                    </Button>
+                </Stack>
+            </form>
+        </Fade>
     );
 };
 
 const style: TStyleSheet = {
     formContent: {
-        paddingBottom: '16px',
-        width: 'clamp(350px, 50%, 1000px)',
+        width: 'max(300px, 90%)',
     },
     form: {
         width: '100%',

@@ -1,0 +1,17 @@
+.contentWrapper {
+    width: max-content;
+    margin-block: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 4rem;
+    padding: 4rem 2rem;
+    position: relative;
+}
+
+.boxShadow {
+    position: absolute;
+    inset: 0;
+    box-shadow: 5px 5px 10px 0px rgba(0, 0, 0, 0.5);
+    z-index: -1;
+    border-radius: 20px;
+}
