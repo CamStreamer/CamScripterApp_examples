@@ -145,6 +145,8 @@ export const Form = () => {
         );
     }
 
+    console.log(errors);
+
     return (
         <form onSubmit={handleSubmit(onSubmit)} style={style.form}>
             <InfoSnackbar
@@ -161,8 +163,13 @@ export const Form = () => {
                             label="Station ID"
                             fullWidth
                             error={!!errors.stationId}
-                            helperText={errors.stationId && 'Station ID is required'}
-                            {...register('stationId', { required: true })}
+                            helperText={
+                                errors.stationId &&
+                                (errors.stationId?.type === 'required'
+                                    ? 'Station ID is required'
+                                    : 'Station ID has at least 7 digits')
+                            }
+                            {...register('stationId', { required: true, minLength: 7 })}
                         />
                     </Grid>
                     <Grid item>
