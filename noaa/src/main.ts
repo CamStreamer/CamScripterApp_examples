@@ -82,20 +82,20 @@ const main = async () => {
             otherDataByTimestamp[endpoint as TEndpoints] = dataArr.find((d) => Date.parse(d.t) === latestTimestamp);
         }
 
-        const textToDisplay = `${settings.location_name},${latestWaterLevelData.metadata.lat}N${
+        const textToDisplay = `${settings.location_name}, ${latestWaterLevelData.metadata.lat}N${
             latestWaterLevelData.metadata.lon
-        }W,${latestWaterLevelData.data.t},Water level:${latestWaterLevelData.data.v} ft Above ${
+        }W, ${latestWaterLevelData.data.t}, Water level: ${latestWaterLevelData.data.v} ft Above ${
             defaultApiParams.datum
-        },${parseNextTideData(namedResults['nextTide'].predictions)},Water Temp:${
+        }, ${parseNextTideData(namedResults['nextTide'].predictions)}, Water Temp: ${
             otherDataByTimestamp['waterTemp'].v
-        }\xB0F,Air Temp:${otherDataByTimestamp['airTemp'].v}\xB0F,Barometric Pressure:${
+        }\xB0F, Air Temp: ${otherDataByTimestamp['airTemp'].v}\xB0F, Barometric Pressure: ${
             otherDataByTimestamp['barometricPressure'].v
-        } mb,Winds: ${otherDataByTimestamp['winds'].s} kts from ${otherDataByTimestamp['winds'].dr},Gusting to: ${
+        } mb, Winds: ${otherDataByTimestamp['winds'].s} kts from ${otherDataByTimestamp['winds'].dr}, Gusting to: ${
             otherDataByTimestamp['winds'].g
         } kts from ${otherDataByTimestamp['winds'].dr}`;
 
         await Promise.all([
-            camOverlayApiIntegration.updateInfoTickerText(settings.it_service_id, textToDisplay),
+            camOverlayApiIntegration.updateInfoTickerText(settings.it_service_id, encodeURIComponent(textToDisplay)),
             camOverlayApiIntegration.updateCustomGraphicsText(
                 settings.cg_service_id,
                 textToDisplay,

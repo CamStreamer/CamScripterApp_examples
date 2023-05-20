@@ -6,11 +6,8 @@ export class CamOverlayIntegration {
     constructor(private _options: CamOverlayOptions) {}
 
     private _initializeCamOverlayApi(serviceID: number) {
-        if (!this._camOverlayApiInstances.has(this._options.serviceID)) {
-            this._camOverlayApiInstances.set(
-                this._options.serviceID,
-                new CamOverlayAPI({ ...this._options, serviceID })
-            );
+        if (!this._camOverlayApiInstances.has(serviceID)) {
+            this._camOverlayApiInstances.set(serviceID, new CamOverlayAPI({ ...this._options, serviceID }));
         }
     }
 
@@ -23,12 +20,12 @@ export class CamOverlayIntegration {
     }
 
     async updateInfoTickerText(serviceID: number, text: string) {
-        if (!this._camOverlayApiInstances.has(this._options.serviceID)) return;
-        return await this._camOverlayApiInstances.get(serviceID).updateInfoticker(text);
+        if (!this._camOverlayApiInstances.has(serviceID)) return;
+        this._camOverlayApiInstances.get(serviceID).updateInfoticker(text);
     }
 
     async updateCustomGraphicsText(serviceID: number, field: string, text: string) {
-        if (!this._camOverlayApiInstances.has(this._options.serviceID)) return;
-        return await this._camOverlayApiInstances.get(serviceID).updateCGText([{ field_name: field, text }]);
+        if (!this._camOverlayApiInstances.has(serviceID)) return;
+        this._camOverlayApiInstances.get(serviceID).updateCGText([{ field_name: field, text }]);
     }
 }
