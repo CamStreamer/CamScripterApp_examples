@@ -19,30 +19,17 @@ type Props = {
 export const CollapsibleFormSection = ({ label, children }: Props) => {
     const [expanded, setExpanded] = useState(false);
 
-    const containerRef = useRef(null);
-
-    const content = (
-        <span style={style.textWrapper} onClick={() => setExpanded((prev) => !prev)}>
-            <Typography textTransform="uppercase">{label}</Typography>
-            <ExpandMore expand={expanded} aria-expanded={expanded} aria-label="show more">
-                <ExpandMoreIcon />
-            </ExpandMore>
-        </span>
-    );
-
     return (
         <Stack spacing={expanded ? 2 : 0}>
-            <Box style={style.box} ref={containerRef}>
-                {expanded ? (
-                    <Slide direction="right" in={expanded} container={containerRef.current}>
-                        <Divider orientation="horizontal" textAlign="left">
-                            {content}
-                        </Divider>
-                    </Slide>
-                ) : (
-                    <Fade in={!expanded}>{content}</Fade>
-                )}
-            </Box>
+            {/* <Divider orientation="horizontal" textAlign="left"> */}
+            <span style={style.textWrapper} onClick={() => setExpanded((prev) => !prev)}>
+                <Typography textTransform="uppercase">{label}</Typography>
+                <ExpandMore expand={expanded} aria-expanded={expanded} aria-label="show more">
+                    <ExpandMoreIcon />
+                </ExpandMore>
+                <Divider style={style.divider} orientation="horizontal" />
+            </span>
+            {/*</Divider> */}
             <Collapse in={expanded}>{children}</Collapse>
         </Stack>
     );
@@ -55,11 +42,9 @@ const style: TStyleSheet = {
         gap: '8px',
         alignItems: 'center',
     },
-    box: {
-        overflow: 'hidden',
-        margin: 0,
+    divider: {
+        flex: 1,
     },
-    expandMore: {},
 };
 
 interface ExpandMoreProps extends IconButtonProps {
