@@ -10,11 +10,11 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Fade from '@mui/material/Fade';
 
 import Grid from '@mui/material/Grid';
-import { InfoSnackbar } from './InfoSnackbar';
+import { InfoSnackbar } from '../InfoSnackbar';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
-import { useSnackbar } from './useSnackbar';
-import { CollapsibleFormSection } from './CollapsibleFormSection';
+import { useSnackbar } from '../../hooks/useSnackbar';
+import { CollapsibleFormSection } from '../collapsibeFormSection/CollapsibleFormSection';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import styles from './Form.module.css';
