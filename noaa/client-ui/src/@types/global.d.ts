@@ -1,4 +1,3 @@
-declare type TStyleSheet = Record<string, React.CSSProperties>;
 declare type TServerData = {
     station_id: number;
     location_name: string;

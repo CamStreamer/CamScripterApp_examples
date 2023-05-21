@@ -17,6 +17,7 @@ import { useSnackbar } from './useSnackbar';
 import { CollapsibleFormSection } from './CollapsibleFormSection';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import styles from './Form.module.css';
 
 type FormData = {
     stationId: number;
@@ -159,13 +160,13 @@ export const Form = ({ isFormInitialized, setIsFormInitialized }: Props) => {
 
     return (
         <Fade in={isFormInitialized} timeout={1000}>
-            <form onSubmit={handleSubmit(onSubmit)} style={style.form}>
+            <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
                 <InfoSnackbar
                     isSmallScreen={matchesSmallScreen}
                     snackbarData={snackbarData}
                     closeSnackbar={closeSnackbar}
                 />
-                <Stack spacing={2} style={style.formContent}>
+                <Stack spacing={2} className={styles.formContent}>
                     <Grid container rowSpacing={2} direction="column">
                         <Typography textTransform="uppercase" className="text">
                             Api settings
@@ -274,7 +275,7 @@ export const Form = ({ isFormInitialized, setIsFormInitialized }: Props) => {
                         type="submit"
                         variant="contained"
                         disabled={Object.keys(errors).length > 0 || submitting}
-                        style={matchesSmallScreen ? style.buttonSmallScreen : style.button}
+                        className={styles.button}
                     >
                         {submitting ? <CircularProgress size={20} /> : <Typography>Submit</Typography>}
                     </Button>
@@ -282,23 +283,4 @@ export const Form = ({ isFormInitialized, setIsFormInitialized }: Props) => {
             </form>
         </Fade>
     );
-};
-
-const style: TStyleSheet = {
-    formContent: {
-        width: 'max(300px, 90%)',
-    },
-    form: {
-        width: '100%',
-        display: 'flex',
-        justifyContent: 'center',
-    },
-    button: {
-        width: '33%',
-        height: '40px',
-    },
-    buttonSmallScreen: {
-        width: '100%',
-        height: '40px',
-    },
 };

@@ -1,0 +1,14 @@
+.textWrapper {
+    cursor: pointer;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+
+    .divider {
+        flex: 1;
+    }
+}
+
+.collapse {
+    padding-top: 5px; /* fixing cutoff in label */
+}

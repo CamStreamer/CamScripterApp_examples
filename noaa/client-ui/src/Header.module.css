@@ -1,0 +1,14 @@
+.box {
+    .title {
+        composes: text from global;
+        font-size: clamp(1.75rem, 7vw, 3.75rem);
+    }
+
+    .img {
+        width: clamp(4rem, 13vw, 7rem);
+    }
+
+    display: grid;
+    place-items: center;
+    gap: 1em;
+}

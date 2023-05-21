@@ -15,7 +15,7 @@ export const App = () => {
     return (
         <>
             <Nav />
-            <Container style={style.container}>
+            <Container className={styles.container}>
                 <CssBaseline />
                 <Box className={styles.contentWrapper}>
                     <Fade in={isFormInitialized} className={styles.boxShadow} timeout={1000}>
@@ -27,13 +27,4 @@ export const App = () => {
             </Container>
         </>
     );
-};
-
-const style: TStyleSheet = {
-    container: {
-        display: 'flex',
-        flexDirection: 'column',
-        minHeight: '100%',
-        alignItems: 'center',
-    },
 };

@@ -1,0 +1,18 @@
+.form {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+
+    .formContent {
+        width: max(300px, 90%);
+
+        .button {
+            width: 33%;
+            height: 40px;
+
+            @media (max-width: 390px) {
+                width: 100%;
+            }
+        }
+    }
+}

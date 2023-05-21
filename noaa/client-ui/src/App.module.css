@@ -1,21 +1,24 @@
-.contentWrapper {
-    width: max-content;
-    margin-block: 2em;
+.container {
     display: flex;
     flex-direction: column;
-    gap: 4em;
-    padding: 4em 2em;
-    position: relative;
+    min-height: 100%;
+    align-items: center;
 
-    /* @media (max-width: 390px) {
-        padding: 2rem 1rem;
-    } */
-}
+    .contentWrapper {
+        width: max-content;
+        margin-block: 2em;
+        display: flex;
+        flex-direction: column;
+        gap: 4em;
+        padding: 4em 2em;
+        position: relative;
 
-.boxShadow {
-    position: absolute;
-    inset: 0;
-    box-shadow: 3px 3px 7px 0px rgba(0, 0, 0, 0.5);
-    z-index: -1;
-    border-radius: 20px;
+        .boxShadow {
+            position: absolute;
+            inset: 0;
+            box-shadow: 3px 3px 7px 0px rgba(0, 0, 0, 0.5);
+            z-index: -1;
+            border-radius: 20px;
+        }
+    }
 }
