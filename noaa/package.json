@@ -24,7 +24,7 @@
     "author": "CamStreamer s.r.o",
     "license": "ISC",
     "dependencies": {
-        "camstreamerlib": "^1.8.6"
+        "camstreamerlib": "^1.8.7"
     },
     "devDependencies": {
         "@camstreamer/prettier-config": "^2.0.4",
