@@ -29,16 +29,31 @@ const getScriptFileNamesFromHtml = (html) => {
     return scripts.map((script) => script.match(reg2)[0]);
 };
 
+const getStylesheetFileNamesFromHtml = (html) => {
+    if (!html) throw new Error('No HTML to parse.');
+
+    const reg1 = /<link href="([^"]+)" rel="stylesheet">/g;
+    const styles = html.match(reg1);
+
+    const reg2 = /(?<=href=")([^"])*(?=")/;
+    return styles.map((style) => style.match(reg2)[0]);
+};
+
 const getReactHTMLCode = async () => {
     try {
         const mainPath = './build';
         const html = await readFile(mainPath + '/index.html');
 
-        const fileNames = getScriptFileNamesFromHtml(html);
-        const filePromises = fileNames.map((file) => readFile(mainPath + file));
-        const codes = await Promise.all(filePromises);
+        const scriptNames = getScriptFileNamesFromHtml(html);
+        const scriptPromises = scriptNames.map((file) => readFile(mainPath + file));
+        const codes = await Promise.all(scriptPromises);
+
+        const stylesheetNames = getStylesheetFileNamesFromHtml(html);
+        const stylesheetPromises = stylesheetNames.map((file) => readFile(mainPath + file));
+        const stylesheets = await Promise.all(stylesheetPromises);
 
         await writeFile('../html/assets/js/react.min.js', codes.join(';\n'));
+        await writeFile('../html/assets/styles/styles.min.css', stylesheets.join(';\n'));
 
         console.log('SUCCESS');
     } catch (e) {
