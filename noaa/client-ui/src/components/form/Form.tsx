@@ -178,13 +178,11 @@ export const Form = ({ isFormInitialized, setIsFormInitialized }: Props) => {
                                 required
                                 fullWidth
                                 error={!!errors.stationId}
-                                helperText={
-                                    errors.stationId &&
-                                    (errors.stationId?.type === 'required'
-                                        ? 'Station ID is required'
-                                        : 'Station ID has at least 7 digits')
-                                }
-                                {...register('stationId', { required: true, minLength: 7 })}
+                                helperText={errors?.stationId?.message}
+                                {...register('stationId', {
+                                    required: { value: true, message: 'Station ID is required' },
+                                    minLength: { value: 7, message: 'Station ID has at least 7 digits' },
+                                })}
                             />
                         </Grid>
                         <Grid item>
@@ -258,7 +256,7 @@ export const Form = ({ isFormInitialized, setIsFormInitialized }: Props) => {
                                     label="Data refresh rate"
                                     fullWidth
                                     error={!!errors.dataRefreshRateS}
-                                    helperText={errors.dataRefreshRateS && 'The minimum rate is 60 seconds'}
+                                    helperText={errors?.dataRefreshRateS?.message}
                                     InputProps={{
                                         endAdornment: (
                                             <InputAdornment position="end">
@@ -266,7 +264,9 @@ export const Form = ({ isFormInitialized, setIsFormInitialized }: Props) => {
                                             </InputAdornment>
                                         ),
                                     }}
-                                    {...register('dataRefreshRateS', { min: 60 })}
+                                    {...register('dataRefreshRateS', {
+                                        min: { value: 60, message: 'The minimum rate is 60 seconds' },
+                                    })}
                                 />
                             </Grid>
                         </Grid>
