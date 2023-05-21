@@ -6,6 +6,10 @@
     gap: 4rem;
     padding: 4rem 2rem;
     position: relative;
+
+    @media (max-width: 390px) {
+        padding: 2rem 1rem;
+    }
 }
 
 .boxShadow {

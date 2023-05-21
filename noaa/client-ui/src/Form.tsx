@@ -1,4 +1,7 @@
-import { Typography, useMediaQuery } from '@mui/material';
+import { useMediaQuery } from '@mui/material';
+import IconButton from '@mui/material/IconButton';
+import InputAdornment from '@mui/material/InputAdornment';
+import Typography from '@mui/material/Typography';
 import React, { useEffect, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
@@ -12,6 +15,8 @@ import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import { useSnackbar } from './useSnackbar';
 import { CollapsibleFormSection } from './CollapsibleFormSection';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 type FormData = {
     stationId: number;
@@ -47,6 +52,9 @@ type Props = {
 export const Form = ({ isFormInitialized, setIsFormInitialized }: Props) => {
     const [submitting, setSubmitting] = useState(false);
     const { snackbarData, displaySnackbar, closeSnackbar } = useSnackbar();
+    const [showPassword, setShowPassword] = useState(false);
+
+    const handleClickShowPassword = () => setShowPassword((show) => !show);
 
     const matchesSmallScreen = useMediaQuery('(max-width:390px)');
 
@@ -166,6 +174,7 @@ export const Form = ({ isFormInitialized, setIsFormInitialized }: Props) => {
                             <TextField
                                 type="number"
                                 label="Station ID"
+                                required
                                 fullWidth
                                 error={!!errors.stationId}
                                 helperText={
@@ -193,7 +202,26 @@ export const Form = ({ isFormInitialized, setIsFormInitialized }: Props) => {
                                 <TextField type="text" label="Camera username" fullWidth {...register('cameraUser')} />
                             </Grid>
                             <Grid item>
-                                <TextField type="text" label="Camera password" fullWidth {...register('cameraPass')} />
+                                <TextField
+                                    type={showPassword ? 'text' : 'password'}
+                                    label="Camera password"
+                                    fullWidth
+                                    InputProps={{
+                                        endAdornment: (
+                                            <InputAdornment position="end">
+                                                <IconButton
+                                                    aria-label="toggle password visibility"
+                                                    onClick={handleClickShowPassword}
+                                                    onMouseDown={(e) => e.preventDefault()}
+                                                    edge="end"
+                                                >
+                                                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                                                </IconButton>
+                                            </InputAdornment>
+                                        ),
+                                    }}
+                                    {...register('cameraPass')}
+                                />
                             </Grid>
                         </Grid>
                     </CollapsibleFormSection>
@@ -226,10 +254,17 @@ export const Form = ({ isFormInitialized, setIsFormInitialized }: Props) => {
                             <Grid item>
                                 <TextField
                                     type="number"
-                                    label="Data refresh rate (seconds)"
+                                    label="Data refresh rate"
                                     fullWidth
                                     error={!!errors.dataRefreshRateS}
                                     helperText={errors.dataRefreshRateS && 'The minimum rate is 60 seconds'}
+                                    InputProps={{
+                                        endAdornment: (
+                                            <InputAdornment position="end">
+                                                <Typography>sec</Typography>
+                                            </InputAdornment>
+                                        ),
+                                    }}
                                     {...register('dataRefreshRateS', { min: 60 })}
                                 />
                             </Grid>
