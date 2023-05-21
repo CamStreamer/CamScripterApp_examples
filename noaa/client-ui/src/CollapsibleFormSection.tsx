@@ -32,7 +32,9 @@ export const CollapsibleFormSection = ({ label, children }: Props) => {
                 <Divider style={style.divider} orientation="horizontal" />
             </span>
             {/*</Divider> */}
-            <Collapse in={expanded}>{children}</Collapse>
+            <Collapse in={expanded} style={style.collapse}>
+                {children}
+            </Collapse>
         </Stack>
     );
 };
@@ -46,6 +48,9 @@ const style: TStyleSheet = {
     },
     divider: {
         flex: 1,
+    },
+    collapse: {
+        paddingTop: '5px', //fixing cutting the label
     },
 };
 
