@@ -15,7 +15,7 @@
 .boxShadow {
     position: absolute;
     inset: 0;
-    box-shadow: 5px 5px 10px 0px rgba(0, 0, 0, 0.5);
+    box-shadow: 3px 3px 7px 0px rgba(0, 0, 0, 0.5);
     z-index: -1;
     border-radius: 20px;
 }
