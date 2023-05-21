@@ -8,7 +8,8 @@ export const Nav = (props: Props) => {
     return (
         <nav className={styles.nav}>
             <a href="#" className={styles.link}>
-                <img src="./assets/images/logo_cs.png" alt="scs-logo" /> <Typography>CamScripter </Typography>
+                <img src="./assets/images/logo_cs.png" alt="camscripter-logo" className={styles.img} />{' '}
+                <Typography className={styles.text}>CamScripter </Typography>
             </a>
         </nav>
     );

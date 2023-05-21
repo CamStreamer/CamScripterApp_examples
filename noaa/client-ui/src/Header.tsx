@@ -17,7 +17,7 @@ const style: TStyleSheet = {
     box: {
         display: 'grid',
         placeItems: 'center',
-        gap: '1rem',
+        gap: '1em',
     },
     title: {
         fontSize: 'clamp(1.75rem, 7vw, 3.75rem)',

@@ -1,15 +1,15 @@
 .contentWrapper {
     width: max-content;
-    margin-block: 2rem;
+    margin-block: 2em;
     display: flex;
     flex-direction: column;
-    gap: 4rem;
-    padding: 4rem 2rem;
+    gap: 4em;
+    padding: 4em 2em;
     position: relative;
 
-    @media (max-width: 390px) {
+    /* @media (max-width: 390px) {
         padding: 2rem 1rem;
-    }
+    } */
 }
 
 .boxShadow {
