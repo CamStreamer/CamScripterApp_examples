@@ -1,0 +1,16 @@
+.nav {
+    background-color: #15273d;
+    padding: 0.5rem 1rem;
+    display: flex;
+    align-items: center;
+    color: #fff;
+    /* position: sticky; */
+
+    .link {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        text-decoration: none;
+        color: inherit;
+    }
+}

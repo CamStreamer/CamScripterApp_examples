@@ -7,21 +7,25 @@ import styles from './App.module.css';
 import Box from '@mui/material/Box';
 import Fade from '@mui/material/Fade';
 import './Global.module.css';
+import { Nav } from './Nav';
 
 export const App = () => {
     const [isFormInitialized, setIsFormInitialized] = useState(false);
 
     return (
-        <Container style={style.container}>
-            <CssBaseline />
-            <Box className={styles.contentWrapper}>
-                <Fade in={isFormInitialized} className={styles.boxShadow} timeout={1000}>
-                    <Box />
-                </Fade>
-                <Header />
-                <Form isFormInitialized={isFormInitialized} setIsFormInitialized={setIsFormInitialized} />
-            </Box>
-        </Container>
+        <>
+            <Nav />
+            <Container style={style.container}>
+                <CssBaseline />
+                <Box className={styles.contentWrapper}>
+                    <Fade in={isFormInitialized} className={styles.boxShadow} timeout={1000}>
+                        <Box />
+                    </Fade>
+                    <Header />
+                    <Form isFormInitialized={isFormInitialized} setIsFormInitialized={setIsFormInitialized} />
+                </Box>
+            </Container>
+        </>
     );
 };
 
