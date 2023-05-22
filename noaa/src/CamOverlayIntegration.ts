@@ -21,11 +21,11 @@ export class CamOverlayIntegration {
 
     async updateInfoTickerText(serviceID: number, text: string) {
         if (!this._camOverlayApiInstances.has(serviceID)) return;
-        this._camOverlayApiInstances.get(serviceID).updateInfoticker(text);
+        await this._camOverlayApiInstances.get(serviceID).updateInfoticker(text);
     }
 
     async updateCustomGraphicsText(serviceID: number, field: string, text: string) {
         if (!this._camOverlayApiInstances.has(serviceID)) return;
-        this._camOverlayApiInstances.get(serviceID).updateCGText([{ field_name: field, text }]);
+        await this._camOverlayApiInstances.get(serviceID).updateCGText([{ field_name: field, text }]);
     }
 }
