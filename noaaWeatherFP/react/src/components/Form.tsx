@@ -76,7 +76,7 @@ export const Form = ({ isFormInitialized, setIsFormInitialized }: Props) => {
             let response: Response;
             let data: TServerData;
             try {
-                response = await fetch('/local/camscripter/package/settings.cgi?package_name=noaaWeather&action=get');
+                response = await fetch('/local/camscripter/package/settings.cgi?package_name=noaaWeatherFP&action=get');
                 data = await response.json();
 
                 if (skip) return;
@@ -126,7 +126,7 @@ export const Form = ({ isFormInitialized, setIsFormInitialized }: Props) => {
         };
         setIsSubmitting(true);
         try {
-            const res = await fetch('/local/camscripter/package/settings.cgi?package_name=noaaWeather&action=set', {
+            const res = await fetch('/local/camscripter/package/settings.cgi?package_name=noaaWeatherFP&action=set', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
