@@ -12,22 +12,21 @@ import { NetworkError } from './errors';
 
 const API_PATH = 'https://api.tidesandcurrents.noaa.gov/api/prod/datagetter';
 
-const API_ENDPOINTS = {
-    waterLevel: (queryParams: TApiQueryParams) =>
-        `${API_PATH}?date=${queryParams.date}&station=${queryParams.stationId}&format=json&units=${queryParams.units}&time_zone=${queryParams.timeZone}&datum=${queryParams.datum}&product=water_level`,
-    nextTide: (queryParams: TApiQueryParams) =>
-        `${API_PATH}?date=${queryParams.date}&station=${queryParams.stationId}&format=json&units=${queryParams.units}&time_zone=${queryParams.timeZone}&datum=${queryParams.datum}&product=predictions&interval=hilo`,
-    waterTemp: (queryParams: TApiQueryParams) =>
-        `${API_PATH}?date=${queryParams.date}&station=${queryParams.stationId}&format=json&units=${queryParams.units}&time_zone=${queryParams.timeZone}&datum=${queryParams.datum}&product=water_temperature`,
-    airTemp: (queryParams: TApiQueryParams) =>
-        `${API_PATH}?date=${queryParams.date}&station=${queryParams.stationId}&format=json&units=${queryParams.units}&time_zone=${queryParams.timeZone}&datum=${queryParams.datum}&product=air_temperature`,
-    barometricPressure: (queryParams: TApiQueryParams) =>
-        `${API_PATH}?date=${queryParams.date}&station=${queryParams.stationId}&format=json&units=${queryParams.units}&time_zone=${queryParams.timeZone}&datum=${queryParams.datum}&product=air_pressure`,
-    winds: (queryParams: TApiQueryParams) =>
-        `${API_PATH}?date=${queryParams.date}&station=${queryParams.stationId}&format=json&units=${queryParams.units}&time_zone=${queryParams.timeZone}&datum=${queryParams.datum}&product=wind`,
+const API_ENDPOINT_PRODUCTS = {
+    waterLevel: 'product=water_level',
+    nextTide: 'product=predictions&interval=hilo',
+    waterTemp: 'product=water_temperature',
+    airTemp: 'product=air_temperature',
+    barometricPressure: 'product=air_pressure',
+    winds: 'product=wind',
 } as const;
 
-export type TEndpoints = keyof typeof API_ENDPOINTS;
+export type TEndpoints = keyof typeof API_ENDPOINT_PRODUCTS;
+
+const getAPIEndpoint = (queryParams: TApiQueryParams, apiEnpoint: TEndpoints) => {
+    return `${API_PATH}?date=${queryParams.date}&station=${queryParams.stationId}&format=json&units=${queryParams.units}&time_zone=${queryParams.timeZone}&datum=${queryParams.datum}&${API_ENDPOINT_PRODUCTS[apiEnpoint]}`;
+};
+
 type TDataPromises = Record<TEndpoints, Promise<string>>;
 
 export type TParsedDataType<T> = T extends 'waterLevel'
@@ -90,10 +89,10 @@ export const parseNextTideData = (predictions: TNextTideApiData['predictions']) 
         return acc;
     }, '');
 
-const fetchApiData = async (urlEndpoint: keyof typeof API_ENDPOINTS, queryParams: TApiQueryParams) => {
+const fetchApiData = async (urlEndpoint: TEndpoints, queryParams: TApiQueryParams) => {
     return new Promise<string>((resolve, reject) => {
         https
-            .get(API_ENDPOINTS[urlEndpoint](queryParams), (res) => {
+            .get(getAPIEndpoint(queryParams, urlEndpoint), (res) => {
                 let data = [];
                 res.on('data', (chunk) => {
                     data.push(chunk);
