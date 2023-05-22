@@ -50,9 +50,6 @@ const coBasicSettings: CamOverlayOptions = {
 
 const camOverlayApiIntegration = new CamOverlayIntegration(coBasicSettings);
 
-camOverlayApiIntegration.initializeInfoTickerCamOverlayApi(settings.it_service_id);
-camOverlayApiIntegration.initializeCustomGraphicsCamOverlayApi(settings.cg_service_id);
-
 const main = async () => {
     const queryParams: TApiQueryParams = {
         ...defaultApiParams,
@@ -98,12 +95,12 @@ const main = async () => {
             camOverlayApiIntegration.updateInfoTickerText(settings.it_service_id, encodeURIComponent(textToDisplay)),
             camOverlayApiIntegration.updateCustomGraphicsText(
                 settings.cg_service_id,
-                textToDisplay,
-                settings.cg_field_name
+                settings.cg_field_name,
+                textToDisplay
             ),
         ]);
     } catch (e: unknown) {
-        console.error('error', e);
+        console.error(e);
         if (e instanceof NetworkError) {
             process.exit();
         }

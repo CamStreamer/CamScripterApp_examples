@@ -19,6 +19,7 @@ import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import styles from './Form.module.css';
 
+// NOTE: empty string in serviceId means the service is not enabled
 type FormData = {
     stationId: number;
     locationName: string;
@@ -26,9 +27,9 @@ type FormData = {
     cameraPort: number;
     cameraUser: string;
     cameraPass: string;
-    cgServiceId: number;
+    cgServiceId: number | '';
     cgFieldName: string;
-    itServiceId: number;
+    itServiceId: number | '';
     dataRefreshRateS: number;
 };
 
@@ -39,9 +40,9 @@ const errorDefaultValues: FormData = {
     cameraPort: 80,
     cameraUser: 'root',
     cameraPass: '',
-    cgServiceId: 0,
+    cgServiceId: '',
     cgFieldName: 'field1',
-    itServiceId: 0,
+    itServiceId: '',
     dataRefreshRateS: 120,
 };
 

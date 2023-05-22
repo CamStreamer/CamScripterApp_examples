@@ -5,9 +5,9 @@ declare type TServerData = {
     camera_port: number;
     camera_user: string;
     camera_pass: string;
-    cg_service_id: number;
+    cg_service_id: number | '';
     cg_field_name: string;
-    it_service_id: number;
+    it_service_id: number | '';
     data_refresh_rate_s: number;
 };
 declare type TSnackData = {
