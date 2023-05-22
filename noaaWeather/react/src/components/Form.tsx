@@ -1,23 +1,22 @@
-import IconButton from '@mui/material/IconButton';
-import InputAdornment from '@mui/material/InputAdornment';
-import Typography from '@mui/material/Typography';
+import Button, { ButtonProps } from '@mui/material/Button';
 import React, { useEffect, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
-import Button, { ButtonProps } from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
+import { CollapsibleFormSection } from './CollapsibleFormSection';
 import Fade from '@mui/material/Fade';
-
 import Grid from '@mui/material/Grid';
+import IconButton from '@mui/material/IconButton';
 import { InfoSnackbar } from './InfoSnackbar';
+import InputAdornment from '@mui/material/InputAdornment';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
-import { useSnackbar } from '../hooks/useSnackbar';
-import { CollapsibleFormSection } from './CollapsibleFormSection';
+import Typography from '@mui/material/Typography';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { styled } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import { useSnackbar } from '../hooks/useSnackbar';
 
 // NOTE: empty string in serviceId means the service is not enabled
 type FormData = {
@@ -77,7 +76,7 @@ export const Form = ({ isFormInitialized, setIsFormInitialized }: Props) => {
             let response: Response;
             let data: TServerData;
             try {
-                response = await fetch('/local/camscripter/package/settings.cgi?package_name=noaa&action=get');
+                response = await fetch('/local/camscripter/package/settings.cgi?package_name=noaaWeather&action=get');
                 data = await response.json();
 
                 if (skip) return;
@@ -127,7 +126,7 @@ export const Form = ({ isFormInitialized, setIsFormInitialized }: Props) => {
         };
         setIsSubmitting(true);
         try {
-            const res = await fetch('/local/camscripter/package/settings.cgi?package_name=noaa&action=set', {
+            const res = await fetch('/local/camscripter/package/settings.cgi?package_name=noaaWeather&action=set', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

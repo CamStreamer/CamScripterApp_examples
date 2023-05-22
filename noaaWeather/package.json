@@ -1,5 +1,5 @@
 {
-    "name": "@camstreamer/noaa",
+    "name": "@camstreamer/noaaWeather",
     "version": "1.0.0",
     "description": "",
     "prettier": "@camstreamer/prettier-config",
