@@ -22,7 +22,7 @@ const setTimeoutPromise = promisify(setTimeout);
 const defaultApiParams: Omit<TApiQueryParams, 'stationId'> = {
     date: 'today',
     units: 'english',
-    timeZone: 'lst',
+    timeZone: 'lst_ldt',
     datum: 'MLLW',
 };
 

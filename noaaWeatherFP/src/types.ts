@@ -15,7 +15,7 @@ export type TApiQueryParams = {
     stationId: number;
     date: 'today';
     units: 'english';
-    timeZone: 'lst';
+    timeZone: 'lst_ldt';
     datum: 'MLLW';
 };
 
