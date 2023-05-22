@@ -1,12 +1,11 @@
 {
-    "name": "@camstreamer/noaaWeather",
+    "name": "@camstreamer/noaa-weather",
     "version": "1.0.0",
     "description": "",
     "prettier": "@camstreamer/prettier-config",
     "main": "main.js",
     "scripts": {
         "clean": "rimraf dist/*;",
-        "clean-ui": "rimraf react/node_modules",
         "start-server": "PERSISTENT_DATA_PATH=\"./localdata/\" ts-node src/main.ts",
         "build": "npm-run-all clean tsc",
         "start-client": "cd react && npm run start && cd ..",
@@ -21,14 +20,14 @@
         "in:ui": "cd react && npm install && cd ..",
         "in": "npm install",
         "in:all": "npm-run-all in in:ui",
-        "prepare-zip": "npm-run-all in:all build-all clean-ui in:prod",
-        "zip:package": "node node_modules/camstreamerlib/CreatePackage -i",
+        "prepare-zip": "npm-run-all in:all build-all in:prod",
+        "zip:package": "node node_modules/camstreamerlib/CreatePackage -i -e=react",
         "zip": "npm-run-all prepare-zip zip:package in"
     },
     "author": "CamStreamer s.r.o",
     "license": "ISC",
     "dependencies": {
-        "camstreamerlib": "^1.8.7"
+        "camstreamerlib": "^1.8.8"
     },
     "devDependencies": {
         "@camstreamer/prettier-config": "^2.0.4",
