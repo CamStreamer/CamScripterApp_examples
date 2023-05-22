@@ -10,7 +10,7 @@ import {
 
 import { NetworkError } from './errors';
 
-const API_PATH = 'https://api.tidesandcurrents.noaaWeather.gov/api/prod/datagetter';
+const API_PATH = 'https://api.tidesandcurrents.noaa.gov/api/prod/datagetter';
 
 const API_ENDPOINT_PRODUCTS = {
     waterLevel: 'product=water_level',
