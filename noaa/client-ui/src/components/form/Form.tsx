@@ -57,8 +57,6 @@ export const Form = ({ isFormInitialized, setIsFormInitialized }: Props) => {
 
     const handleClickShowPassword = () => setShowPassword((show) => !show);
 
-    const matchesSmallScreen = useMediaQuery('(max-width:390px)');
-
     const {
         register,
         handleSubmit,
@@ -161,11 +159,7 @@ export const Form = ({ isFormInitialized, setIsFormInitialized }: Props) => {
     return (
         <Fade in={isFormInitialized} timeout={1000}>
             <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
-                <InfoSnackbar
-                    isSmallScreen={matchesSmallScreen}
-                    snackbarData={snackbarData}
-                    closeSnackbar={closeSnackbar}
-                />
+                <InfoSnackbar snackbarData={snackbarData} closeSnackbar={closeSnackbar} />
                 <Stack spacing={2} className={styles.formContent}>
                     <Grid container rowSpacing={2} direction="column">
                         <Typography textTransform="uppercase" className="text">

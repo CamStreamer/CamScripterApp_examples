@@ -3,9 +3,9 @@ import Snackbar, { SnackbarOrigin } from '@mui/material/Snackbar';
 
 import Alert from '@mui/material/Alert';
 import React from 'react';
+import useMediaQuery from '@mui/material/useMediaQuery';
 
 type Props = {
-    isSmallScreen: boolean;
     snackbarData: TSnackData | null;
     closeSnackbar: () => void;
 };
@@ -13,14 +13,20 @@ type Props = {
 const TRANSITION_PROPS_LARGE: SnackbarOrigin = { vertical: 'bottom', horizontal: 'right' };
 const TRANSITION_PROPS_SMALL: SnackbarOrigin = { vertical: 'top', horizontal: 'center' };
 
-export const InfoSnackbar = ({ isSmallScreen, snackbarData, closeSnackbar }: Props) => (
-    <Snackbar
-        open={!!snackbarData}
-        anchorOrigin={isSmallScreen ? TRANSITION_PROPS_SMALL : TRANSITION_PROPS_LARGE}
-        TransitionComponent={(props: SlideProps) => <Slide {...props} direction={isSmallScreen ? 'down' : 'up'} />}
-    >
-        <Alert severity={snackbarData?.type} variant="filled" onClose={closeSnackbar}>
-            {snackbarData && snackbarData.message}
-        </Alert>
-    </Snackbar>
-);
+export const InfoSnackbar = ({ snackbarData, closeSnackbar }: Props) => {
+    const matchesSmallScreen = useMediaQuery('(max-width:390px)');
+
+    return (
+        <Snackbar
+            open={!!snackbarData}
+            anchorOrigin={matchesSmallScreen ? TRANSITION_PROPS_SMALL : TRANSITION_PROPS_LARGE}
+            TransitionComponent={(props: SlideProps) => (
+                <Slide {...props} direction={matchesSmallScreen ? 'down' : 'up'} />
+            )}
+        >
+            <Alert severity={snackbarData?.type} variant="filled" onClose={closeSnackbar}>
+                {snackbarData && snackbarData.message}
+            </Alert>
+        </Snackbar>
+    );
+};
