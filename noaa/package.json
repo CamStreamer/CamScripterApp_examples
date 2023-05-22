@@ -6,6 +6,7 @@
     "main": "main.js",
     "scripts": {
         "clean": "rimraf dist/*;",
+        "clean-ui": "rimraf client-ui/node_modules",
         "start-server": "PERSISTENT_DATA_PATH=\"./localdata/\" ts-node src/main.ts",
         "build": "npm-run-all clean tsc",
         "start-client": "cd client-ui && npm run start && cd ..",
@@ -17,9 +18,12 @@
         "pretty:check": "prettier --check \"./src/*.{ts,tsx}\"",
         "test": "echo \"Error: no test specified\" && exit 1",
         "in:prod": "npm install -production",
-        "in:all": "npm install",
+        "in:ui": "cd client-ui && npm install && cd ..",
+        "in": "npm install",
+        "in:all": "npm-run-all in in:ui",
+        "prepare-zip": "npm-run-all in:all build-all clean-ui in:prod",
         "zip:package": "node node_modules/camstreamerlib/CreatePackage -i",
-        "zip": "npm-run-all build in:prod zip:package in:all"
+        "zip": "npm-run-all prepare-zip zip:package in"
     },
     "author": "CamStreamer s.r.o",
     "license": "ISC",
