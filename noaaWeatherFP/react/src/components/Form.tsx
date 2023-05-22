@@ -223,7 +223,7 @@ export const Form = ({ isFormInitialized, setIsFormInitialized }: Props) => {
                             <Grid item>
                                 <TextField
                                     type="number"
-                                    label="Custom graphics service ID"
+                                    label="Custom Graphics service ID"
                                     fullWidth
                                     {...register('cgServiceId')}
                                 />
@@ -231,7 +231,7 @@ export const Form = ({ isFormInitialized, setIsFormInitialized }: Props) => {
                             <Grid item>
                                 <TextField
                                     type="text"
-                                    label="Custom graphics field name"
+                                    label="Custom Graphics field name"
                                     fullWidth
                                     {...register('cgFieldName')}
                                 />

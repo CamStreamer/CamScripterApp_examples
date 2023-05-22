@@ -79,11 +79,11 @@ const main = async () => {
             otherDataByTimestamp[endpoint as TEndpoints] = dataArr.find((d) => Date.parse(d.t) === latestTimestamp);
         }
 
-        const textToDisplay = `${settings.location_name}, ${latestWaterLevelData.metadata.lat}N${
+        const textToDisplay = `${settings.location_name}, ${latestWaterLevelData.metadata.lat}N ${
             latestWaterLevelData.metadata.lon
         }W, ${latestWaterLevelData.data.t}, Water level: ${latestWaterLevelData.data.v} ft Above ${
             defaultApiParams.datum
-        }, ${parseNextTideData(namedResults['nextTide'].predictions)}, Water Temp: ${
+        }, Next Tides: ${parseNextTideData(namedResults['nextTide'].predictions)}, Water Temp: ${
             otherDataByTimestamp['waterTemp'].v
         }\xB0F, Air Temp: ${otherDataByTimestamp['airTemp'].v}\xB0F, Barometric Pressure: ${
             otherDataByTimestamp['barometricPressure'].v

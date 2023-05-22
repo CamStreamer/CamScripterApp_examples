@@ -7,7 +7,7 @@ export const Header = () => {
     return (
         <StyledWrapper>
             <StyledLogo src="./assets/images/noaa_digital_logo.svg" alt="logo" />
-            <StyledTitle variant="h2">NOA Weather FP</StyledTitle>
+            <StyledTitle variant="h2">NOAA Weather FP</StyledTitle>
         </StyledWrapper>
     );
 };

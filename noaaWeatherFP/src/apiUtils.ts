@@ -82,12 +82,14 @@ export const prepareAllDataFetch = (queryParams: TApiQueryParams): TDataPromises
     }, {} as TDataPromises);
 
 export const parseNextTideData = (predictions: TNextTideApiData['predictions']) =>
-    predictions.reduce((acc, curr) => {
-        const timeString = new Date(curr.t).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-        const position = curr.type === 'H' ? 'high' : 'low';
-        acc += `${timeString} ${position} ${curr.v}`;
-        return acc;
-    }, '');
+    predictions
+        .reduce((acc, curr) => {
+            const timeString = new Date(curr.t).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+            const position = curr.type === 'H' ? 'high' : 'low';
+            acc += `${timeString} ${position} ${curr.v} `;
+            return acc;
+        }, '')
+        .trim();
 
 const fetchApiData = async (urlEndpoint: TEndpoints, queryParams: TApiQueryParams) => {
     return new Promise<string>((resolve, reject) => {
