@@ -1,23 +1,23 @@
-import { useMediaQuery } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
 import Typography from '@mui/material/Typography';
 import React, { useEffect, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
-import Button from '@mui/material/Button';
+import Button, { ButtonProps } from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 import Fade from '@mui/material/Fade';
 
 import Grid from '@mui/material/Grid';
-import { InfoSnackbar } from '../InfoSnackbar';
+import { InfoSnackbar } from './InfoSnackbar';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
-import { useSnackbar } from '../../hooks/useSnackbar';
-import { CollapsibleFormSection } from '../collapsibeFormSection/CollapsibleFormSection';
+import { useSnackbar } from '../hooks/useSnackbar';
+import { CollapsibleFormSection } from './CollapsibleFormSection';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import styles from './Form.module.css';
+import { styled } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
 
 // NOTE: empty string in serviceId means the service is not enabled
 type FormData = {
@@ -52,9 +52,11 @@ type Props = {
 };
 
 export const Form = ({ isFormInitialized, setIsFormInitialized }: Props) => {
-    const [submitting, setSubmitting] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const { snackbarData, displaySnackbar, closeSnackbar } = useSnackbar();
     const [showPassword, setShowPassword] = useState(false);
+
+    const matchesSmallScreen = useMediaQuery('(max-width:390px)');
 
     const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -123,7 +125,7 @@ export const Form = ({ isFormInitialized, setIsFormInitialized }: Props) => {
             it_service_id: data.itServiceId,
             data_refresh_rate_s: data.dataRefreshRateS,
         };
-        setSubmitting(true);
+        setIsSubmitting(true);
         try {
             const res = await fetch('/local/camscripter/package/settings.cgi?package_name=noaa&action=set', {
                 method: 'POST',
@@ -145,7 +147,7 @@ export const Form = ({ isFormInitialized, setIsFormInitialized }: Props) => {
                 message: 'Error submitting data.',
             });
         } finally {
-            setSubmitting(false);
+            setIsSubmitting(false);
         }
     };
 
@@ -159,13 +161,11 @@ export const Form = ({ isFormInitialized, setIsFormInitialized }: Props) => {
 
     return (
         <Fade in={isFormInitialized} timeout={1000}>
-            <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
+            <StyledForm onSubmit={handleSubmit(onSubmit)}>
                 <InfoSnackbar snackbarData={snackbarData} closeSnackbar={closeSnackbar} />
-                <Stack spacing={2} className={styles.formContent}>
+                <StyledFormContent spacing={2}>
                     <Grid container rowSpacing={2} direction="column">
-                        <Typography textTransform="uppercase" className="text">
-                            Api settings
-                        </Typography>
+                        <StyledLabelText textTransform="uppercase">Api settings</StyledLabelText>
                         <Grid item>
                             <TextField
                                 type="number"
@@ -266,16 +266,39 @@ export const Form = ({ isFormInitialized, setIsFormInitialized }: Props) => {
                             </Grid>
                         </Grid>
                     </CollapsibleFormSection>
-                    <Button
+                    <StyledSubmitButton
                         type="submit"
                         variant="contained"
-                        disabled={Object.keys(errors).length > 0 || submitting}
-                        className={styles.button}
+                        disabled={Object.keys(errors).length > 0 || isSubmitting}
+                        isSmallScreen={matchesSmallScreen}
                     >
-                        {submitting ? <CircularProgress size={20} /> : <Typography>Submit</Typography>}
-                    </Button>
-                </Stack>
-            </form>
+                        {isSubmitting ? <CircularProgress size={20} /> : <Typography>Submit</Typography>}
+                    </StyledSubmitButton>
+                </StyledFormContent>
+            </StyledForm>
         </Fade>
     );
 };
+
+const StyledLabelText = styled(Typography)({
+    fontSize: '1em',
+    opacity: 0.9,
+});
+
+const StyledForm = styled('form')({
+    width: '100%',
+    display: 'flex',
+    justifyContent: 'center',
+});
+
+const StyledFormContent = styled(Stack)({
+    width: 'max(300px, 90%)',
+});
+
+const StyledSubmitButton = styled((props: { isSmallScreen: boolean } & ButtonProps) => {
+    const { isSmallScreen, ...other } = props;
+    return <Button {...other} />;
+})(({ isSmallScreen }) => ({
+    width: isSmallScreen ? '100%' : '33%',
+    height: '40px',
+}));
