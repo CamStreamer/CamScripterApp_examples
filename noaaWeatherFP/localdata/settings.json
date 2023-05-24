@@ -1,0 +1,12 @@
+{
+    "station_id": 8658163,
+    "location_name": "Johnnie Mercers Fishing Pier",
+    "camera_ip": "127.0.0.1",
+    "camera_port": 80,
+    "camera_user": "root",
+    "camera_pass": "",
+    "cg_service_id": "",
+    "cg_field_name": "field1",
+    "it_service_id": "",
+    "data_refresh_rate_s": 120
+}
