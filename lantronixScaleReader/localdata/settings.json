@@ -1,6 +1,7 @@
 {
     "scale_ip": "",
     "scale_port": 10001,
+    "camera_protocol": "http",
     "camera_ip": "127.0.0.1",
     "camera_port": 80,
     "camera_user": "root",
@@ -9,6 +10,7 @@
     "service_id": 1,
     "value_field_name": "field1",
     "unit_field_name": "field2",
+    "acs_protocol": "https_insecure",
     "acs_ip": "",
     "acs_user": "",
     "acs_pass": "",
