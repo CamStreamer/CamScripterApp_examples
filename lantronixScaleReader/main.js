@@ -1,12 +1,12 @@
 const fs = require('fs');
 const net = require('net');
 const https = require('https');
-const { CameraVapix } = require('camstreamerlib/CameraVapix');
+const { CamOverlayAPI } = require('camstreamerlib/CamOverlayAPI');
 
 let prevWeightData = null;
 let dataBuffer = '';
 
-let cameraVapix = null;
+let camOverlay = null;
 let milestoneClient = null;
 let milestoneConnected = false;
 let milestoneProtectionPeriod = false;
@@ -24,11 +24,13 @@ try {
 // CamOverlay integration
 const coEnabled = settings.camera_ip && settings.service_id;
 if (coEnabled) {
-    cameraVapix = new CameraVapix({
-        protocol: 'http',
+    camOverlay = new CamOverlayAPI({
+        tls: settings.camera_protocol !== 'http',
+        tlsInsecure: settings.camera_protocol === 'https_insecure',
         ip: settings.camera_ip,
         port: settings.camera_port,
         auth: settings.camera_user + ':' + settings.camera_pass,
+        serviceID: settings.service_id,
     });
 }
 
@@ -49,7 +51,7 @@ scaleClient.on('connect', (data) => {
     }, settings.refresh_rate);
 });
 
-scaleClient.on('data', (data) => {
+scaleClient.on('data', async (data) => {
     dataBuffer += Buffer.from(data, 'hex').toString();
     const messageEnd = dataBuffer.indexOf('\r\n');
     if (messageEnd == -1) {
@@ -67,21 +69,20 @@ scaleClient.on('data', (data) => {
 
         // Show image in CamOverlay service
         if (coEnabled) {
-            cameraVapix
-                .vapixGet(
-                    '/local/camoverlay/api/customGraphics.cgi?' +
-                    `service_id=${settings.service_id}&` +
-                    `${settings.value_field_name}=${weight}&` +
-                    `${settings.unit_field_name}=${unit}`
-                )
-                .then(
-                    (response) => {
-                        //console.log(response);
+            try {
+                await camOverlay.updateCGText([
+                    {
+                        field_name: settings.value_field_name,
+                        text: weight,
                     },
-                    function (err) {
-                        console.error('CamOverlay error:', err);
-                    }
-                );
+                    {
+                        field_name: settings.unit_field_name,
+                        text: unit,
+                    },
+                ]);
+            } catch (err) {
+                console.error('CamOverlay error:', err);
+            }
         }
 
         // Send to Axis Camera Station. Unit is not empty when the weight is stable.
