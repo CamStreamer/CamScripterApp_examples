@@ -25,7 +25,7 @@
     <div class="container">
         <div id="accordionTemper">
             <div class="card">
-                <div class="card-header" id="headingTemper">
+                <div class="card-header d-flex align-items-center" id="headingTemper" style="height: 87px;">
                     <button class="btn" style="background-color: transparent;" data-toggle="collapse"
                         data-target="#collapseTemper" aria-expanded="false" aria-controls="collapseTemper">
                         <img src="temperature.png" alt=""> Temperature Settings
@@ -61,7 +61,7 @@
     <div class="container">
         <div id="accordionCamOverlay">
             <div class="card">
-                <div class="card-header" id="headingCamOverlay">
+                <div class="card-header d-flex align-items-center" id="headingCamOverlay" style="height: 87px;">
                     <button class="btn" style="background-color: transparent;" data-toggle="collapse"
                         data-target="#collapseCamOverlay" aria-expanded="false" aria-controls="collapseCamOverlay">
                         <img src="logo_cs.png" alt=""> CamOverlay App Integration
@@ -121,7 +121,7 @@
     <div class="container">
         <div id="accordionAcs">
             <div class="card">
-                <div class="card-header" id="headingACS">
+                <div class="card-header d-flex align-items-center" id="headingACS" style="height: 87px;">
                     <button class="btn" style="background-color: transparent;" data-toggle="collapse"
                         data-target="#collapseACS" aria-expanded="false" aria-controls="collapseACS">
                         <img src="logo_axis.png" alt="">&nbsp;&nbsp;Axis Camera Station
@@ -194,6 +194,84 @@
                                 <label for="acsRepeatAfter">Repeat Notification After (s)</label>
                                 <input type="text" class="form-control" id="acsRepeatAfter" placeholder="">
                             </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div id="accordionCameraEvents">
+            <div class="card">
+                <div class="card-header d-flex align-items-center" id="headingCameraEvents" style="height: 87px;">
+                    <button class="btn ml-2" style="background-color: transparent;" data-toggle="collapse"
+                        data-target="#collapseCameraEvents" aria-expanded="false" aria-controls="collapseCameraEvents">
+                        <img src="camera_events.png" alt="">&nbsp;&nbsp;Axis Camera Events
+                    </button>
+                </div>
+                <div id="collapseCameraEvents" class="collapse" aria-labelledby="headingCameraEvents"
+                    data-parent="#accordionCameraEvents">
+                    <div class="card-body">
+                        <form class="myForm">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="eventCameraProtocol">Protocol</label>
+                                        <select class="form-control" id="eventCameraProtocol">
+                                            <option value="http">HTTP</option>
+                                            <option value="https">HTTPS</option>
+                                            <option value="https_insecure">HTTPS (insecure)</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="eventCameraIP">Camera IP</label>
+                                        <input type="text" class="form-control" id="eventCameraIP" placeholder="127.0.0.1">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="eventCameraPort">Camera Port</label>
+                                        <input type="text" class="form-control" id="eventCameraPort" placeholder="80">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="eventCameraUser">Camera User</label>
+                                        <input type="text" class="form-control" id="eventCameraUser" placeholder="">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="eventCameraPass">Camera Pass</label>
+                                        <input type="password" class="form-control" id="eventCameraPass" placeholder="">
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+
+                        <div>When the camera event is triggered.</div>
+                        <form class="myForm form-inline mt-3">
+                            <select class="form-control mr-3" id="eventConditionDelay">
+                                <option value="0">Immediately</option>
+                                <option value="120">After 2 minutes</option>
+                                <option value="300">After 5 minutes</option>
+                                <option value="600">After 10 minutes</option>
+                                <option value="1800">After 30 minutes</option>
+                                <option value="3600">After 1 hour</option>
+                                <option value="10800">After 3 hours</option>
+                                <option value="21600">After 6 hours</option>
+                                <option value="43200">After 12 hours</option>
+                                <option value="86400">After 1 day</option>
+                            </select>
+                            <div class="mr-3">
+                                when temperature
+                            </div>
+                            <select class="form-control mr-1" id="eventConditionOperator">
+                                <option value="0">=</option>
+                                <option value="1">&#62;</option>
+                                <option value="2">&#60;</option>
+                                <option value="3">&#62;=</option>
+                                <option value="4">&#60;=</option>
+                            </select>
+                            <input type="text" class="form-control mr-1" id="eventConditionValue" placeholder="">
+                            <div id="eventConditionUnit">&#176;C</div>
                         </form>
                     </div>
                 </div>
