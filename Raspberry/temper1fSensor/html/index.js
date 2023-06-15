@@ -31,7 +31,8 @@ $(document).ready(function () {
         unitChanged();
     });
 
-    $('#cameraProtocol').change(protocolChanged);
+    $('#cameraProtocol').change(cameraProtocolChanged);
+    $('#eventCameraProtocol').change(eventCameraProtocolChanged);
     $('.form-control').change(inputChanged);
     $('.unit').click(radioClickedCallback);
     $('.myForm').submit(function () {
@@ -39,9 +40,14 @@ $(document).ready(function () {
     });
 });
 
-function protocolChanged() {
+function cameraProtocolChanged() {
     const port = $('#cameraProtocol').val() === 'http' ? 80 : 443;
     $('#cameraPort').val(port);
+}
+
+function eventCameraProtocolChanged() {
+    const port = $('#eventCameraProtocol').val() === 'http' ? 80 : 443;
+    $('#eventCameraPort').val(port);
 }
 
 function radioClickedCallback() {
