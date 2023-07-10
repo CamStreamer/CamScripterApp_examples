@@ -103,7 +103,7 @@ function showCamOverlay() {
 }
 
 let timeoutID;
-async function displayInCamOverlay(data) {
+async function displayInCamOverlay(data: { timestamp: number; licensePlate: string }) {
     try {
         const options: CamOverlayOptions = {
             ip: settings.targetCamera.IP,
@@ -159,8 +159,8 @@ async function displayInCamOverlay(data) {
 
 function onMessage(data) {
     const outputData = {
-        timestamp: data.timestamp,
-        licensePlate: data.message.data.text,
+        timestamp: data.timestamp as number,
+        licensePlate: data.message.data.text as string,
     };
     displayInCamOverlay(outputData);
 }
