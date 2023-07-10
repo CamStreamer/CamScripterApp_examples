@@ -170,8 +170,8 @@ function startCameraVapixLibraryWebsocket() {
         ip: settings.sourceCamera.IP,
         port: settings.sourceCamera.port,
         auth: `${settings.sourceCamera.user}:${settings.sourceCamera.password}`,
-        tls: settings.targetCamera.protocol !== 'http',
-        tlsInsecure: settings.targetCamera.protocol === 'https_insecure',
+        tls: settings.sourceCamera.protocol !== 'http',
+        tlsInsecure: settings.sourceCamera.protocol === 'https_insecure',
     };
 
     const cv = new CameraVapix(options);
