@@ -19,64 +19,60 @@ $(document).ready(function () {
         $('#tsFieldName').val(settings.tsFieldName);
         $('#visibilityTime').val(settings.visibilityTime);
     });
-    
-    $("#scProtocol").change(() => protocolChanged("sc"));
-    $("#tcProtocol").change(() => protocolChanged("tc"));
-    $(".form-control").change(inputChanged);
 
-    $(".myForm").submit(function () {
+    $('#scProtocol').change(() => protocolChanged('sc'));
+    $('#tcProtocol').change(() => protocolChanged('tc'));
+    $('.form-control').change(inputChanged);
+
+    $('.myForm').submit(function () {
         return false;
     });
 });
 
 function protocolChanged(prefix) {
-    if ($(`#${prefix}Protocol`).val() === "http")
-    {
+    if ($(`#${prefix}Protocol`).val() === 'http') {
         $(`#${prefix}Port`).val(80);
-    }
-    else
-    {
+    } else {
         $(`#${prefix}Port`).val(443);
     }
 }
 
 function inputChanged() {
-    let settings =
-    {
-        sourceCamera:
-        {
+    let settings = {
+        sourceCamera: {
             IP: $('#scIP').val(),
             protocol: $('#scProtocol').val(),
             port: $('#scPort').val(),
             user: $('#scUser').val(),
-            password: $('#scPassword').val()
+            password: $('#scPassword').val(),
         },
 
-        targetCamera:
-        {
+        targetCamera: {
             IP: $('#tcIP').val(),
             protocol: $('#tcProtocol').val(),
             port: $('#tcPort').val(),
             user: $('#tcUser').val(),
-            password: $('#tcPassword').val()
+            password: $('#tcPassword').val(),
         },
 
         serviceID: $('#serviceID').val(),
         timeFormat: $('#timeFormat').val(),
         dateFormat: $('#dateFormat').val(),
         lpFieldName: $('#lpFieldName').val(),
-        tsFieldName: $('#tsFieldName').val()
+        tsFieldName: $('#tsFieldName').val(),
     };
-    
+
     let time = parseInt($('#visibilityTime').val());
     if (Number.isNaN(time) || time < 0) {
         settings.visibilityTime = 0;
         $('#visibilityTime').val(0);
-    }
-    else {
+    } else {
         settings.visibilityTime = time;
         $('#visibilityTime').val(time);
     }
 
-    $.post('/local/camscripter/package/settings.cgi?package_name=LicensePlateReader&action=set', JSON.stringify(settings));
+    $.post(
+        '/local/camscripter/package/settings.cgi?package_name=LicensePlateReader&action=set',
+        JSON.stringify(settings)
+    );
 }
