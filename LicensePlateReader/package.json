@@ -14,8 +14,7 @@
     "in:prod": "npm install -production",
     "in:all": "npm install",
     "zip:package": "node node_modules/camstreamerlib/CreatePackage -i",
-    "zip": "npm-run-all build in:prod zip:package in:all",
-    "build:zip": "npm-run-all build zip:package"
+    "zip": "npm-run-all build in:prod zip:package in:all"
   },
   "author": "CamStreamer s.r.o",
   "license": "ISC",
