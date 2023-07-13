@@ -2,6 +2,7 @@
     "sourceCamera":
     {
         "IP": "127.0.0.1",
+        "protocol": "http",
         "port": 80,
         "user": "root",
         "password": ""
@@ -9,6 +10,7 @@
     "targetCamera":
     {
         "IP": "127.0.0.1",
+        "protocol": "http",
         "port": 80,
         "user": "root",
         "password": ""

@@ -1,10 +1,12 @@
 import * as fs from 'fs';
 import * as http from 'http';
-import { CameraVapix } from 'camstreamerlib/CameraVapix';
-import { CamOverlayAPI } from 'camstreamerlib/CamOverlayAPI';
+import * as https from 'https';
+import { CameraVapix, CameraVapixOptions } from 'camstreamerlib/CameraVapix';
+import { CamOverlayAPI, CamOverlayOptions } from 'camstreamerlib/CamOverlayAPI';
 
 type Camera = {
     IP: string;
+    protocol: string;
     port: number;
     user: string;
     password: string;
@@ -81,7 +83,8 @@ function sendEnabledRequest(enabledParameter: number) {
         method: 'GET',
     };
 
-    const req = http.request(options);
+    const client = settings.targetCamera.protocol === 'http' ? http : https;
+    const req = client.request(options);
     req.on('error', function (error) {
         console.log(`Error with HTTP (${options.path}): `, error);
     });
@@ -100,13 +103,15 @@ function showCamOverlay() {
 }
 
 let timeoutID;
-async function displayInCamOverlay(data) {
+async function displayInCamOverlay(data: { timestamp: number; licensePlate: string }) {
     try {
-        const options = {
+        const options: CamOverlayOptions = {
             ip: settings.targetCamera.IP,
             port: settings.targetCamera.port,
             auth: settings.targetCamera.user + ':' + settings.targetCamera.password,
             serviceID: settings.serviceID,
+            tls: settings.targetCamera.protocol !== 'http',
+            tlsInsecure: settings.targetCamera.protocol === 'https_insecure',
         };
         const co = new CamOverlayAPI(options);
 
@@ -154,17 +159,19 @@ async function displayInCamOverlay(data) {
 
 function onMessage(data) {
     const outputData = {
-        timestamp: data.timestamp,
-        licensePlate: data.message.data.text,
+        timestamp: data.timestamp as number,
+        licensePlate: data.message.data.text as string,
     };
     displayInCamOverlay(outputData);
 }
 
 function startCameraVapixLibraryWebsocket() {
-    const options = {
+    const options: CameraVapixOptions = {
         ip: settings.sourceCamera.IP,
         port: settings.sourceCamera.port,
         auth: `${settings.sourceCamera.user}:${settings.sourceCamera.password}`,
+        tls: settings.sourceCamera.protocol !== 'http',
+        tlsInsecure: settings.sourceCamera.protocol === 'https_insecure',
     };
 
     const cv = new CameraVapix(options);

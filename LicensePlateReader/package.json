@@ -1,6 +1,6 @@
 {
   "name": "LicensePlateReader",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "",
   "prettier": "@camstreamer/prettier-config",
   "main": "dist/main.ts",
@@ -8,8 +8,8 @@
     "clean": "rimraf dist/*; rm -f LicensePlateReader.zip",
     "build": "npm-run-all clean tsc",
     "tsc": "tsc",
-    "pretty": "prettier --write \"./src/*.{ts,tsx}\"",
-    "pretty:check": "prettier --check \"./src/*.{ts,tsx}\"",
+    "pretty": "prettier --write \"./{src,html}/*.{ts,tsx,js,jsx}\"",
+    "pretty:check": "prettier --check \"./{src,html}/*.{ts,tsx,js,jsx}\"",
     "test": "echo \"Error: no test specified\" && exit 1",
     "in:prod": "npm install -production",
     "in:all": "npm install",
@@ -19,7 +19,7 @@
   "author": "CamStreamer s.r.o",
   "license": "ISC",
   "dependencies": {
-    "camstreamerlib": "^1.7.4"
+    "camstreamerlib": "^1.9.1"
   },
   "devDependencies": {
     "@camstreamer/prettier-config": "^2.0.4",
