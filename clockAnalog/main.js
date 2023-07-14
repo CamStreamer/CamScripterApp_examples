@@ -1,5 +1,5 @@
 const fs = require('fs');
-const { CamOverlayAPI } = require('camstreamerlib/CamOverlayAPI');
+const { CamOverlayDrawingAPI } = require('camstreamerlib/CamOverlayDrawingAPI');
 
 let settings = null;
 
@@ -19,15 +19,13 @@ function clockRun() {
         return;
     }
 
-    co = new CamOverlayAPI({
+    co = new CamOverlayDrawingAPI({
         'ip': settings.camera_ip ? settings.camera_ip : '127.0.0.1',
         'port': settings.camera_port ? settings.camera_port : 80,
         'auth': settings.camera_user + ':' + settings.camera_pass,
-        'serviceName': 'Analog Clock',
-        'serviceID': -1,
     });
 
-    co.on('msg', function (msg) {
+    co.on('message', function (msg) {
         //console.log('COAPI-Message: ' + msg);
     });
 
