@@ -15,14 +15,6 @@ function getCOAPI(camera_ip, camera_port, camera_auth, overlay_id) {
         auth: camera_auth,
         serviceID: parseInt(overlay_id),
     });
-    co.on("error", (err) => {
-        console.log("COAPI" + overlay_id + "-Error: " + err);
-    });
-
-    co.on("close", () => {
-        console.log("COAPI" + overlay_id + "-Error: connection closed");
-        process.exit(1);
-    });
 
     return co;
 }
