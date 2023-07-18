@@ -1,8 +1,7 @@
-const fs = require('fs');
 const { CameraVapix } = require('camstreamerlib/CameraVapix');
 
 var cv = new CameraVapix({
-    'protocol': 'http',
+    'tls': false,
     'ip': '127.0.0.1',
     'port': 80,
     'auth': 'root:pass',
