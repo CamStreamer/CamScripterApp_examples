@@ -16,31 +16,6 @@ function getEventDeclarations() {
     });
 }
 
-function subscribeEventsRTSP() {
-    console.log("___subscribeEventsRTSP")
-    cv.on('eventsConnect', function () { console.log('Events connected') });
-    cv.on('eventsDisconnect', function (err) { console.log('Events disconnected: ' + err) });
-
-    cv.on('axis:CameraApplicationPlatform/VMD/Camera1Profile1/.', function (event) {
-        try {
-            var simpleItem = event['tt:MetadataStream']['tt:Event']
-            [0]['wsnt:NotificationMessage']
-            [0]['wsnt:Message']
-            [0]['tt:Message']
-            [0]['tt:Data']
-            [0]['tt:SimpleItem'];
-            for (var i = 0; i < simpleItem.length; i++) {
-                if (simpleItem[i]['$'].Name == 'active') {
-                    console.log(simpleItem[i]['$']);
-                    break;
-                }
-            }
-        } catch (err) {
-            console.log('Invalid event data: ' + err);
-        }
-    });
-    cv.eventsConnect();
-}
 
 function subscribeEventsWebsocket() {
     cv.on('eventsConnect', function () { console.log('Events connected') });
@@ -65,9 +40,9 @@ function subscribeEventsWebsocket() {
             console.log('Invalid event data: ' + err);
         }
     });
-    cv.eventsConnect("websocket");
+    cv.eventsConnect();
 }
 
 getEventDeclarations();
-subscribeEventsRTSP();
-//subscribeEventsWebsocket();
+subscribeEventsWebsocket(); 
+// support of RTSP was removed in CamStreamerlib 2.0.0
