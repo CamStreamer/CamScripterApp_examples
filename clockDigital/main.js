@@ -1,19 +1,18 @@
 const fs = require('fs');  // see https://nodejs.org/api/fs.html
-const { CamOverlayAPI } = require('camstreamerlib/CamOverlayAPI'); // load the library
+const { CamOverlayDrawingAPI } = require('camstreamerlib/CamOverlayDrawingAPI'); // load the library
 
 // Main function
 function clockRun() {
     // Create CamOverlayAPI object
-    var co = new CamOverlayAPI({
+    var co = new CamOverlayDrawingAPI({
         'ip': '127.0.0.1', // use 127.0.0.1 because CamOverlay is running on the same camera as CamScripter
         'port': 80,        // http port - mind that the camera could use different port
         'auth': 'root:pass',  // please change the username / password to access http interface of the camera (sure there should be some configuration parameter in production version)
-        'serviceName': 'Digital Clock', // use some unique name, new CamOverlay service will be created (is visible in CamOverlay UI)
         'camera': 0 // destination video channel (default is 0)
     });
 
     // Listen for debugging messages (optional)
-    co.on('msg', function (msg) {
+    co.on('message', function (msg) {
         //console.log('COAPI-Message: ' + msg);
     });
 
