@@ -243,21 +243,6 @@ var co = new CamOverlayAPI({
     "ip": cameraIp,
     "port": camPort,
     "auth": user + ":" + pass,
-    //'serviceName': 'Wheather Flow',
-    "serviceID": coServiceID,
-});
-
-co.on("msg", function (msg) {
-    //console.log('COAPI-Message: ' + msg);
-});
-
-co.on("error", function (err) {
-    console.log('COAPI-Error: ' + err);
-});
-
-co.on("close", function () {
-    console.log('COAPI-Error: connection closed');
-    process.exit(1);
 });
 
 var count = 0;
@@ -277,7 +262,7 @@ async function oneAppPeriod() {
                 //"color": "255255255"
             });
         }
-        await co.updateCGText(fields);
+        await co.updateCGText(coServiceID, fields);
         count++;
         count %= updatePeriod * 12; //uP*12*5s == uP*60s
     } catch (error) {
