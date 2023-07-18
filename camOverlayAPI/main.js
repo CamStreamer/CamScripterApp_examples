@@ -1,16 +1,14 @@
 const fs = require('fs');
-const { CamOverlayAPI } = require('camstreamerlib/CamOverlayAPI');
+const { CamOverlayDrawingAPI } = require('camstreamerlib/CamOverlayDrawingAPI');
 
 function createImage() {
-    var co = new CamOverlayAPI({
+    var co = new CamOverlayDrawingAPI({
         'ip': '127.0.0.1',
         'port': 80,
         'auth': 'root:pass',
-        'serviceName': 'Drawing Test',
-        'serviceID': -1
     });
 
-    co.on('msg', function (msg) {
+    co.on('message', function (msg) {
         console.log('COAPI-Message: ' + msg);
     });
 
@@ -74,9 +72,7 @@ function createImage() {
                         co.cairo('cairo_surface_destroy', imgSurface);
 
                         co.showCairoImage(surface, -1.0, -1.0).then(function () {
-                            process.exit(0);
-                        }, function () {
-                            process.exit(1);
+                            console.log("Image shown.")
                         });
                     });
                 });
@@ -87,5 +83,9 @@ function createImage() {
             console.log(err)
     });
 }
+
+process.on("unhandledRejection", (e)=>{
+    console.log("unhandledRejection:", e);
+})
 
 createImage();
