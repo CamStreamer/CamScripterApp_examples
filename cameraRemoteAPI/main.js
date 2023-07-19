@@ -2,11 +2,8 @@ const fs = require('fs');
 const url = require('url');
 
 const { http, https } = require('follow-redirects');
-const { HTTPRequest } = require('camstreamerlib/HTTPRequest')
-const { CamOverlayAPI } = require('camstreamerlib/CamOverlayAPI');
 
 let settings = null;
-let co = null;
 let default_period_time = 1000;
 
 function run() {
@@ -18,29 +15,7 @@ function run() {
         return;
     }
 
-
-    co = new CamOverlayAPI({
-        'ip': settings.camera_ip,
-        'port': settings.camera_port,
-        'auth': settings.camera_user + ':' + settings.camera_pass,
-        'serviceID': settings.overlay_id
-    });
-
-    co.on('error', (err) => {
-        console.log('COAPI-Error: ' + err);
-    });
-
-    co.on('close', () => {
-        console.log('COAPI-Error: connection closed');
-        process.exit(1);
-    });
-
-    co.connect().then(() => {
-        oneAppPeriod(co);
-    }, () => {
-        console.log('COAPI-Error: connection error');
-        process.exit(1);
-    });
+    oneAppPeriod();
 }
 
 function sendRequest(raw_url, auth) {
@@ -133,7 +108,7 @@ function fireRequests(request_field) {
     }
 }
 
-async function oneAppPeriod(co) {
+async function oneAppPeriod() {
     try {
         let data = await requestSheet(settings.sheet_addr);
         if (data) {
@@ -143,7 +118,7 @@ async function oneAppPeriod(co) {
     } catch (error) {
         console.log(error);
     } finally {
-        setTimeout(oneAppPeriod, settings.refresh_rate * default_period_time, co);
+        setTimeout(oneAppPeriod, settings.refresh_rate * default_period_time);
     }
 }
 

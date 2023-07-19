@@ -1,7 +1,7 @@
 {
   "package_name": "ui_advanced",
   "package_menu_name": "UI Advanced",
-  "package_version": "1.0.1",
+  "package_version": "1.0.2",
   "vendor": "Camstreamer s.r.o.",
   "required_camscripter_version": "1.2.3",
   "required_camscripter_rbi_version": "1.0.0",

@@ -5,23 +5,15 @@ const { https } = require("follow-redirects");
 const { CamOverlayAPI } = require("camstreamerlib/CamOverlayAPI");
 
 var settings = null;
-var c_overlays = {};
+const serviceIDs = [];
+let co = null;
 var default_period_time = 1000;
 
-function getCOAPI(camera_ip, camera_port, camera_auth, overlay_id) {
+function getCOAPI(camera_ip, camera_port, camera_auth) {
     let co = new CamOverlayAPI({
         ip: camera_ip,
         port: camera_port,
         auth: camera_auth,
-        serviceID: parseInt(overlay_id),
-    });
-    co.on("error", (err) => {
-        console.log("COAPI" + overlay_id + "-Error: " + err);
-    });
-
-    co.on("close", () => {
-        console.log("COAPI" + overlay_id + "-Error: connection closed");
-        process.exit(1);
     });
 
     return co;
@@ -37,19 +29,12 @@ function run() {
         return;
     }
 
+    co = getCOAPI(settings.camera_ip, settings.camera_port, settings.camera_user + ":" + settings.camera_pass);
     for (let i = 0; i < settings.field_list.length; i++) {
         let c_field = settings.field_list[i];
-        let service = c_field["service"];
-        if (!(service in c_overlays)) {
-            c_overlays[service] = getCOAPI(
-                settings.camera_ip,
-                settings.camera_port,
-                settings.camera_user + ":" + settings.camera_pass,
-                service
-            );
-        }
+        serviceIDs.push(Number.parseInt(c_field["service"]))
     }
-    oneAppPeriod(c_overlays);
+    oneAppPeriod();
 }
 
 function sendRequest(send_url, auth) {
@@ -148,21 +133,21 @@ async function requestSheet(doc_id) {
     }
 }
 
-async function oneAppPeriod(overlays) {
+async function oneAppPeriod() {
     console.log("Starting Period");
 
     try {
         let data = null;
         let fields = null;
-        for (let service in overlays) {
-            let enabled = await overlays[service].isEnabled();
+        for (let service of serviceIDs) {
+            let enabled = await co.isEnabled(service);
             if (enabled) {
                 if (!fields) {
                     data = await requestSheet(settings.sheet_addr);
                     fields = mapData(data.values);
                 }
                 let cf = fields[service];
-                overlays[service].updateCGText(cf);
+                co.updateCGText(service, cf);
             }
         }
     } catch (error) {
@@ -171,7 +156,6 @@ async function oneAppPeriod(overlays) {
         setTimeout(
             oneAppPeriod,
             settings.refresh_rate * default_period_time,
-            overlays
         );
     }
 }

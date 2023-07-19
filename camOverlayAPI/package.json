@@ -1,21 +1,26 @@
 {
-  "name": "@camstreamer/camoverlay-api",
-  "version": "1.0.0",
-  "description": "",
-  "main": "main.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "in:prod": "npm install -production",
-    "in:all": "npm install",
-    "zip:package": "node node_modules/camstreamerlib/CreatePackage -i",
-    "zip": "npm-run-all in:prod zip:package in:all"
-  },
-  "author": "CamStreamer s.r.o",
-  "license": "ISC",
-  "dependencies": {
-    "camstreamerlib": "^1.7.4"
-  },
-  "devDependencies": {
-    "npm-run-all": "^4.1.5"
-  }
+    "name": "@camstreamer/camoverlay-api",
+    "version": "1.0.1",
+    "description": "",
+    "main": "main.js",
+    "prettier": "@camstreamer/prettier-config",
+    "scripts": {
+        "pretty": "prettier --write \"*.{js,json}\"",
+        "pretty:check": "prettier --check \"./{src,doc}/*.{js,json}\"",
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "in:prod": "npm install -production",
+        "in:all": "npm install",
+        "zip:package": "node node_modules/camstreamerlib/CreatePackage -i",
+        "zip": "npm-run-all in:prod zip:package in:all"
+    },
+    "author": "CamStreamer s.r.o",
+    "license": "ISC",
+    "dependencies": {
+        "camstreamerlib": "2.0.0"
+    },
+    "devDependencies": {
+        "@camstreamer/prettier-config": "^2.0.4",
+        "npm-run-all": "^4.1.5",
+        "prettier": "^3.0.0"
+    }
 }

@@ -1,6 +1,6 @@
 {
   "name": "position_based_image",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "",
   "prettier": "@camstreamer/prettier-config",
   "main": "src/main.ts",
@@ -20,7 +20,7 @@
   "author": "CamStreamer s.r.o",
   "license": "ISC",
   "dependencies": {
-    "camstreamerlib": "^1.7.4"
+    "camstreamerlib": "^2.0.0"
   },
   "devDependencies": {
     "@camstreamer/prettier-config": "^2.0.4",

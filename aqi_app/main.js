@@ -4,7 +4,7 @@ const CairoFrame = require('./CairoFrame');
 const CairoPainter = require('./CairoPainter');
 
 const { https } = require("follow-redirects");
-const { CamOverlayAPI } = require('camstreamerlib/CamOverlayAPI');
+const { CamOverlayDrawingAPI } = require('camstreamerlib/CamOverlayDrawingAPI');
 
 let settings = null;
 let co = null;
@@ -25,11 +25,10 @@ function run() {
         return;
     }
 
-    co = new CamOverlayAPI({
+    co = new CamOverlayDrawingAPI({
         'ip': settings.camera_ip,
         'port': settings.camera_port,
         'auth': settings.camera_user + ':' + settings.camera_pass,
-        'serviceName': 'AQI'
     });
 
     co.on('error', (err) => {

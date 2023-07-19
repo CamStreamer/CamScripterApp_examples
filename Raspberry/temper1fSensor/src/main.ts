@@ -52,7 +52,6 @@ if (coConfigured) {
         ip: settings.camera_ip,
         port: settings.camera_port,
         auth: settings.camera_user + ':' + settings.camera_pass,
-        serviceID: settings.service_id,
     });
 }
 
@@ -92,7 +91,7 @@ async function onePeriod() {
         sensorReader = null;
         console.error(error);
         if (coConfigured) {
-            await co.updateCGText([
+            await co.updateCGText(settings.service_id, [
                 {
                     field_name: settings.field_name,
                     text: 'No Data',
@@ -113,7 +112,7 @@ function convertTemperature(num: number, unitTag: string): number {
 
 async function updateCOGraphics(temperature: number) {
     try {
-        await co.updateCGText([
+        await co.updateCGText(settings.service_id, [
             {
                 field_name: settings.field_name,
                 text: temperature.toFixed(1) + ' ' + UNITS[settings.unit],

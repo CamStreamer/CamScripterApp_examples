@@ -3,6 +3,7 @@ import * as net from 'net';
 import * as https from 'https';
 import { URLSearchParams } from 'url';
 import { CamOverlayAPI } from 'camstreamerlib/CamOverlayAPI';
+import { CamOverlayDrawingAPI } from 'camstreamerlib/CamOverlayDrawingAPI';
 
 type Camera = {
     IP: string;
@@ -38,8 +39,9 @@ type Settings = {
 
 let activeServices: number[] = [];
 let settings: Settings;
-const cos: Record<number, CamOverlayAPI> = {};
-let mapCO: CamOverlayAPI;
+const serviceIDs: number[] = [];
+const co: CamOverlayAPI = null;
+let mapCO: CamOverlayDrawingAPI = null;
 
 function deg2rad(angle: number) {
     return (angle * Math.PI) / 180;
@@ -97,13 +99,12 @@ function serverResponseParse(lines: string[]): Coordinates {
 }
 
 async function synchroniseCamOverlay() {
-    for (const idString in cos) {
-        const id = Number.parseInt(idString);
-        const isEnabled = await cos[id].isEnabled();
+    for (const id of serviceIDs) {
+        const isEnabled = await co.isEnabled(id);
         if (!isEnabled && activeServices.includes(id)) {
-            cos[id].setEnabled(true);
+            co.setEnabled(id, true);
         } else if (isEnabled && !activeServices.includes(id)) {
-            cos[id].setEnabled(false);
+            co.setEnabled(id, false);
         }
     }
 }
@@ -257,7 +258,7 @@ async function openMap() {
         auth: settings.targetCamera.user + ':' + settings.targetCamera.password,
         serviceName: 'Position Based Image',
     };
-    mapCO = new CamOverlayAPI(options);
+    mapCO = new CamOverlayDrawingAPI(options);
     mapCO.on('error', (error) => {
         console.log(error);
         process.exit(1);
@@ -284,7 +285,6 @@ async function main() {
         return;
     }
 
-    const serviceIDs: number[] = [];
     for (const area of settings.areas) {
         area.serviceIDs.sort();
 
@@ -293,22 +293,19 @@ async function main() {
         }
     }
 
-    for (const serviceID of serviceIDs) {
+    try {
         const options = {
             ip: settings.targetCamera.IP,
             port: settings.targetCamera.port,
             auth: `${settings.targetCamera.user}:${settings.targetCamera.password}`,
-            serviceID,
         };
-        try {
-            const co = new CamOverlayAPI(options);
-            await co.connect();
-            await co.setEnabled(false);
-            cos[serviceID] = co;
-        } catch (error) {
-            console.log(`Cannot connect to CamOverlay service with ID ${serviceID}`);
-            console.log(error);
+        const co = new CamOverlayAPI(options);
+        for (const serviceID of serviceIDs) {
+            await co.setEnabled(serviceID, false);
         }
+    } catch (error) {
+        console.log(`Cannot connect to CamOverlay.`);
+        console.log(error);
     }
     await openMap();
     serverConnect();

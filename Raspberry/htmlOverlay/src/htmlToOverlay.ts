@@ -1,5 +1,5 @@
 import puppeteer, { Browser, Page } from 'puppeteer-core';
-import { CamOverlayAPI } from 'camstreamerlib/CamOverlayAPI';
+import { CamOverlayDrawingAPI } from 'camstreamerlib/CamOverlayDrawingAPI';
 
 export type CoordSystem = 'top_left' | 'top_right' | 'bottom_left' | 'bottom_right';
 
@@ -42,7 +42,7 @@ export class HtmlToOverlay {
     private startTimer: NodeJS.Timeout;
     private screenshotTimer: NodeJS.Timeout;
     private removeImageTimer: NodeJS.Timeout;
-    private co: CamOverlayAPI;
+    private co: CamOverlayDrawingAPI;
     private coConnected = false;
     private coDowntimeTimer: NodeJS.Timeout;
     private takeScreenshotPromise;
@@ -182,14 +182,12 @@ export class HtmlToOverlay {
 
     private async startCamOverlayConnection() {
         if (!this.coConnected && !this.coDowntimeTimer) {
-            const serviceName = this.options.configName.length ? this.options.configName : 'htmlOverlay';
-            this.co = new CamOverlayAPI({
+            this.co = new CamOverlayDrawingAPI({
                 tls: this.options.cameraSettings.protocol !== 'http',
                 tlsInsecure: this.options.cameraSettings.protocol === 'https_insecure',
                 ip: this.options.cameraSettings.ip,
                 port: this.options.cameraSettings.port,
                 auth: this.options.cameraSettings.user + ':' + this.options.cameraSettings.pass,
-                serviceName,
                 camera: this.options.coSettings.cameraList,
             });
 
@@ -209,7 +207,6 @@ export class HtmlToOverlay {
                 console.log(`COAPI-Error: ${this.options.configName}: connection closed`);
                 this.coConnected = false;
             });
-
             await this.co.connect();
         }
         return this.coConnected;

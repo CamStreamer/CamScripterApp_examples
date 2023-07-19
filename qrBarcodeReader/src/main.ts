@@ -2,13 +2,13 @@ import * as fs from 'fs';
 import * as util from 'util';
 import * as QRCode from 'qrcode';
 import * as MemoryStream from 'memorystream';
-import { CamOverlayAPI, CairoCreateResponse } from 'camstreamerlib/CamOverlayAPI';
-import { httpRequest } from 'camstreamerlib/HTTPRequest';
+import { CamOverlayDrawingAPI, CairoCreateResponse } from 'camstreamerlib/CamOverlayDrawingAPI';
+import { httpRequest } from 'camstreamerlib/HttpRequest';
 import { QRCodeReader } from './qrCodeReader';
 
 const setTimeoutPromise = util.promisify(setTimeout);
 
-let co: CamOverlayAPI = null;
+let co: CamOverlayDrawingAPI = null;
 let coConnected = false;
 let barcodeFont = null;
 let displayTimer: NodeJS.Timeout = null;
@@ -69,14 +69,12 @@ async function displayGraphics(text: string) {
 
 async function initCamOverlay() {
     if (!coConnected) {
-        co = new CamOverlayAPI({
+        co = new CamOverlayDrawingAPI({
             tls: settings.camera_protocol !== 'http',
             tlsInsecure: settings.camera_protocol === 'https_insecure',
             ip: settings.camera_ip,
             port: settings.camera_port,
             auth: settings.camera_user + ':' + settings.camera_pass,
-            serviceName: 'QR & Barcode Reader',
-            serviceID: settings.widget_type === 'generated' ? undefined : settings.cg_service_id,
         });
 
         co.on('open', () => {

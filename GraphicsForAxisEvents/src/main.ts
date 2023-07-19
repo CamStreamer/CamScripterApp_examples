@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import { CameraVapix } from 'camstreamerlib/CameraVapix';
-import { CamOverlayAPI } from 'camstreamerlib/CamOverlayAPI';
+import { CamOverlayAPI, CamOverlayOptions } from 'camstreamerlib/CamOverlayAPI';
 
 type Camera = {
     IP: string;
@@ -29,16 +29,16 @@ type Event = {
 };
 
 const timeouts: Record<number, NodeJS.Timeout> = {};
-const services: Record<number, CamOverlayAPI> = {};
+let co: CamOverlayAPI = null;
 
 function onStatelessEvent(event: Event) {
-    services[event.serviceID].setEnabled(true);
+    co.setEnabled(event.serviceID, true);
     if (event.duration >= 1) {
         if (timeouts[event.serviceID] != null) {
             clearTimeout(timeouts[event.serviceID]);
         }
         timeouts[event.serviceID] = setTimeout(() => {
-            services[event.serviceID].setEnabled(false);
+            co.setEnabled(event.serviceID, false);
             timeouts[event.serviceID] = null;
         }, event.duration);
     }
@@ -50,21 +50,21 @@ function onStatefulEvent(event: Event, state: boolean, invert: boolean) {
         if (state !== lastState[event.eventName]) {
             lastState[event.eventName] = state;
             if (state !== invert) {
-                services[event.serviceID].setEnabled(true);
+                co.setEnabled(event.serviceID, true);
                 if (timeouts[event.serviceID] !== null) {
                     clearTimeout(timeouts[event.serviceID]);
                 }
                 timeouts[event.serviceID] = setTimeout(() => {
-                    services[event.serviceID].setEnabled(false);
+                    co.setEnabled(event.serviceID, false);
                     timeouts[event.serviceID] = null;
                 }, event.duration);
             } else if (timeouts[event.serviceID] != null) {
-                services[event.serviceID].setEnabled(false);
+                co.setEnabled(event.serviceID, false);
                 clearTimeout(timeouts[event.serviceID]);
             }
         }
     } else {
-        services[event.serviceID].setEnabled(state !== invert);
+        co.setEnabled(event.serviceID, state !== invert);
     }
 }
 
@@ -80,18 +80,16 @@ function getSettings() {
 }
 
 async function prepareCamOverlay(settings: Settings) {
+    const options: CamOverlayOptions = {
+        ip: settings.targetCamera.IP,
+        port: settings.targetCamera.port,
+        auth: `${settings.targetCamera.user}:${settings.targetCamera.password}`,
+    };
+    co = new CamOverlayAPI(options);
     for (let event of settings.events) {
-        const options = {
-            ip: settings.targetCamera.IP,
-            port: settings.targetCamera.port,
-            auth: `${settings.targetCamera.user}:${settings.targetCamera.password}`,
-            serviceID: event.serviceID,
-        };
         try {
-            const co = new CamOverlayAPI(options);
-            await co.connect();
-            await co.setEnabled(false);
-            services[event.serviceID] = co;
+            
+            await co.setEnabled(event.serviceID, false);
         } catch (error) {
             console.log(`Cannot connect to CamOverlay service with ID ${event.serviceID} (${error})`);
             process.exit(1);
@@ -146,7 +144,7 @@ async function subscribeEventMessages(settings: Settings) {
             }
         });
     }
-    cv.eventsConnect('websocket');
+    cv.eventsConnect();
 }
 
 async function main() {
