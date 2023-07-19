@@ -30,7 +30,6 @@ if (coEnabled) {
         ip: settings.camera_ip,
         port: settings.camera_port,
         auth: settings.camera_user + ':' + settings.camera_pass,
-        serviceID: settings.service_id,
     });
 }
 
@@ -70,7 +69,7 @@ scaleClient.on('data', async (data) => {
         // Show image in CamOverlay service
         if (coEnabled) {
             try {
-                await camOverlay.updateCGText([
+                await camOverlay.updateCGText(settings.service_id,[
                     {
                         field_name: settings.value_field_name,
                         text: weight,
