@@ -1,8 +1,9 @@
 import * as fs from 'fs';
 import * as net from 'net';
 import * as util from 'util';
-import { CamOverlayAPI, CairoCreateResponse } from 'camstreamerlib/CamOverlayAPI';
-import { httpRequest } from 'camstreamerlib/HTTPRequest';
+import { httpRequest } from 'camstreamerlib/HttpRequest';
+import { CamOverlayAPI } from 'camstreamerlib/CamOverlayAPI';
+import { CamOverlayDrawingAPI, CairoCreateResponse } from 'camstreamerlib/CamOverlayDrawingAPI';
 
 const setTimeoutPromise = util.promisify(setTimeout);
 
@@ -46,6 +47,7 @@ const acsConfigured =
 let scaleSocket: net.Socket = null;
 let lastWeightInfo: WeightInfo = null;
 let co: CamOverlayAPI = null;
+let cod: CamOverlayDrawingAPI = null;
 let coConnected = false;
 let bgImage: string;
 
@@ -168,7 +170,7 @@ async function displayGraphics(weightInfo: WeightInfo) {
             if (settings.widget_type === 'generated') {
                 await drawWidget(weightInfo);
             } else {
-                await co.updateCGText([
+                await co.updateCGText(settings.cg_service_id, [
                     {
                         field_name: settings.cg_field_name,
                         text: weightInfoToString(weightInfo),
@@ -183,34 +185,34 @@ async function displayGraphics(weightInfo: WeightInfo) {
 
 async function initCamOverlay() {
     if (!coConnected) {
-        co = new CamOverlayAPI({
+        const options = {
             tls: settings.camera_protocol !== 'http',
             tlsInsecure: settings.camera_protocol === 'https_insecure',
             ip: settings.camera_ip,
             port: settings.camera_port,
             auth: settings.camera_user + ':' + settings.camera_pass,
-            serviceName: 'MettlerToledoPlugin',
-            serviceID: settings.widget_type === 'generated' ? undefined : settings.cg_service_id,
-        });
+        };
 
         if (settings.widget_type === 'generated') {
-            co.on('open', () => {
+            cod = new CamOverlayDrawingAPI(options);
+            cod.on('open', () => {
                 console.log('COAPI: connected');
                 coConnected = true;
             });
 
-            co.on('error', (err) => {
+            cod.on('error', (err) => {
                 console.log('COAPI-Error: ' + err);
             });
 
-            co.on('close', () => {
+            cod.on('close', () => {
                 console.log('COAPI-Error: connection closed');
                 coConnected = false;
             });
 
-            await co.connect();
+            await cod.connect();
             await setTimeoutPromise(1000);
         } else {
+            co = new CamOverlayAPI(options);
             coConnected = true;
         }
     }
@@ -221,7 +223,7 @@ async function drawWidget(weightInfo: WeightInfo) {
     const widgetWidth = Math.round(720 * settings.widget_scale);
     const widgetHeight = Math.round(192 * settings.widget_scale);
 
-    const surfaceResponse = (await co.cairo(
+    const surfaceResponse = (await cod.cairo(
         'cairo_image_surface_create',
         'CAIRO_FORMAT_ARGB32',
         widgetWidth,
@@ -229,17 +231,17 @@ async function drawWidget(weightInfo: WeightInfo) {
     )) as CairoCreateResponse;
     const surface = surfaceResponse.var;
 
-    const cairoResponse = (await co.cairo('cairo_create', surface)) as CairoCreateResponse;
+    const cairoResponse = (await cod.cairo('cairo_create', surface)) as CairoCreateResponse;
     const cairo = cairoResponse.var;
 
     const bgImage = await loadBackground();
-    co.cairo('cairo_scale', cairo, settings.widget_scale, settings.widget_scale);
-    co.cairo('cairo_translate', cairo, 0, 0);
-    co.cairo('cairo_set_source_surface', cairo, bgImage, 0, 0);
-    co.cairo('cairo_paint', cairo);
+    cod.cairo('cairo_scale', cairo, settings.widget_scale, settings.widget_scale);
+    cod.cairo('cairo_translate', cairo, 0, 0);
+    cod.cairo('cairo_set_source_surface', cairo, bgImage, 0, 0);
+    cod.cairo('cairo_paint', cairo);
 
-    co.cairo('cairo_set_source_rgb', cairo, 0.9, 0.9, 0.9);
-    co.writeText(cairo, weightInfoToString(weightInfo), 180, 25, 490, 110, 'A_RIGHT', 'TFM_SCALE');
+    cod.cairo('cairo_set_source_rgb', cairo, 0.9, 0.9, 0.9);
+    cod.writeText(cairo, weightInfoToString(weightInfo), 180, 25, 490, 110, 'A_RIGHT', 'TFM_SCALE');
 
     const pos = computePosition(
         settings.widget_coord_system,
@@ -250,10 +252,16 @@ async function drawWidget(weightInfo: WeightInfo) {
         settings.widget_stream_width,
         settings.widget_stream_height
     );
-    await co.showCairoImageAbsolute(surface, pos.x, pos.y, settings.widget_stream_width, settings.widget_stream_height);
+    await cod.showCairoImageAbsolute(
+        surface,
+        pos.x,
+        pos.y,
+        settings.widget_stream_width,
+        settings.widget_stream_height
+    );
 
-    co.cairo('cairo_surface_destroy', surface);
-    co.cairo('cairo_destroy', cairo);
+    cod.cairo('cairo_surface_destroy', surface);
+    cod.cairo('cairo_destroy', cairo);
 }
 
 async function loadBackground() {
@@ -265,7 +273,7 @@ async function loadBackground() {
 
 async function loadImage(fileName) {
     const imgData = fs.readFileSync(fileName);
-    const imgResponse = (await co.uploadImageData(imgData)) as CairoCreateResponse;
+    const imgResponse = (await cod.uploadImageData(imgData)) as CairoCreateResponse;
     return imgResponse.var;
 }
 
@@ -381,8 +389,8 @@ async function cleanExit() {
         if (scaleSocket) {
             scaleSocket.destroy();
         }
-        if (co && coConnected && settings.widget_type === 'generated') {
-            await co.removeImage();
+        if (cod && coConnected && settings.widget_type === 'generated') {
+            await cod.removeImage();
         }
     } catch (err) {
         console.error('Hide graphics: ', err);
