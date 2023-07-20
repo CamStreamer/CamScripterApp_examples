@@ -19,10 +19,11 @@ $(document).ready(function() {
         'resolution': '1920x1080'
       };
     }
-    $('#userCam').val(settings.camera_user);
-    $('#passCam').val(settings.camera_pass);
+    $('#camProtocol').val(settings.camera_protocol);
     $('#camIP').val(settings.camera_ip);
     $('#camPort').val(settings.camera_port);
+    $('#userCam').val(settings.camera_user);
+    $('#passCam').val(settings.camera_pass);
     $('#updateFreq').val(settings.update_frequency);
     $('#posX').val(settings.pos_x);
     $('#posY').val(settings.pos_y);
@@ -36,6 +37,7 @@ $(document).ready(function() {
     $('#resH').val(resolution[1]);
   });
 
+  $('#camProtocol').change(protocolChanged);
   $(".form-control").change(inputChanged);
 
   $(".myForm").submit(function() {
@@ -43,13 +45,22 @@ $(document).ready(function() {
   });
 });
 
+function protocolChanged() {
+  if ($("#camProtocol").val() === 'http') {
+      $("#camPort").val(80);
+  } else {
+      $("#camPort").val(443);
+  }
+}
+
 function inputChanged() {
   console.log('param changed');
   var settings = {
-    'camera_user': $('#userCam').val(),
-    'camera_pass': $('#passCam').val(),
+    'camera_protocol': $('#camProtocol').val(),
     'camera_ip': $('#camIP').val(),
     'camera_port': $('#camPort').val(),
+    'camera_user': $('#userCam').val(),
+    'camera_pass': $('#passCam').val(),
     'access_token': $('#accessToken').val(),
     "display_location":$('#displayLocation').val(),
     'coordinates': $('#coordinates').val(),

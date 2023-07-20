@@ -29,6 +29,8 @@ function run() {
         'ip': settings.camera_ip,
         'port': settings.camera_port,
         'auth': settings.camera_user + ':' + settings.camera_pass,
+        'tls': settings.camera_protocol !== 'http',
+        'tlsInsecure': settings.camera_protocol === 'https_insecure',
     });
 
     co.on('error', (err) => {
