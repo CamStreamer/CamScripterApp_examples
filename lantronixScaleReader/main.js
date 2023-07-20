@@ -2,7 +2,8 @@ const fs = require('fs');
 const net = require('net');
 const https = require('https');
 const { CamOverlayAPI } = require('camstreamerlib/CamOverlayAPI');
-const { CameraEventsGenerator } = require ('camstreamerlib/CamScripterAPICameraEventsGenerator').CamScripterAPICameraEventsGenerator;
+const { CameraEventsGenerator } =
+    require('camstreamerlib/CamScripterAPICameraEventsGenerator').CamScripterAPICameraEventsGenerator;
 
 let prevWeightData = null;
 let dataBuffer = '';
@@ -44,15 +45,14 @@ const eventsConfigured =
     settings.event_condition_operator != null &&
     settings.event_condition_value != null;
 
-if (eventsConfigured)
-{
+if (eventsConfigured) {
     csc = new CameraEventsGenerator({
         tls: settings.event_camera_protocol !== 'http',
         tlsInsecure: settings.event_camera_protocol === 'https_insecure',
         ip: settings.event_camera_ip,
         port: settings.event_camera_port,
         auth: settings.event_camera_user + ':' + settings.event_camera_pass,
-    })
+    });
 }
 
 // Axis Camera Station integration
@@ -91,7 +91,7 @@ scaleClient.on('data', async (data) => {
         // Show image in CamOverlay service
         if (coEnabled) {
             try {
-                await camOverlay.updateCGText(settings.service_id,[
+                await camOverlay.updateCGText(settings.service_id, [
                     {
                         field_name: settings.value_field_name,
                         text: weight,
@@ -108,7 +108,7 @@ scaleClient.on('data', async (data) => {
 
         // Send Camera Event
         if (eventsConfigured && weight != 0 && unit.length) {
-            checkCondtionAndSendCameraEvent(weight)
+            checkCondtionAndSendCameraEvent(weight);
         }
 
         // Send to Axis Camera Station. Unit is not empty when the weight is stable.
