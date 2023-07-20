@@ -14,6 +14,8 @@ function getCOAPI(camera_ip, camera_port, camera_auth) {
         ip: camera_ip,
         port: camera_port,
         auth: camera_auth,
+        tls: settings.camera_protocol !== 'http',
+        tlsInsecure: settings.camera_protocol === 'https_insecure',
     });
 
     return co;
