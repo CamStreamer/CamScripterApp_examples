@@ -2,11 +2,13 @@ const fs = require('fs');
 const net = require('net');
 const https = require('https');
 const { CamOverlayAPI } = require('camstreamerlib/CamOverlayAPI');
+const { CameraEventsGenerator } = require ('camstreamerlib/CamScripterAPICameraEventsGenerator').CamScripterAPICameraEventsGenerator;
 
 let prevWeightData = null;
 let dataBuffer = '';
 
 let camOverlay = null;
+let csc = null;
 let milestoneClient = null;
 let milestoneConnected = false;
 let milestoneProtectionPeriod = false;
@@ -31,6 +33,26 @@ if (coEnabled) {
         port: settings.camera_port,
         auth: settings.camera_user + ':' + settings.camera_pass,
     });
+}
+
+// Camera Events integration
+const eventsConfigured =
+    settings.event_camera_ip.length !== 0 &&
+    settings.event_camera_user.length !== 0 &&
+    settings.event_camera_pass.length !== 0 &&
+    settings.event_condition_delay != null &&
+    settings.event_condition_operator != null &&
+    settings.event_condition_value != null;
+
+if (eventsConfigured)
+{
+    csc = new CameraEventsGenerator({
+        tls: settings.event_camera_protocol !== 'http',
+        tlsInsecure: settings.event_camera_protocol === 'https_insecure',
+        ip: settings.event_camera_ip,
+        port: settings.event_camera_port,
+        auth: settings.event_camera_user + ':' + settings.event_camera_pass,
+    })
 }
 
 // Axis Camera Station integration
@@ -82,6 +104,11 @@ scaleClient.on('data', async (data) => {
             } catch (err) {
                 console.error('CamOverlay error:', err);
             }
+        }
+
+        // Send Camera Event
+        if (eventsConfigured && weight != 0 && unit.length) {
+            checkCondtionAndSendCameraEvent(weight)
         }
 
         // Send to Axis Camera Station. Unit is not empty when the weight is stable.
@@ -153,6 +180,138 @@ scaleClient.on('close', () => {
     console.log('Scale connection closed');
     process.exit(0);
 });
+
+let cscConnected = false;
+let cscEventDeclared = false;
+let cscEventConditionTimer = null;
+
+function isConditionActive(weight, operator, conditionValue) {
+    switch (operator) {
+        case 0:
+            return weight === conditionValue;
+        case 1:
+            return weight > conditionValue;
+        case 2:
+            return weight < conditionValue;
+        case 3:
+            return weight >= conditionValue;
+        case 4:
+            return weight <= conditionValue;
+    }
+}
+
+async function connectCameraEvents() {
+    if (!cscConnected) {
+        csc.removeAllListeners();
+        csc.on('open', () => {
+            console.log('CSc: connected');
+            cscConnected = true;
+        });
+
+        csc.on('error', (err) => {
+            console.log('CSc-Error: ' + err);
+        });
+
+        csc.on('close', () => {
+            console.log('CSc-Error: connection closed');
+            cscConnected = false;
+            cscEventDeclared = false;
+            sentActiveState = false;
+        });
+
+        await csc.connect();
+    }
+    return cscConnected;
+}
+
+function declareCameraEvent() {
+    return csc.declareEvent({
+        declaration_id: 'LantronixScaleReader',
+        stateless: false,
+        declaration: [
+            {
+                namespace: 'tnsaxis',
+                key: 'topic0',
+                value: 'CameraApplicationPlatform',
+                value_type: 'STRING',
+            },
+            {
+                namespace: 'tnsaxis',
+                key: 'topic1',
+                value: 'CamScripter',
+                value_type: 'STRING',
+            },
+            {
+                namespace: 'tnsaxis',
+                key: 'topic2',
+                value: 'LantronixScaleReader',
+                value_type: 'STRING',
+                value_nice_name: 'CamScripter: CameraApplicationPlatform',
+            },
+            {
+                type: 'DATA',
+                namespace: '',
+                key: 'condition_active',
+                value: false,
+                value_type: 'BOOL',
+                key_nice_name: 'React on active condition (settings in the script)',
+                value_nice_name: 'Condition is active',
+            },
+        ],
+    });
+}
+
+async function sendCameraEventTimerCallback(conditionActive) {
+    try {
+        await sendCameraEvent(conditionActive);
+        sentActiveState = conditionActive;
+        cscEventConditionTimer = null;
+    } catch (err) {
+        console.error('Camera events error:', err);
+        cscEventConditionTimer = setTimeout(() => sendCameraEventTimerCallback(conditionActive), 5000);
+    }
+}
+
+function sendCameraEvent(active) {
+    return csc.sendEvent({
+        declaration_id: 'Temper1fSensor',
+        event_data: [
+            {
+                namespace: '',
+                key: 'condition_active',
+                value: active,
+                value_type: 'BOOL',
+            },
+        ],
+    });
+}
+
+async function checkCondtionAndSendCameraEvent(weight) {
+    try {
+        const conditionActive = isConditionActive(
+            weight,
+            settings.event_condition_operator,
+            settings.event_condition_value
+        );
+
+        if (!(await connectCameraEvents())) {
+            return;
+        }
+
+        if (!cscEventDeclared) {
+            await declareCameraEvent();
+            cscEventDeclared = true;
+        }
+
+        if (conditionActive != sentActiveState && (!cscEventConditionTimer || !conditionActive)) {
+            const timerTime = conditionActive ? settings.event_condition_delay * 1000 : 0;
+            clearTimeout(cscEventConditionTimer);
+            cscEventConditionTimer = setTimeout(() => sendCameraEventTimerCallback(conditionActive), timerTime);
+        }
+    } catch (err) {
+        console.error('Camera events error:', err);
+    }
+}
 
 function connectMilestone() {
     if (milestoneClient !== null) {
