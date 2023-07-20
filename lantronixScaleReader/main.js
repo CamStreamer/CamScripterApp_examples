@@ -274,7 +274,7 @@ async function sendCameraEventTimerCallback(conditionActive) {
 
 function sendCameraEvent(active) {
     return csc.sendEvent({
-        declaration_id: 'Temper1fSensor',
+        declaration_id: 'LantronixScaleReader',
         event_data: [
             {
                 namespace: '',
