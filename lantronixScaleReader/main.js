@@ -2,8 +2,7 @@ const fs = require('fs');
 const net = require('net');
 const https = require('https');
 const { CamOverlayAPI } = require('camstreamerlib/CamOverlayAPI');
-const { CameraEventsGenerator } =
-    require('camstreamerlib/CamScripterAPICameraEventsGenerator').CamScripterAPICameraEventsGenerator;
+const { CamScripterAPICameraEventsGenerator } = require('camstreamerlib/CamScripterAPICameraEventsGenerator');
 
 let prevWeightData = null;
 let dataBuffer = '';
@@ -46,7 +45,7 @@ const eventsConfigured =
     settings.event_condition_value != null;
 
 if (eventsConfigured) {
-    csc = new CameraEventsGenerator({
+    csc = new CamScripterAPICameraEventsGenerator({
         tls: settings.event_camera_protocol !== 'http',
         tlsInsecure: settings.event_camera_protocol === 'https_insecure',
         ip: settings.event_camera_ip,
