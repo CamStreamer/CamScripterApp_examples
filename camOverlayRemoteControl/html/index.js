@@ -10,6 +10,7 @@ $(document).ready(function() {
   });
   $("#substractFieldBtn").click(substractField);
   $("#addFieldBtn").click(addField);
+  $('#camProtocol').change(protocolChanged);
   $(".form-control").change(inputChanged);
   $("#forceSaveBtn").click(inputChanged);
   $(".myForm").submit(function() {
@@ -18,10 +19,11 @@ $(document).ready(function() {
 });
 
 function createLayout(settings) {
-  $('#userCam').val(settings.camera_user);
-  $('#passCam').val(settings.camera_pass);
+  $('#camProtocol').val(settings.camera_protocol);
   $('#camIP').val(settings.camera_ip);
   $('#camPort').val(settings.camera_port);
+  $('#userCam').val(settings.camera_user);
+  $('#passCam').val(settings.camera_pass);
   $('#updateFreq').val(settings.refresh_rate);
   $('#listName').val(settings.list_name);
   $('#apiKey').val(settings.api_key);
@@ -29,6 +31,7 @@ function createLayout(settings) {
   $('#fieldContainer').html(genFields(settings.field_list.length));
   populateFields(settings.field_list);
   $(".form-control").off();
+  $('#camProtocol').change(protocolChanged);
   $(".form-control").change(inputChanged);
 
 }
@@ -77,6 +80,7 @@ function addField(){
   $("#fieldContainer").html(genFields(field_count));
   populateFields(fields);
   $(".form-control").off();
+  $('#camProtocol').change(protocolChanged);
   $(".form-control").change(inputChanged);
   inputChanged();
 }
@@ -86,18 +90,28 @@ function substractField(){
   $("#fieldContainer").html(genFields(field_count));
   populateFields(fields);
   $(".form-control").off();
+  $('#camProtocol').change(protocolChanged);
   $(".form-control").change(inputChanged);
   inputChanged();
+}
+
+function protocolChanged() {
+  if ($("#camProtocol").val() === 'http') {
+      $("#camPort").val(80);
+  } else {
+      $("#camPort").val(443);
+  }
 }
 
 function inputChanged() {
   console.log('param changed');
   fields = readTheFields();
   var settings = {
-    'camera_user': $('#userCam').val(),
-    'camera_pass': $('#passCam').val(),
+    'camera_protocol': $('#camProtocol').val(),
     'camera_ip': $('#camIP').val(),
     'camera_port': $('#camPort').val(),
+    'camera_user': $('#userCam').val(),
+    'camera_pass': $('#passCam').val(),
     'refresh_rate': $('#updateFreq').val(),
     'api_key': $('#apiKey').val(),
     'list_name': $('#listName').val(),

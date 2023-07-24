@@ -1,8 +1,9 @@
 {
-    "camera_user": "root",
-    "camera_pass": "",
+    "camera_protocol": "http",
     "camera_ip": "127.0.0.1",
     "camera_port": 80,
+    "camera_user": "root",
+    "camera_pass": "",
     "remote_hide": true,
     "list_name": "Sheet1",
     "api_key":"",
