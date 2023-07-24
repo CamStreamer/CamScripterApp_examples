@@ -183,6 +183,7 @@ scaleClient.on('close', () => {
 let cscConnected = false;
 let cscEventDeclared = false;
 let cscEventConditionTimer = null;
+let sentActiveState = false;
 
 function isConditionActive(weight, operator, conditionValue) {
     switch (operator) {
@@ -288,9 +289,9 @@ function sendCameraEvent(active) {
 async function checkCondtionAndSendCameraEvent(weight) {
     try {
         const conditionActive = isConditionActive(
-            weight,
-            settings.event_condition_operator,
-            settings.event_condition_value
+            Number.parseInt(weight),
+            Number.parseInt(settings.event_condition_operator),
+            Number.parseInt(settings.event_condition_value)
         );
 
         if (!(await connectCameraEvents())) {
