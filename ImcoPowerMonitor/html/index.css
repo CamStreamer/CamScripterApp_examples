@@ -1,0 +1,21 @@
+div.form-inline
+{
+    margin-bottom: 0.5rem;
+}
+#temperature_delay, #door_delay,
+#temperature_value, #battery_percentage
+{
+    width: 25%;
+    max-width: 90px;
+}
+.inline_text
+{
+    margin-left: 1%;
+    margin-right: 3%;
+}
+#temperature_operator
+{
+    text-align: center;
+    margin-right: 1%;
+    width: 55px;
+}
