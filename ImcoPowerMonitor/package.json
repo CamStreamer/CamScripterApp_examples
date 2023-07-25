@@ -1,0 +1,32 @@
+{
+  "name": "imco_power_monitor",
+  "version": "1.0.0",
+  "description": "",
+  "prettier": "@camstreamer/prettier-config",
+  "main": "src/main.ts",
+  "scripts": {
+    "clean": "rimraf dist/*; rm -f position_based_image.zip",
+    "build": "npm-run-all clean tsc",
+    "tsc": "tsc",
+    "pretty": "prettier --write \"./{src,html}/*.{ts,tsx,js,jsx}\"",
+    "pretty:check": "prettier --check \"./{src,html}/*.{ts,tsx,js,jsx}\"",
+    "try": "npm run build; PERSISTENT_DATA_PATH=\"./localdata/\" node dist/main.js",
+    "in:prod": "npm install -production",
+    "in:all": "npm install",
+    "zip:package": "node node_modules/camstreamerlib/CreatePackage -i",
+    "zip": "npm-run-all build in:prod zip:package in:all"
+  },
+  "author": "CamStreamer s.r.o.",
+  "license": "ISC",
+  "dependencies": {
+    "camstreamerlib": "^2.0.0"
+  },
+  "devDependencies": {
+    "@camstreamer/prettier-config": "^2.0.4",
+    "@types/node": "^18.0.6",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^2.7.1",
+    "rimraf": "^3.0.2",
+    "typescript": "^4.7.4"
+  }
+}
