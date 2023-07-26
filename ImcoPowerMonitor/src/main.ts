@@ -28,69 +28,11 @@ type Settings = {
     };
 };
 
-const temperatureAlarm = "temperature";
-const doorsAlarm = "doors_open";
-const batteryPercentageAlarm = "battery_percentage";
-const powerLineDisconnectionAlarm = "power_line_disconnection"
-
-function triggerAlarm(alarm: string)
-{
-    return ceg.sendEvent({
-        declaration_id: nameOfThisPackage,
-        event_data: [
-            {
-                namespace: "",
-                key: 'alarm',
-                value: alarm,
-                value_type: 'STRING',
-            }
-        ]
-    })
-}
-
-
-function parseResponse(response: string)
-{
-    const answer: any = {};
-    const a = response.split("|");
-    for(let i=0; i<a.length; i+=2) 
-    { 
-        answer[a[i]] = a[i+1];
-    }
-
-    const ov = (answer.U03==0 || answer.U90==0) ? ((answer.U14==1 || answer.U14==2) ? "yell" : "ok") : "error";
-    const battBreak = (answer.U08 == 0) ? ((answer.T20[3]==0) ? "close" : "open") : "none"
-    const doorClosed = (answer.T20[4] == 0)
-    const u1OutV = (answer.T20[4] == 1 && answer.U09 == 0) ? 0 : answer.F01
-    return {
-        temperature: answer.F04,     // Teplota akumulátora
-        "capacity": answer.F05,      // Stav nabitia / vybitia akumulátora v % (odlišit barevně např. na 5 úrovní)
-        outputVoltage_1: u1OutV,     // Výstupné napätie V1
-        outputVoltage_2: answer.F02, // Výstupné napätie V2
-        "load": answer.F15,          // Veľkosť zaťaženia v %
-        current: answer.F03,         // Výstupný prúd
-        "battBreak": battBreak,      // Istenie výstupu zdroja, akumulátora
-        doorClosed: doorClosed,      // stav dvířek
-        "outputVoltage": ov          // 230V připojeno/nepřipojeno
-    }
-}
-
-
-async function connectToPowerSource()
-{
-    const options: HttpRequestOptions =
-    {
-        method: "GET",
-        protocol: "http",
-        host: "192.168.90.176",
-        port: 80,
-        path: "/shared.txt"
-    }
-    const response: any = await httpRequest(options)
-    console.log(parseResponse(response))
-}
-
 const nameOfThisPackage = 'imco_power_monitor';
+
+// -------------
+// |   setup   |
+// -------------
 
 let settings: Settings;
 let co: CamOverlayAPI;
@@ -125,7 +67,6 @@ function coSetup() {
     };
     co = new CamOverlayAPI(options);
 }
-
 async function declareEvents() {
     return ceg.declareEvent({
         declaration_id: nameOfThisPackage,
@@ -160,7 +101,6 @@ async function declareEvents() {
         ],
     });
 }
-
 async function cegSetup() {
     const events_camera = settings.events_camera;
     if (
@@ -184,6 +124,80 @@ async function cegSetup() {
     await ceg.connect();
     await declareEvents();
 }
+
+// -------------
+// |   alarm   |
+// -------------
+
+const temperatureAlarm = "temperature";
+const doorsAlarm = "doors_open";
+const batteryPercentageAlarm = "battery_percentage";
+const powerLineDisconnectionAlarm = "power_line_disconnection"
+
+function triggerAlarm(alarm: string)
+{
+    return ceg.sendEvent({
+        declaration_id: nameOfThisPackage,
+        event_data: [
+            {
+                namespace: "",
+                key: 'alarm',
+                value: alarm,
+                value_type: 'STRING',
+            }
+        ]
+    })
+}
+
+// --------------------
+// |   power source   |
+// --------------------
+
+const refreshPeriod = 5000;
+
+function parseResponse(response: string)
+{
+    const answer: any = {};
+    const a = response.split("|");
+    for(let i=0; i<a.length; i+=2) 
+    { 
+        answer[a[i]] = a[i+1];
+    }
+
+    const ov = (answer.U03==0 || answer.U90==0) ? ((answer.U14==1 || answer.U14==2) ? "yell" : "ok") : "error";
+    const battBreak = (answer.U08 == 0) ? ((answer.T20[3]==0) ? "close" : "open") : "none"
+    const doorClosed = (answer.T20[4] == 0)
+    const u1OutV = (answer.T20[4] == 1 && answer.U09 == 0) ? 0 : answer.F01
+    return {
+        temperature: answer.F04,     // Teplota akumulátora
+        "capacity": answer.F05,      // Stav nabitia / vybitia akumulátora v % (odlišit barevně např. na 5 úrovní)
+        outputVoltage_1: u1OutV,     // Výstupné napätie V1
+        outputVoltage_2: answer.F02, // Výstupné napätie V2
+        "load": answer.F15,          // Veľkosť zaťaženia v %
+        current: answer.F03,         // Výstupný prúd
+        "battBreak": battBreak,      // Istenie výstupu zdroja, akumulátora
+        doorClosed: doorClosed,      // stav dvířek
+        "outputVoltage": ov          // 230V připojeno/nepřipojeno
+    }
+}
+
+async function connectToPowerSource()
+{
+    const options: HttpRequestOptions =
+    {
+        method: "GET",
+        protocol: "http",
+        host: "192.168.90.176",
+        port: 80,
+        path: "/shared.txt"
+    }
+    const response: any = await httpRequest(options)
+    console.log(parseResponse(response))
+
+    setTimeout(connectToPowerSource, refreshPeriod);
+}
+
+
 
 async function main() {
     process.on('uncaughtException', (error) => {
