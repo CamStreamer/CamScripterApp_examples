@@ -294,13 +294,3 @@ async function main(): Promise<void> {
 }
 
 main();
-
-// code for testing purposes
-// remove before code review
-import { CameraVapix } from 'camstreamerlib/CameraVapix';
-
-const cv = new CameraVapix({ ip: settings.events_camera.ip, auth: 'root:admin' });
-cv.on('tnsaxis:CameraApplicationPlatform/CamScripter/' + nameOfThisPackage, (event) => {
-    console.log(event.params.notification.timestamp, event.params.notification.message.data);
-});
-cv.eventsConnect();
