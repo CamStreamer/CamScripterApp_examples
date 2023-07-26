@@ -18,13 +18,13 @@ $(document).ready(function () {
         $('#temperature_operator').val(settings.events.temperature_operator);
         $('#temperature_value').val(settings.events.temperature_value);
         $('#door_delay').val(settings.events.door_delay);
-        $('#battery_percentage').val(settings.events.battery_percentage);
+        $('#battery_percentage').val(settings.events.battery_charge_percentage);
     });
 
     $('#co_protocol').change(() => protocolChanged('co'));
     $('#events_protocol').change(() => protocolChanged('events'));
     $('.form-control').change(inputChanged);
-    $('.myForm').submit(function () {
+    $('form').submit(function () {
         return false;
     });
 });
@@ -64,15 +64,15 @@ function inputChanged() {
             temperature_operator: $('#temperature_operator').val(),
             temperature_value: Number.parseInt($('#temperature_value').val()),
             door_delay: Number.parseInt($('#door_delay').val()),
-            battery_percentage: Number.parseInt($('#battery_percentage').val()),
+            battery_charge_percentage: Number.parseInt($('#battery_percentage').val()),
         },
     };
 
-    if (settings.events.battery_percentage > 100) {
-        settings.events.battery_percentage = 100;
+    if (settings.events.battery_charge_percentage > 100) {
+        settings.events.battery_charge_percentage = 100;
         $('#battery_percentage').val(100);
-    } else if (settings.events.battery_percentage < 0) {
-        settings.events.battery_percentage = 0;
+    } else if (settings.events.battery_charge_percentage < 0) {
+        settings.events.battery_charge_percentage = 0;
         $('#battery_percentage').val(0);
     } else if (settings.events.temperature_delay < 0) {
         settings.events.temperature_delay = 0;

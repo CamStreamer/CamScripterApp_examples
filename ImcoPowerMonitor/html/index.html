@@ -13,99 +13,122 @@
 
         <div class="jumbotron">
             <div class="container">
-                <h1 class="display-3">IMCO Power Monitor</h1>
-                <div class="row">
-                    <!--CamOverlay-->
-                    <div class="col-md-6">
-                        <form class="myForm">
-                            <h2>CamOverlay Camera</h2>
-                            <div class="form-group">
-                                <label for="co_protocol">Protocol</label>
-                                <select class="form-control" id="co_protocol">
-                                    <option value="http" selected>HTTP</option>
-                                    <option value="https">HTTPS</option>
-                                    <option value="https_insecure">HTTPS (insecure)</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="co_ip">IP</label>
-                                <input type="text" class="form-control" id="co_ip" placeholder="127.0.0.1" />
-                            </div>
-                            <div class="form-group">
-                                <label for="co_port">Port</label>
-                                <input type="text" class="form-control" id="co_port" placeholder="80" />
-                            </div>
-                            <div class="form-group">
-                                <label for="co_user">User</label>
-                                <input type="text" class="form-control" id="co_user" placeholder="root" />
-                            </div>
-                            <div class="form-group">
-                                <label for="co_password">Password</label>
-                                <input type="password" class="form-control" id="co_password" placeholder="password" />
-                            </div>
-                        </form>
+                <h1 class="display-4">IMCO Power Monitor</h1>
+            </div>
+            <br><br>
+            <div class="container" id="accordition">
+                <div class="card">
+                    <div class="card-header">
+                        <button class="btn" data-toggle="collapse" data-target="#collapse_co">
+                            <img src="logo_cs.png" width="50px" height="35px"> CamOverlay Integration
+                        </button>
                     </div>
-                    <!--Axis Events-->
-                    <div class="col-md-6">
-                        <form class="myForm">
-                            <h2>Axis Events Camera</h2>
-                            <div class="form-group">
-                                <label for="events_protocol">Protocol</label>
-                                <select class="form-control" id="events_protocol">
-                                    <option value="http" selected>HTTP</option>
-                                    <option value="https">HTTPS</option>
-                                    <option value="https_insecure">HTTPS (insecure)</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="events_ip">IP</label>
-                                <input type="text" class="form-control" id="events_ip" placeholder="127.0.0.1" />
-                            </div>
-                            <div class="form-group">
-                                <label for="events_port">Port</label>
-                                <input type="text" class="form-control" id="events_port" placeholder="80" />
-                            </div>
-                            <div class="form-group">
-                                <label for="events_user">User</label>
-                                <input type="text" class="form-control" id="events_user" placeholder="root" />
-                            </div>
-                            <div class="form-group">
-                                <label for="events_password">Password</label>
-                                <input
-                                    type="password"
-                                    class="form-control"
-                                    id="events_password"
-                                    placeholder="password"
-                                />
-                            </div>
-                        </form>
-                        <form class="myForm">
-                            <h2>Axis Events settings</h2>
-                            <label>Set delay when the camera event is triggered. (Set 0 for immediate reaction.)</label>
-                            <div class="form-inline">
-                                <input type="number" class="form-control" id="temperature_delay" />
-                                <div class="inline_text">s when temperature</div>
-                                <select class="form-control" id="temperature_operator">
-                                    <option value="=">=</option>
-                                    <option value=">">&#62;</option>
-                                    <option value="<">&#60;</option>
-                                    <option value=">=">&#62;=</option>
-                                    <option value="<=">&#60;=</option>
-                                </select>
-                                <input type="number" class="form-control" id="temperature_value" />
-                                <div class="inline_text">&#176;C.</div>
-                            </div>
-                            <div class="form-inline">
-                                <input type="number" class="form-control" id="door_delay" />
-                                <div class="inline_text">s when door is open.</div>
-                            </div>
-                            <div class="form-inline">
-                                <div class="inline_text">Battery percentage below:</div>
-                                <input type="number" class="form-control" id="battery_percentage" />
-                                <div class="inline_text">%</div>
-                            </div>
-                        </form>
-                        <form class="myForm form-inline mt-3"></form>
+                    <div id="collapse_co" class="collapse" data-parent="#accordion">
+                        <div class="card-body row">
+                            <form class="col-md-6">
+                                <h2>Camera settings</h2>
+                                <div class="form-group">
+                                    <label for="co_protocol">Protocol</label>
+                                    <select class="form-control" id="co_protocol">
+                                        <option value="http" selected>HTTP</option>
+                                        <option value="https">HTTPS</option>
+                                        <option value="https_insecure">HTTPS (insecure)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="co_ip">IP</label>
+                                    <input type="text" class="form-control" id="co_ip" placeholder="127.0.0.1" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="co_port">Port</label>
+                                    <input type="text" class="form-control" id="co_port" placeholder="80" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="co_user">User</label>
+                                    <input type="text" class="form-control" id="co_user" placeholder="root" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="co_password">Password</label>
+                                    <input
+                                        type="password"
+                                        class="form-control"
+                                        id="co_password"
+                                        placeholder="password"
+                                    />
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <button class="btn" data-toggle="collapse" data-target="#collapse_events"">
+                            <img src="camera_events.png" width="35px" height="35px"> Axis Events
+                        </button>
+                    </div>
+                    <div id="collapse_events" class="collapse" data-parent="#accordion">
+                        <div class="card-body row">
+                            <form class="col-md-6">
+                                <h2>Camera settings</h2>
+                                <div class="form-group">
+                                    <label for="events_protocol">Protocol</label>
+                                    <select class="form-control" id="events_protocol">
+                                        <option value="http" selected>HTTP</option>
+                                        <option value="https">HTTPS</option>
+                                        <option value="https_insecure">HTTPS (insecure)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="events_ip">IP</label>
+                                    <input type="text" class="form-control" id="events_ip" placeholder="127.0.0.1" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="events_port">Port</label>
+                                    <input type="text" class="form-control" id="events_port" placeholder="80" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="events_user">User</label>
+                                    <input type="text" class="form-control" id="events_user" placeholder="root" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="events_password">Password</label>
+                                    <input
+                                        type="password"
+                                        class="form-control"
+                                        id="events_password"
+                                        placeholder="password"
+                                    />
+                                </div>
+                            </form>
+                            <form class="col-md-6">
+                                <h2>Event settings</h2>
+                                <label>
+                                    Set delay when the camera event is triggered. (Set 0 for immediate reaction.)
+                                </label>
+                                <div class="form-inline">
+                                    <input type="number" class="form-control" id="temperature_delay" />
+                                    <div class="inline_text">s when temperature</div>
+                                    <select class="form-control" id="temperature_operator">
+                                        <option value="=">=</option>
+                                        <option value=">">&#62;</option>
+                                        <option value="<">&#60;</option>
+                                        <option value=">=">&#62;=</option>
+                                        <option value="<=">&#60;=</option>
+                                    </select>
+                                    <input type="number" class="form-control" id="temperature_value" />
+                                    <div class="inline_text">&#176;C.</div>
+                                </div>
+                                <div class="form-inline">
+                                    <input type="number" class="form-control" id="door_delay" />
+                                    <div class="inline_text">s when door is open.</div>
+                                </div>
+                                <div class="form-inline">
+                                    <div class="inline_text">Battery percentage below:</div>
+                                    <input type="number" class="form-control" id="battery_percentage" />
+                                    <div class="inline_text">%</div>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
