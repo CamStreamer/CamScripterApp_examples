@@ -185,7 +185,7 @@ function checkTemperatureCondition(actualTemperature: number, triggerTemperature
             return actualTemperature > triggerTemperature;
         case '<=':
             return actualTemperature <= triggerTemperature;
-        case '=>':
+        case '>=':
             return actualTemperature >= triggerTemperature;
         default:
             throw new Error('Unexpected operator.');
@@ -198,18 +198,22 @@ function checkConditions(response: Response): void {
     const events = settings.events;
     if (alarmSetup[Alarm.temperature]) {
         if (checkTemperatureCondition(response.temperature, events.temperature_value, events.temperature_operator)) {
-            clearTimeout(temperatureTimeoutID);
-            temperatureTimeoutID = setTimeout(triggerAlarm, events.temperature_delay, Alarm.temperature);
+            if (doorTimeoutID == null) {
+                temperatureTimeoutID = setTimeout(triggerAlarm, 1000 * events.temperature_delay, Alarm.temperature);
+            }
         } else {
             clearTimeout(temperatureTimeoutID);
         }
     }
     if (alarmSetup[Alarm.doors]) {
+        console.log(response.doorOpened);
         if (response.doorOpened) {
-            clearTimeout(doorTimeoutID);
-            doorTimeoutID = setTimeout(triggerAlarm, events.door_delay, Alarm.doors);
+            if (doorTimeoutID == null) {
+                doorTimeoutID = setTimeout(triggerAlarm, 1000 * events.door_delay, Alarm.doors);
+            }
         } else {
             clearTimeout(doorTimeoutID);
+            doorTimeoutID = null;
         }
     }
     if (alarmSetup[Alarm.batteryPercentage] && response.batteryChargePercentage < events.battery_charge_percentage) {
@@ -224,7 +228,7 @@ function checkConditions(response: Response): void {
 // |   power source   |
 // --------------------
 
-const refreshPeriod = 5000;
+const refreshPeriod = 1000;
 
 function parseResponse(response: string): Response {
     const answer: any = {};
@@ -237,13 +241,14 @@ function parseResponse(response: string): Response {
     const battBreak = answer.U08 == 0 ? (answer.T20[3] == 0 ? 'close' : 'open') : 'none';
     const doorOpened = answer.T20[4] != 0;
     const u1OutV = answer.T20[4] == 1 && answer.U09 == 0 ? 0 : answer.F01;
+
     return {
-        temperature: answer.F04,
-        batteryChargePercentage: answer.F05,
-        outputVoltage_1: u1OutV,
-        outputVoltage_2: answer.F02,
-        load: answer.F15,
-        current: answer.F03,
+        temperature: Number.parseFloat(answer.F04),
+        batteryChargePercentage: Number.parseFloat(answer.F05),
+        outputVoltage_1: Number.parseFloat(u1OutV),
+        outputVoltage_2: Number.parseFloat(answer.F02),
+        load: Number.parseFloat(answer.F15),
+        current: Number.parseFloat(answer.F03),
         doorOpened: doorOpened,
         battBreak: battBreak,
         gridConnection: ov,
@@ -296,7 +301,6 @@ import { CameraVapix } from 'camstreamerlib/CameraVapix';
 
 const cv = new CameraVapix({ ip: settings.events_camera.ip, auth: 'root:admin' });
 cv.on('tnsaxis:CameraApplicationPlatform/CamScripter/' + nameOfThisPackage, (event) => {
-    console.log(event);
-    console.log(event.params.notification.message);
+    console.log(event.params.notification.timestamp, event.params.notification.message.data);
 });
 cv.eventsConnect();
