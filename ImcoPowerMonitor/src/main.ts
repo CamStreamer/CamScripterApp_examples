@@ -5,7 +5,7 @@ import { httpRequest, HttpRequestOptions } from 'camstreamerlib/HttpRequest';
 import { CamOverlayAPI, CamOverlayOptions } from 'camstreamerlib/CamOverlayAPI';
 import {
     CamScripterAPICameraEventsGenerator,
-    CamScripterOptions,
+    CamScripterOptions, Response as CegResponse
 } from 'camstreamerlib/CamScripterAPICameraEventsGenerator';
 
 type Camera = {
@@ -24,9 +24,21 @@ type Settings = {
         temperature_operator: string;
         temperature_value: number;
         door_delay: number;
-        battery_percentage: number;
+        battery_charge_percentage: number;
     };
 };
+
+type Response = {
+    temperature: number,
+    batteryChargePercentage: number,
+    outputVoltage_1: number,    
+    outputVoltage_2: number,
+    load: number,    
+    current: number,   
+    doorOpened: boolean,   
+    battBreak: string,     
+    gridConnection: string
+}
 
 enum Alarm {
     temperature = "temperature",
@@ -34,8 +46,6 @@ enum Alarm {
     batteryPercentage = "battery_percentage",
     powerLineDisconnection = "power_line_disconnection"
 }
-
-let alarmSetup: Record<Alarm,boolean>;
 
 const nameOfThisPackage = 'imco_power_monitor';
 
@@ -46,6 +56,7 @@ const nameOfThisPackage = 'imco_power_monitor';
 let settings: Settings;
 let co: CamOverlayAPI;
 let ceg: CamScripterAPICameraEventsGenerator;
+let alarmSetup: Record<Alarm,boolean>;
 
 function readSettings(): void {
     try {
@@ -56,7 +67,7 @@ function readSettings(): void {
         process.exit(1);
     }
 }
-function coSetup() {
+function coSetup(): void {
     const co_camera = settings.co_camera;
     if (
         co_camera.protocol.length == 0 ||
@@ -110,7 +121,7 @@ async function declareEvents() {
         ],
     });
 }
-async function cegSetup() {
+async function cegSetup(): Promise<void> {
     const events_camera = settings.events_camera;
     if (
         events_camera.protocol.length == 0 ||
@@ -137,7 +148,7 @@ async function cegSetup() {
     alarmSetup = {
         "temperature": events.temperature_delay != null && events.temperature_operator.length != 0 && events.temperature_value != null,
         "doors_open": events.door_delay != null,
-        "battery_percentage": events.battery_percentage != null,
+        "battery_percentage": events.battery_charge_percentage != null,
         "power_line_disconnection": true
     }
 }
@@ -146,7 +157,7 @@ async function cegSetup() {
 // |   alarm   |
 // -------------
 
-function triggerAlarm(alarm: Alarm)
+function triggerAlarm(alarm: Alarm): Promise<CegResponse>
 {
     return ceg.sendEvent({
         declaration_id: nameOfThisPackage,
@@ -161,7 +172,7 @@ function triggerAlarm(alarm: Alarm)
     })
 }
 
-function checkTemperatureCondition(actualTemperature: number, triggerTemperature: number, operator: string)
+function checkTemperatureCondition(actualTemperature: number, triggerTemperature: number, operator: string): boolean
 {
     switch (operator)
     {
@@ -182,7 +193,7 @@ function checkTemperatureCondition(actualTemperature: number, triggerTemperature
 
 let temperatureTimeoutID: NodeJS.Timeout = null;
 let doorTimeoutID: NodeJS.Timeout = null;
-function checkConditions(response: Response)
+function checkConditions(response: Response): void
 {
     const events = settings.events;
     if (alarmSetup[Alarm.temperature])
@@ -199,7 +210,7 @@ function checkConditions(response: Response)
     }
     if (alarmSetup[Alarm.doors])
     {
-        if (!response.doorClosed)
+        if (response.doorOpened)
         {
             clearTimeout(doorTimeoutID);
             doorTimeoutID = setTimeout(triggerAlarm, events.door_delay, Alarm.doors);
@@ -209,11 +220,11 @@ function checkConditions(response: Response)
             clearTimeout(doorTimeoutID);
         }
     }
-    if (alarmSetup[Alarm.batteryPercentage] && response.capacity < events.battery_percentage)
+    if (alarmSetup[Alarm.batteryPercentage] && response.batteryChargePercentage < events.battery_charge_percentage)
     {
         triggerAlarm(Alarm.batteryPercentage);
     }
-    if (alarmSetup[Alarm.powerLineDisconnection])
+    if (alarmSetup[Alarm.powerLineDisconnection] && response.gridConnection != "ok")
     {
         triggerAlarm(Alarm.powerLineDisconnection);
     }
@@ -222,18 +233,6 @@ function checkConditions(response: Response)
 // --------------------
 // |   power source   |
 // --------------------
-
-type Response = {
-    temperature: number,
-    "capacity": number,
-    outputVoltage_1: number,    
-    outputVoltage_2: number,
-    "load": number,    
-    current: number,   
-    "battBreak": string,  
-    doorClosed: boolean,      
-    "outputVoltage": string
-}
 
 const refreshPeriod = 5000;
 
@@ -248,22 +247,22 @@ function parseResponse(response: string): Response
 
     const ov = (answer.U03==0 || answer.U90==0) ? ((answer.U14==1 || answer.U14==2) ? "yell" : "ok") : "error";
     const battBreak = (answer.U08 == 0) ? ((answer.T20[3]==0) ? "close" : "open") : "none"
-    const doorClosed = (answer.T20[4] == 0)
+    const doorOpened = (answer.T20[4] != 0)
     const u1OutV = (answer.T20[4] == 1 && answer.U09 == 0) ? 0 : answer.F01
     return {
-        temperature: answer.F04,     // Teplota akumulátora
-        "capacity": answer.F05,      // Stav nabitia / vybitia akumulátora v % (odlišit barevně např. na 5 úrovní)
-        outputVoltage_1: u1OutV,     // Výstupné napätie V1
-        outputVoltage_2: answer.F02, // Výstupné napätie V2
-        "load": answer.F15,          // Veľkosť zaťaženia v %
-        current: answer.F03,         // Výstupný prúd
-        "battBreak": battBreak,      // Istenie výstupu zdroja, akumulátora
-        doorClosed: doorClosed,      // stav dvířek
-        "outputVoltage": ov          // 230V připojeno/nepřipojeno
+        temperature: answer.F04,     
+        batteryChargePercentage: answer.F05,      
+        outputVoltage_1: u1OutV,     
+        outputVoltage_2: answer.F02, 
+        load: answer.F15,         
+        current: answer.F03,         
+        doorOpened: doorOpened,
+        battBreak: battBreak,     
+        gridConnection: ov   
     }
 }
 
-async function connectToPowerSource()
+async function connectToPowerSource(): Promise<void>
 {
     const options: HttpRequestOptions =
     {
@@ -284,7 +283,7 @@ async function connectToPowerSource()
 // |   entry point   |
 // -------------------
 
-async function main() {
+async function main(): Promise<void> {
     process.on('uncaughtException', (error) => {
         console.log(error.message);
         console.log(error.stack);
