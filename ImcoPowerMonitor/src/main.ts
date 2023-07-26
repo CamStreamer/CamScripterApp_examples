@@ -28,6 +28,15 @@ type Settings = {
     };
 };
 
+enum Alarm {
+    temperature = "temperature",
+    doors = "doors_open",
+    batteryPercentage = "battery_percentage",
+    powerLineDisconnection = "power_line_disconnection"
+}
+
+let alarmSetup: Record<Alarm,boolean>;
+
 const nameOfThisPackage = 'imco_power_monitor';
 
 // -------------
@@ -123,18 +132,21 @@ async function cegSetup() {
     ceg = new CamScripterAPICameraEventsGenerator(options);
     await ceg.connect();
     await declareEvents();
+
+    const events = settings.events;
+    alarmSetup = {
+        "temperature": events.temperature_delay != null && events.temperature_operator.length != 0 && events.temperature_value != null,
+        "doors_open": events.door_delay != null,
+        "battery_percentage": events.battery_percentage != null,
+        "power_line_disconnection": true
+    }
 }
 
 // -------------
 // |   alarm   |
 // -------------
 
-const temperatureAlarm = "temperature";
-const doorsAlarm = "doors_open";
-const batteryPercentageAlarm = "battery_percentage";
-const powerLineDisconnectionAlarm = "power_line_disconnection"
-
-function triggerAlarm(alarm: string)
+function triggerAlarm(alarm: Alarm)
 {
     return ceg.sendEvent({
         declaration_id: nameOfThisPackage,
@@ -149,13 +161,83 @@ function triggerAlarm(alarm: string)
     })
 }
 
+function checkTemperatureCondition(actualTemperature: number, triggerTemperature: number, operator: string)
+{
+    switch (operator)
+    {
+        case "=":
+            return actualTemperature == triggerTemperature;
+            case "<":
+                return actualTemperature < triggerTemperature;
+                case ">":
+                    return actualTemperature > triggerTemperature;
+                    case "<=":
+                        return actualTemperature <= triggerTemperature;
+                        case "=>":
+                            return actualTemperature >= triggerTemperature;
+                            default:
+                                throw new Error("Unexpected operator.");
+    }
+}
+
+let temperatureTimeoutID: NodeJS.Timeout = null;
+let doorTimeoutID: NodeJS.Timeout = null;
+function checkConditions(response: Response)
+{
+    const events = settings.events;
+    if (alarmSetup[Alarm.temperature])
+    {
+        if (checkTemperatureCondition(response.temperature, events.temperature_value, events.temperature_operator))
+        {
+            clearTimeout(temperatureTimeoutID);
+            temperatureTimeoutID = setTimeout(triggerAlarm, events.temperature_delay, Alarm.temperature);
+        }
+        else
+        {
+            clearTimeout(temperatureTimeoutID);
+        }
+    }
+    if (alarmSetup[Alarm.doors])
+    {
+        if (!response.doorClosed)
+        {
+            clearTimeout(doorTimeoutID);
+            doorTimeoutID = setTimeout(triggerAlarm, events.door_delay, Alarm.doors);
+        }
+        else
+        {
+            clearTimeout(doorTimeoutID);
+        }
+    }
+    if (alarmSetup[Alarm.batteryPercentage] && response.capacity < events.battery_percentage)
+    {
+        triggerAlarm(Alarm.batteryPercentage);
+    }
+    if (alarmSetup[Alarm.powerLineDisconnection])
+    {
+        triggerAlarm(Alarm.powerLineDisconnection);
+    }
+}
+
 // --------------------
 // |   power source   |
 // --------------------
 
+type Response = {
+    temperature: number,
+    "capacity": number,
+    outputVoltage_1: number,    
+    outputVoltage_2: number,
+    "load": number,    
+    current: number,   
+    "battBreak": string,  
+    doorClosed: boolean,      
+    "outputVoltage": string
+}
+
 const refreshPeriod = 5000;
 
-function parseResponse(response: string)
+function parseResponse(response: string): Response
 {
     const answer: any = {};
     const a = response.split("|");
@@ -186,18 +268,21 @@ async function connectToPowerSource()
     const options: HttpRequestOptions =
     {
         method: "GET",
-        protocol: "http",
+        protocol: "http:",
         host: "192.168.90.176",
         port: 80,
         path: "/shared.txt"
     }
-    const response: any = await httpRequest(options)
-    console.log(parseResponse(response))
+    const response = parseResponse(await httpRequest(options) as string);
+    
+    checkConditions(response)
 
     setTimeout(connectToPowerSource, refreshPeriod);
 }
 
-
+// -------------------
+// |   entry point   |
+// -------------------
 
 async function main() {
     process.on('uncaughtException', (error) => {
