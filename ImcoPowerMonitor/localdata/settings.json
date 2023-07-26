@@ -1,0 +1,26 @@
+{
+    "co_camera":
+    {
+        "protocol": "http",
+        "ip": "127.0.0.1",
+        "port": 80,
+        "user": "root",
+        "password": ""
+    },
+    "events_camera":
+    {
+        "protocol": "http",
+        "ip": "192.168.91.224",
+        "port": 80,
+        "user": "root",
+        "password": ""
+    },
+    "events":
+    {
+        "temperature_delay": null,
+        "temperature_operator": ">=",
+        "temperature_value": null,
+        "door_delay": null,
+        "battery_charge_percentage": null
+    }
+}
