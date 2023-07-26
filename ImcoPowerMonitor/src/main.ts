@@ -5,7 +5,8 @@ import { httpRequest, HttpRequestOptions } from 'camstreamerlib/HttpRequest';
 import { CamOverlayAPI, CamOverlayOptions } from 'camstreamerlib/CamOverlayAPI';
 import {
     CamScripterAPICameraEventsGenerator,
-    CamScripterOptions, Response as CegResponse
+    CamScripterOptions,
+    Response as CegResponse,
 } from 'camstreamerlib/CamScripterAPICameraEventsGenerator';
 
 type Camera = {
@@ -29,22 +30,22 @@ type Settings = {
 };
 
 type Response = {
-    temperature: number,
-    batteryChargePercentage: number,
-    outputVoltage_1: number,    
-    outputVoltage_2: number,
-    load: number,    
-    current: number,   
-    doorOpened: boolean,   
-    battBreak: string,     
-    gridConnection: string
-}
+    temperature: number;
+    batteryChargePercentage: number;
+    outputVoltage_1: number;
+    outputVoltage_2: number;
+    load: number;
+    current: number;
+    doorOpened: boolean;
+    battBreak: string;
+    gridConnection: string;
+};
 
 enum Alarm {
-    temperature = "temperature",
-    doors = "doors_open",
-    batteryPercentage = "battery_percentage",
-    powerLineDisconnection = "power_line_disconnection"
+    temperature = 'temperature',
+    doors = 'doors_open',
+    batteryPercentage = 'battery_percentage',
+    powerLineDisconnection = 'power_line_disconnection',
 }
 
 const nameOfThisPackage = 'imco_power_monitor';
@@ -56,7 +57,7 @@ const nameOfThisPackage = 'imco_power_monitor';
 let settings: Settings;
 let co: CamOverlayAPI;
 let ceg: CamScripterAPICameraEventsGenerator;
-let alarmSetup: Record<Alarm,boolean>;
+let alarmSetup: Record<Alarm, boolean>;
 
 function readSettings(): void {
     try {
@@ -146,86 +147,75 @@ async function cegSetup(): Promise<void> {
 
     const events = settings.events;
     alarmSetup = {
-        "temperature": events.temperature_delay != null && events.temperature_operator.length != 0 && events.temperature_value != null,
-        "doors_open": events.door_delay != null,
-        "battery_percentage": events.battery_charge_percentage != null,
-        "power_line_disconnection": true
-    }
+        temperature:
+            events.temperature_delay != null &&
+            events.temperature_operator.length != 0 &&
+            events.temperature_value != null,
+        doors_open: events.door_delay != null,
+        battery_percentage: events.battery_charge_percentage != null,
+        power_line_disconnection: true,
+    };
 }
 
 // -------------
 // |   alarm   |
 // -------------
 
-function triggerAlarm(alarm: Alarm): Promise<CegResponse>
-{
+function triggerAlarm(alarm: Alarm): Promise<CegResponse> {
     return ceg.sendEvent({
         declaration_id: nameOfThisPackage,
         event_data: [
             {
-                namespace: "",
+                namespace: '',
                 key: 'alarm',
                 value: alarm,
                 value_type: 'STRING',
-            }
-        ]
-    })
+            },
+        ],
+    });
 }
 
-function checkTemperatureCondition(actualTemperature: number, triggerTemperature: number, operator: string): boolean
-{
-    switch (operator)
-    {
-        case "=":
+function checkTemperatureCondition(actualTemperature: number, triggerTemperature: number, operator: string): boolean {
+    switch (operator) {
+        case '=':
             return actualTemperature == triggerTemperature;
-            case "<":
-                return actualTemperature < triggerTemperature;
-                case ">":
-                    return actualTemperature > triggerTemperature;
-                    case "<=":
-                        return actualTemperature <= triggerTemperature;
-                        case "=>":
-                            return actualTemperature >= triggerTemperature;
-                            default:
-                                throw new Error("Unexpected operator.");
+        case '<':
+            return actualTemperature < triggerTemperature;
+        case '>':
+            return actualTemperature > triggerTemperature;
+        case '<=':
+            return actualTemperature <= triggerTemperature;
+        case '=>':
+            return actualTemperature >= triggerTemperature;
+        default:
+            throw new Error('Unexpected operator.');
     }
 }
 
 let temperatureTimeoutID: NodeJS.Timeout = null;
 let doorTimeoutID: NodeJS.Timeout = null;
-function checkConditions(response: Response): void
-{
+function checkConditions(response: Response): void {
     const events = settings.events;
-    if (alarmSetup[Alarm.temperature])
-    {
-        if (checkTemperatureCondition(response.temperature, events.temperature_value, events.temperature_operator))
-        {
+    if (alarmSetup[Alarm.temperature]) {
+        if (checkTemperatureCondition(response.temperature, events.temperature_value, events.temperature_operator)) {
             clearTimeout(temperatureTimeoutID);
             temperatureTimeoutID = setTimeout(triggerAlarm, events.temperature_delay, Alarm.temperature);
-        }
-        else
-        {
+        } else {
             clearTimeout(temperatureTimeoutID);
         }
     }
-    if (alarmSetup[Alarm.doors])
-    {
-        if (response.doorOpened)
-        {
+    if (alarmSetup[Alarm.doors]) {
+        if (response.doorOpened) {
             clearTimeout(doorTimeoutID);
             doorTimeoutID = setTimeout(triggerAlarm, events.door_delay, Alarm.doors);
-        }
-        else
-        {
+        } else {
             clearTimeout(doorTimeoutID);
         }
     }
-    if (alarmSetup[Alarm.batteryPercentage] && response.batteryChargePercentage < events.battery_charge_percentage)
-    {
+    if (alarmSetup[Alarm.batteryPercentage] && response.batteryChargePercentage < events.battery_charge_percentage) {
         triggerAlarm(Alarm.batteryPercentage);
     }
-    if (alarmSetup[Alarm.powerLineDisconnection] && response.gridConnection != "ok")
-    {
+    if (alarmSetup[Alarm.powerLineDisconnection] && response.gridConnection != 'ok') {
         triggerAlarm(Alarm.powerLineDisconnection);
     }
 }
@@ -236,45 +226,41 @@ function checkConditions(response: Response): void
 
 const refreshPeriod = 5000;
 
-function parseResponse(response: string): Response
-{
+function parseResponse(response: string): Response {
     const answer: any = {};
-    const a = response.split("|");
-    for(let i=0; i<a.length; i+=2) 
-    { 
-        answer[a[i]] = a[i+1];
+    const a = response.split('|');
+    for (let i = 0; i < a.length; i += 2) {
+        answer[a[i]] = a[i + 1];
     }
 
-    const ov = (answer.U03==0 || answer.U90==0) ? ((answer.U14==1 || answer.U14==2) ? "yell" : "ok") : "error";
-    const battBreak = (answer.U08 == 0) ? ((answer.T20[3]==0) ? "close" : "open") : "none"
-    const doorOpened = (answer.T20[4] != 0)
-    const u1OutV = (answer.T20[4] == 1 && answer.U09 == 0) ? 0 : answer.F01
+    const ov = answer.U03 == 0 || answer.U90 == 0 ? (answer.U14 == 1 || answer.U14 == 2 ? 'yell' : 'ok') : 'error';
+    const battBreak = answer.U08 == 0 ? (answer.T20[3] == 0 ? 'close' : 'open') : 'none';
+    const doorOpened = answer.T20[4] != 0;
+    const u1OutV = answer.T20[4] == 1 && answer.U09 == 0 ? 0 : answer.F01;
     return {
-        temperature: answer.F04,     
-        batteryChargePercentage: answer.F05,      
-        outputVoltage_1: u1OutV,     
-        outputVoltage_2: answer.F02, 
-        load: answer.F15,         
-        current: answer.F03,         
+        temperature: answer.F04,
+        batteryChargePercentage: answer.F05,
+        outputVoltage_1: u1OutV,
+        outputVoltage_2: answer.F02,
+        load: answer.F15,
+        current: answer.F03,
         doorOpened: doorOpened,
-        battBreak: battBreak,     
-        gridConnection: ov   
-    }
+        battBreak: battBreak,
+        gridConnection: ov,
+    };
 }
 
-async function connectToPowerSource(): Promise<void>
-{
-    const options: HttpRequestOptions =
-    {
-        method: "GET",
-        protocol: "http:",
-        host: "192.168.90.176",
+async function connectToPowerSource(): Promise<void> {
+    const options: HttpRequestOptions = {
+        method: 'GET',
+        protocol: 'http:',
+        host: '192.168.90.176',
         port: 80,
-        path: "/shared.txt"
-    }
-    const response = parseResponse(await httpRequest(options) as string);
-    
-    checkConditions(response)
+        path: '/shared.txt',
+    };
+    const response = parseResponse((await httpRequest(options)) as string);
+
+    checkConditions(response);
 
     setTimeout(connectToPowerSource, refreshPeriod);
 }
