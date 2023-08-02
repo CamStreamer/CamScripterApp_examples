@@ -1,5 +1,5 @@
 # CamScripterApp_examples
-Example packages for CamScripter Acap application.
+Example packages for CamScripter Acap application. See [this repository](https://github.com/CamStreamer/CamScripterApp_packages_to_use) for more detailed packages description.
 ## Package Structure
 In source form the package should have the following structure:
 ```
@@ -66,9 +66,7 @@ packagename.zip/
 ├── package-lock.json
 └── ...
 ```
-To realse run this command in your package directory:
+To release run this command in your package directory:
 ```bash
-zip -r ../packagename.zip *
+npm run zip
 ```
-!!DO NOT USE `zip -r packagename.zip packagename/*` FROM OVERARCHING DIRECTORY. It will result in wrong directory structure!
-It should be noted `node_modules` directory will be created by npm automaticaly and should not ever be part of commit to this repository.
