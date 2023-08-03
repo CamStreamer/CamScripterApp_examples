@@ -38,6 +38,9 @@ const getReactHTMLCode = async () => {
         const scriptPromises = scriptNames.map((file) => readFile(mainPath + file));
         const codes = await Promise.all(scriptPromises);
 
+        if (!fs.existsSync('../html/assets/js')) {
+            fs.mkdirSync('../html/assets/js');
+        }
         await writeFile('../html/assets/js/react.min.js', codes.join(';\n'));
 
         console.log('SUCCESS');
