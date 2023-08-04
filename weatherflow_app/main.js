@@ -2,7 +2,7 @@ const fs = require("fs");
 const url = require("url");
 const { setInterval } = require("timers");
 const { https } = require("follow-redirects");
-const CamOverlayAPI = require("camstreamerlib/CamOverlayAPI");
+const { CamOverlayAPI } = require("camstreamerlib/CamOverlayAPI");
 
 
 let user = "root";
@@ -235,7 +235,7 @@ async function reqWeatherflowData(station, acc_token) {
         return JSON.parse(data);
     } catch (error) {
         console.log("Cannot get data form station: " + station + " with access token: " + acc_token);
-        //console.err(error);
+        //console.error(error);
     }
 }
 
@@ -267,7 +267,7 @@ async function oneAppPeriod() {
         count %= updatePeriod * 12; //uP*12*5s == uP*60s
     } catch (error) {
         console.log("Error Updating CamOverlay");
-        console.err(error);
+        console.error(error);
     }
 }
 
