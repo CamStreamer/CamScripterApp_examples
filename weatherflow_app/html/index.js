@@ -49,7 +49,7 @@ function inputChanged() {
     "camera_user": $("#userCam").val().trim(),
     "camera_pass": $("#passCam").val().trim(),
     "camera_ip": $('#camIP').val().trim(),
-    "camera_port": $('camPort').val().trim(),
+    "camera_port": $('#camPort').val().trim(),
     "access_token": $("#accessToken").val().trim(),
     "station_id": parseInt($("#stationID").val().trim()),
     "wheather_check_period": parseInt($("#updatePeriod").val().trim()),
