@@ -1,6 +1,8 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import * as util from 'util';
 
+import { httpRequest, HttpRequestOptions } from 'camstreamerlib/HttpRequest';
 import { CamOverlayDrawingAPI, UploadImageResponse } from 'camstreamerlib/CamOverlayDrawingAPI';
 
 import CairoFrame from './CairoFrame';
@@ -8,6 +10,7 @@ import CairoPainter from './CairoPainter';
 
 type SimInfo = {
     active: boolean;
+    slot: number;
     operator: string;
     connection_type: string;
     strenght: number;
@@ -16,14 +19,13 @@ type ModemInfo = {
     name: string;
     wan_ip: string;
 
-    sim_1: SimInfo;
-    sim_2: SimInfo;
+    sim: SimInfo;
     wifi_2: boolean;
     wifi_5: boolean;
 
     ports: Record<number, boolean>;
 
-    uptime: number;
+    uptime: string;
     latitude: number;
     longitude: number;
     last_update_time: string;
@@ -36,6 +38,11 @@ type Camera = {
     password: string;
 };
 type Settings = {
+    modem: {
+        token: string;
+        device: number;
+        refresh_period: number;
+    };
     co_camera: Camera;
     overlay: {
         scale: number;
@@ -67,6 +74,8 @@ type Frames = {
     lastUpdate: CairoFrame;
 };
 
+const setTimeoutPromise = util.promisify(setTimeout);
+
 let settings: Settings;
 let co: CamOverlayDrawingAPI = null;
 let coConnected = false;
@@ -92,9 +101,9 @@ function readSettings(): Settings {
     }
 }
 function isSetup(): boolean {
-    return co != null;
+    return settings.modem.device != null && settings.modem.token != '' && co != null;
 }
-async function coSetup(): Promise<void> {
+function coSetup(): void {
     const co_camera = settings.co_camera;
     const options = {
         ip: co_camera.ip,
@@ -245,7 +254,47 @@ function prepareCairoPainter(): void {
 //  |  connect to modem  |
 //  ----------------------
 
-function getTime(date: string): string {
+function transformSignalStrenght(strenght: number): number | never {
+    if (strenght > -57) {
+        return 5;
+    } else if (strenght > -67) {
+        return 4;
+    } else if (strenght > -82) {
+        return 3;
+    } else if (strenght > -97) {
+        return 2;
+    } else if (strenght > -111) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+function transformConnectionType(connection_type: string): string {
+    if (['5G-NSA', '5G-SA'].includes(connection_type)) {
+        return '5G';
+    } else if (['LTE', 'CAT-M1', 'FDD LTE', 'TDD LTE'].includes(connection_type)) {
+        return '4G';
+    } else if (
+        [
+            'WCDMA',
+            'HSDPA',
+            'HSUPA',
+            'HSPA',
+            'HSPA+',
+            'HSDPA and HSUPA',
+            'HSDPA and H',
+            'HSDPA+HSUPA',
+            'DC-HSPA+',
+        ].includes(connection_type)
+    ) {
+        return '3G';
+    } else if (['CDMA', 'EDGE', 'GPRS', 'GSM', 'CAT-NB1'].includes(connection_type)) {
+        return '2G';
+    } else {
+        return connection_type;
+    }
+}
+function getUpdateTime(date: string): string {
     const d = new Date(date);
     let hour = d.getHours().toString();
     let minute = d.getMinutes().toString();
@@ -263,28 +312,115 @@ function getTime(date: string): string {
 
     return `${hour}:${minute}:${second}`;
 }
-async function getModemInfo(deviceID = 859233): Promise<ModemInfo> {
+function parseUptime(uptime: number): string {
+    let second = (uptime % 60).toString();
+    uptime = Math.floor(uptime / 60);
+
+    let minute = (uptime % 60).toString();
+    uptime = Math.floor(uptime / 60);
+
+    let hour = (uptime % 60).toString();
+    uptime = Math.floor(uptime / 60);
+
+    if (hour.length == 1) {
+        hour = '0' + hour;
+    }
+    if (minute.length == 1) {
+        minute = '0' + minute;
+    }
+    if (second.length == 1) {
+        second = `0` + second;
+    }
+
+    return `${uptime}:${hour}:${minute}:${second}`;
+}
+function parseResponse(
+    response: Record<string, unknown>,
+    wireless: { ssid: string; active: number }[],
+    ports: { id: number; name: string; type: string }[]
+): ModemInfo {
+    let wifi_2 = false;
+    let wifi_5 = false;
+
+    for (const { ssid, active } of wireless) {
+        if (ssid == 'RUT_C52E_2G' && active == 1) {
+            wifi_2 = true;
+        } else if (ssid == 'RUT_C52F_5G' && active == 1) {
+            wifi_5 = true;
+        }
+    }
+
+    const portsInfo = [false, false, false, false, false];
+    for (const { name } of ports ?? []) {
+        portsInfo[parseInt(name.split(' ')[1]) - 1] = true;
+    }
+
     return {
-        name: 'Test RUTX50',
-        wan_ip: '100.106.115.186',
+        name: response.name as string,
+        wan_ip: response.wan_ip as string,
 
-        sim_1: {
-            strenght: 4,
-            connection_type: '5G',
-            active: true,
-            operator: 'Voda-Foun',
+        sim: {
+            active: response.sim_state == 'Inserted',
+            slot: response.sim_slot as number,
+            strenght: transformSignalStrenght(response.signal as number),
+            operator: response.operator as string,
+            connection_type: transformConnectionType(response.connection_type as string),
         },
-        sim_2: null,
-        wifi_2: true,
-        wifi_5: false,
+        wifi_2: wifi_2,
+        wifi_5: wifi_5,
 
-        ports: [null, true, false, true, false, true],
+        ports: portsInfo,
 
-        uptime: 415491,
-        latitude: 48.790625,
-        longitude: 14.269965,
-        last_update_time: getTime('2023-08-14 07:02:34'),
+        uptime: parseUptime(response.router_uptime as number),
+        latitude: response.latitude as number,
+        longitude: response.longitude as number,
+        last_update_time: getUpdateTime(response.last_update_at as string),
     };
+}
+async function getModemInfo(): Promise<void> {
+    const deviceID = settings.modem.device;
+
+    const o: HttpRequestOptions = {
+        method: 'GET',
+        protocol: 'https:',
+        host: 'rms.teltonika-networks.com',
+        port: 443,
+        path: '/api/devices/' + deviceID,
+
+        headers: {
+            accept: 'application/json',
+            Authorization: `Bearer ${settings.modem.token}`,
+        },
+    };
+
+    try {
+        let response = (await httpRequest(o)) as string;
+        const json = JSON.parse(response);
+
+        o.path += '/wireless';
+        response = (await httpRequest(o)) as string;
+        const wireless = JSON.parse(response);
+
+        o.path = `/api/devices/${deviceID}/port-scan?type=ethernet`;
+        response = (await httpRequest(o)) as string;
+
+        const channel = JSON.parse(response).meta.channel;
+        o.path = '/status/channel/' + channel;
+
+        await setTimeoutPromise(1000);
+        response = (await httpRequest(o)) as string;
+        const ports = JSON.parse(response).data[deviceID][0].ports;
+
+        const mi: ModemInfo = parseResponse(json.data, wireless.data, ports);
+
+        if (co != null && (await coConnect())) {
+            displayGraphics(mi);
+        }
+        setTimeout(getModemInfo, settings.modem.refresh_period);
+    } catch (error) {
+        console.error('Cannot connect to modem:', error);
+        setTimeout(getModemInfo, 10 * settings.modem.refresh_period);
+    }
 }
 
 //  ---------------------------
@@ -357,20 +493,22 @@ async function coConnect(): Promise<boolean> {
     }
     return coConnected;
 }
-function draw(mi: ModemInfo) {
+function displayGraphics(mi: ModemInfo) {
     frames.routerName.setText(mi.name, 'A_LEFT');
     frames.routerIP.setText(mi.wan_ip, 'A_LEFT');
 
-    frames.simInserted.setBgImage(mi.sim_1.active ? images['sim_1_active'] : images['sim_1_inactive'], 'fit');
-    frames.operator.setText(mi.sim_1.operator, 'A_LEFT');
-    frames.connectionType.setText(mi.sim_1.connection_type, 'A_LEFT');
-    frames.signalStrenght.setBgImage(images['strength_' + mi.sim_1.strenght], 'fit');
+    const img = mi.sim.slot;
 
-    frames.port_1.setBgImage(mi.ports[1] ? images['port_1_active'] : images['port_1_inactive'], 'fit');
-    frames.port_2.setBgImage(mi.ports[2] ? images['port_2_active'] : images['port_2_inactive'], 'fit');
-    frames.port_3.setBgImage(mi.ports[3] ? images['port_3_active'] : images['port_3_inactive'], 'fit');
-    frames.port_4.setBgImage(mi.ports[4] ? images['port_4_active'] : images['port_4_inactive'], 'fit');
-    frames.port_5.setBgImage(mi.ports[5] ? images['port_5_active'] : images['port_5_inactive'], 'fit');
+    frames.simInserted.setBgImage(mi.sim.active ? images[`sim_${img}_active`] : images[`sim_${img}_inactive`], 'fit');
+    frames.operator.setText(mi.sim.operator, 'A_LEFT');
+    frames.connectionType.setText(mi.sim.connection_type, 'A_LEFT');
+    frames.signalStrenght.setBgImage(images['strength_' + mi.sim.strenght], 'fit');
+
+    frames.port_1.setBgImage(mi.ports[0] ? images['port_1_active'] : images['port_1_inactive'], 'fit');
+    frames.port_2.setBgImage(mi.ports[1] ? images['port_2_active'] : images['port_2_inactive'], 'fit');
+    frames.port_3.setBgImage(mi.ports[2] ? images['port_3_active'] : images['port_3_inactive'], 'fit');
+    frames.port_4.setBgImage(mi.ports[3] ? images['port_4_active'] : images['port_4_inactive'], 'fit');
+    frames.port_5.setBgImage(mi.ports[4] ? images['port_5_active'] : images['port_5_inactive'], 'fit');
 
     frames.wifi_2.setBgImage(mi.wifi_2 ? images['wifi_2_active'] : images['wifi_2_inactive'], 'fit');
     frames.wifi_5.setBgImage(mi.wifi_5 ? images['wifi_5_active'] : images['wifi_5_inactive'], 'fit');
@@ -378,13 +516,15 @@ function draw(mi: ModemInfo) {
     frames.uptime.setText('Device uptime: ' + mi.uptime, 'A_LEFT');
     frames.coordinates.setText(`${mi.latitude} N, ${mi.longitude} E`, 'A_LEFT');
     frames.lastUpdate.setText('Last update: ' + mi.last_update_time, 'A_LEFT');
+
+    cp.generate(co, settings.overlay.scale);
 }
 
 //  ----------
 //  |  main  |
 //  ----------
 
-async function main() {
+function main() {
     process.on('uncaughtException', (e: Error) => {
         console.log('Uncaught exception:', e);
         process.exit();
@@ -397,7 +537,7 @@ async function main() {
     settings = readSettings();
 
     if (coConfigured()) {
-        await coSetup();
+        coSetup();
     }
 
     if (!isSetup()) {
@@ -405,11 +545,7 @@ async function main() {
         process.exit(1);
     }
 
-    const mi = await getModemInfo();
-
-    await coConnect();
-    draw(mi);
-    cp.generate(co, settings.overlay.scale);
+    getModemInfo();
 }
 
 main();
