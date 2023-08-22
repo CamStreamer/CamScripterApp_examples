@@ -52,6 +52,20 @@ type Settings = {
         width: number;
         height: number;
     };
+    map_camera: Camera;
+    map: {
+        x: number;
+        y: number;
+        alignment: string;
+        width: number;
+        height: number;
+
+        map_width: number;
+        map_height: number;
+        zoomLevel: number;
+        APIkey: string;
+        tolerance: number;
+    };
 };
 type Frames = {
     routerName: CairoFrame;
@@ -77,8 +91,12 @@ type Frames = {
 const setTimeoutPromise = util.promisify(setTimeout);
 
 let settings: Settings;
+
 let co: CamOverlayDrawingAPI = null;
 let coConnected = false;
+
+let mapCO: CamOverlayDrawingAPI = null;
+let mapCOconnected = false;
 
 let images: Record<string, UploadImageResponse>;
 let regular: string;
@@ -101,7 +119,7 @@ function readSettings(): Settings {
     }
 }
 function isSetup(): boolean {
-    return settings.modem.device != null && settings.modem.token != '' && co != null;
+    return settings.modem.device != null && settings.modem.token != '' && (co != null || mapCO != null);
 }
 function coSetup(): void {
     const co_camera = settings.co_camera;
@@ -248,6 +266,27 @@ function prepareCairoPainter(): void {
     });
 
     cp.insertAll(frames);
+}
+function mapCOsetup(): void {
+    const map_camera = settings.map_camera;
+    const options = {
+        ip: map_camera.ip,
+        port: map_camera.port,
+        auth: `${map_camera.user}:${map_camera.password}`,
+        tls: map_camera.protocol != 'http',
+        tlsInsecure: map_camera.protocol == 'https_insecure',
+    };
+    mapCO = new CamOverlayDrawingAPI(options);
+}
+function mapCOconfigured(): boolean {
+    const map_camera = settings.map_camera;
+    return (
+        map_camera.protocol != '' &&
+        map_camera.port != null &&
+        map_camera.ip != '' &&
+        map_camera.user != '' &&
+        map_camera.password != ''
+    );
 }
 
 //  ----------------------
@@ -416,6 +455,10 @@ async function getModemInfo(): Promise<void> {
         if (co != null && (await coConnect())) {
             displayGraphics(mi);
         }
+        if (mapCO != null && (await mapCOconnect())) {
+            displayMap({ latitude: mi.latitude, longitude: mi.longitude });
+        }
+
         setTimeout(getModemInfo, settings.modem.refresh_period);
     } catch (error) {
         console.error('Cannot connect to modem:', error);
@@ -520,6 +563,107 @@ function displayGraphics(mi: ModemInfo) {
     cp.generate(co, settings.overlay.scale);
 }
 
+//  ---------
+//  |  map  |
+//  ---------
+
+type Coordinates = {
+    latitude: number;
+    longitude: number;
+};
+function deg2rad(angle: number) {
+    return (angle * Math.PI) / 180;
+}
+function calculateDistance(a: Coordinates, b: Coordinates) {
+    const aLatRad = deg2rad(a.latitude);
+    const aLonRad = deg2rad(a.longitude);
+    const bLatRad = deg2rad(b.latitude);
+    const bLonRad = deg2rad(b.longitude);
+
+    const sinDiffLat = Math.sin((aLatRad - bLatRad) / 2);
+    const sinDiffLon = Math.sin((aLonRad - bLonRad) / 2);
+    const aCosLat = Math.cos(aLatRad);
+    const bCosLat = Math.cos(bLatRad);
+
+    const c = Math.pow(sinDiffLat, 2) + aCosLat * bCosLat * Math.pow(sinDiffLon, 2);
+    return 2000 * 6371 * Math.asin(Math.sqrt(c));
+}
+
+let lastCoordinates: Coordinates = null;
+async function getMapImage(actualCoordinates: Coordinates): Promise<Buffer> {
+    const map = settings.map;
+    const params = {
+        center: `${actualCoordinates.latitude},${actualCoordinates.longitude}`,
+        zoom: map.zoomLevel.toString(),
+        size: `${map.map_width}x${map.map_height}`,
+        key: map.APIkey,
+        markers: `${actualCoordinates.latitude},${actualCoordinates.longitude}`,
+    };
+
+    const path = '/maps/api/staticmap?' + new URLSearchParams(params).toString();
+
+    const options: HttpRequestOptions = {
+        host: 'maps.googleapis.com',
+        port: 443,
+        path: path,
+        protocol: 'https:',
+    };
+    return Buffer.from((await httpRequest(options)) as string);
+}
+
+async function displayMap(actualCoordinates: Coordinates) {
+    const map = settings.map;
+    try {
+        if (
+            actualCoordinates == null ||
+            (lastCoordinates != null && calculateDistance(lastCoordinates, actualCoordinates) < map.tolerance)
+        ) {
+            return;
+        }
+        lastCoordinates = actualCoordinates;
+        const buffer = await getMapImage(actualCoordinates);
+
+        const image = ((await mapCO.uploadImageData(buffer)) as UploadImageResponse).var;
+        const surface = (
+            (await mapCO.cairo(
+                'cairo_image_surface_create',
+                'CAIRO_FORMAT_ARGB32',
+                map.map_width,
+                map.map_height
+            )) as UploadImageResponse
+        ).var;
+        const cairo = ((await mapCO.cairo('cairo_create', surface)) as UploadImageResponse).var;
+
+        mapCO.cairo('cairo_set_source_surface', cairo, image, 0, 0);
+        mapCO.cairo('cairo_paint', cairo);
+        mapCO.showCairoImageAbsolute(surface, map.x, map.y, map.width, map.height);
+        mapCO.cairo('cairo_surface_destroy', image);
+        mapCO.cairo('cairo_surface_destroy', surface);
+        mapCO.cairo('cairo_destroy', cairo);
+    } catch (e) {
+        console.error(e);
+    }
+}
+async function mapCOconnect(): Promise<boolean> {
+    if (!mapCOconnected) {
+        mapCO.removeAllListeners();
+        mapCO.on('open', () => {
+            console.log('COAPI connected (map)');
+            mapCOconnected = true;
+        });
+        mapCO.on('error', function (err) {
+            console.log('COAPI-Error (map): ' + err);
+        });
+        mapCO.on('close', function () {
+            console.log('COAPI-Error (map): connection closed');
+            mapCOconnected = false;
+        });
+
+        await mapCO.connect();
+    }
+    return mapCOconnected;
+}
+
 //  ----------
 //  |  main  |
 //  ----------
@@ -538,6 +682,9 @@ function main() {
 
     if (coConfigured()) {
         coSetup();
+    }
+    if (mapCOconfigured) {
+        mapCOsetup();
     }
 
     if (!isSetup()) {

@@ -18,5 +18,18 @@
         "width": 1920,
         "height": 1080,
         "scale": 1
+    },
+    "map": {
+        "x": 10,
+        "y": 10,
+        "alignment": "top_right",
+        "width": 1920,
+        "height": 1080,
+
+        "map_width": 100,
+        "map_height": 100,
+        "zoomLevel": 15,
+        "APIkey": "",
+        "tolerance": 2
     }
 }
