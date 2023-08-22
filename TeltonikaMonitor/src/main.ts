@@ -18,6 +18,7 @@ type SimInfo = {
 type ModemInfo = {
     name: string;
     wan_ip: string;
+    wan_state: string;
 
     sim: SimInfo;
     wifi_2: boolean;
@@ -68,6 +69,7 @@ type Settings = {
     };
 };
 type Frames = {
+    wanState: CairoFrame;
     routerName: CairoFrame;
     routerIP: CairoFrame;
     simInserted: CairoFrame;
@@ -397,6 +399,7 @@ function parseResponse(
     return {
         name: response.name as string,
         wan_ip: response.wan_ip as string,
+        wan_state: response.wan_state as string,
 
         sim: {
             active: response.sim_state == 'Inserted',
@@ -471,13 +474,14 @@ async function getModemInfo(): Promise<void> {
 //  ---------------------------
 
 async function loadImages(): Promise<void> {
-    const imageNames = ['background', 'uptime_logo', 'coordinates_logo'];
+    const imageNames = ['background', 'uptime_logo', 'coordinates_logo', 'wan_wifi', 'wan_wired'];
 
     for (let f = 1; f <= 5; f += 1) {
         imageNames.push(`port_${f}_active`);
         imageNames.push(`port_${f}_inactive`);
     }
     for (let f = 1; f <= 2; f += 1) {
+        imageNames.push(`wan_sim_${f}`);
         imageNames.push(`sim_${f}_active`);
         imageNames.push(`sim_${f}_inactive`);
     }
@@ -537,10 +541,18 @@ async function coConnect(): Promise<boolean> {
     return coConnected;
 }
 function displayGraphics(mi: ModemInfo) {
+    const img = mi.sim.slot;
+
+    if (mi.wan_state == 'Mobile') {
+        frames.wanState.setBgImage(images[`wan_sim_${img}`], 'fit');
+    } else if (mi.wan_state == 'Wired') {
+        frames.wanState.setBgImage(images[`wan_wired`], 'fit');
+    } else {
+        frames.wanState.setBgImage(images[`wan_wifi`], 'fit');
+    }
+
     frames.routerName.setText(mi.name, 'A_LEFT');
     frames.routerIP.setText(mi.wan_ip, 'A_LEFT');
-
-    const img = mi.sim.slot;
 
     frames.simInserted.setBgImage(mi.sim.active ? images[`sim_${img}_active`] : images[`sim_${img}_inactive`], 'fit');
     frames.operator.setText(mi.sim.operator, 'A_LEFT');
