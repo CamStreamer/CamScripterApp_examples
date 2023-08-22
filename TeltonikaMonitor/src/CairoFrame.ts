@@ -103,7 +103,8 @@ export default class CairoFrame {
                 Math.floor(scale * this.posY),
                 Math.floor(scale * this.width),
                 Math.floor(scale * this.height),
-                this.align
+                this.align,
+                'TFM_OVERFLOW'
             );
         }
     }
@@ -171,5 +172,11 @@ export default class CairoFrame {
             this.height = this.bg_height;
         }
         this.bg_type = type;
+    }
+
+    removeImage(): void {
+        this.bg_image = null;
+        this.bg_width = 0;
+        this.bg_height = 0;
     }
 }

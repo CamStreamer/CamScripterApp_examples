@@ -72,10 +72,14 @@ type Frames = {
     wanState: CairoFrame;
     routerName: CairoFrame;
     routerIP: CairoFrame;
-    simInserted: CairoFrame;
-    operator: CairoFrame;
-    connectionType: CairoFrame;
-    signalStrenght: CairoFrame;
+    simInserted_1: CairoFrame;
+    operator_1: CairoFrame;
+    connectionType_1: CairoFrame;
+    signalStrenght_1: CairoFrame;
+    simInserted_2: CairoFrame;
+    operator_2: CairoFrame;
+    connectionType_2: CairoFrame;
+    signalStrenght_2: CairoFrame;
     port_1: CairoFrame;
     port_2: CairoFrame;
     port_3: CairoFrame;
@@ -158,113 +162,143 @@ function prepareCairoPainter(): void {
     });
 
     frames = {} as Frames;
+    frames.wanState = new CairoFrame({
+        x: 55,
+        y: 62,
+        width: 62,
+        height: 59,
+    });
     frames.routerName = new CairoFrame({
-        x: 0,
-        y: 0,
-        width: 300,
-        height: 50,
+        x: 148,
+        y: 73,
+        width: 301,
+        height: 35,
     });
     frames.routerIP = new CairoFrame({
-        x: 350,
-        y: 0,
-        width: 300,
-        height: 50,
+        x: 651,
+        y: 73,
+        width: 269,
+        height: 35,
     });
-    frames.simInserted = new CairoFrame({
-        x: 0,
-        y: 50,
+    frames.simInserted_1 = new CairoFrame({
+        x: 55,
+        y: 158,
         width: 109,
         height: 146,
     });
-    frames.operator = new CairoFrame({
-        x: 110,
-        y: 50,
-        width: 300,
-        height: 50,
+    frames.operator_1 = new CairoFrame({
+        x: 189,
+        y: 204,
+        width: 164,
+        height: 28,
     });
-    frames.connectionType = new CairoFrame({
-        x: 110,
-        y: 100,
-        width: 50,
-        height: 50,
+    frames.connectionType_1 = new CairoFrame({
+        x: 189,
+        y: 259,
+        width: 53,
+        height: 28,
     });
-    frames.signalStrenght = new CairoFrame({
-        x: 160,
-        y: 100,
+    frames.signalStrenght_1 = new CairoFrame({
+        x: 265,
+        y: 243,
+        width: 51,
+        height: 41,
+    });
+    frames.simInserted_2 = new CairoFrame({
+        x: 483,
+        y: 158,
+        width: 109,
+        height: 146,
+    });
+    frames.operator_2 = new CairoFrame({
+        x: 625,
+        y: 204,
+        width: 164,
+        height: 28,
+    });
+    frames.connectionType_2 = new CairoFrame({
+        x: 625,
+        y: 259,
+        width: 53,
+        height: 28,
+    });
+    frames.signalStrenght_2 = new CairoFrame({
+        x: 700,
+        y: 243,
         width: 51,
         height: 41,
     });
     frames.port_1 = new CairoFrame({
-        x: 0,
-        y: 200,
+        x: 55,
+        y: 356,
         width: 94,
         height: 70,
     });
     frames.port_2 = new CairoFrame({
-        x: 80,
-        y: 200,
+        x: 200,
+        y: 356,
         width: 94,
         height: 70,
     });
     frames.port_3 = new CairoFrame({
-        x: 160,
-        y: 200,
+        x: 345,
+        y: 356,
         width: 94,
         height: 70,
     });
     frames.port_4 = new CairoFrame({
-        x: 240,
-        y: 200,
+        x: 490,
+        y: 356,
         width: 94,
         height: 70,
     });
     frames.port_5 = new CairoFrame({
-        x: 320,
-        y: 200,
+        x: 634,
+        y: 356,
         width: 94,
         height: 70,
     });
     frames.wifi_2 = new CairoFrame({
-        x: 0,
-        y: 400,
+        x: 55,
+        y: 445,
         width: 306,
         height: 65,
     });
     frames.wifi_5 = new CairoFrame({
-        x: 400,
-        y: 400,
+        x: 483,
+        y: 445,
         width: 270,
         height: 65,
     });
     frames.uptimeLogo = new CairoFrame({
-        x: 0,
-        y: 500,
+        x: 55,
+        y: 556,
         width: 57,
         height: 59,
     });
     frames.uptime = new CairoFrame({
-        x: 100,
-        y: 500,
-        width: 300,
-        height: 50,
+        x: 148,
+        y: 568,
+        width: 508,
+        height: 29,
     });
     frames.coordinatesLogo = new CairoFrame({
-        x: 0,
-        y: 600,
+        x: 55,
+        y: 645,
         width: 59,
         height: 79,
     });
     frames.coordinates = new CairoFrame({
-        x: 100,
-        y: 600,
-        width: 300,
-        height: 50,
+        x: 148,
+        y: 653,
+        width: 525,
+        height: 29,
     });
     frames.lastUpdate = new CairoFrame({
-        x: 100,
-        y: 650,
-        width: 300,
-        height: 50,
+        x: 148,
+        y: 694,
+        width: 554,
+        height: 21,
     });
 
     cp.insertAll(frames);
@@ -351,7 +385,7 @@ function getUpdateTime(date: string): string {
         second = '0' + second;
     }
 
-    return `${hour}:${minute}:${second}`;
+    return `${d.getDate()}. ${d.getMonth()}. ${d.getFullYear()} ${hour}:${minute}:${second}`;
 }
 function parseUptime(uptime: number): string {
     let second = (uptime % 60).toString();
@@ -360,8 +394,8 @@ function parseUptime(uptime: number): string {
     let minute = (uptime % 60).toString();
     uptime = Math.floor(uptime / 60);
 
-    let hour = (uptime % 60).toString();
-    uptime = Math.floor(uptime / 60);
+    let hour = (uptime % 24).toString();
+    uptime = Math.floor(uptime / 24);
 
     if (hour.length == 1) {
         hour = '0' + hour;
@@ -508,8 +542,10 @@ function updateFrames(): void {
 
     frames.routerName.setFont(bold);
     frames.routerIP.setFont(bold);
-    frames.connectionType.setFont(bold);
-    frames.operator.setFont(bold);
+    frames.connectionType_1.setFont(bold);
+    frames.operator_1.setFont(bold);
+    frames.connectionType_2.setFont(bold);
+    frames.operator_2.setFont(bold);
     frames.uptime.setFont(bold);
     frames.coordinates.setFont(bold);
     frames.lastUpdate.setFont(regular);
@@ -544,20 +580,37 @@ function displayGraphics(mi: ModemInfo) {
     const img = mi.sim.slot;
 
     if (mi.wan_state == 'Mobile') {
-        frames.wanState.setBgImage(images[`wan_sim_${img}`], 'fit');
+        frames.wanState.setBgImage(images[`wan_sim_${img}`], 'stretch');
     } else if (mi.wan_state == 'Wired') {
-        frames.wanState.setBgImage(images[`wan_wired`], 'fit');
+        frames.wanState.setBgImage(images[`wan_wired`], 'stretch');
     } else {
-        frames.wanState.setBgImage(images[`wan_wifi`], 'fit');
+        frames.wanState.setBgImage(images[`wan_wifi`], 'stretch');
     }
 
     frames.routerName.setText(mi.name, 'A_LEFT');
     frames.routerIP.setText(mi.wan_ip, 'A_LEFT');
 
-    frames.simInserted.setBgImage(mi.sim.active ? images[`sim_${img}_active`] : images[`sim_${img}_inactive`], 'fit');
-    frames.operator.setText(mi.sim.operator, 'A_LEFT');
-    frames.connectionType.setText(mi.sim.connection_type, 'A_LEFT');
-    frames.signalStrenght.setBgImage(images['strength_' + mi.sim.strenght], 'fit');
+    if (img == 1) {
+        frames.simInserted_1.setBgImage(mi.sim.active ? images[`sim_1_active`] : images[`sim_1_inactive`], 'fit');
+        frames.operator_1.setText(mi.sim.operator, 'A_LEFT');
+        frames.connectionType_1.setText(mi.sim.connection_type, 'A_LEFT');
+        frames.signalStrenght_1.setBgImage(images['strength_' + mi.sim.strenght], 'fit');
+
+        frames.simInserted_2.setBgImage(images[`sim_2_inactive`], 'fit');
+        frames.operator_2.setText('', 'A_LEFT');
+        frames.connectionType_2.setText('', 'A_LEFT');
+        frames.signalStrenght_2.removeImage();
+    } else {
+        frames.simInserted_2.setBgImage(mi.sim.active ? images[`sim_2_active`] : images[`sim_2_inactive`], 'fit');
+        frames.operator_2.setText(mi.sim.operator, 'A_LEFT');
+        frames.connectionType_2.setText(mi.sim.connection_type, 'A_LEFT');
+        frames.signalStrenght_2.setBgImage(images['strength_' + mi.sim.strenght], 'fit');
+
+        frames.simInserted_1.setBgImage(images[`sim_1_inactive`], 'fit');
+        frames.operator_1.setText('', 'A_LEFT');
+        frames.connectionType_1.setText('', 'A_LEFT');
+        frames.signalStrenght_1.removeImage();
+    }
 
     frames.port_1.setBgImage(mi.ports[0] ? images['port_1_active'] : images['port_1_inactive'], 'fit');
     frames.port_2.setBgImage(mi.ports[1] ? images['port_2_active'] : images['port_2_inactive'], 'fit');
