@@ -110,6 +110,7 @@ let images: Record<string, UploadImageResponse>;
 let regular: string;
 let bold: string;
 
+let mapCP: CairoPainter;
 let cp: CairoPainter;
 let frames: Frames;
 
@@ -306,7 +307,9 @@ function prepareCairoPainter(): void {
     cp.insertAll(frames);
 }
 function mapCOsetup(): void {
+    const map = settings.map;
     const map_camera = settings.map_camera;
+
     const options = {
         ip: map_camera.ip,
         port: map_camera.port,
@@ -315,6 +318,15 @@ function mapCOsetup(): void {
         tlsInsecure: map_camera.protocol == 'https_insecure',
     };
     mapCO = new CamOverlayDrawingAPI(options);
+    mapCP = new CairoPainter({
+        x: map.x,
+        y: map.y,
+        width: map.map_width,
+        height: map.map_height,
+        screen_width: map.width,
+        screen_height: map.height,
+        co_ord: map.alignment,
+    });
 }
 function mapCOconfigured(): boolean {
     const map_camera = settings.map_camera;
@@ -704,23 +716,10 @@ async function displayMap(actualCoordinates: Coordinates) {
         lastCoordinates = actualCoordinates;
         const buffer = await getMapImage(actualCoordinates);
 
-        const image = ((await mapCO.uploadImageData(buffer)) as UploadImageResponse).var;
-        const surface = (
-            (await mapCO.cairo(
-                'cairo_image_surface_create',
-                'CAIRO_FORMAT_ARGB32',
-                map.map_width,
-                map.map_height
-            )) as UploadImageResponse
-        ).var;
-        const cairo = ((await mapCO.cairo('cairo_create', surface)) as UploadImageResponse).var;
+        const image = (await mapCO.uploadImageData(buffer)) as UploadImageResponse;
 
-        mapCO.cairo('cairo_set_source_surface', cairo, image, 0, 0);
-        mapCO.cairo('cairo_paint', cairo);
-        mapCO.showCairoImageAbsolute(surface, map.x, map.y, map.width, map.height);
-        mapCO.cairo('cairo_surface_destroy', image);
-        mapCO.cairo('cairo_surface_destroy', surface);
-        mapCO.cairo('cairo_destroy', cairo);
+        mapCP.setBgImage(image, 'stretch');
+        mapCP.generate(mapCO);
     } catch (e) {
         console.error(e);
     }
