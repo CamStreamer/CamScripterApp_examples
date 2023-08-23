@@ -5,9 +5,18 @@
     "prettier": "@camstreamer/prettier-config",
     "main": "src/main.ts",
     "scripts": {
-        "clean": "rimraf dist/*",
+        "in:prod": "npm install --omit dev",
+        "in:all": "npm install",
+        "clean": "rimraf dist/* html/*",
         "try": "ts-node src/main.ts",
-        "pretty": "prettier --write \"./src/*.{ts,tsx}\""
+        "start": "cd react && npm run start && cd ..",
+        "pretty": "prettier --write \"./{src,react/src,react/src/components}/*.{ts,tsx}\"",
+        "build:BE": "tsc",
+        "build:FE": "cd react && npm run build && cd ..",
+        "build": "npm-run-all build:BE build:FE",
+        "prepare-zip": "npm-run-all build in:prod",
+        "zip:package": "node node_modules/camstreamerlib/CreatePackage -i -e=react,testing",
+        "zip": "npm-run-all clean prepare-zip zip:package in:all"
     },
     "author": "CamStreamer s.r.o.",
     "license": "ISC",
