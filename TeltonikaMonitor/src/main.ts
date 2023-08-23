@@ -1,7 +1,9 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as util from 'util';
+import * as https from 'https';
 
+import { URLSearchParams } from 'url';
 import { httpRequest, HttpRequestOptions } from 'camstreamerlib/HttpRequest';
 import { CamOverlayDrawingAPI, UploadImageResponse } from 'camstreamerlib/CamOverlayDrawingAPI';
 
@@ -657,23 +659,37 @@ function calculateDistance(a: Coordinates, b: Coordinates) {
 let lastCoordinates: Coordinates = null;
 async function getMapImage(actualCoordinates: Coordinates): Promise<Buffer> {
     const map = settings.map;
-    const params = {
-        center: `${actualCoordinates.latitude},${actualCoordinates.longitude}`,
-        zoom: map.zoomLevel.toString(),
-        size: `${map.map_width}x${map.map_height}`,
-        key: map.APIkey,
-        markers: `${actualCoordinates.latitude},${actualCoordinates.longitude}`,
-    };
+    return new Promise<Buffer>((resolve, reject) => {
+        const params = {
+            center: `${actualCoordinates.latitude},${actualCoordinates.longitude}`,
+            zoom: map.zoomLevel.toString(),
+            size: `${map.map_width}x${map.map_height}`,
+            key: map.APIkey,
+            markers: `${actualCoordinates.latitude},${actualCoordinates.longitude}`,
+        };
 
-    const path = '/maps/api/staticmap?' + new URLSearchParams(params).toString();
+        const path = '/maps/api/staticmap?' + new URLSearchParams(params).toString();
 
-    const options: HttpRequestOptions = {
-        host: 'maps.googleapis.com',
-        port: 443,
-        path: path,
-        protocol: 'https:',
-    };
-    return Buffer.from((await httpRequest(options)) as string);
+        const options: HttpRequestOptions = {
+            host: 'maps.googleapis.com',
+            port: 443,
+            path: path,
+        };
+
+        let dataBuffer = Buffer.alloc(0);
+        const request = https.request(options, (response) => {
+            response.on('data', (chunk) => {
+                dataBuffer = Buffer.concat([dataBuffer, chunk]);
+            });
+            response.on('end', () => {
+                resolve(dataBuffer);
+            });
+        });
+        request.on('error', (err) => {
+            reject(err);
+        });
+        request.end();
+    });
 }
 
 async function displayMap(actualCoordinates: Coordinates) {
