@@ -641,7 +641,7 @@ function displayGraphics(mi: ModemInfo) {
     frames.coordinates.setText(`${mi.latitude} N, ${mi.longitude} E`, 'A_LEFT');
     frames.lastUpdate.setText('Last update: ' + mi.last_update_time, 'A_LEFT');
 
-    cp.generate(co, settings.overlay.scale);
+    cp.generate(co, (2 * settings.overlay.scale) / 3);
 }
 
 //  ---------
@@ -765,7 +765,7 @@ function main() {
     if (coConfigured()) {
         coSetup();
     }
-    if (mapCOconfigured) {
+    if (mapCOconfigured()) {
         mapCOsetup();
     }
 
