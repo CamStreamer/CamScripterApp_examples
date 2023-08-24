@@ -14,13 +14,13 @@ type SimInfo = {
     active: boolean;
     slot: number;
     operator: string;
-    connection_type: string;
+    connectionType: string;
     strenght: number;
 };
 type ModemInfo = {
     name: string;
-    wan_ip: string;
-    wan_state: string;
+    wanIP: string;
+    wanState: string;
 
     sim: SimInfo;
     wifi_2: boolean;
@@ -31,7 +31,7 @@ type ModemInfo = {
     uptime: string;
     latitude: number;
     longitude: number;
-    last_update_time: string;
+    lastUpdateTime: string;
 };
 type Camera = {
     protocol: string;
@@ -74,21 +74,21 @@ type Frames = {
     wanState: CairoFrame;
     routerName: CairoFrame;
     routerIP: CairoFrame;
-    simInserted_1: CairoFrame;
-    operator_1: CairoFrame;
-    connectionType_1: CairoFrame;
-    signalStrenght_1: CairoFrame;
-    simInserted_2: CairoFrame;
-    operator_2: CairoFrame;
-    connectionType_2: CairoFrame;
-    signalStrenght_2: CairoFrame;
-    port_1: CairoFrame;
-    port_2: CairoFrame;
-    port_3: CairoFrame;
-    port_4: CairoFrame;
-    port_5: CairoFrame;
-    wifi_2: CairoFrame;
-    wifi_5: CairoFrame;
+    simInserted1: CairoFrame;
+    operator1: CairoFrame;
+    connectionType1: CairoFrame;
+    signalStrenght1: CairoFrame;
+    simInserted2: CairoFrame;
+    operator2: CairoFrame;
+    connectionType2: CairoFrame;
+    signalStrenght2: CairoFrame;
+    port1: CairoFrame;
+    port2: CairoFrame;
+    port3: CairoFrame;
+    port4: CairoFrame;
+    port5: CairoFrame;
+    wifi2: CairoFrame;
+    wifi5: CairoFrame;
     uptimeLogo: CairoFrame;
     uptime: CairoFrame;
     coordinatesLogo: CairoFrame;
@@ -128,28 +128,28 @@ function readSettings(): Settings {
     }
 }
 function isSetup(): boolean {
-    return settings.modem.device != null && settings.modem.token != '' && (co != null || mapCO != null);
+    return settings.modem.device !== null && settings.modem.token !== '' && (co !== null || mapCO !== null);
 }
 function coSetup(): void {
-    const co_camera = settings.co_camera;
+    const coCamera = settings.co_camera;
     const options = {
-        ip: co_camera.ip,
-        port: co_camera.port,
-        auth: `${co_camera.user}:${co_camera.password}`,
-        tls: co_camera.protocol != 'http',
-        tlsInsecure: co_camera.protocol == 'https_insecure',
+        ip: coCamera.ip,
+        port: coCamera.port,
+        auth: `${coCamera.user}:${coCamera.password}`,
+        tls: coCamera.protocol !== 'http',
+        tlsInsecure: coCamera.protocol === 'https_insecure',
     };
     co = new CamOverlayDrawingAPI(options);
     prepareCairoPainter();
 }
 function coConfigured(): boolean {
-    const co_camera = settings.co_camera;
+    const coCamera = settings.co_camera;
     return (
-        co_camera.protocol != '' &&
-        co_camera.port != null &&
-        co_camera.ip != '' &&
-        co_camera.user != '' &&
-        co_camera.password != ''
+        coCamera.protocol !== '' &&
+        coCamera.port !== null &&
+        coCamera.ip !== '' &&
+        coCamera.user !== '' &&
+        coCamera.password !== ''
     );
 }
 function prepareCairoPainter(): void {
@@ -183,91 +183,91 @@ function prepareCairoPainter(): void {
         width: 221,
         height: 35,
     });
-    frames.simInserted_1 = new CairoFrame({
+    frames.simInserted1 = new CairoFrame({
         x: 55,
         y: 158,
         width: 109,
         height: 146,
     });
-    frames.operator_1 = new CairoFrame({
+    frames.operator1 = new CairoFrame({
         x: 189,
         y: 204,
         width: 281,
         height: 28,
     });
-    frames.connectionType_1 = new CairoFrame({
+    frames.connectionType1 = new CairoFrame({
         x: 189,
         y: 244,
         width: 70,
         height: 37,
     });
-    frames.signalStrenght_1 = new CairoFrame({
+    frames.signalStrenght1 = new CairoFrame({
         x: 265,
         y: 243,
         width: 51,
         height: 41,
     });
-    frames.simInserted_2 = new CairoFrame({
+    frames.simInserted2 = new CairoFrame({
         x: 478,
         y: 158,
         width: 109,
         height: 146,
     });
-    frames.operator_2 = new CairoFrame({
+    frames.operator2 = new CairoFrame({
         x: 620,
         y: 204,
         width: 281,
         height: 28,
     });
-    frames.connectionType_2 = new CairoFrame({
+    frames.connectionType2 = new CairoFrame({
         x: 620,
         y: 244,
         width: 70,
         height: 37,
     });
-    frames.signalStrenght_2 = new CairoFrame({
+    frames.signalStrenght2 = new CairoFrame({
         x: 695,
         y: 243,
         width: 51,
         height: 41,
     });
-    frames.port_1 = new CairoFrame({
+    frames.port1 = new CairoFrame({
         x: 55,
         y: 356,
         width: 94,
         height: 70,
     });
-    frames.port_2 = new CairoFrame({
+    frames.port2 = new CairoFrame({
         x: 200,
         y: 356,
         width: 94,
         height: 70,
     });
-    frames.port_3 = new CairoFrame({
+    frames.port3 = new CairoFrame({
         x: 345,
         y: 356,
         width: 94,
         height: 70,
     });
-    frames.port_4 = new CairoFrame({
+    frames.port4 = new CairoFrame({
         x: 490,
         y: 356,
         width: 94,
         height: 70,
     });
-    frames.port_5 = new CairoFrame({
+    frames.port5 = new CairoFrame({
         x: 634,
         y: 356,
         width: 94,
         height: 70,
     });
-    frames.wifi_2 = new CairoFrame({
+    frames.wifi2 = new CairoFrame({
         x: 55,
         y: 445,
         width: 306,
         height: 65,
     });
-    frames.wifi_5 = new CairoFrame({
+    frames.wifi5 = new CairoFrame({
         x: 483,
         y: 445,
         width: 270,
@@ -308,14 +308,14 @@ function prepareCairoPainter(): void {
 }
 function mapCOsetup(): void {
     const map = settings.map;
-    const map_camera = settings.map_camera;
+    const mapCamera = settings.map_camera;
 
     const options = {
-        ip: map_camera.ip,
-        port: map_camera.port,
-        auth: `${map_camera.user}:${map_camera.password}`,
-        tls: map_camera.protocol != 'http',
-        tlsInsecure: map_camera.protocol == 'https_insecure',
+        ip: mapCamera.ip,
+        port: mapCamera.port,
+        auth: `${mapCamera.user}:${mapCamera.password}`,
+        tls: mapCamera.protocol !== 'http',
+        tlsInsecure: mapCamera.protocol === 'https_insecure',
     };
     mapCO = new CamOverlayDrawingAPI(options);
     mapCP = new CairoPainter({
@@ -329,13 +329,13 @@ function mapCOsetup(): void {
     });
 }
 function mapCOconfigured(): boolean {
-    const map_camera = settings.map_camera;
+    const mapCamera = settings.map_camera;
     return (
-        map_camera.protocol != '' &&
-        map_camera.port != null &&
-        map_camera.ip != '' &&
-        map_camera.user != '' &&
-        map_camera.password != ''
+        mapCamera.protocol !== '' &&
+        mapCamera.port !== null &&
+        mapCamera.ip !== '' &&
+        mapCamera.user !== '' &&
+        mapCamera.password !== ''
     );
 }
 
@@ -359,10 +359,10 @@ function transformSignalStrenght(strenght: number): number | never {
         return 0;
     }
 }
-function transformConnectionType(connection_type: string): string {
-    if (['5G-NSA', '5G-SA'].includes(connection_type)) {
+function transformConnectionType(connectionType: string): string {
+    if (['5G-NSA', '5G-SA'].includes(connectionType)) {
         return '5G';
-    } else if (['LTE', 'CAT-M1', 'FDD LTE', 'TDD LTE'].includes(connection_type)) {
+    } else if (['LTE', 'CAT-M1', 'FDD LTE', 'TDD LTE'].includes(connectionType)) {
         return '4G';
     } else if (
         [
@@ -375,13 +375,13 @@ function transformConnectionType(connection_type: string): string {
             'HSDPA and H',
             'HSDPA+HSUPA',
             'DC-HSPA+',
-        ].includes(connection_type)
+        ].includes(connectionType)
     ) {
         return '3G';
-    } else if (['CDMA', 'EDGE', 'GPRS', 'GSM', 'CAT-NB1'].includes(connection_type)) {
+    } else if (['CDMA', 'EDGE', 'GPRS', 'GSM', 'CAT-NB1'].includes(connectionType)) {
         return '2G';
     } else {
-        return connection_type;
+        return connectionType;
     }
 }
 function getUpdateTime(date: string): string {
@@ -390,13 +390,13 @@ function getUpdateTime(date: string): string {
     let minute = d.getMinutes().toString();
     let second = d.getSeconds().toString();
 
-    if (hour.length == 1) {
+    if (hour.length === 1) {
         hour = '0' + hour;
     }
-    if (minute.length == 1) {
+    if (minute.length === 1) {
         minute = '0' + minute;
     }
-    if (second.length == 1) {
+    if (second.length === 1) {
         second = '0' + second;
     }
 
@@ -412,19 +412,19 @@ function parseUptime(uptime: number): string {
     let hour = (uptime % 24).toString();
     uptime = Math.floor(uptime / 24);
 
-    if (hour.length == 1) {
+    if (hour.length === 1) {
         hour = '0' + hour;
     }
-    if (minute.length == 1) {
+    if (minute.length === 1) {
         minute = '0' + minute;
     }
-    if (second.length == 1) {
+    if (second.length === 1) {
         second = `0` + second;
     }
 
     return `${uptime}:${hour}:${minute}:${second}`;
 }
-function parseResponse(
+function parseTeltonikaResponse(
     response: Record<string, unknown>,
     wireless: { ssid: string; active: number }[],
     ports: { id: number; name: string; type: string }[]
@@ -433,14 +433,14 @@ function parseResponse(
     let wifi_5 = false;
 
     for (const { ssid, active } of wireless) {
-        if (ssid == 'RUT_C52E_2G' && active == 1) {
+        if (ssid === 'RUT_C52E_2G' && active === 1) {
             wifi_2 = true;
-        } else if (ssid == 'RUT_C52F_5G' && active == 1) {
+        } else if (ssid === 'RUT_C52F_5G' && active === 1) {
             wifi_5 = true;
         }
     }
 
-    if (ports != null) {
+    if (ports !== null) {
         portsInfo = [false, false, false, false, false];
         for (const { name } of ports) {
             portsInfo[parseInt(name.split(' ')[1]) - 1] = true;
@@ -449,15 +449,15 @@ function parseResponse(
 
     return {
         name: response.name as string,
-        wan_ip: response.wan_ip as string,
-        wan_state: response.wan_state as string,
+        wanIP: response.wan_ip as string,
+        wanState: response.wan_state as string,
 
         sim: {
-            active: response.sim_state == 'Inserted',
+            active: response.sim_state === 'Inserted',
             slot: response.sim_slot as number,
             strenght: transformSignalStrenght(response.signal as number),
             operator: response.operator as string,
-            connection_type: transformConnectionType(response.connection_type as string),
+            connectionType: transformConnectionType(response.connection_type as string),
         },
         wifi_2: wifi_2,
         wifi_5: wifi_5,
@@ -467,54 +467,54 @@ function parseResponse(
         uptime: parseUptime(response.router_uptime as number),
         latitude: response.latitude as number,
         longitude: response.longitude as number,
-        last_update_time: getUpdateTime(response.last_update_at as string),
+        lastUpdateTime: getUpdateTime(response.last_update_at as string),
     };
 }
 async function getModemInfo(): Promise<void> {
-    const deviceID = settings.modem.device;
-
-    const o: HttpRequestOptions = {
-        method: 'GET',
-        protocol: 'https:',
-        host: 'rms.teltonika-networks.com',
-        port: 443,
-        path: '/api/devices/' + deviceID,
-
-        headers: {
-            accept: 'application/json',
-            Authorization: `Bearer ${settings.modem.token}`,
-        },
-    };
-
     try {
-        let response = (await httpRequest(o)) as string;
-        const json = JSON.parse(response);
+        const deviceID = settings.modem.device;
 
-        o.path += '/wireless';
-        response = (await httpRequest(o)) as string;
+        const requestOptions: HttpRequestOptions = {
+            method: 'GET',
+            protocol: 'https:',
+            host: 'rms.teltonika-networks.com',
+            port: 443,
+            path: '/api/devices/' + deviceID,
+
+            headers: {
+                accept: 'application/json',
+                Authorization: `Bearer ${settings.modem.token}`,
+            },
+        };
+
+        let response = (await httpRequest(requestOptions)) as string;
+        const parsedResponse = JSON.parse(response);
+
+        requestOptions.path += '/wireless';
+        response = (await httpRequest(requestOptions)) as string;
         const wireless = JSON.parse(response);
 
-        o.path = `/api/devices/${deviceID}/port-scan?type=ethernet`;
-        response = (await httpRequest(o)) as string;
+        requestOptions.path = `/api/devices/${deviceID}/port-scan?type=ethernet`;
+        response = (await httpRequest(requestOptions)) as string;
 
         const channel = JSON.parse(response).meta.channel;
-        o.path = '/status/channel/' + channel;
+        requestOptions.path = '/status/channel/' + channel;
 
         await setTimeoutPromise(1000);
-        response = (await httpRequest(o)) as string;
+        response = (await httpRequest(requestOptions)) as string;
         const ports = JSON.parse(response).data[deviceID][0].ports;
 
-        const mi: ModemInfo = parseResponse(json.data, wireless.data, ports);
+        const mi: ModemInfo = parseTeltonikaResponse(parsedResponse.data, wireless.data, ports);
 
-        if (co != null && (await coConnect())) {
+        if (co !== null && (await coConnect())) {
             displayGraphics(mi);
         }
-        if (mapCO != null && (await mapCOconnect())) {
+        if (mapCO !== null && (await mapCOconnect())) {
             displayMap({ latitude: mi.latitude, longitude: mi.longitude });
         }
-
-        setTimeout(getModemInfo, settings.modem.refresh_period);
-    } catch (error) {
+    } catch {
+        //
+    } finally {
         setTimeout(getModemInfo, settings.modem.refresh_period);
     }
 }
@@ -558,10 +558,10 @@ function updateFrames(): void {
 
     frames.routerName.setFont(bold);
     frames.routerIP.setFont(bold);
-    frames.connectionType_1.setFont(bold);
-    frames.operator_1.setFont(bold);
-    frames.connectionType_2.setFont(bold);
-    frames.operator_2.setFont(bold);
+    frames.connectionType1.setFont(bold);
+    frames.operator1.setFont(bold);
+    frames.connectionType2.setFont(bold);
+    frames.operator2.setFont(bold);
     frames.uptime.setFont(bold);
     frames.coordinates.setFont(bold);
     frames.lastUpdate.setFont(regular);
@@ -595,51 +595,51 @@ async function coConnect(): Promise<boolean> {
 function displayGraphics(mi: ModemInfo) {
     const img = mi.sim.slot;
 
-    if (mi.wan_state == 'Mobile') {
+    if (mi.wanState === 'Mobile') {
         frames.wanState.setBgImage(images[`wan_sim_${img}`], 'stretch');
-    } else if (mi.wan_state == 'Wired') {
+    } else if (mi.wanState === 'Wired') {
         frames.wanState.setBgImage(images[`wan_wired`], 'stretch');
     } else {
         frames.wanState.setBgImage(images[`wan_wifi`], 'stretch');
     }
 
     frames.routerName.setText(mi.name, 'A_LEFT');
-    frames.routerIP.setText(mi.wan_ip, 'A_RIGHT');
+    frames.routerIP.setText(mi.wanIP, 'A_RIGHT');
 
-    if (img == 1) {
-        frames.simInserted_1.setBgImage(mi.sim.active ? images[`sim_1_active`] : images[`sim_1_inactive`], 'fit');
-        frames.operator_1.setText(mi.sim.operator, 'A_LEFT', 'TFM_TRUNCATE');
-        frames.connectionType_1.setText(mi.sim.connection_type, 'A_LEFT');
-        frames.signalStrenght_1.setBgImage(images['strength_' + mi.sim.strenght], 'fit');
+    if (img === 1) {
+        frames.simInserted1.setBgImage(mi.sim.active ? images[`sim_1_active`] : images[`sim_1_inactive`], 'fit');
+        frames.operator1.setText(mi.sim.operator, 'A_LEFT', 'TFM_TRUNCATE');
+        frames.connectionType1.setText(mi.sim.connectionType, 'A_LEFT');
+        frames.signalStrenght1.setBgImage(images['strength_' + mi.sim.strenght], 'fit');
 
-        frames.simInserted_2.setBgImage(images[`sim_2_inactive`], 'fit');
-        frames.operator_2.setText('', 'A_LEFT');
-        frames.connectionType_2.setText('', 'A_LEFT');
-        frames.signalStrenght_2.removeImage();
+        frames.simInserted2.setBgImage(images[`sim_2_inactive`], 'fit');
+        frames.operator2.setText('', 'A_LEFT');
+        frames.connectionType2.setText('', 'A_LEFT');
+        frames.signalStrenght2.removeImage();
     } else {
-        frames.simInserted_2.setBgImage(mi.sim.active ? images[`sim_2_active`] : images[`sim_2_inactive`], 'fit');
-        frames.operator_2.setText(mi.sim.operator, 'A_LEFT', 'TFM_TRUNCATE');
-        frames.connectionType_2.setText(mi.sim.connection_type, 'A_LEFT');
-        frames.signalStrenght_2.setBgImage(images['strength_' + mi.sim.strenght], 'fit');
+        frames.simInserted2.setBgImage(mi.sim.active ? images[`sim_2_active`] : images[`sim_2_inactive`], 'fit');
+        frames.operator2.setText(mi.sim.operator, 'A_LEFT', 'TFM_TRUNCATE');
+        frames.connectionType2.setText(mi.sim.connectionType, 'A_LEFT');
+        frames.signalStrenght2.setBgImage(images['strength_' + mi.sim.strenght], 'fit');
 
-        frames.simInserted_1.setBgImage(images[`sim_1_inactive`], 'fit');
-        frames.operator_1.setText('', 'A_LEFT');
-        frames.connectionType_1.setText('', 'A_LEFT');
-        frames.signalStrenght_1.removeImage();
+        frames.simInserted1.setBgImage(images[`sim_1_inactive`], 'fit');
+        frames.operator1.setText('', 'A_LEFT');
+        frames.connectionType1.setText('', 'A_LEFT');
+        frames.signalStrenght1.removeImage();
     }
 
-    frames.port_1.setBgImage(mi.ports[0] ? images['port_1_active'] : images['port_1_inactive'], 'fit');
-    frames.port_2.setBgImage(mi.ports[1] ? images['port_2_active'] : images['port_2_inactive'], 'fit');
-    frames.port_3.setBgImage(mi.ports[2] ? images['port_3_active'] : images['port_3_inactive'], 'fit');
-    frames.port_4.setBgImage(mi.ports[3] ? images['port_4_active'] : images['port_4_inactive'], 'fit');
-    frames.port_5.setBgImage(mi.ports[4] ? images['port_5_active'] : images['port_5_inactive'], 'fit');
+    frames.port1.setBgImage(mi.ports[0] ? images['port_1_active'] : images['port_1_inactive'], 'fit');
+    frames.port2.setBgImage(mi.ports[1] ? images['port_2_active'] : images['port_2_inactive'], 'fit');
+    frames.port3.setBgImage(mi.ports[2] ? images['port_3_active'] : images['port_3_inactive'], 'fit');
+    frames.port4.setBgImage(mi.ports[3] ? images['port_4_active'] : images['port_4_inactive'], 'fit');
+    frames.port5.setBgImage(mi.ports[4] ? images['port_5_active'] : images['port_5_inactive'], 'fit');
 
-    frames.wifi_2.setBgImage(mi.wifi_2 ? images['wifi_2_active'] : images['wifi_2_inactive'], 'fit');
-    frames.wifi_5.setBgImage(mi.wifi_5 ? images['wifi_5_active'] : images['wifi_5_inactive'], 'fit');
+    frames.wifi2.setBgImage(mi.wifi_2 ? images['wifi_2_active'] : images['wifi_2_inactive'], 'fit');
+    frames.wifi5.setBgImage(mi.wifi_5 ? images['wifi_5_active'] : images['wifi_5_inactive'], 'fit');
 
     frames.uptime.setText('Device uptime: ' + mi.uptime, 'A_LEFT');
     frames.coordinates.setText(`${mi.latitude} N, ${mi.longitude} E`, 'A_LEFT');
-    frames.lastUpdate.setText('Last update: ' + mi.last_update_time, 'A_LEFT');
+    frames.lastUpdate.setText('Last update: ' + mi.lastUpdateTime, 'A_LEFT');
 
     cp.generate(co, (2 * settings.overlay.scale) / 3);
 }
@@ -695,6 +695,9 @@ async function getMapImage(actualCoordinates: Coordinates): Promise<Buffer> {
             response.on('data', (chunk) => {
                 dataBuffer = Buffer.concat([dataBuffer, chunk]);
             });
+            response.on('error', (err) => {
+                reject(err);
+            });
             response.on('end', () => {
                 resolve(dataBuffer);
             });
@@ -710,8 +713,8 @@ async function displayMap(actualCoordinates: Coordinates) {
     const map = settings.map;
     try {
         if (
-            actualCoordinates == null ||
-            (lastCoordinates != null && calculateDistance(lastCoordinates, actualCoordinates) < map.tolerance)
+            actualCoordinates === null ||
+            (lastCoordinates !== null && calculateDistance(lastCoordinates, actualCoordinates) < map.tolerance)
         ) {
             return;
         }
@@ -753,11 +756,11 @@ async function mapCOconnect(): Promise<boolean> {
 function main() {
     process.on('uncaughtException', (e: Error) => {
         console.log('Uncaught exception:', e);
-        process.exit();
+        process.exit(1);
     });
     process.on('unhandledRejection', (e: Error) => {
         console.log('Unhandled rejection:', e);
-        process.exit();
+        process.exit(1);
     });
 
     settings = readSettings();
