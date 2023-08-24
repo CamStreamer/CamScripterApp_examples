@@ -440,7 +440,7 @@ function parseTeltonikaResponse(
         }
     }
 
-    if (ports !== null) {
+    if (ports !== null || ports !== undefined) {
         portsInfo = [false, false, false, false, false];
         for (const { name } of ports) {
             portsInfo[parseInt(name.split(' ')[1]) - 1] = true;
@@ -512,8 +512,8 @@ async function getModemInfo(): Promise<void> {
         if (mapCO !== null && (await mapCOconnect())) {
             displayMap({ latitude: mi.latitude, longitude: mi.longitude });
         }
-    } catch {
-        //
+    } catch (error) {
+        console.log(error.message);
     } finally {
         setTimeout(getModemInfo, settings.modem.refresh_period);
     }
