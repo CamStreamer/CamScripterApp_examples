@@ -7,7 +7,7 @@ import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { UseFormRegister } from 'react-hook-form';
 
-import { FormInput } from '../types';
+import { FormInput } from '../FormInput';
 
 type Props = {
     register: UseFormRegister<FormInput>;

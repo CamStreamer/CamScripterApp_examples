@@ -3,13 +3,15 @@ import { styled } from '@mui/material/styles';
 
 export const Header = () => {
     return (
-        <center>
+        <StyledContainer>
             <StyledLogo src="./assets/images/Teltonika-logo.png" alt="logo" />
-        </center>
+        </StyledContainer>
     );
 };
 
 const StyledLogo = styled('img')({
     width: 'clamp(80%, 13vw, 90%)',
+});
+const StyledContainer = styled('div')({
     textAlign: 'center',
 });

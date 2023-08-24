@@ -21,8 +21,8 @@ import { useForm, SubmitHandler, Controller } from 'react-hook-form';
 import { InfoSnackbar } from './Snackbar';
 import { useSnackbar } from '../hooks/Snackbar';
 import { PasswordInput } from './PasswordInput';
-import { FormInput } from '../types';
 import { CollapsibleFormSection } from './CollapsibleFormSection';
+import { FormInput, defaultValues, convertValueToNumber } from '../FormInput';
 
 const nameOfThisPackage = 'teltonika_monitor';
 
@@ -30,98 +30,6 @@ type Props = {
     initialized: boolean;
     setInitialized: React.Dispatch<React.SetStateAction<boolean>>;
 };
-
-const defaultValues: FormInput = {
-    modem: {
-        token: '',
-        device: '',
-        refresh_period: 60,
-    },
-    co_camera: {
-        protocol: 'http',
-        ip: '127.0.0.1',
-        port: 80,
-        user: 'root',
-        password: '',
-    },
-    map_camera: {
-        protocol: 'http',
-        ip: '127.0.0.1',
-        port: 80,
-        user: 'root',
-        password: '',
-    },
-    overlay: {
-        x: 10,
-        y: 10,
-        alignment: 'top_left',
-        width: 1920,
-        height: 1080,
-        scale: 100,
-    },
-    map: {
-        x: 10,
-        y: 10,
-        alignment: 'top_right',
-        width: 1920,
-        height: 1080,
-
-        map_width: 100,
-        map_height: 100,
-        zoomLevel: 15,
-        APIkey: '',
-        tolerance: 2,
-    },
-};
-function convert(input: FormInput) {
-    if (typeof input.modem.refresh_period == 'string') {
-        input.modem.refresh_period = parseInt(input.modem.refresh_period);
-    }
-    if (typeof input.co_camera.port == 'string') {
-        input.co_camera.port = parseInt(input.co_camera.port);
-    }
-    if (typeof input.map_camera.port == 'string') {
-        input.map_camera.port = parseInt(input.map_camera.port);
-    }
-
-    if (typeof input.overlay.x == 'string') {
-        input.overlay.x = parseInt(input.overlay.x);
-    }
-    if (typeof input.overlay.y == 'string') {
-        input.overlay.y = parseInt(input.overlay.y);
-    }
-    if (typeof input.overlay.width == 'string') {
-        input.overlay.width = parseInt(input.overlay.width);
-    }
-    if (typeof input.overlay.height == 'string') {
-        input.overlay.height = parseInt(input.overlay.height);
-    }
-
-    if (typeof input.map.x == 'string') {
-        input.map.x = parseInt(input.map.x);
-    }
-    if (typeof input.map.y == 'string') {
-        input.map.y = parseInt(input.map.y);
-    }
-    if (typeof input.map.width == 'string') {
-        input.map.width = parseInt(input.map.width);
-    }
-    if (typeof input.map.height == 'string') {
-        input.map.height = parseInt(input.map.height);
-    }
-    if (typeof input.map.map_width == 'string') {
-        input.map.map_width = parseInt(input.map.map_width);
-    }
-    if (typeof input.map.map_height == 'string') {
-        input.map.map_height = parseInt(input.map.map_height);
-    }
-    if (typeof input.map.zoomLevel == 'string') {
-        input.map.zoomLevel = parseInt(input.map.zoomLevel);
-    }
-    if (typeof input.map.tolerance == 'string') {
-        input.map.tolerance = parseInt(input.map.tolerance);
-    }
-}
 
 export function Form({ initialized, setInitialized }: Props) {
     const [submitting, setSubmitting] = useState(false);
@@ -140,7 +48,7 @@ export function Form({ initialized, setInitialized }: Props) {
 
     const onSubmit: SubmitHandler<FormInput> = async (toPost) => {
         setSubmitting(true);
-        convert(toPost);
+        convertValueToNumber(toPost);
         try {
             if (toPost.overlay.scale != null) {
                 toPost.overlay.scale /= 100;
