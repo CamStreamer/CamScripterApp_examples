@@ -12,6 +12,7 @@ type Options = {
     font_color?: RGB;
     bg_color?: RGBA;
 };
+type TMF = 'TFM_OVERFLOW' | 'TFM_SCALE' | 'TFM_TRUNCATE';
 
 const white: RGB = [255, 255, 255];
 
@@ -28,6 +29,7 @@ export default class CairoFrame {
     private fill: boolean;
     private bg_image: string;
     private bg_type: 'fit' | 'stretch' | 'plain';
+    private text_type: TMF;
     private align: Align;
     private bg_width: number = null;
     private bg_height: number = null;
@@ -48,13 +50,15 @@ export default class CairoFrame {
         this.fill = true;
 
         this.bg_type = 'plain';
+        this.text_type = 'TFM_OVERFLOW';
         this.align = 'A_LEFT';
     }
 
-    setText(text: string, align: Align, color = white): void {
+    setText(text: string, align: Align, text_type: TMF = 'TFM_OVERFLOW', color = white): void {
         this.text = text;
         this.font_color = color;
         this.align = align;
+        this.text_type = text_type;
     }
 
     insert(...frames: CairoFrame[]): void {
@@ -104,7 +108,7 @@ export default class CairoFrame {
                 Math.floor(scale * this.width),
                 Math.floor(scale * this.height),
                 this.align,
-                'TFM_OVERFLOW'
+                this.text_type
             );
         }
     }

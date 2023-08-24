@@ -160,7 +160,7 @@ function prepareCairoPainter(): void {
         screen_width: overlay.width,
         screen_height: overlay.height,
         co_ord: overlay.alignment,
-        width: 980,
+        width: 902,
         height: 930,
     });
 
@@ -173,14 +173,14 @@ function prepareCairoPainter(): void {
     });
     frames.routerName = new CairoFrame({
         x: 148,
-        y: 73,
+        y: 64,
         width: 301,
         height: 35,
     });
     frames.routerIP = new CairoFrame({
-        x: 651,
-        y: 73,
-        width: 269,
+        x: 632,
+        y: 64,
+        width: 221,
         height: 35,
     });
     frames.simInserted_1 = new CairoFrame({
@@ -192,14 +192,14 @@ function prepareCairoPainter(): void {
     frames.operator_1 = new CairoFrame({
         x: 189,
         y: 204,
-        width: 164,
+        width: 281,
         height: 28,
     });
     frames.connectionType_1 = new CairoFrame({
         x: 189,
-        y: 259,
-        width: 53,
-        height: 28,
+        y: 244,
+        width: 70,
+        height: 37,
     });
     frames.signalStrenght_1 = new CairoFrame({
         x: 265,
@@ -208,25 +208,25 @@ function prepareCairoPainter(): void {
         height: 41,
     });
     frames.simInserted_2 = new CairoFrame({
-        x: 483,
+        x: 478,
         y: 158,
         width: 109,
         height: 146,
     });
     frames.operator_2 = new CairoFrame({
-        x: 625,
+        x: 620,
         y: 204,
-        width: 164,
+        width: 281,
         height: 28,
     });
     frames.connectionType_2 = new CairoFrame({
-        x: 625,
-        y: 259,
-        width: 53,
-        height: 28,
+        x: 620,
+        y: 244,
+        width: 70,
+        height: 37,
     });
     frames.signalStrenght_2 = new CairoFrame({
-        x: 700,
+        x: 695,
         y: 243,
         width: 51,
         height: 41,
@@ -301,7 +301,7 @@ function prepareCairoPainter(): void {
         x: 148,
         y: 694,
         width: 554,
-        height: 21,
+        height: 25,
     });
 
     cp.insertAll(frames);
@@ -552,7 +552,7 @@ async function loadFonts(): Promise<void> {
     bold = (await co.uploadFontData(fs.readFileSync('./fonts/gotham_bold.ttf'))).var;
 }
 function updateFrames(): void {
-    cp.setBgImage(images['background'], 'fit');
+    cp.setBgImage(images['background'], 'plain');
 
     frames.routerName.setFont(bold);
     frames.routerIP.setFont(bold);
@@ -602,11 +602,11 @@ function displayGraphics(mi: ModemInfo) {
     }
 
     frames.routerName.setText(mi.name, 'A_LEFT');
-    frames.routerIP.setText(mi.wan_ip, 'A_LEFT');
+    frames.routerIP.setText(mi.wan_ip, 'A_RIGHT');
 
     if (img == 1) {
         frames.simInserted_1.setBgImage(mi.sim.active ? images[`sim_1_active`] : images[`sim_1_inactive`], 'fit');
-        frames.operator_1.setText(mi.sim.operator, 'A_LEFT');
+        frames.operator_1.setText(mi.sim.operator, 'A_LEFT', 'TFM_TRUNCATE');
         frames.connectionType_1.setText(mi.sim.connection_type, 'A_LEFT');
         frames.signalStrenght_1.setBgImage(images['strength_' + mi.sim.strenght], 'fit');
 
@@ -616,7 +616,7 @@ function displayGraphics(mi: ModemInfo) {
         frames.signalStrenght_2.removeImage();
     } else {
         frames.simInserted_2.setBgImage(mi.sim.active ? images[`sim_2_active`] : images[`sim_2_inactive`], 'fit');
-        frames.operator_2.setText(mi.sim.operator, 'A_LEFT');
+        frames.operator_2.setText(mi.sim.operator, 'A_LEFT', 'TFM_TRUNCATE');
         frames.connectionType_2.setText(mi.sim.connection_type, 'A_LEFT');
         frames.signalStrenght_2.setBgImage(images['strength_' + mi.sim.strenght], 'fit');
 
