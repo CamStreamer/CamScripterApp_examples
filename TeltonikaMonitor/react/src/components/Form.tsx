@@ -163,20 +163,21 @@ export function Form({ initialized, setInitialized }: Props) {
                                     </Grid>
                                 </Grid>
                                 <Grid item xs={12} md={6}>
-                                    <Input
-                                        required
-                                        fullWidth
-                                        label="Refresh period"
-                                        error={errors?.modem?.refresh_period != undefined}
-                                        helperText={errors?.modem?.refresh_period?.message}
-                                        {...register('modem.refresh_period', {
-                                            required: { value: true, message: 'Refresh period is required' },
-                                            pattern: {
-                                                value: /^[0-9]*$/,
-                                                message: 'Set number',
-                                            },
-                                        })}
-                                    />
+                                    <FormControl error={errors?.modem?.refresh_period != undefined} fullWidth required>
+                                        <InputLabel>Refresh period</InputLabel>
+                                        <StyledOutlinedInput
+                                            endAdornment={<InputAdornment position="end">seconds</InputAdornment>}
+                                            label="Refresh period"
+                                            {...register('modem.refresh_period', {
+                                                required: { value: true, message: 'Refresh period is required' },
+                                                pattern: {
+                                                    value: /^[0-9]*$/,
+                                                    message: 'Set number',
+                                                },
+                                            })}
+                                        />
+                                        <FormHelperText>{errors?.map?.tolerance?.message}</FormHelperText>
+                                    </FormControl>
                                 </Grid>
                             </Grid>
                         </CollapsibleFormSection>
