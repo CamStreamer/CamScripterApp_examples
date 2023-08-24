@@ -343,6 +343,7 @@ function mapCOconfigured(): boolean {
 //  |  connect to modem  |
 //  ----------------------
 
+let portsInfo = [false, false, false, false, false];
 function transformSignalStrenght(strenght: number): number | never {
     if (strenght > -57) {
         return 5;
@@ -439,9 +440,11 @@ function parseResponse(
         }
     }
 
-    const portsInfo = [false, false, false, false, false];
-    for (const { name } of ports ?? []) {
-        portsInfo[parseInt(name.split(' ')[1]) - 1] = true;
+    if (ports != null) {
+        portsInfo = [false, false, false, false, false];
+        for (const { name } of ports) {
+            portsInfo[parseInt(name.split(' ')[1]) - 1] = true;
+        }
     }
 
     return {
@@ -512,8 +515,7 @@ async function getModemInfo(): Promise<void> {
 
         setTimeout(getModemInfo, settings.modem.refresh_period);
     } catch (error) {
-        console.error('Cannot connect to modem:', error);
-        setTimeout(getModemInfo, 10 * settings.modem.refresh_period);
+        setTimeout(getModemInfo, settings.modem.refresh_period);
     }
 }
 
