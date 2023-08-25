@@ -23,8 +23,8 @@ type ModemInfo = {
     wanState: string;
 
     sim: SimInfo;
-    wifi_2: boolean;
-    wifi_5: boolean;
+    wifi2: boolean;
+    wifi5: boolean;
 
     ports: Record<number, boolean>;
 
@@ -429,18 +429,18 @@ function parseTeltonikaResponse(
     wireless: { ssid: string; active: number }[],
     ports: { id: number; name: string; type: string }[]
 ): ModemInfo {
-    let wifi_2 = false;
-    let wifi_5 = false;
+    let wifi2 = false;
+    let wifi5 = false;
 
     for (const { ssid, active } of wireless) {
         if (ssid === 'RUT_C52E_2G' && active === 1) {
-            wifi_2 = true;
+            wifi2 = true;
         } else if (ssid === 'RUT_C52F_5G' && active === 1) {
-            wifi_5 = true;
+            wifi5 = true;
         }
     }
 
-    if (ports !== null || ports !== undefined) {
+    if (ports) {
         portsInfo = [false, false, false, false, false];
         for (const { name } of ports) {
             portsInfo[parseInt(name.split(' ')[1]) - 1] = true;
@@ -459,8 +459,8 @@ function parseTeltonikaResponse(
             operator: response.operator as string,
             connectionType: transformConnectionType(response.connection_type as string),
         },
-        wifi_2: wifi_2,
-        wifi_5: wifi_5,
+        wifi2,
+        wifi5,
 
         ports: portsInfo,
 
@@ -634,8 +634,8 @@ function displayGraphics(mi: ModemInfo) {
     frames.port4.setBgImage(mi.ports[3] ? images['port_4_active'] : images['port_4_inactive'], 'fit');
     frames.port5.setBgImage(mi.ports[4] ? images['port_5_active'] : images['port_5_inactive'], 'fit');
 
-    frames.wifi2.setBgImage(mi.wifi_2 ? images['wifi_2_active'] : images['wifi_2_inactive'], 'fit');
-    frames.wifi5.setBgImage(mi.wifi_5 ? images['wifi_5_active'] : images['wifi_5_inactive'], 'fit');
+    frames.wifi2.setBgImage(mi.wifi2 ? images['wifi_2_active'] : images['wifi_2_inactive'], 'fit');
+    frames.wifi5.setBgImage(mi.wifi5 ? images['wifi_5_active'] : images['wifi_5_inactive'], 'fit');
 
     frames.uptime.setText('Device uptime: ' + mi.uptime, 'A_LEFT');
     frames.coordinates.setText(`${mi.latitude} N, ${mi.longitude} E`, 'A_LEFT');
