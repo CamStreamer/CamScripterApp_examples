@@ -109,7 +109,6 @@ async function displayInCamOverlay(data: { timestamp: number; licensePlate: stri
             ip: settings.targetCamera.IP,
             port: settings.targetCamera.port,
             auth: settings.targetCamera.user + ':' + settings.targetCamera.password,
-            serviceID: settings.serviceID,
             tls: settings.targetCamera.protocol !== 'http',
             tlsInsecure: settings.targetCamera.protocol === 'https_insecure',
         };
@@ -144,7 +143,7 @@ async function displayInCamOverlay(data: { timestamp: number; licensePlate: stri
         if (!isCamOverlayVisible) {
             showCamOverlay();
         }
-        await co.updateCGText(fields);
+        await co.updateCGText(settings.serviceID, fields);
         clearTimeout(timeoutID);
 
         if (settings.visibilityTime > 0) {
@@ -188,12 +187,16 @@ function startCameraVapixLibraryWebsocket() {
             process.exit(1);
         }
     });
+    cv.on('close', () => {
+        console.log('Websocket disconnected.');
+        process.exit(1);
+    });
 
     cv.on('tnsaxis:CameraApplicationPlatform/ALPV.AllPlates', (data) => {
         onMessage(data.params.notification);
     });
 
-    cv.eventsConnect('websocket');
+    cv.eventsConnect();
 }
 
 function main() {

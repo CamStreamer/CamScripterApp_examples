@@ -19,14 +19,14 @@
   "author": "CamStreamer s.r.o",
   "license": "ISC",
   "dependencies": {
-    "camstreamerlib": "^1.9.1"
+    "camstreamerlib": "^2.0.0"
   },
   "devDependencies": {
     "@camstreamer/prettier-config": "^2.0.4",
     "@types/node": "^18.0.6",
     "npm-run-all": "^4.1.5",
     "prettier": "^2.7.1",
-    "typescript": "^4.7.4",
-    "rimraf": "^3.0.2"
+    "rimraf": "^3.0.2",
+    "typescript": "^4.7.4"
   }
 }
