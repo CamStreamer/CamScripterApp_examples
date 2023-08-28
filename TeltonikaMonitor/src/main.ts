@@ -500,7 +500,7 @@ async function getModemInfo(): Promise<void> {
         const channel = JSON.parse(response).meta.channel;
         requestOptions.path = '/status/channel/' + channel;
 
-        await setTimeoutPromise(1000);
+        await setTimeoutPromise(2000);
         response = (await httpRequest(requestOptions)) as string;
         const ports = JSON.parse(response).data[deviceID][0].ports;
 
