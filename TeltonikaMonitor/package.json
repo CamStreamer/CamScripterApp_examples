@@ -17,12 +17,12 @@
         "build:FE": "cd react && npm run build",
         "build": "npm-run-all build:BE build:FE",
         "zip:package": "node node_modules/camstreamerlib/CreatePackage -i -e=react,testing",
-        "zip": "npm install; npm-run-all clean in:ui build zip:package"
+        "zip": "npm-run-all clean in:ui build zip:package"
     },
     "author": "CamStreamer s.r.o.",
     "license": "ISC",
     "dependencies": {
-        "camstreamerlib": "^2.0.0"
+        "camstreamerlib": "^2.0.1"
     },
     "devDependencies": {
         "@camstreamer/prettier-config": "^2.0.4",
