@@ -70,97 +70,126 @@ export default class CairoFrame {
         }
     }
 
-    generateOwnImage(co: CamOverlayDrawingAPI, cairo: string, ppX: number, ppY: number, scale: number): void {
-        co.cairo('cairo_identity_matrix', cairo);
+    generateOwnImage(
+        co: CamOverlayDrawingAPI,
+        cairo: string,
+        ppX: number,
+        ppY: number,
+        scale: number
+    ): Promise<unknown> {
+        const promises = new Array<Promise<unknown>>();
+
+        promises.push(co.cairo('cairo_identity_matrix', cairo));
         if (this.font) {
-            co.cairo('cairo_set_font_face', cairo, this.font);
+            promises.push(co.cairo('cairo_set_font_face', cairo, this.font));
         }
         if (this.bg_color) {
-            co.cairo(
-                'cairo_set_source_rgba',
-                cairo,
-                this.bg_color[0],
-                this.bg_color[1],
-                this.bg_color[2],
-                this.bg_color[3]
+            promises.push(
+                co.cairo(
+                    'cairo_set_source_rgba',
+                    cairo,
+                    this.bg_color[0],
+                    this.bg_color[1],
+                    this.bg_color[2],
+                    this.bg_color[3]
+                )
             );
-            this.drawFrame(co, cairo);
+            promises.push(this.drawFrame(co, cairo));
         }
         if (this.bg_image) {
             if (this.bg_type == 'fit') {
                 const sx = this.width / this.bg_width;
                 const sy = this.height / this.bg_height;
-                co.cairo('cairo_scale', cairo, scale * sx, scale * sy);
+                promises.push(co.cairo('cairo_scale', cairo, scale * sx, scale * sy));
             } else {
-                co.cairo('cairo_scale', cairo, scale, scale);
+                promises.push(co.cairo('cairo_scale', cairo, scale, scale));
             }
-            co.cairo('cairo_translate', cairo, ppX, ppY);
-            co.cairo('cairo_set_source_surface', cairo, this.bg_image, 0, 0);
-            co.cairo('cairo_paint', cairo);
+            promises.push(co.cairo('cairo_translate', cairo, ppX, ppY));
+            promises.push(co.cairo('cairo_set_source_surface', cairo, this.bg_image, 0, 0));
+            promises.push(co.cairo('cairo_paint', cairo));
         }
         if (this.text) {
-            co.cairo('cairo_set_source_rgb', cairo, this.font_color[0], this.font_color[1], this.font_color[2]);
-            co.writeText(
-                cairo,
-                '' + this.text,
-                Math.floor(scale * this.posX),
-                Math.floor(scale * this.posY),
-                Math.floor(scale * this.width),
-                Math.floor(scale * this.height),
-                this.align,
-                this.text_type
+            promises.push(
+                co.cairo('cairo_set_source_rgb', cairo, this.font_color[0], this.font_color[1], this.font_color[2])
+            );
+            promises.push(
+                co.writeText(
+                    cairo,
+                    '' + this.text,
+                    Math.floor(scale * this.posX),
+                    Math.floor(scale * this.posY),
+                    Math.floor(scale * this.width),
+                    Math.floor(scale * this.height),
+                    this.align,
+                    this.text_type
+                )
             );
         }
+        return Promise.all(promises);
     }
 
-    generateImage(co: CamOverlayDrawingAPI, cairo: string, parentPos: [number, number], scale = 1): void {
+    generateImage(co: CamOverlayDrawingAPI, cairo: string, parentPos: [number, number], scale = 1): Promise<unknown> {
         const ppX = parentPos[0];
         const ppY = parentPos[1];
 
-        this.generateOwnImage(co, cairo, this.posX + ppX, this.posY + ppY, scale);
+        const promises = new Array<Promise<unknown>>();
+
+        promises.push(this.generateOwnImage(co, cairo, this.posX + ppX, this.posY + ppY, scale));
         for (const child of this.children) {
-            child.generateImage(co, cairo, [this.posX + ppX, this.posY + ppY], scale);
+            promises.push(child.generateImage(co, cairo, [this.posX + ppX, this.posY + ppY], scale));
         }
+        return Promise.all(promises);
     }
 
-    drawFrame(co: CamOverlayDrawingAPI, cairo: string): void {
+    drawFrame(co: CamOverlayDrawingAPI, cairo: string): Promise<unknown> {
         const degrees = Math.PI / 180.0;
         const radius = 30.0;
 
-        co.cairo('cairo_new_sub_path', cairo);
-        co.cairo(
-            'cairo_arc',
-            cairo,
-            this.posX + this.width - radius,
-            this.posY + radius,
-            radius,
-            -90 * degrees,
-            0 * degrees
+        const promises = new Array<Promise<unknown>>();
+
+        promises.push(co.cairo('cairo_new_sub_path', cairo));
+        promises.push(
+            co.cairo(
+                'cairo_arc',
+                cairo,
+                this.posX + this.width - radius,
+                this.posY + radius,
+                radius,
+                -90 * degrees,
+                0 * degrees
+            )
         );
-        co.cairo(
-            'cairo_arc',
-            cairo,
-            this.posX + this.width - radius,
-            this.posY + this.height - radius,
-            radius,
-            0 * degrees,
-            90 * degrees
+        promises.push(
+            co.cairo(
+                'cairo_arc',
+                cairo,
+                this.posX + this.width - radius,
+                this.posY + this.height - radius,
+                radius,
+                0 * degrees,
+                90 * degrees
+            )
         );
-        co.cairo(
-            'cairo_arc',
-            cairo,
-            this.posX + radius,
-            this.posY + this.height - radius,
-            radius,
-            90 * degrees,
-            180 * degrees
+        promises.push(
+            co.cairo(
+                'cairo_arc',
+                cairo,
+                this.posX + radius,
+                this.posY + this.height - radius,
+                radius,
+                90 * degrees,
+                180 * degrees
+            )
         );
-        co.cairo('cairo_arc', cairo, this.posX + radius, this.posY + radius, radius, 180 * degrees, 270 * degrees);
-        co.cairo('cairo_close_path', cairo);
+        promises.push(
+            co.cairo('cairo_arc', cairo, this.posX + radius, this.posY + radius, radius, 180 * degrees, 270 * degrees)
+        );
+        promises.push(co.cairo('cairo_close_path', cairo));
         if (this.fill) {
-            co.cairo('cairo_fill', cairo);
+            promises.push(co.cairo('cairo_fill', cairo));
         }
-        co.cairo('cairo_paint', cairo);
+        promises.push(co.cairo('cairo_paint', cairo));
+        return Promise.all(promises);
     }
 
     setFont(fontdata: string): void {

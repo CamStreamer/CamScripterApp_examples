@@ -506,12 +506,14 @@ async function getModemInfo(): Promise<void> {
 
         const mi: ModemInfo = parseTeltonikaResponse(parsedResponse.data, wireless.data, ports);
 
+        const promises = new Array<Promise<void>>();
         if (co !== null && (await coConnect())) {
-            displayGraphics(mi);
+            promises.push(displayGraphics(mi));
         }
         if (mapCO !== null && (await mapCOconnect())) {
-            displayMap({ latitude: mi.latitude, longitude: mi.longitude });
+            promises.push(displayMap({ latitude: mi.latitude, longitude: mi.longitude }));
         }
+        await Promise.allSettled(promises);
     } catch (error) {
         console.log(error.message);
     } finally {
@@ -592,7 +594,7 @@ async function coConnect(): Promise<boolean> {
     }
     return coConnected;
 }
-function displayGraphics(mi: ModemInfo) {
+async function displayGraphics(mi: ModemInfo) {
     const img = mi.sim.slot;
 
     if (mi.wanState === 'Mobile') {
@@ -641,7 +643,7 @@ function displayGraphics(mi: ModemInfo) {
     frames.coordinates.setText(`${mi.latitude} N, ${mi.longitude} E`, 'A_LEFT');
     frames.lastUpdate.setText('Last update: ' + mi.lastUpdateTime, 'A_LEFT');
 
-    cp.generate(co, (2 * settings.overlay.scale) / 3);
+    await cp.generate(co, (2 * settings.overlay.scale) / 3);
 }
 
 //  ---------
@@ -724,7 +726,7 @@ async function displayMap(actualCoordinates: Coordinates) {
         const image = (await mapCO.uploadImageData(buffer)) as UploadImageResponse;
 
         mapCP.setBgImage(image, 'stretch');
-        mapCP.generate(mapCO);
+        await mapCP.generate(mapCO);
     } catch (e) {
         console.error(e);
     }

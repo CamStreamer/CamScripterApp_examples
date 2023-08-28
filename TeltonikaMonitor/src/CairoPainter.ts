@@ -42,16 +42,21 @@ export default class CairoPainter extends CairoFrame {
         const access = await this.begin(co, scale);
         this.surface = access[0];
         this.cairo = access[1];
-        this.generateOwnImage(co, this.cairo, 0, 0, scale);
+
+        const promises = new Array<Promise<unknown>>();
+        promises.push(this.generateOwnImage(co, this.cairo, 0, 0, scale));
         for (const child of this.children) {
-            child.generateImage(co, this.cairo, [0, 0], scale);
+            promises.push(child.generateImage(co, this.cairo, [0, 0], scale));
         }
-        co.showCairoImage(
-            this.surface,
-            this.convertor(this.co_ord[0], this.screen_width, this.posX, scale * this.width),
-            this.convertor(this.co_ord[1], this.screen_height, this.posY, scale * this.height)
+        promises.push(
+            co.showCairoImage(
+                this.surface,
+                this.convertor(this.co_ord[0], this.screen_width, this.posX, scale * this.width),
+                this.convertor(this.co_ord[1], this.screen_height, this.posY, scale * this.height)
+            )
         );
-        this.destroy(co);
+        await Promise.all(promises);
+        await this.destroy(co);
     }
     private convertor(alignment: number, screen_size: number, position: number, graphics_size: number): number {
         switch (alignment) {
@@ -77,7 +82,7 @@ export default class CairoPainter extends CairoFrame {
         return [surface.var, cairo.var];
     }
     private async destroy(co: CamOverlayDrawingAPI) {
-        co.cairo('cairo_surface_destroy', this.surface);
-        co.cairo('cairo_destroy', this.cairo);
+        await co.cairo('cairo_surface_destroy', this.surface);
+        await co.cairo('cairo_destroy', this.cairo);
     }
 }
