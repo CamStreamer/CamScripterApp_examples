@@ -517,7 +517,7 @@ async function getModemInfo(): Promise<void> {
     } catch (error) {
         console.log(error.message);
     } finally {
-        setTimeout(getModemInfo, settings.modem.refresh_period);
+        setTimeout(getModemInfo, 1000 * settings.modem.refresh_period);
     }
 }
 
