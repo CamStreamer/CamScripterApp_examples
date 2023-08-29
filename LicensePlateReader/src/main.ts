@@ -1,6 +1,5 @@
 import * as fs from 'fs';
-import * as http from 'http';
-import * as https from 'https';
+import { httpRequest, HttpRequestOptions } from 'camstreamerlib/HttpRequest';
 import { CameraVapix, CameraVapixOptions } from 'camstreamerlib/CameraVapix';
 import { CamOverlayAPI, CamOverlayOptions } from 'camstreamerlib/CamOverlayAPI';
 
@@ -74,21 +73,22 @@ function dateFromTimestamp(timestamp: number, format: Format) {
     }
 }
 
-function sendEnabledRequest(enabledParameter: number) {
-    const options = {
-        hostname: settings.targetCamera.IP,
+async function sendEnabledRequest(enabledParameter: number) {
+    const options: HttpRequestOptions = {
+        host: settings.targetCamera.IP,
         port: settings.targetCamera.port,
         path: `/local/camoverlay/api/enabled.cgi?id_${settings.serviceID}=${enabledParameter}`,
         auth: settings.targetCamera.user + ':' + settings.targetCamera.password,
         method: 'GET',
+        protocol: settings.targetCamera.protocol === 'http' ? 'http:' : 'https:',
+        rejectUnauthorized: settings.targetCamera.protocol === 'https',
     };
 
-    const client = settings.targetCamera.protocol === 'http' ? http : https;
-    const req = client.request(options);
-    req.on('error', function (error) {
-        console.log(`Error with HTTP (${options.path}): `, error);
-    });
-    req.end();
+    try {
+        await httpRequest(options, '', true);
+    } catch (error) {
+        console.error(error);
+    }
 }
 
 let isCamOverlayVisible = false;
