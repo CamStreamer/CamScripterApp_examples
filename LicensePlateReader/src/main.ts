@@ -152,7 +152,7 @@ async function displayInCamOverlay(data: { timestamp: number; licensePlate: stri
             }, 1000 * settings.visibilityTime);
         }
     } catch (error) {
-        console.log('Camoverlay error: ', error);
+        console.error('Camoverlay error: ', error);
     }
 }
 
@@ -183,11 +183,11 @@ function startCameraVapixLibraryWebsocket() {
             console.log('Websocket disconnected.');
             process.exit(1);
         } else {
-            console.log('Websocket error: ', error);
+            console.error('Websocket error: ', error);
             process.exit(1);
         }
     });
-    cv.on('close', () => {
+    cv.on('eventsClose', () => {
         console.log('Websocket disconnected.');
         process.exit(1);
     });
@@ -205,14 +205,19 @@ function main() {
         const data: any = fs.readFileSync(path + 'settings.json');
         settings = JSON.parse(data);
     } catch (error) {
-        console.log('Error with Settings file: ', error);
+        console.error('Error with Settings file: ', error);
         return;
     }
     startCameraVapixLibraryWebsocket();
 }
 
+process.on('uncaughtException', function (error) {
+    console.error('uncaughtException: ', error);
+    process.exit(1);
+});
+
 process.on('unhandledRejection', function (error) {
-    console.log('unhandledRejection: ', error);
+    console.error('unhandledRejection: ', error);
     process.exit(1);
 });
 
