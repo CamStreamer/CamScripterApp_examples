@@ -1,0 +1,41 @@
+{
+    "modem": {
+        "token": "",
+        "device": "",
+        "refresh_period": 60
+    },
+    "co_camera": {
+        "protocol": "http",
+        "ip": "127.0.0.1",
+        "port": 80,
+        "user": "root",
+        "password": ""
+    },
+    "overlay": {
+        "x": 10,
+        "y": 10,
+        "alignment": "top_left",
+        "width": 1920,
+        "height": 1080,
+        "scale": 1
+    },
+    "map_camera": {
+        "protocol": "http",
+        "ip": "127.0.0.1",
+        "port": 80,
+        "user": "root",
+        "password": ""
+    },
+    "map": {
+        "x": 10,
+        "y": 10,
+        "alignment": "top_right",
+        "width": 1920,
+        "height": 1080,
+        "map_width": 400,
+        "map_height": 400,
+        "zoomLevel": 15,
+        "APIkey": "",
+        "tolerance": 2
+    }
+}

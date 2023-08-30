@@ -1,4 +1,5 @@
 **/node_modules/
+**/production_modules/
 **/dist/
 .vs/
 **/*.zip
