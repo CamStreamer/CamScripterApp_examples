@@ -1,6 +1,5 @@
 import * as fs from 'fs';
-import * as http from 'http';
-import * as https from 'https';
+import { httpRequest, HttpRequestOptions } from 'camstreamerlib/HttpRequest';
 import { CameraVapix, CameraVapixOptions } from 'camstreamerlib/CameraVapix';
 import { CamOverlayAPI, CamOverlayOptions } from 'camstreamerlib/CamOverlayAPI';
 
@@ -74,21 +73,22 @@ function dateFromTimestamp(timestamp: number, format: Format) {
     }
 }
 
-function sendEnabledRequest(enabledParameter: number) {
-    const options = {
-        hostname: settings.targetCamera.IP,
+async function sendEnabledRequest(enabledParameter: number) {
+    const options: HttpRequestOptions = {
+        host: settings.targetCamera.IP,
         port: settings.targetCamera.port,
         path: `/local/camoverlay/api/enabled.cgi?id_${settings.serviceID}=${enabledParameter}`,
         auth: settings.targetCamera.user + ':' + settings.targetCamera.password,
         method: 'GET',
+        protocol: settings.targetCamera.protocol === 'http' ? 'http:' : 'https:',
+        rejectUnauthorized: settings.targetCamera.protocol === 'https',
     };
 
-    const client = settings.targetCamera.protocol === 'http' ? http : https;
-    const req = client.request(options);
-    req.on('error', function (error) {
-        console.log(`Error with HTTP (${options.path}): `, error);
-    });
-    req.end();
+    try {
+        await httpRequest(options, '', true);
+    } catch (error) {
+        console.error(error);
+    }
 }
 
 let isCamOverlayVisible = false;
@@ -109,7 +109,6 @@ async function displayInCamOverlay(data: { timestamp: number; licensePlate: stri
             ip: settings.targetCamera.IP,
             port: settings.targetCamera.port,
             auth: settings.targetCamera.user + ':' + settings.targetCamera.password,
-            serviceID: settings.serviceID,
             tls: settings.targetCamera.protocol !== 'http',
             tlsInsecure: settings.targetCamera.protocol === 'https_insecure',
         };
@@ -144,7 +143,7 @@ async function displayInCamOverlay(data: { timestamp: number; licensePlate: stri
         if (!isCamOverlayVisible) {
             showCamOverlay();
         }
-        await co.updateCGText(fields);
+        await co.updateCGText(settings.serviceID, fields);
         clearTimeout(timeoutID);
 
         if (settings.visibilityTime > 0) {
@@ -153,7 +152,7 @@ async function displayInCamOverlay(data: { timestamp: number; licensePlate: stri
             }, 1000 * settings.visibilityTime);
         }
     } catch (error) {
-        console.log('Camoverlay error: ', error);
+        console.error('Camoverlay error: ', error);
     }
 }
 
@@ -184,16 +183,20 @@ function startCameraVapixLibraryWebsocket() {
             console.log('Websocket disconnected.');
             process.exit(1);
         } else {
-            console.log('Websocket error: ', error);
+            console.error('Websocket error: ', error);
             process.exit(1);
         }
+    });
+    cv.on('eventsClose', () => {
+        console.log('Websocket disconnected.');
+        process.exit(1);
     });
 
     cv.on('tnsaxis:CameraApplicationPlatform/ALPV.AllPlates', (data) => {
         onMessage(data.params.notification);
     });
 
-    cv.eventsConnect('websocket');
+    cv.eventsConnect();
 }
 
 function main() {
@@ -202,14 +205,19 @@ function main() {
         const data: any = fs.readFileSync(path + 'settings.json');
         settings = JSON.parse(data);
     } catch (error) {
-        console.log('Error with Settings file: ', error);
+        console.error('Error with Settings file: ', error);
         return;
     }
     startCameraVapixLibraryWebsocket();
 }
 
+process.on('uncaughtException', function (error) {
+    console.error('uncaughtException: ', error);
+    process.exit(1);
+});
+
 process.on('unhandledRejection', function (error) {
-    console.log('unhandledRejection: ', error);
+    console.error('unhandledRejection: ', error);
     process.exit(1);
 });
 
