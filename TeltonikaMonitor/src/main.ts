@@ -114,6 +114,30 @@ let mapCP: CairoPainter;
 let cp: CairoPainter;
 let frames: Frames;
 
+function allSettled(promises: Promise<void>[]): Promise<void> {
+    return new Promise((resolve) => {
+        let numberOfFulfilledPromise = 0;
+
+        for (const promise of promises) {
+            promise.then(
+                () => {
+                    numberOfFulfilledPromise += 1;
+                    if (numberOfFulfilledPromise === promises.length) {
+                        resolve();
+                    }
+                },
+                (error) => {
+                    console.error(error);
+                    numberOfFulfilledPromise += 1;
+                    if (numberOfFulfilledPromise === promises.length) {
+                        resolve();
+                    }
+                }
+            );
+        }
+    });
+}
+
 //  -----------
 //  |  setup  |
 //  -----------
@@ -513,9 +537,9 @@ async function getModemInfo(): Promise<void> {
         if (mapCO !== null && (await mapCOconnect())) {
             promises.push(displayMap({ latitude: mi.latitude, longitude: mi.longitude }));
         }
-        await Promise.allSettled(promises);
+        await allSettled(promises);
     } catch (error) {
-        console.log(error.message);
+        console.error(error.message);
     } finally {
         setTimeout(getModemInfo, 1000 * settings.modem.refresh_period);
     }
@@ -757,11 +781,11 @@ async function mapCOconnect(): Promise<boolean> {
 
 function main() {
     process.on('uncaughtException', (e: Error) => {
-        console.log('Uncaught exception:', e);
+        console.error('Uncaught exception:', e);
         process.exit(1);
     });
     process.on('unhandledRejection', (e: Error) => {
-        console.log('Unhandled rejection:', e);
+        console.error('Unhandled rejection:', e);
         process.exit(1);
     });
 
