@@ -539,7 +539,7 @@ async function getModemInfo(): Promise<void> {
         }
         await allSettled(promises);
     } catch (error) {
-        console.log(error.message);
+        console.error(error.message);
     } finally {
         setTimeout(getModemInfo, 1000 * settings.modem.refresh_period);
     }
@@ -781,11 +781,11 @@ async function mapCOconnect(): Promise<boolean> {
 
 function main() {
     process.on('uncaughtException', (e: Error) => {
-        console.log('Uncaught exception:', e);
+        console.error('Uncaught exception:', e);
         process.exit(1);
     });
     process.on('unhandledRejection', (e: Error) => {
-        console.log('Unhandled rejection:', e);
+        console.error('Unhandled rejection:', e);
         process.exit(1);
     });
 
