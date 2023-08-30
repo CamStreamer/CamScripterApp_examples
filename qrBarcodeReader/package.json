@@ -1,6 +1,6 @@
 {
     "name": "@camstreamer/qr-barcode-reader",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "description": "",
     "prettier": "@camstreamer/prettier-config",
     "main": "main.js",
@@ -20,7 +20,7 @@
     "author": "CamStreamer s.r.o",
     "license": "ISC",
     "dependencies": {
-        "camstreamerlib": "^2.0.0",
+        "camstreamerlib": "^2.0.2",
         "fast-glob": "^3.2.12",
         "memorystream": "^0.3.1",
         "qrcode": "^1.5.3"

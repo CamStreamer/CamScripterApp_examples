@@ -1,6 +1,6 @@
 {
   "name": "@camstreamer/lantronix-wr",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "",
   "main": "main.js",
   "prettier": "@camstreamer/prettier-config",
@@ -16,7 +16,7 @@
   "author": "CamStreamer s.r.o",
   "license": "ISC",
   "dependencies": {
-    "camstreamerlib": "^2.0.0"
+    "camstreamerlib": "^2.0.2"
   },
   "devDependencies": {
     "@camstreamer/prettier-config": "^2.0.4",
