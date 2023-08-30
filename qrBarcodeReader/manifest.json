@@ -1,7 +1,7 @@
 {
   "package_name": "qrBarcodeReader",
   "package_menu_name": "QR & Barcode Reader",
-  "package_version": "1.0.2",
+  "package_version": "1.0.3",
   "vendor": "Camstreamer s.r.o.",
   "required_camscripter_version": "1.4.7",
   "ui_link": "/local/camscripter/package/qrBarcodeReader/index.html"

@@ -1,6 +1,6 @@
 {
     "name": "@camstreamer/mettler-toledo-plugin",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "description": "",
     "prettier": "@camstreamer/prettier-config",
     "main": "main.js",
@@ -20,7 +20,7 @@
     "author": "CamStreamer s.r.o",
     "license": "ISC",
     "dependencies": {
-        "camstreamerlib": "^2.0.0"
+        "camstreamerlib": "^2.0.2"
     },
     "devDependencies": {
         "@camstreamer/prettier-config": "^2.0.4",
