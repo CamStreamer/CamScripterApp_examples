@@ -40,11 +40,27 @@
     },
     "accuweather": {
         "APIkey": "",
-        "cg_services": [
-            {
-                "service_id": "",
-                "fields": []
-            }
-        ]
+        "units": "Metric",
+        "location": {
+            "fieldName": "",
+            "serviceIds": []
+        },
+
+        "temperature": {
+            "fieldName": "",
+            "serviceIds": []
+        },
+        "wind": {
+            "fieldName": "",
+            "serviceIds": []
+        },
+        "wind_gust": {
+            "fieldName": "",
+            "serviceIds": []
+        },
+        "humidity": {
+            "fieldName": "",
+            "serviceIds": []
+        }
     }
 }

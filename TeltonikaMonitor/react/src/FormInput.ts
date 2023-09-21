@@ -1,3 +1,8 @@
+type TAccuweatherApiValue = {
+    fieldName: string;
+    serviceIds: string[];
+};
+
 export type FormInput = {
     modem: {
         token: string;
@@ -41,10 +46,12 @@ export type FormInput = {
     };
     accuweather: {
         APIkey: string;
-        cg_services: {
-            service_id: number | '';
-            fields: string[];
-        }[];
+        units: 'Metric' | 'Imperial';
+        location: TAccuweatherApiValue;
+        temperature: TAccuweatherApiValue;
+        wind: TAccuweatherApiValue;
+        wind_gust: TAccuweatherApiValue;
+        humidity: TAccuweatherApiValue;
     };
 };
 export const defaultValues: FormInput = {
@@ -90,12 +97,28 @@ export const defaultValues: FormInput = {
     },
     accuweather: {
         APIkey: '',
-        cg_services: [
-            {
-                service_id: '',
-                fields: [],
-            },
-        ],
+        units: 'Metric',
+        location: {
+            fieldName: '',
+            serviceIds: [],
+        },
+
+        temperature: {
+            fieldName: '',
+            serviceIds: [],
+        },
+        wind: {
+            fieldName: '',
+            serviceIds: [],
+        },
+        wind_gust: {
+            fieldName: '',
+            serviceIds: [],
+        },
+        humidity: {
+            fieldName: '',
+            serviceIds: [],
+        },
     },
 };
 
