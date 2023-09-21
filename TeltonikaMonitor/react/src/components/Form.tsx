@@ -1,28 +1,27 @@
-import React, { useState, useEffect } from 'react';
-
-import Grid from '@mui/material/Grid';
-import Fade from '@mui/material/Fade';
-import Stack from '@mui/material/Stack';
-import Select from '@mui/material/Select';
-import MenuItem from '@mui/material/MenuItem';
-import TextField from '@mui/material/TextField';
-import styled from '@mui/material/styles/styled';
-import InputLabel from '@mui/material/InputLabel';
-import Typography from '@mui/material/Typography';
-import FormControl from '@mui/material/FormControl';
-import OutlinedInput from '@mui/material/OutlinedInput';
-import useMediaQuery from '@mui/material/useMediaQuery';
-import InputAdornment from '@mui/material/InputAdornment';
-import FormHelperText from '@mui/material/FormHelperText';
 import Button, { ButtonProps } from '@mui/material/Button';
-import CircularProgress from '@mui/material/CircularProgress';
-import { useForm, SubmitHandler, Controller } from 'react-hook-form';
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
+import { FormInput, convertValueToNumber, defaultValues } from '../FormInput';
+import React, { useEffect } from 'react';
 
-import { InfoSnackbar } from './Snackbar';
-import { useSnackbar } from '../hooks/Snackbar';
-import { PasswordInput } from './PasswordInput';
+import CircularProgress from '@mui/material/CircularProgress';
 import { CollapsibleFormSection } from './CollapsibleFormSection';
-import { FormInput, defaultValues, convertValueToNumber } from '../FormInput';
+import Fade from '@mui/material/Fade';
+import FormControl from '@mui/material/FormControl';
+import FormHelperText from '@mui/material/FormHelperText';
+import Grid from '@mui/material/Grid';
+import { InfoSnackbar } from './Snackbar';
+import InputAdornment from '@mui/material/InputAdornment';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import { PasswordInput } from './PasswordInput';
+import Select from '@mui/material/Select';
+import Stack from '@mui/material/Stack';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
+import styled from '@mui/material/styles/styled';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { useSnackbar } from '../hooks/Snackbar';
 
 const nameOfThisPackage = 'teltonika_monitor';
 
@@ -32,8 +31,6 @@ type Props = {
 };
 
 export function Form({ initialized, setInitialized }: Props) {
-    const [submitting, setSubmitting] = useState(false);
-
     const { snackbarData, displaySnackbar, closeSnackbar } = useSnackbar();
     const matchesSmallScreen = useMediaQuery('(max-width:390px)');
 
@@ -41,13 +38,12 @@ export function Form({ initialized, setInitialized }: Props) {
         register,
         handleSubmit,
         reset,
-        formState: { errors },
+        formState: { errors, isSubmitting },
         control,
         setValue,
     } = useForm<FormInput>({ mode: 'onChange', defaultValues });
 
     const onSubmit: SubmitHandler<FormInput> = async (toPost) => {
-        setSubmitting(true);
         convertValueToNumber(toPost);
         try {
             if (toPost.overlay.scale != null) {
@@ -76,8 +72,6 @@ export function Form({ initialized, setInitialized }: Props) {
                 type: 'error',
                 message: 'Error submitting data.',
             });
-        } finally {
-            setSubmitting(false);
         }
     };
 
@@ -647,10 +641,10 @@ export function Form({ initialized, setInitialized }: Props) {
                             <SubmitButton
                                 type="submit"
                                 variant="contained"
-                                disabled={Object.keys(errors).length > 0 || submitting}
+                                disabled={Object.keys(errors).length > 0 || isSubmitting}
                                 isSmallScreen={matchesSmallScreen}
                             >
-                                {submitting ? <CircularProgress size={20} /> : <Typography>Submit</Typography>}
+                                {isSubmitting ? <CircularProgress size={20} /> : <Typography>Submit</Typography>}
                             </SubmitButton>
                         </Grid>
                     </Grid>
