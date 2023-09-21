@@ -1,14 +1,18 @@
 import Button, { ButtonProps } from '@mui/material/Button';
-import { Controller, SubmitHandler, useForm } from 'react-hook-form';
+import { Controller, SubmitHandler, useFieldArray, useForm } from 'react-hook-form';
 import { FormInput, convertValueToNumber, defaultValues } from '../FormInput';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
+import AddIcon from '@mui/icons-material/Add';
+import { Chip } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 import { CollapsibleFormSection } from './CollapsibleFormSection';
+import DeleteIcon from '@mui/icons-material/Delete';
 import Fade from '@mui/material/Fade';
 import FormControl from '@mui/material/FormControl';
 import FormHelperText from '@mui/material/FormHelperText';
 import Grid from '@mui/material/Grid';
+import IconButton from '@mui/material/IconButton';
 import { InfoSnackbar } from './Snackbar';
 import InputAdornment from '@mui/material/InputAdornment';
 import InputLabel from '@mui/material/InputLabel';
@@ -33,6 +37,10 @@ type Props = {
 export function Form({ initialized, setInitialized }: Props) {
     const { snackbarData, displaySnackbar, closeSnackbar } = useSnackbar();
     const matchesSmallScreen = useMediaQuery('(max-width:390px)');
+    const matchesOneColumn = useMediaQuery('(max-width:900px)');
+
+    const [fieldValue, setFieldValue] = useState<Record<number, string>>({});
+    const [isFieldNameDuplicit, setIsFieldNameDuplicit] = useState(false);
 
     const {
         register,
@@ -40,7 +48,9 @@ export function Form({ initialized, setInitialized }: Props) {
         reset,
         formState: { errors, isSubmitting },
         control,
+        getValues,
         setValue,
+        watch,
     } = useForm<FormInput>({ mode: 'onChange', defaultValues });
 
     const onSubmit: SubmitHandler<FormInput> = async (toPost) => {
@@ -109,6 +119,13 @@ export function Form({ initialized, setInitialized }: Props) {
         };
     }, [reset, setInitialized]);
 
+    const { fields, append, remove } = useFieldArray({
+        control,
+        name: 'accuweather.cg_services',
+    });
+
+    const watchedFields = watch('accuweather.cg_services', fields);
+
     if (!initialized) {
         return (
             <Grid container justifyContent="center" alignItems="center">
@@ -119,7 +136,7 @@ export function Form({ initialized, setInitialized }: Props) {
 
     return (
         <Fade in={initialized} timeout={1000}>
-            <StyledForm onSubmit={handleSubmit(onSubmit)}>
+            <StyledForm onSubmit={handleSubmit(onSubmit, (e) => console.log(e))}>
                 <InfoSnackbar snackbarData={snackbarData} closeSnackbar={closeSnackbar} />
 
                 <StyledFormContent>
@@ -637,11 +654,211 @@ export function Form({ initialized, setInitialized }: Props) {
                             </Grid>
                         </CollapsibleFormSection>
 
+                        <CollapsibleFormSection label={'accuweather integration'} defaultExpanded={false}>
+                            <Grid item container spacing={2}>
+                                <Grid item container xs={12} md={6} rowSpacing={2} direction="column">
+                                    <Grid item>
+                                        <h3>Camera Settings</h3>
+                                    </Grid>
+                                    <Grid item>
+                                        <FormControl fullWidth>
+                                            <InputLabel id="events_protocol">Protocol</InputLabel>
+                                            <Controller
+                                                render={({ field: { onBlur, ref, onChange } }) => (
+                                                    <StyledSelect
+                                                        labelId="events_protocol"
+                                                        label="Protocol"
+                                                        defaultValue={'http'}
+                                                        onBlur={onBlur}
+                                                        ref={ref}
+                                                        onChange={(e) => {
+                                                            const protocol = e.target.value;
+                                                            setValue(
+                                                                'map_camera.port',
+                                                                protocol === 'http' ? 80 : 443,
+                                                                {
+                                                                    shouldTouch: true,
+                                                                }
+                                                            );
+                                                            onChange(e);
+                                                        }}
+                                                    >
+                                                        <MenuItem value="http">HTTP</MenuItem>
+                                                        <MenuItem value="https">HTTPS</MenuItem>
+                                                        <MenuItem value="https_insecure">HTTPS (insecure)</MenuItem>
+                                                    </StyledSelect>
+                                                )}
+                                                control={control}
+                                                name="map_camera.protocol"
+                                            />
+                                        </FormControl>
+                                    </Grid>
+                                    <Grid item>
+                                        <Input
+                                            fullWidth
+                                            label="IP"
+                                            error={errors?.map_camera?.ip != undefined}
+                                            helperText={errors?.map_camera?.ip?.message}
+                                            {...register('map_camera.ip', {
+                                                pattern: {
+                                                    value: /^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/,
+                                                    message: 'Set valid IP adress (xxx.xxx.xxx.xxx)',
+                                                },
+                                            })}
+                                        />
+                                    </Grid>
+                                    <Grid item>
+                                        <Input
+                                            fullWidth
+                                            label="Port"
+                                            error={errors?.map_camera?.port != undefined}
+                                            helperText={errors?.map_camera?.port?.message}
+                                            {...register('map_camera.port', {
+                                                pattern: {
+                                                    value: /^[0-9]*$/,
+                                                    message: 'Port has to be a positive number less then 65536.',
+                                                },
+                                                min: {
+                                                    value: 1,
+                                                    message: 'Port has to be a positive number less then 65536.',
+                                                },
+                                                max: {
+                                                    value: 65535,
+                                                    message: 'Port has to be a positive number less then 65536.',
+                                                },
+                                            })}
+                                        />
+                                    </Grid>
+                                    <Grid item>
+                                        <Input fullWidth label="User" {...register('map_camera.user')} />
+                                    </Grid>
+                                    <Grid item>
+                                        <PasswordInput register={register} name="map_camera.password" />
+                                    </Grid>
+                                </Grid>
+                                <Grid item container rowSpacing={2} direction="column">
+                                    <Grid item>
+                                        <h3>Accuweather API</h3>
+                                    </Grid>
+                                </Grid>
+                                <Grid item container xs={12} md={6} rowSpacing={2} direction="column">
+                                    <Grid item>
+                                        <Input
+                                            fullWidth
+                                            label="API key"
+                                            error={errors?.accuweather?.APIkey != undefined}
+                                            helperText={errors?.accuweather?.APIkey?.message}
+                                            {...register('accuweather.APIkey')}
+                                        />
+                                    </Grid>
+                                </Grid>
+                                <Grid item container rowSpacing={2} direction="column">
+                                    <Grid item>
+                                        <h3>CustomGraphics Settings</h3>
+                                    </Grid>
+                                </Grid>
+                                <Grid item xs={12} rowSpacing={2}>
+                                    <StyledAccuContentWrapper>
+                                        {fields.map((item, index) => (
+                                            <StyledServiceRowWrapper key={item.id}>
+                                                <StyledServiceRow className={matchesOneColumn ? 'one-column' : ''}>
+                                                    <Input
+                                                        fullWidth
+                                                        label="CustomGraphics service ID"
+                                                        {...register(
+                                                            `accuweather.cg_services.${index}.service_id` as const
+                                                        )}
+                                                    />
+                                                    {fields.length === 1 ? null : (
+                                                        <span>
+                                                            <IconButton onClick={() => remove(index)}>
+                                                                <DeleteIcon />
+                                                            </IconButton>
+                                                        </span>
+                                                    )}
+                                                    {watchedFields[index].service_id !== '' && (
+                                                        <Input
+                                                            className="field-input"
+                                                            label="CustomGraphics field name"
+                                                            value={fieldValue[index] ?? ''}
+                                                            onChange={(e) => {
+                                                                setFieldValue((prev) => ({
+                                                                    ...prev,
+                                                                    [index]: e.target.value,
+                                                                }));
+                                                                if (
+                                                                    watchedFields[index].fields.includes(e.target.value)
+                                                                ) {
+                                                                    setIsFieldNameDuplicit(true);
+                                                                } else {
+                                                                    setIsFieldNameDuplicit(false);
+                                                                }
+                                                            }}
+                                                            onBlur={() => {
+                                                                if (isFieldNameDuplicit || fieldValue[index] === '')
+                                                                    return;
+                                                                setValue(`accuweather.cg_services.${index}.fields`, [
+                                                                    ...getValues(
+                                                                        `accuweather.cg_services.${index}.fields`
+                                                                    ),
+                                                                    fieldValue[index],
+                                                                ]);
+                                                                setFieldValue((prev) => ({
+                                                                    ...prev,
+                                                                    [index]: '',
+                                                                }));
+                                                            }}
+                                                            error={isFieldNameDuplicit}
+                                                            helperText={
+                                                                isFieldNameDuplicit
+                                                                    ? 'Field name already exists for given service.'
+                                                                    : undefined
+                                                            }
+                                                        />
+                                                    )}
+                                                </StyledServiceRow>
+                                                {watchedFields[index].fields.length > 0 && (
+                                                    <StyledChipRowWrapper>
+                                                        <div></div>
+                                                        <StyledChipRow>
+                                                            {watchedFields[index].fields.map((val) => (
+                                                                <Chip
+                                                                    label={val}
+                                                                    //variant="outlined"
+                                                                    onDelete={() => {
+                                                                        setValue(
+                                                                            `accuweather.cg_services.${index}.fields`,
+                                                                            getValues(
+                                                                                `accuweather.cg_services.${index}.fields`
+                                                                            ).filter((v) => v !== val)
+                                                                        );
+                                                                    }}
+                                                                />
+                                                            ))}
+                                                        </StyledChipRow>
+                                                    </StyledChipRowWrapper>
+                                                )}
+                                            </StyledServiceRowWrapper>
+                                        ))}
+                                        <span>
+                                            <Button
+                                                onClick={() => append({ service_id: '', fields: [] })}
+                                                startIcon={<AddIcon />}
+                                                color="primary"
+                                                variant="outlined"
+                                            >
+                                                <Typography textTransform="none">Add service</Typography>
+                                            </Button>
+                                        </span>
+                                    </StyledAccuContentWrapper>
+                                </Grid>
+                            </Grid>
+                        </CollapsibleFormSection>
                         <Grid item>
                             <SubmitButton
                                 type="submit"
                                 variant="contained"
-                                disabled={Object.keys(errors).length > 0 || isSubmitting}
+                                disabled={Object.keys(errors).length > 0 || isSubmitting || isFieldNameDuplicit}
                                 isSmallScreen={matchesSmallScreen}
                             >
                                 {isSubmitting ? <CircularProgress size={20} /> : <Typography>Submit</Typography>}
@@ -675,6 +892,57 @@ const SubmitButton = styled((props: { isSmallScreen: boolean } & ButtonProps) =>
     const { ...other } = props;
     return <Button {...other} />;
 })(({ isSmallScreen }) => ({
-    width: isSmallScreen ? '100%' : '33%',
+    width: isSmallScreen ? '100%' : '50%',
     height: '40px',
 }));
+
+const StyledAccuContentWrapper = styled('div')({
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '16px',
+    width: '100%',
+});
+
+const StyledServiceRowWrapper = styled('div')({
+    display: 'flex',
+    flexDirection: 'column',
+});
+
+const StyledServiceRow = styled('div')({
+    'display': 'grid',
+    'alignItems': 'center',
+    'columnGap': '8px',
+    'marginBottom': '8px',
+
+    'gridTemplateColumns': '49% auto',
+    'gridAutoRows': 'auto',
+    'rowGap': '8px',
+
+    '& .field-input': {
+        gridRow: '2',
+        gridColumn: '1 / span 2',
+        width: '250px',
+        marginLeft: '25px',
+    },
+
+    '&.one-column': {
+        gridTemplateColumns: '1fr auto',
+    },
+});
+
+const StyledChipRowWrapper = styled('div')({
+    width: '100%',
+    display: 'grid',
+    alignItems: 'center',
+    gridTemplateColumns: '25px 1fr',
+    gap: '8px',
+    marginTop: '8px',
+    marginBottom: '20px',
+});
+
+const StyledChipRow = styled('div')({
+    width: '100%',
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: '8px',
+});

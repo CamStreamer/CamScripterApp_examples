@@ -39,6 +39,13 @@ export type FormInput = {
         APIkey: string;
         tolerance: number | null;
     };
+    accuweather: {
+        APIkey: string;
+        cg_services: {
+            service_id: number | '';
+            fields: string[];
+        }[];
+    };
 };
 export const defaultValues: FormInput = {
     modem: {
@@ -80,6 +87,15 @@ export const defaultValues: FormInput = {
         zoomLevel: 15,
         APIkey: '',
         tolerance: 2,
+    },
+    accuweather: {
+        APIkey: '',
+        cg_services: [
+            {
+                service_id: '',
+                fields: [],
+            },
+        ],
     },
 };
 
