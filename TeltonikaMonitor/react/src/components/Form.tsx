@@ -1,10 +1,9 @@
 import Button, { ButtonProps } from '@mui/material/Button';
 import { Controller, SubmitHandler, useFieldArray, useForm } from 'react-hook-form';
 import { FormInput, convertValueToNumber, defaultValues } from '../FormInput';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 
 import AddIcon from '@mui/icons-material/Add';
-import { Chip } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 import { CollapsibleFormSection } from './CollapsibleFormSection';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -37,10 +36,6 @@ type Props = {
 export function Form({ initialized, setInitialized }: Props) {
     const { snackbarData, displaySnackbar, closeSnackbar } = useSnackbar();
     const matchesSmallScreen = useMediaQuery('(max-width:390px)');
-    const matchesOneColumn = useMediaQuery('(max-width:900px)');
-
-    const [fieldValue, setFieldValue] = useState<Record<number, string>>({});
-    const [isFieldNameDuplicit, setIsFieldNameDuplicit] = useState(false);
 
     const {
         register,
@@ -48,12 +43,11 @@ export function Form({ initialized, setInitialized }: Props) {
         reset,
         formState: { errors, isSubmitting },
         control,
-        getValues,
         setValue,
-        watch,
     } = useForm<FormInput>({ mode: 'onChange', defaultValues });
 
     const onSubmit: SubmitHandler<FormInput> = async (toPost) => {
+        console.log(toPost);
         convertValueToNumber(toPost);
         try {
             if (toPost.overlay.scale != null) {
@@ -119,12 +113,46 @@ export function Form({ initialized, setInitialized }: Props) {
         };
     }, [reset, setInitialized]);
 
-    const { fields, append, remove } = useFieldArray({
+    const {
+        fields: locationFields,
+        append: locationAppend,
+        remove: locationRemove,
+    } = useFieldArray({
         control,
-        name: 'accuweather.cg_services',
+        name: 'accuweather.location.serviceIds',
     });
-
-    const watchedFields = watch('accuweather.cg_services', fields);
+    const {
+        fields: temperatureFields,
+        append: temperatureAppend,
+        remove: temperatureRemove,
+    } = useFieldArray({
+        control,
+        name: 'accuweather.temperature.serviceIds',
+    });
+    const {
+        fields: windFields,
+        append: windAppend,
+        remove: windRemove,
+    } = useFieldArray({
+        control,
+        name: 'accuweather.wind.serviceIds',
+    });
+    const {
+        fields: windGustFields,
+        append: windGustAppend,
+        remove: windGustRemove,
+    } = useFieldArray({
+        control,
+        name: 'accuweather.wind_gust.serviceIds',
+    });
+    const {
+        fields: humidityFields,
+        append: humidityAppend,
+        remove: humidityRemove,
+    } = useFieldArray({
+        control,
+        name: 'accuweather.humidity.serviceIds',
+    });
 
     if (!initialized) {
         return (
@@ -741,7 +769,7 @@ export function Form({ initialized, setInitialized }: Props) {
                                         <h3>Accuweather API</h3>
                                     </Grid>
                                 </Grid>
-                                <Grid item container xs={12} md={6} rowSpacing={2} direction="column">
+                                <Grid item xs={12} md={6}>
                                     <Grid item>
                                         <Input
                                             fullWidth
@@ -752,105 +780,221 @@ export function Form({ initialized, setInitialized }: Props) {
                                         />
                                     </Grid>
                                 </Grid>
+                                <Grid item xs={12} md={6}>
+                                    <FormControl fullWidth>
+                                        <InputLabel id="units">Units</InputLabel>
+                                        <Controller
+                                            control={control}
+                                            name="accuweather.units"
+                                            render={({ field }) => (
+                                                <StyledSelect labelId="units" label="Protocol" {...field}>
+                                                    <MenuItem value="Metric">Metric</MenuItem>
+                                                    <MenuItem value="Imperial">Imperial</MenuItem>
+                                                </StyledSelect>
+                                            )}
+                                        />
+                                    </FormControl>
+                                </Grid>
                                 <Grid item container rowSpacing={2} direction="column">
                                     <Grid item>
                                         <h3>CustomGraphics Settings</h3>
                                     </Grid>
                                 </Grid>
-                                <Grid item xs={12} rowSpacing={2}>
-                                    <StyledAccuContentWrapper>
-                                        {fields.map((item, index) => (
-                                            <StyledServiceRowWrapper key={item.id}>
-                                                <StyledServiceRow className={matchesOneColumn ? 'one-column' : ''}>
-                                                    <Input
-                                                        fullWidth
-                                                        label="CustomGraphics service ID"
-                                                        {...register(
-                                                            `accuweather.cg_services.${index}.service_id` as const
-                                                        )}
-                                                    />
-                                                    {fields.length === 1 ? null : (
+                                <Grid item container rowSpacing={2} direction="column">
+                                    <StyledApiValuesContent>
+                                        <Typography>location:</Typography>
+                                        <Input
+                                            fullWidth
+                                            label="CustomGraphics field name"
+                                            {...register('accuweather.location.fieldName')}
+                                        />
+                                        {locationFields.map((item, index) => (
+                                            <>
+                                                <Input
+                                                    key={item.id}
+                                                    className="service-id-input"
+                                                    fullWidth
+                                                    label="CustomGraphics service ID"
+                                                    {...register(
+                                                        `accuweather.location.serviceIds.${index}.id` as const
+                                                    )}
+                                                />
+                                                <span>
+                                                    {locationFields.length === 1 ? null : (
                                                         <span>
-                                                            <IconButton onClick={() => remove(index)}>
+                                                            <IconButton onClick={() => locationRemove(index)}>
                                                                 <DeleteIcon />
                                                             </IconButton>
                                                         </span>
                                                     )}
-                                                    {watchedFields[index].service_id !== '' && (
-                                                        <Input
-                                                            className="field-input"
-                                                            label="CustomGraphics field name"
-                                                            value={fieldValue[index] ?? ''}
-                                                            onChange={(e) => {
-                                                                setFieldValue((prev) => ({
-                                                                    ...prev,
-                                                                    [index]: e.target.value,
-                                                                }));
-                                                                if (
-                                                                    watchedFields[index].fields.includes(e.target.value)
-                                                                ) {
-                                                                    setIsFieldNameDuplicit(true);
-                                                                } else {
-                                                                    setIsFieldNameDuplicit(false);
-                                                                }
-                                                            }}
-                                                            onBlur={() => {
-                                                                if (isFieldNameDuplicit || fieldValue[index] === '')
-                                                                    return;
-                                                                setValue(`accuweather.cg_services.${index}.fields`, [
-                                                                    ...getValues(
-                                                                        `accuweather.cg_services.${index}.fields`
-                                                                    ),
-                                                                    fieldValue[index],
-                                                                ]);
-                                                                setFieldValue((prev) => ({
-                                                                    ...prev,
-                                                                    [index]: '',
-                                                                }));
-                                                            }}
-                                                            error={isFieldNameDuplicit}
-                                                            helperText={
-                                                                isFieldNameDuplicit
-                                                                    ? 'Field name already exists for given service.'
-                                                                    : undefined
-                                                            }
-                                                        />
+                                                    {index === locationFields.length - 1 && (
+                                                        <Button
+                                                            onClick={() => locationAppend({ id: '' })}
+                                                            startIcon={<AddIcon />}
+                                                            color="primary"
+                                                            variant="outlined"
+                                                        >
+                                                            <Typography textTransform="none">Add service</Typography>
+                                                        </Button>
                                                     )}
-                                                </StyledServiceRow>
-                                                {watchedFields[index].fields.length > 0 && (
-                                                    <StyledChipRowWrapper>
-                                                        <div></div>
-                                                        <StyledChipRow>
-                                                            {watchedFields[index].fields.map((val) => (
-                                                                <Chip
-                                                                    label={val}
-                                                                    //variant="outlined"
-                                                                    onDelete={() => {
-                                                                        setValue(
-                                                                            `accuweather.cg_services.${index}.fields`,
-                                                                            getValues(
-                                                                                `accuweather.cg_services.${index}.fields`
-                                                                            ).filter((v) => v !== val)
-                                                                        );
-                                                                    }}
-                                                                />
-                                                            ))}
-                                                        </StyledChipRow>
-                                                    </StyledChipRowWrapper>
-                                                )}
-                                            </StyledServiceRowWrapper>
+                                                </span>
+                                            </>
                                         ))}
-                                        <span>
-                                            <Button
-                                                onClick={() => append({ service_id: '', fields: [] })}
-                                                startIcon={<AddIcon />}
-                                                color="primary"
-                                                variant="outlined"
-                                            >
-                                                <Typography textTransform="none">Add service</Typography>
-                                            </Button>
-                                        </span>
-                                    </StyledAccuContentWrapper>
+
+                                        <Typography>temperature:</Typography>
+                                        <Input
+                                            fullWidth
+                                            label="CustomGraphics field name"
+                                            {...register('accuweather.temperature.fieldName')}
+                                        />
+                                        {temperatureFields.map((item, index) => (
+                                            <>
+                                                <Input
+                                                    key={item.id}
+                                                    className="service-id-input"
+                                                    fullWidth
+                                                    label="CustomGraphics service ID"
+                                                    {...register(
+                                                        `accuweather.temperature.serviceIds.${index}.id` as const
+                                                    )}
+                                                />
+                                                <span>
+                                                    {temperatureFields.length === 1 ? null : (
+                                                        <span>
+                                                            <IconButton onClick={() => temperatureRemove(index)}>
+                                                                <DeleteIcon />
+                                                            </IconButton>
+                                                        </span>
+                                                    )}
+                                                    {index === temperatureFields.length - 1 && (
+                                                        <Button
+                                                            onClick={() => temperatureAppend({ id: '' })}
+                                                            startIcon={<AddIcon />}
+                                                            color="primary"
+                                                            variant="outlined"
+                                                        >
+                                                            <Typography textTransform="none">Add service</Typography>
+                                                        </Button>
+                                                    )}
+                                                </span>
+                                            </>
+                                        ))}
+
+                                        <Typography>wind:</Typography>
+                                        <Input
+                                            fullWidth
+                                            label="CustomGraphics field name"
+                                            {...register('accuweather.wind.fieldName')}
+                                        />
+                                        {windFields.map((item, index) => (
+                                            <>
+                                                <Input
+                                                    key={item.id}
+                                                    className="service-id-input"
+                                                    fullWidth
+                                                    label="CustomGraphics service ID"
+                                                    {...register(`accuweather.wind.serviceIds.${index}.id` as const)}
+                                                />
+                                                <span>
+                                                    {windFields.length === 1 ? null : (
+                                                        <span>
+                                                            <IconButton onClick={() => windRemove(index)}>
+                                                                <DeleteIcon />
+                                                            </IconButton>
+                                                        </span>
+                                                    )}
+                                                    {index === windFields.length - 1 && (
+                                                        <Button
+                                                            onClick={() => windAppend({ id: '' })}
+                                                            startIcon={<AddIcon />}
+                                                            color="primary"
+                                                            variant="outlined"
+                                                        >
+                                                            <Typography textTransform="none">Add service</Typography>
+                                                        </Button>
+                                                    )}
+                                                </span>
+                                            </>
+                                        ))}
+
+                                        <Typography>wind gust:</Typography>
+                                        <Input
+                                            fullWidth
+                                            label="CustomGraphics field name"
+                                            {...register('accuweather.wind_gust.fieldName')}
+                                        />
+                                        {windGustFields.map((item, index) => (
+                                            <>
+                                                <Input
+                                                    key={item.id}
+                                                    className="service-id-input"
+                                                    fullWidth
+                                                    label="CustomGraphics service ID"
+                                                    {...register(
+                                                        `accuweather.wind_gust.serviceIds.${index}.id` as const
+                                                    )}
+                                                />
+                                                <span>
+                                                    {windGustFields.length === 1 ? null : (
+                                                        <span>
+                                                            <IconButton onClick={() => windGustRemove(index)}>
+                                                                <DeleteIcon />
+                                                            </IconButton>
+                                                        </span>
+                                                    )}
+                                                    {index === windGustFields.length - 1 && (
+                                                        <Button
+                                                            onClick={() => windGustAppend({ id: '' })}
+                                                            startIcon={<AddIcon />}
+                                                            color="primary"
+                                                            variant="outlined"
+                                                        >
+                                                            <Typography textTransform="none">Add service</Typography>
+                                                        </Button>
+                                                    )}
+                                                </span>
+                                            </>
+                                        ))}
+
+                                        <Typography>humidity:</Typography>
+                                        <Input
+                                            fullWidth
+                                            label="CustomGraphics field name"
+                                            {...register('accuweather.humidity.fieldName')}
+                                        />
+                                        {humidityFields.map((item, index) => (
+                                            <>
+                                                <Input
+                                                    key={item.id}
+                                                    className="service-id-input"
+                                                    fullWidth
+                                                    label="CustomGraphics service ID"
+                                                    {...register(
+                                                        `accuweather.humidity.serviceIds.${index}.id` as const
+                                                    )}
+                                                />
+                                                <span>
+                                                    {humidityFields.length === 1 ? null : (
+                                                        <span>
+                                                            <IconButton onClick={() => humidityRemove(index)}>
+                                                                <DeleteIcon />
+                                                            </IconButton>
+                                                        </span>
+                                                    )}
+                                                    {index === humidityFields.length - 1 && (
+                                                        <Button
+                                                            onClick={() => humidityAppend({ id: '' })}
+                                                            startIcon={<AddIcon />}
+                                                            color="primary"
+                                                            variant="outlined"
+                                                        >
+                                                            <Typography textTransform="none">Add service</Typography>
+                                                        </Button>
+                                                    )}
+                                                </span>
+                                            </>
+                                        ))}
+                                    </StyledApiValuesContent>
                                 </Grid>
                             </Grid>
                         </CollapsibleFormSection>
@@ -858,7 +1002,7 @@ export function Form({ initialized, setInitialized }: Props) {
                             <SubmitButton
                                 type="submit"
                                 variant="contained"
-                                disabled={Object.keys(errors).length > 0 || isSubmitting || isFieldNameDuplicit}
+                                disabled={Object.keys(errors).length > 0 || isSubmitting}
                                 isSmallScreen={matchesSmallScreen}
                             >
                                 {isSubmitting ? <CircularProgress size={20} /> : <Typography>Submit</Typography>}
@@ -896,53 +1040,14 @@ const SubmitButton = styled((props: { isSmallScreen: boolean } & ButtonProps) =>
     height: '40px',
 }));
 
-const StyledAccuContentWrapper = styled('div')({
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '16px',
-    width: '100%',
-});
-
-const StyledServiceRowWrapper = styled('div')({
-    display: 'flex',
-    flexDirection: 'column',
-});
-
-const StyledServiceRow = styled('div')({
+const StyledApiValuesContent = styled('div')({
     'display': 'grid',
+    'gridTemplateColumns': 'max-content 250px 250px auto',
+    'gap': '16px',
     'alignItems': 'center',
-    'columnGap': '8px',
-    'marginBottom': '8px',
+    'marginTop': '16px',
 
-    'gridTemplateColumns': '49% auto',
-    'gridAutoRows': 'auto',
-    'rowGap': '8px',
-
-    '& .field-input': {
-        gridRow: '2',
-        gridColumn: '1 / span 2',
-        width: '250px',
-        marginLeft: '25px',
+    '& .service-id-input': {
+        gridColumn: '3',
     },
-
-    '&.one-column': {
-        gridTemplateColumns: '1fr auto',
-    },
-});
-
-const StyledChipRowWrapper = styled('div')({
-    width: '100%',
-    display: 'grid',
-    alignItems: 'center',
-    gridTemplateColumns: '25px 1fr',
-    gap: '8px',
-    marginTop: '8px',
-    marginBottom: '20px',
-});
-
-const StyledChipRow = styled('div')({
-    width: '100%',
-    display: 'flex',
-    flexWrap: 'wrap',
-    gap: '8px',
 });

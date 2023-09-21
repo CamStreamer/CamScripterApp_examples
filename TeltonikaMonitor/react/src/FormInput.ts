@@ -1,6 +1,6 @@
 type TAccuweatherApiValue = {
     fieldName: string;
-    serviceIds: string[];
+    serviceIds: { id: number | '' }[];
 };
 
 export type FormInput = {
@@ -100,24 +100,43 @@ export const defaultValues: FormInput = {
         units: 'Metric',
         location: {
             fieldName: '',
-            serviceIds: [],
+            serviceIds: [
+                {
+                    id: '',
+                },
+            ],
         },
-
         temperature: {
             fieldName: '',
-            serviceIds: [],
+            serviceIds: [
+                {
+                    id: '',
+                },
+            ],
         },
         wind: {
             fieldName: '',
-            serviceIds: [],
+            serviceIds: [
+                {
+                    id: '',
+                },
+            ],
         },
         wind_gust: {
             fieldName: '',
-            serviceIds: [],
+            serviceIds: [
+                {
+                    id: '',
+                },
+            ],
         },
         humidity: {
             fieldName: '',
-            serviceIds: [],
+            serviceIds: [
+                {
+                    id: '',
+                },
+            ],
         },
     },
 };
