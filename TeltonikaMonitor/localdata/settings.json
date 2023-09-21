@@ -37,5 +37,14 @@
         "zoomLevel": 15,
         "APIkey": "",
         "tolerance": 2
+    },
+    "accuweather": {
+        "APIkey": "",
+        "cg_services": [
+            {
+                "service_id": "",
+                "fields": []
+            }
+        ]
     }
 }
