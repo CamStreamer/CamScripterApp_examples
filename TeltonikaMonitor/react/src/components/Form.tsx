@@ -801,7 +801,7 @@ export function Form({ initialized, setInitialized }: Props) {
                                             {...register('accuweather.temperature.fieldName')}
                                         />
 
-                                        <Typography>wind:</Typography>
+                                        <Typography>wind speed:</Typography>
                                         <Input
                                             fullWidth
                                             label="CustomGraphics service ID"

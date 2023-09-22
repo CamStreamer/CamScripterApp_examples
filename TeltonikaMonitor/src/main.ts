@@ -610,7 +610,6 @@ async function getModemInfo(): Promise<void> {
 
         const mi: ModemInfo = parseTeltonikaResponse(parsedResponse.data, wireless.data, ports);
 
-        sendAccuweatherData(mi.latitude, mi.longitude);
         latitude = mi.latitude;
         longitude = mi.longitude;
 
@@ -621,7 +620,7 @@ async function getModemInfo(): Promise<void> {
         if (mapCO !== null && (await mapCOconnect())) {
             promises.push(displayMap({ latitude: mi.latitude, longitude: mi.longitude }));
         }
-
+        promises.push(sendAccuweatherData(mi.latitude, mi.longitude));
         await allSettled(promises);
     } catch (error) {
         console.error(error.message);

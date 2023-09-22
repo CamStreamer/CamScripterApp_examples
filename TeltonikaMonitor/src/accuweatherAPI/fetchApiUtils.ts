@@ -42,7 +42,7 @@ export const getApiData = async (apiKey: string, lat: number, lon: number, unit:
         temperature: `${Temperature[unit].Value}\xB0${Temperature[unit].Unit}`,
         wind: `${Wind.Speed[unit].Value}${Wind.Speed[unit].Unit}`,
         wind_gust: `${WindGust.Speed[unit].Value}${WindGust.Speed[unit].Unit}`,
-        humidity: RelativeHumidity,
+        humidity: `${RelativeHumidity}%`,
     };
 };
 
