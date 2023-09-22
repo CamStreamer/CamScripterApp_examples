@@ -1,28 +1,27 @@
-import React, { useState, useEffect } from 'react';
-
-import Grid from '@mui/material/Grid';
-import Fade from '@mui/material/Fade';
-import Stack from '@mui/material/Stack';
-import Select from '@mui/material/Select';
-import MenuItem from '@mui/material/MenuItem';
-import TextField from '@mui/material/TextField';
-import styled from '@mui/material/styles/styled';
-import InputLabel from '@mui/material/InputLabel';
-import Typography from '@mui/material/Typography';
-import FormControl from '@mui/material/FormControl';
-import OutlinedInput from '@mui/material/OutlinedInput';
-import useMediaQuery from '@mui/material/useMediaQuery';
-import InputAdornment from '@mui/material/InputAdornment';
-import FormHelperText from '@mui/material/FormHelperText';
 import Button, { ButtonProps } from '@mui/material/Button';
-import CircularProgress from '@mui/material/CircularProgress';
-import { useForm, SubmitHandler, Controller } from 'react-hook-form';
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
+import { FormInput, convertValueToNumber, defaultValues } from '../FormInput';
+import React, { useEffect } from 'react';
 
-import { InfoSnackbar } from './Snackbar';
-import { useSnackbar } from '../hooks/Snackbar';
-import { PasswordInput } from './PasswordInput';
+import CircularProgress from '@mui/material/CircularProgress';
 import { CollapsibleFormSection } from './CollapsibleFormSection';
-import { FormInput, defaultValues, convertValueToNumber } from '../FormInput';
+import Fade from '@mui/material/Fade';
+import FormControl from '@mui/material/FormControl';
+import FormHelperText from '@mui/material/FormHelperText';
+import Grid from '@mui/material/Grid';
+import { InfoSnackbar } from './Snackbar';
+import InputAdornment from '@mui/material/InputAdornment';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import { PasswordInput } from './PasswordInput';
+import Select from '@mui/material/Select';
+import Stack from '@mui/material/Stack';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
+import styled from '@mui/material/styles/styled';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { useSnackbar } from '../hooks/Snackbar';
 
 const nameOfThisPackage = 'teltonika_monitor';
 
@@ -32,8 +31,6 @@ type Props = {
 };
 
 export function Form({ initialized, setInitialized }: Props) {
-    const [submitting, setSubmitting] = useState(false);
-
     const { snackbarData, displaySnackbar, closeSnackbar } = useSnackbar();
     const matchesSmallScreen = useMediaQuery('(max-width:390px)');
 
@@ -41,13 +38,12 @@ export function Form({ initialized, setInitialized }: Props) {
         register,
         handleSubmit,
         reset,
-        formState: { errors },
+        formState: { errors, isSubmitting },
         control,
         setValue,
     } = useForm<FormInput>({ mode: 'onChange', defaultValues });
 
     const onSubmit: SubmitHandler<FormInput> = async (toPost) => {
-        setSubmitting(true);
         convertValueToNumber(toPost);
         try {
             if (toPost.overlay.scale != null) {
@@ -76,8 +72,6 @@ export function Form({ initialized, setInitialized }: Props) {
                 type: 'error',
                 message: 'Error submitting data.',
             });
-        } finally {
-            setSubmitting(false);
         }
     };
 
@@ -125,7 +119,7 @@ export function Form({ initialized, setInitialized }: Props) {
 
     return (
         <Fade in={initialized} timeout={1000}>
-            <StyledForm onSubmit={handleSubmit(onSubmit)}>
+            <StyledForm onSubmit={handleSubmit(onSubmit, (e) => console.log(e))}>
                 <InfoSnackbar snackbarData={snackbarData} closeSnackbar={closeSnackbar} />
 
                 <StyledFormContent>
@@ -232,12 +226,10 @@ export function Form({ initialized, setInitialized }: Props) {
                                         />
                                     </Grid>
                                     <Grid item>
-                                        <Input
-                                            fullWidth
-                                            label="Port"
-                                            error={errors?.co_camera?.port != undefined}
-                                            helperText={errors?.co_camera?.port?.message}
-                                            {...register('co_camera.port', {
+                                        <Controller
+                                            name="co_camera.port"
+                                            control={control}
+                                            rules={{
                                                 pattern: {
                                                     value: /^[0-9]*$/,
                                                     message: 'Port has to be a positive number less then 65536.',
@@ -250,7 +242,16 @@ export function Form({ initialized, setInitialized }: Props) {
                                                     value: 65535,
                                                     message: 'Port has to be a positive number less then 65536.',
                                                 },
-                                            })}
+                                            }}
+                                            render={({ field }) => (
+                                                <Input
+                                                    {...field}
+                                                    fullWidth
+                                                    label="Port"
+                                                    error={errors?.co_camera?.port != undefined}
+                                                    helperText={errors?.co_camera?.port?.message}
+                                                />
+                                            )}
                                         />
                                     </Grid>
                                     <Grid item>
@@ -429,12 +430,10 @@ export function Form({ initialized, setInitialized }: Props) {
                                         />
                                     </Grid>
                                     <Grid item>
-                                        <Input
-                                            fullWidth
-                                            label="Port"
-                                            error={errors?.map_camera?.port != undefined}
-                                            helperText={errors?.map_camera?.port?.message}
-                                            {...register('map_camera.port', {
+                                        <Controller
+                                            name="map_camera.port"
+                                            control={control}
+                                            rules={{
                                                 pattern: {
                                                     value: /^[0-9]*$/,
                                                     message: 'Port has to be a positive number less then 65536.',
@@ -447,7 +446,16 @@ export function Form({ initialized, setInitialized }: Props) {
                                                     value: 65535,
                                                     message: 'Port has to be a positive number less then 65536.',
                                                 },
-                                            })}
+                                            }}
+                                            render={({ field }) => (
+                                                <Input
+                                                    {...field}
+                                                    fullWidth
+                                                    label="Port"
+                                                    error={errors?.map_camera?.port != undefined}
+                                                    helperText={errors?.map_camera?.port?.message}
+                                                />
+                                            )}
                                         />
                                     </Grid>
                                     <Grid item>
@@ -643,14 +651,224 @@ export function Form({ initialized, setInitialized }: Props) {
                             </Grid>
                         </CollapsibleFormSection>
 
+                        <CollapsibleFormSection label={'accuweather integration'} defaultExpanded={false}>
+                            <Grid item container spacing={2}>
+                                <Grid item container xs={12} md={6} rowSpacing={2} direction="column">
+                                    <Grid item>
+                                        <h3>Camera Settings</h3>
+                                    </Grid>
+                                    <Grid item>
+                                        <FormControl fullWidth>
+                                            <InputLabel id="events_protocol">Protocol</InputLabel>
+                                            <Controller
+                                                render={({ field: { onBlur, ref, onChange } }) => (
+                                                    <StyledSelect
+                                                        labelId="events_protocol"
+                                                        label="Protocol"
+                                                        defaultValue={'http'}
+                                                        onBlur={onBlur}
+                                                        ref={ref}
+                                                        onChange={(e) => {
+                                                            const protocol = e.target.value;
+                                                            setValue(
+                                                                'accuweather_camera.port',
+                                                                protocol === 'http' ? 80 : 443,
+                                                                {
+                                                                    shouldTouch: true,
+                                                                }
+                                                            );
+                                                            onChange(e);
+                                                        }}
+                                                    >
+                                                        <MenuItem value="http">HTTP</MenuItem>
+                                                        <MenuItem value="https">HTTPS</MenuItem>
+                                                        <MenuItem value="https_insecure">HTTPS (insecure)</MenuItem>
+                                                    </StyledSelect>
+                                                )}
+                                                control={control}
+                                                name="accuweather_camera.protocol"
+                                            />
+                                        </FormControl>
+                                    </Grid>
+                                    <Grid item>
+                                        <Input
+                                            fullWidth
+                                            label="IP"
+                                            error={errors?.accuweather_camera?.ip != undefined}
+                                            helperText={errors?.accuweather_camera?.ip?.message}
+                                            {...register('accuweather_camera.ip', {
+                                                pattern: {
+                                                    value: /^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/,
+                                                    message: 'Set valid IP adress (xxx.xxx.xxx.xxx)',
+                                                },
+                                            })}
+                                        />
+                                    </Grid>
+                                    <Grid item>
+                                        <Controller
+                                            name="accuweather_camera.port"
+                                            control={control}
+                                            rules={{
+                                                pattern: {
+                                                    value: /^[0-9]*$/,
+                                                    message: 'Port has to be a positive number less then 65536.',
+                                                },
+                                                min: {
+                                                    value: 1,
+                                                    message: 'Port has to be a positive number less then 65536.',
+                                                },
+                                                max: {
+                                                    value: 65535,
+                                                    message: 'Port has to be a positive number less then 65536.',
+                                                },
+                                            }}
+                                            render={({ field }) => (
+                                                <Input
+                                                    {...field}
+                                                    fullWidth
+                                                    label="Port"
+                                                    error={errors?.accuweather_camera?.port != undefined}
+                                                    helperText={errors?.accuweather_camera?.port?.message}
+                                                />
+                                            )}
+                                        />
+                                    </Grid>
+                                    <Grid item>
+                                        <Input fullWidth label="User" {...register('accuweather_camera.user')} />
+                                    </Grid>
+                                    <Grid item>
+                                        <PasswordInput register={register} name="accuweather_camera.password" />
+                                    </Grid>
+                                </Grid>
+                                <Grid item container rowSpacing={2} direction="column">
+                                    <Grid item>
+                                        <h3>Accuweather API</h3>
+                                    </Grid>
+                                </Grid>
+                                <Grid item xs={12} md={6}>
+                                    <Grid item>
+                                        <Input
+                                            fullWidth
+                                            label="API key"
+                                            error={errors?.accuweather?.APIkey != undefined}
+                                            helperText={errors?.accuweather?.APIkey?.message}
+                                            {...register('accuweather.APIkey')}
+                                        />
+                                    </Grid>
+                                </Grid>
+                                <Grid item xs={12} md={6}>
+                                    <FormControl fullWidth>
+                                        <InputLabel id="units">Units</InputLabel>
+                                        <Controller
+                                            control={control}
+                                            name="accuweather.units"
+                                            render={({ field }) => (
+                                                <StyledSelect labelId="units" label="Protocol" {...field}>
+                                                    <MenuItem value="Metric">Metric</MenuItem>
+                                                    <MenuItem value="Imperial">Imperial</MenuItem>
+                                                </StyledSelect>
+                                            )}
+                                        />
+                                    </FormControl>
+                                </Grid>
+                                <Grid item xs={12} md={6}>
+                                    <FormControl
+                                        error={errors?.accuweather?.refresh_period != undefined}
+                                        fullWidth
+                                        required
+                                    >
+                                        <InputLabel>Refresh period</InputLabel>
+                                        <StyledOutlinedInput
+                                            endAdornment={<InputAdornment position="end">seconds</InputAdornment>}
+                                            label="Refresh period"
+                                            {...register('accuweather.refresh_period', {
+                                                required: { value: true, message: 'Refresh period is required' },
+                                                pattern: {
+                                                    value: /^[0-9]*$/,
+                                                    message: 'Set number',
+                                                },
+                                            })}
+                                        />
+                                    </FormControl>
+                                </Grid>
+                                <Grid item container rowSpacing={2} direction="column">
+                                    <Grid item>
+                                        <h3>CustomGraphics Settings</h3>
+                                    </Grid>
+                                </Grid>
+                                <Grid item container rowSpacing={2} direction="column">
+                                    <StyledApiValuesContent>
+                                        <Typography>location:</Typography>
+                                        <Input
+                                            fullWidth
+                                            label="CustomGraphics service ID"
+                                            {...register('accuweather.location.serviceId', { valueAsNumber: true })}
+                                        />
+                                        <Input
+                                            fullWidth
+                                            label="CustomGraphics field name"
+                                            {...register('accuweather.location.fieldName')}
+                                        />
+
+                                        <Typography>temperature:</Typography>
+                                        <Input
+                                            fullWidth
+                                            label="CustomGraphics service ID"
+                                            {...register('accuweather.temperature.serviceId', { valueAsNumber: true })}
+                                        />
+                                        <Input
+                                            fullWidth
+                                            label="CustomGraphics field name"
+                                            {...register('accuweather.temperature.fieldName')}
+                                        />
+
+                                        <Typography>wind speed:</Typography>
+                                        <Input
+                                            fullWidth
+                                            label="CustomGraphics service ID"
+                                            {...register('accuweather.wind.serviceId', { valueAsNumber: true })}
+                                        />
+                                        <Input
+                                            fullWidth
+                                            label="CustomGraphics field name"
+                                            {...register('accuweather.wind.fieldName')}
+                                        />
+
+                                        <Typography>wind gust:</Typography>
+                                        <Input
+                                            fullWidth
+                                            label="CustomGraphics service ID"
+                                            {...register('accuweather.wind_gust.serviceId', { valueAsNumber: true })}
+                                        />
+                                        <Input
+                                            fullWidth
+                                            label="CustomGraphics field name"
+                                            {...register('accuweather.wind_gust.fieldName')}
+                                        />
+
+                                        <Typography>humidity:</Typography>
+                                        <Input
+                                            fullWidth
+                                            label="CustomGraphics service ID"
+                                            {...register('accuweather.humidity.serviceId', { valueAsNumber: true })}
+                                        />
+                                        <Input
+                                            fullWidth
+                                            label="CustomGraphics field name"
+                                            {...register('accuweather.humidity.fieldName')}
+                                        />
+                                    </StyledApiValuesContent>
+                                </Grid>
+                            </Grid>
+                        </CollapsibleFormSection>
                         <Grid item>
                             <SubmitButton
                                 type="submit"
                                 variant="contained"
-                                disabled={Object.keys(errors).length > 0 || submitting}
+                                disabled={Object.keys(errors).length > 0 || isSubmitting}
                                 isSmallScreen={matchesSmallScreen}
                             >
-                                {submitting ? <CircularProgress size={20} /> : <Typography>Submit</Typography>}
+                                {isSubmitting ? <CircularProgress size={20} /> : <Typography>Submit</Typography>}
                             </SubmitButton>
                         </Grid>
                     </Grid>
@@ -681,6 +899,14 @@ const SubmitButton = styled((props: { isSmallScreen: boolean } & ButtonProps) =>
     const { ...other } = props;
     return <Button {...other} />;
 })(({ isSmallScreen }) => ({
-    width: isSmallScreen ? '100%' : '33%',
+    width: isSmallScreen ? '100%' : '50%',
     height: '40px',
 }));
+
+const StyledApiValuesContent = styled('div')({
+    display: 'grid',
+    gridTemplateColumns: 'max-content 250px 250px',
+    gap: '16px',
+    alignItems: 'center',
+    marginTop: '16px',
+});

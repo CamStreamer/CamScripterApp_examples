@@ -1,14 +1,16 @@
 import * as fs from 'fs';
+import * as https from 'https';
 import * as path from 'path';
 import * as util from 'util';
-import * as https from 'https';
 
-import { URLSearchParams } from 'url';
-import { httpRequest, HttpRequestOptions } from 'camstreamerlib/HttpRequest';
 import { CamOverlayDrawingAPI, UploadImageResponse } from 'camstreamerlib/CamOverlayDrawingAPI';
+import { HttpRequestOptions, httpRequest } from 'camstreamerlib/HttpRequest';
+import { getApiData, parseSettingsData } from './accuweatherAPI/fetchApiUtils';
 
 import CairoFrame from './CairoFrame';
 import CairoPainter from './CairoPainter';
+import { CamOverlayIntegration } from './accuweatherAPI/CamOverlayIntegration';
+import { URLSearchParams } from 'url';
 
 type SimInfo = {
     active: boolean;
@@ -40,6 +42,10 @@ type Camera = {
     user: string;
     password: string;
 };
+type TAccuweatherApiValue = {
+    fieldName: string;
+    serviceId: number | '';
+};
 type Settings = {
     modem: {
         token: string;
@@ -68,6 +74,17 @@ type Settings = {
         zoomLevel: number;
         APIkey: string;
         tolerance: number;
+    };
+    accuweather_camera: Camera;
+    accuweather: {
+        APIkey: string;
+        units: 'Metric' | 'Imperial';
+        refresh_period: number;
+        location: TAccuweatherApiValue;
+        temperature: TAccuweatherApiValue;
+        wind: TAccuweatherApiValue;
+        wind_gust: TAccuweatherApiValue;
+        humidity: TAccuweatherApiValue;
     };
 };
 type Frames = {
@@ -114,6 +131,10 @@ let mapCP: CairoPainter;
 let cp: CairoPainter;
 let frames: Frames;
 
+let accuweatherCOIntegration: CamOverlayIntegration;
+let latitude: number;
+let longitude: number;
+
 function allSettled(promises: Promise<void>[]): Promise<void> {
     return new Promise((resolve) => {
         let numberOfFulfilledPromise = 0;
@@ -152,7 +173,11 @@ function readSettings(): Settings {
     }
 }
 function isSetup(): boolean {
-    return settings.modem.device !== null && settings.modem.token !== '' && (co !== null || mapCO !== null);
+    return (
+        settings.modem.device !== null &&
+        settings.modem.token !== '' &&
+        (co !== null || mapCO !== null || accuweatherCOconfigured())
+    );
 }
 function coSetup(): void {
     const coCamera = settings.co_camera;
@@ -363,6 +388,61 @@ function mapCOconfigured(): boolean {
     );
 }
 
+//  -----------------
+//  |  accuweather  |
+//  -----------------
+
+function accuweatherCOsetup(): void {
+    const accuweatherCamera = settings.accuweather_camera;
+
+    const options = {
+        ip: accuweatherCamera.ip,
+        port: accuweatherCamera.port,
+        auth: `${accuweatherCamera.user}:${accuweatherCamera.password}`,
+        tls: accuweatherCamera.protocol !== 'http',
+        tlsInsecure: accuweatherCamera.protocol === 'https_insecure',
+    };
+    accuweatherCOIntegration = new CamOverlayIntegration(options);
+}
+function accuweatherCOconfigured(): boolean {
+    const accuweatherCamera = settings.accuweather_camera;
+    return (
+        accuweatherCamera.protocol !== '' &&
+        accuweatherCamera.port !== null &&
+        accuweatherCamera.ip !== '' &&
+        accuweatherCamera.user !== '' &&
+        accuweatherCamera.password !== ''
+    );
+}
+
+async function sendAccuweatherData(lat: number, lon: number) {
+    const apiKey = settings.accuweather.APIkey;
+    if (apiKey === '') {
+        console.log('Warning: Accuweather Api key not provided');
+        return;
+    }
+    if (!lat || !lon) {
+        // console.log('Warning: Modem has not yet provided GPS data');
+        return;
+    }
+
+    const apiData = await getApiData(apiKey, lat, lon, settings.accuweather.units);
+
+    const apiDataToProcess = [];
+
+    apiDataToProcess.push(parseSettingsData(settings.accuweather.location, apiData.location));
+    apiDataToProcess.push(parseSettingsData(settings.accuweather.temperature, apiData.temperature));
+    apiDataToProcess.push(parseSettingsData(settings.accuweather.wind, apiData.wind));
+    apiDataToProcess.push(parseSettingsData(settings.accuweather.wind_gust, apiData.wind_gust));
+    apiDataToProcess.push(parseSettingsData(settings.accuweather.humidity, apiData.humidity));
+
+    apiDataToProcess
+        .filter((d) => d !== null)
+        .forEach((d) => {
+            accuweatherCOIntegration.updateCustomGraphicsFieldTextInAllServices(d.serviceId, d.fieldName, d.text);
+        });
+}
+
 //  ----------------------
 //  |  connect to modem  |
 //  ----------------------
@@ -530,6 +610,9 @@ async function getModemInfo(): Promise<void> {
 
         const mi: ModemInfo = parseTeltonikaResponse(parsedResponse.data, wireless.data, ports);
 
+        latitude = mi.latitude;
+        longitude = mi.longitude;
+
         const promises = new Array<Promise<void>>();
         if (co !== null && (await coConnect())) {
             promises.push(displayGraphics(mi));
@@ -537,6 +620,7 @@ async function getModemInfo(): Promise<void> {
         if (mapCO !== null && (await mapCOconnect())) {
             promises.push(displayMap({ latitude: mi.latitude, longitude: mi.longitude }));
         }
+        promises.push(sendAccuweatherData(mi.latitude, mi.longitude));
         await allSettled(promises);
     } catch (error) {
         console.error(error.message);
@@ -797,6 +881,9 @@ function main() {
     if (mapCOconfigured()) {
         mapCOsetup();
     }
+    if (accuweatherCOconfigured()) {
+        accuweatherCOsetup();
+    }
 
     if (!isSetup()) {
         console.error('Application is not configured');
@@ -804,6 +891,10 @@ function main() {
     }
 
     getModemInfo();
+
+    setTimeout(() => {
+        sendAccuweatherData(latitude, longitude);
+    }, 1000 * settings.accuweather.refresh_period);
 }
 
 main();

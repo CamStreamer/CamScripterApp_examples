@@ -1,3 +1,8 @@
+type TAccuweatherApiValue = {
+    fieldName: string;
+    serviceId: number | '';
+};
+
 export type FormInput = {
     modem: {
         token: string;
@@ -38,6 +43,23 @@ export type FormInput = {
         zoomLevel: number | null;
         APIkey: string;
         tolerance: number | null;
+    };
+    accuweather_camera: {
+        protocol: string;
+        ip: string;
+        port: number | null;
+        user: string;
+        password: string;
+    };
+    accuweather: {
+        APIkey: string;
+        units: 'Metric' | 'Imperial';
+        refresh_period: number;
+        location: TAccuweatherApiValue;
+        temperature: TAccuweatherApiValue;
+        wind: TAccuweatherApiValue;
+        wind_gust: TAccuweatherApiValue;
+        humidity: TAccuweatherApiValue;
     };
 };
 export const defaultValues: FormInput = {
@@ -80,6 +102,38 @@ export const defaultValues: FormInput = {
         zoomLevel: 15,
         APIkey: '',
         tolerance: 2,
+    },
+    accuweather_camera: {
+        protocol: 'http',
+        ip: '127.0.0.1',
+        port: 80,
+        user: 'root',
+        password: '',
+    },
+    accuweather: {
+        APIkey: '',
+        units: 'Metric',
+        refresh_period: 60,
+        location: {
+            fieldName: '',
+            serviceId: '',
+        },
+        temperature: {
+            fieldName: '',
+            serviceId: '',
+        },
+        wind: {
+            fieldName: '',
+            serviceId: '',
+        },
+        wind_gust: {
+            fieldName: '',
+            serviceId: '',
+        },
+        humidity: {
+            fieldName: '',
+            serviceId: '',
+        },
     },
 };
 

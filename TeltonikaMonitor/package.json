@@ -1,6 +1,6 @@
 {
     "name": "teltonika_monitor",
-    "version": "1.0.1",
+    "version": "1.1.0",
     "description": "",
     "prettier": "@camstreamer/prettier-config",
     "main": "src/main.ts",

@@ -37,5 +37,38 @@
         "zoomLevel": 15,
         "APIkey": "",
         "tolerance": 2
+    },
+    "accuweather_camera": {
+        "protocol": "http",
+        "ip": "127.0.0.1",
+        "port": 80,
+        "user": "root",
+        "password": ""
+    },
+    "accuweather": {
+        "APIkey": "",
+        "units": "Metric",
+        "refresh_period": 60,
+        "location": {
+            "fieldName": "",
+            "serviceId": ""
+        },
+
+        "temperature": {
+            "fieldName": "",
+            "serviceId": ""
+        },
+        "wind": {
+            "fieldName": "",
+            "serviceId": ""
+        },
+        "wind_gust": {
+            "fieldName": "",
+            "serviceId": ""
+        },
+        "humidity": {
+            "fieldName": "",
+            "serviceId": ""
+        }
     }
 }
