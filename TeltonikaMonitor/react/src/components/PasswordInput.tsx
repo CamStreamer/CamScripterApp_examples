@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
-import TextField from '@mui/material/TextField';
-import InputAdornment from '@mui/material/InputAdornment';
-import IconButton from '@mui/material/IconButton';
-import { styled } from '@mui/material/styles';
-import Visibility from '@mui/icons-material/Visibility';
-import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import { UseFormRegister } from 'react-hook-form';
 
 import { FormInput } from '../FormInput';
+import IconButton from '@mui/material/IconButton';
+import InputAdornment from '@mui/material/InputAdornment';
+import TextField from '@mui/material/TextField';
+import { UseFormRegister } from 'react-hook-form';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import { styled } from '@mui/material/styles';
 
 type Props = {
     register: UseFormRegister<FormInput>;
-    name: 'co_camera.password' | 'map_camera.password';
+    name: 'co_camera.password' | 'map_camera.password' | 'accuweather_camera.password';
 };
 
 export function PasswordInput({ register, name }: Props) {

@@ -38,6 +38,13 @@
         "APIkey": "",
         "tolerance": 2
     },
+    "accuweather_camera": {
+        "protocol": "http",
+        "ip": "127.0.0.1",
+        "port": 80,
+        "user": "root",
+        "password": ""
+    },
     "accuweather": {
         "APIkey": "",
         "units": "Metric",

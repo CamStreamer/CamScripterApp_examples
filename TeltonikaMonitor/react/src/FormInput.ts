@@ -44,6 +44,13 @@ export type FormInput = {
         APIkey: string;
         tolerance: number | null;
     };
+    accuweather_camera: {
+        protocol: string;
+        ip: string;
+        port: number | null;
+        user: string;
+        password: string;
+    };
     accuweather: {
         APIkey: string;
         units: 'Metric' | 'Imperial';
@@ -94,6 +101,13 @@ export const defaultValues: FormInput = {
         zoomLevel: 15,
         APIkey: '',
         tolerance: 2,
+    },
+    accuweather_camera: {
+        protocol: 'http',
+        ip: '127.0.0.1',
+        port: 80,
+        user: 'root',
+        password: '',
     },
     accuweather: {
         APIkey: '',

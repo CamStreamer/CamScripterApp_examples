@@ -702,7 +702,7 @@ export function Form({ initialized, setInitialized }: Props) {
                                                         onChange={(e) => {
                                                             const protocol = e.target.value;
                                                             setValue(
-                                                                'map_camera.port',
+                                                                'accuweather_camera.port',
                                                                 protocol === 'http' ? 80 : 443,
                                                                 {
                                                                     shouldTouch: true,
@@ -717,7 +717,7 @@ export function Form({ initialized, setInitialized }: Props) {
                                                     </StyledSelect>
                                                 )}
                                                 control={control}
-                                                name="map_camera.protocol"
+                                                name="accuweather_camera.protocol"
                                             />
                                         </FormControl>
                                     </Grid>
@@ -725,9 +725,9 @@ export function Form({ initialized, setInitialized }: Props) {
                                         <Input
                                             fullWidth
                                             label="IP"
-                                            error={errors?.map_camera?.ip != undefined}
-                                            helperText={errors?.map_camera?.ip?.message}
-                                            {...register('map_camera.ip', {
+                                            error={errors?.accuweather_camera?.ip != undefined}
+                                            helperText={errors?.accuweather_camera?.ip?.message}
+                                            {...register('accuweather_camera.ip', {
                                                 pattern: {
                                                     value: /^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/,
                                                     message: 'Set valid IP adress (xxx.xxx.xxx.xxx)',
@@ -739,9 +739,9 @@ export function Form({ initialized, setInitialized }: Props) {
                                         <Input
                                             fullWidth
                                             label="Port"
-                                            error={errors?.map_camera?.port != undefined}
-                                            helperText={errors?.map_camera?.port?.message}
-                                            {...register('map_camera.port', {
+                                            error={errors?.accuweather_camera?.port != undefined}
+                                            helperText={errors?.accuweather_camera?.port?.message}
+                                            {...register('accuweather_camera.port', {
                                                 pattern: {
                                                     value: /^[0-9]*$/,
                                                     message: 'Port has to be a positive number less then 65536.',
@@ -758,10 +758,10 @@ export function Form({ initialized, setInitialized }: Props) {
                                         />
                                     </Grid>
                                     <Grid item>
-                                        <Input fullWidth label="User" {...register('map_camera.user')} />
+                                        <Input fullWidth label="User" {...register('accuweather_camera.user')} />
                                     </Grid>
                                     <Grid item>
-                                        <PasswordInput register={register} name="map_camera.password" />
+                                        <PasswordInput register={register} name="accuweather_camera.password" />
                                     </Grid>
                                 </Grid>
                                 <Grid item container rowSpacing={2} direction="column">
