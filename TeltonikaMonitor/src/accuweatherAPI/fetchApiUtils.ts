@@ -38,11 +38,11 @@ export const getApiData = async (apiKey: string, lat: number, lon: number, unit:
     const temperatureResponse = await fetchApiData(getAccuweatherTemperatureAPi(apiKey, locationID));
     const { Temperature, Wind, WindGust, RelativeHumidity } = JSON.parse(temperatureResponse)[0];
     return {
-        location: `Location: ${EnglishName}`,
-        temperature: `Temperature: ${Temperature[unit].Value}\xB0${Temperature[unit].Unit}`,
-        wind: `Wind: ${Wind.Speed[unit].Value}${Wind.Speed[unit].Unit}`,
-        wind_gust: `Wind gust: ${WindGust.Speed[unit].Value}${WindGust.Speed[unit].Unit}`,
-        humidity: `Humidity: ${RelativeHumidity}`,
+        location: EnglishName,
+        temperature: `${Temperature[unit].Value}\xB0${Temperature[unit].Unit}`,
+        wind: `${Wind.Speed[unit].Value}${Wind.Speed[unit].Unit}`,
+        wind_gust: `${WindGust.Speed[unit].Value}${WindGust.Speed[unit].Unit}`,
+        humidity: RelativeHumidity,
     };
 };
 
@@ -53,14 +53,13 @@ class NetworkError extends Error {
     }
 }
 
-export const parseSettingsData = (settings: { fieldName: string; serviceIds: { id: number | '' }[] }, text: string) => {
-    const servicesToSendTo = settings.serviceIds.map((obj) => obj.id).filter((id) => id !== '') as number[];
-    if (settings.fieldName === '') {
+export const parseSettingsData = (settings: { fieldName: string; serviceId: number | '' }, text: string) => {
+    if (settings.fieldName === '' || settings.serviceId === '') {
         return null;
     }
     return {
         text,
-        serviceIds: servicesToSendTo,
+        serviceId: settings.serviceId,
         fieldName: settings.fieldName,
     };
 };

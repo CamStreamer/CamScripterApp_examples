@@ -7,7 +7,7 @@ export class CamOverlayIntegration {
         this._camOverlayApi = new CamOverlayAPI({ ...this._options });
     }
 
-    async updateCustomGraphicsFieldTextInAllServices(serviceIDs: number[], fieldName: string, text: string) {
+    async updateCustomGraphicsFieldTextInAllServices(serviceID: number, fieldName: string, text: string) {
         const fieldData = [
             {
                 field_name: fieldName,
@@ -15,10 +15,8 @@ export class CamOverlayIntegration {
             },
         ];
 
-        const promiseArr = serviceIDs.map((serviceID) => this._camOverlayApi.updateCGText(serviceID, fieldData));
-
         try {
-            await Promise.allSettled(promiseArr);
+            await this._camOverlayApi.updateCGText(serviceID, fieldData);
         } catch (e) {
             console.error(`Error while trying to update custom graphics text. Error: ${e}`);
         }

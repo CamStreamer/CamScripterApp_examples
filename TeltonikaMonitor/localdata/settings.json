@@ -48,46 +48,27 @@
     "accuweather": {
         "APIkey": "",
         "units": "Metric",
+        "refresh_period": 60,
         "location": {
             "fieldName": "",
-            "serviceIds": [
-                {
-                    "id": ""
-                }
-            ]
+            "serviceId": ""
         },
 
         "temperature": {
             "fieldName": "",
-            "serviceIds": [
-                {
-                    "id": ""
-                }
-            ]
+            "serviceId": ""
         },
         "wind": {
             "fieldName": "",
-            "serviceIds": [
-                {
-                    "id": ""
-                }
-            ]
+            "serviceId": ""
         },
         "wind_gust": {
             "fieldName": "",
-            "serviceIds": [
-                {
-                    "id": ""
-                }
-            ]
+            "serviceId": ""
         },
         "humidity": {
             "fieldName": "",
-            "serviceIds": [
-                {
-                    "id": ""
-                }
-            ]
+            "serviceId": ""
         }
     }
 }

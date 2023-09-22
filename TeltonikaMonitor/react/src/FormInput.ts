@@ -1,6 +1,6 @@
 type TAccuweatherApiValue = {
     fieldName: string;
-    serviceIds: { id: number | '' }[];
+    serviceId: number | '';
 };
 
 export type FormInput = {
@@ -54,6 +54,7 @@ export type FormInput = {
     accuweather: {
         APIkey: string;
         units: 'Metric' | 'Imperial';
+        refresh_period: number;
         location: TAccuweatherApiValue;
         temperature: TAccuweatherApiValue;
         wind: TAccuweatherApiValue;
@@ -112,45 +113,26 @@ export const defaultValues: FormInput = {
     accuweather: {
         APIkey: '',
         units: 'Metric',
+        refresh_period: 60,
         location: {
             fieldName: '',
-            serviceIds: [
-                {
-                    id: '',
-                },
-            ],
+            serviceId: '',
         },
         temperature: {
             fieldName: '',
-            serviceIds: [
-                {
-                    id: '',
-                },
-            ],
+            serviceId: '',
         },
         wind: {
             fieldName: '',
-            serviceIds: [
-                {
-                    id: '',
-                },
-            ],
+            serviceId: '',
         },
         wind_gust: {
             fieldName: '',
-            serviceIds: [
-                {
-                    id: '',
-                },
-            ],
+            serviceId: '',
         },
         humidity: {
             fieldName: '',
-            serviceIds: [
-                {
-                    id: '',
-                },
-            ],
+            serviceId: '',
         },
     },
 };

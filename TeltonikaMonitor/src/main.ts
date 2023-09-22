@@ -44,7 +44,7 @@ type Camera = {
 };
 type TAccuweatherApiValue = {
     fieldName: string;
-    serviceIds: { id: number | '' }[];
+    serviceId: number | '';
 };
 type Settings = {
     modem: {
@@ -79,6 +79,7 @@ type Settings = {
     accuweather: {
         APIkey: string;
         units: 'Metric' | 'Imperial';
+        refresh_period: number;
         location: TAccuweatherApiValue;
         temperature: TAccuweatherApiValue;
         wind: TAccuweatherApiValue;
@@ -131,6 +132,8 @@ let cp: CairoPainter;
 let frames: Frames;
 
 let accuweatherCOIntegration: CamOverlayIntegration;
+let latitude: number;
+let longitude: number;
 
 function allSettled(promises: Promise<void>[]): Promise<void> {
     return new Promise((resolve) => {
@@ -418,6 +421,10 @@ async function sendAccuweatherData(lat: number, lon: number) {
         console.log('Warning: Accuweather Api key not provided');
         return;
     }
+    if (!lat || !lon) {
+        // console.log('Warning: Modem has not yet provided GPS data');
+        return;
+    }
 
     const apiData = await getApiData(apiKey, lat, lon, settings.accuweather.units);
 
@@ -432,7 +439,7 @@ async function sendAccuweatherData(lat: number, lon: number) {
     apiDataToProcess
         .filter((d) => d !== null)
         .forEach((d) => {
-            accuweatherCOIntegration.updateCustomGraphicsFieldTextInAllServices(d.serviceIds, d.fieldName, d.text);
+            accuweatherCOIntegration.updateCustomGraphicsFieldTextInAllServices(d.serviceId, d.fieldName, d.text);
         });
 }
 
@@ -603,6 +610,10 @@ async function getModemInfo(): Promise<void> {
 
         const mi: ModemInfo = parseTeltonikaResponse(parsedResponse.data, wireless.data, ports);
 
+        sendAccuweatherData(mi.latitude, mi.longitude);
+        latitude = mi.latitude;
+        longitude = mi.longitude;
+
         const promises = new Array<Promise<void>>();
         if (co !== null && (await coConnect())) {
             promises.push(displayGraphics(mi));
@@ -610,7 +621,7 @@ async function getModemInfo(): Promise<void> {
         if (mapCO !== null && (await mapCOconnect())) {
             promises.push(displayMap({ latitude: mi.latitude, longitude: mi.longitude }));
         }
-        promises.push(sendAccuweatherData(mi.latitude, mi.longitude));
+
         await allSettled(promises);
     } catch (error) {
         console.error(error.message);
@@ -853,6 +864,7 @@ async function mapCOconnect(): Promise<boolean> {
 //  |  main  |
 //  ----------
 
+let accuweatherTimeoutId: NodeJS.Timeout | null = null;
 function main() {
     process.on('uncaughtException', (e: Error) => {
         console.error('Uncaught exception:', e);
@@ -881,6 +893,15 @@ function main() {
     }
 
     getModemInfo();
+
+    if (accuweatherTimeoutId) {
+        clearTimeout(accuweatherTimeoutId);
+        accuweatherTimeoutId = null;
+    }
+
+    accuweatherTimeoutId = setTimeout(() => {
+        sendAccuweatherData(latitude, longitude);
+    }, 1000 * settings.accuweather.refresh_period);
 }
 
 main();
