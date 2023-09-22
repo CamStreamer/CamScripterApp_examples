@@ -226,12 +226,10 @@ export function Form({ initialized, setInitialized }: Props) {
                                         />
                                     </Grid>
                                     <Grid item>
-                                        <Input
-                                            fullWidth
-                                            label="Port"
-                                            error={errors?.co_camera?.port != undefined}
-                                            helperText={errors?.co_camera?.port?.message}
-                                            {...register('co_camera.port', {
+                                        <Controller
+                                            name="co_camera.port"
+                                            control={control}
+                                            rules={{
                                                 pattern: {
                                                     value: /^[0-9]*$/,
                                                     message: 'Port has to be a positive number less then 65536.',
@@ -244,7 +242,16 @@ export function Form({ initialized, setInitialized }: Props) {
                                                     value: 65535,
                                                     message: 'Port has to be a positive number less then 65536.',
                                                 },
-                                            })}
+                                            }}
+                                            render={({ field }) => (
+                                                <Input
+                                                    {...field}
+                                                    fullWidth
+                                                    label="Port"
+                                                    error={errors?.co_camera?.port != undefined}
+                                                    helperText={errors?.co_camera?.port?.message}
+                                                />
+                                            )}
                                         />
                                     </Grid>
                                     <Grid item>
@@ -423,12 +430,10 @@ export function Form({ initialized, setInitialized }: Props) {
                                         />
                                     </Grid>
                                     <Grid item>
-                                        <Input
-                                            fullWidth
-                                            label="Port"
-                                            error={errors?.map_camera?.port != undefined}
-                                            helperText={errors?.map_camera?.port?.message}
-                                            {...register('map_camera.port', {
+                                        <Controller
+                                            name="map_camera.port"
+                                            control={control}
+                                            rules={{
                                                 pattern: {
                                                     value: /^[0-9]*$/,
                                                     message: 'Port has to be a positive number less then 65536.',
@@ -441,7 +446,16 @@ export function Form({ initialized, setInitialized }: Props) {
                                                     value: 65535,
                                                     message: 'Port has to be a positive number less then 65536.',
                                                 },
-                                            })}
+                                            }}
+                                            render={({ field }) => (
+                                                <Input
+                                                    {...field}
+                                                    fullWidth
+                                                    label="Port"
+                                                    error={errors?.map_camera?.port != undefined}
+                                                    helperText={errors?.map_camera?.port?.message}
+                                                />
+                                            )}
                                         />
                                     </Grid>
                                     <Grid item>
@@ -691,12 +705,10 @@ export function Form({ initialized, setInitialized }: Props) {
                                         />
                                     </Grid>
                                     <Grid item>
-                                        <Input
-                                            fullWidth
-                                            label="Port"
-                                            error={errors?.accuweather_camera?.port != undefined}
-                                            helperText={errors?.accuweather_camera?.port?.message}
-                                            {...register('accuweather_camera.port', {
+                                        <Controller
+                                            name="accuweather_camera.port"
+                                            control={control}
+                                            rules={{
                                                 pattern: {
                                                     value: /^[0-9]*$/,
                                                     message: 'Port has to be a positive number less then 65536.',
@@ -709,7 +721,16 @@ export function Form({ initialized, setInitialized }: Props) {
                                                     value: 65535,
                                                     message: 'Port has to be a positive number less then 65536.',
                                                 },
-                                            })}
+                                            }}
+                                            render={({ field }) => (
+                                                <Input
+                                                    {...field}
+                                                    fullWidth
+                                                    label="Port"
+                                                    error={errors?.accuweather_camera?.port != undefined}
+                                                    helperText={errors?.accuweather_camera?.port?.message}
+                                                />
+                                            )}
                                         />
                                     </Grid>
                                     <Grid item>
