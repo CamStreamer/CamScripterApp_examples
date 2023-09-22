@@ -32,13 +32,18 @@ const fetchApiData = async (url: string) => {
 
 export type TUnit = 'Metric' | 'Imperial';
 
-export const getTextFromApiData = async (apiKey: string, lat: number, lon: number, unit: TUnit) => {
+export const getApiData = async (apiKey: string, lat: number, lon: number, unit: TUnit) => {
     const positionResponse = await fetchApiData(getAccuweatherPositionAPi(apiKey, lat, lon));
     const { Key: locationID, EnglishName } = JSON.parse(positionResponse);
     const temperatureResponse = await fetchApiData(getAccuweatherTemperatureAPi(apiKey, locationID));
     const { Temperature, Wind, WindGust, RelativeHumidity } = JSON.parse(temperatureResponse)[0];
-    const text = `${EnglishName}, temperature: ${Temperature[unit].Value}\xB0${Temperature[unit].Unit}, wind: ${Wind.Speed[unit].Value}${Wind.Speed[unit].Unit}, wind gust: ${WindGust.Speed[unit].Value}${WindGust.Speed[unit].Unit}, relative humidity: ${RelativeHumidity}`;
-    return text;
+    return {
+        location: EnglishName,
+        temperature: `${Temperature[unit].Value}\xB0${Temperature[unit].Unit}`,
+        wind: `${Wind.Speed[unit].Value}${Wind.Speed[unit].Unit}`,
+        wind_gust: `${WindGust.Speed[unit].Value}${WindGust.Speed[unit].Unit}`,
+        humidity: RelativeHumidity,
+    };
 };
 
 class NetworkError extends Error {
@@ -48,4 +53,14 @@ class NetworkError extends Error {
     }
 }
 
-export {};
+export const parseSettingsData = (settings: { fieldName: string; serviceIds: { id: number | '' }[] }, text: string) => {
+    const servicesToSendTo = settings.serviceIds.map((obj) => obj.id).filter((id) => id !== '') as number[];
+    if (settings.fieldName === '') {
+        return null;
+    }
+    return {
+        text,
+        serviceIds: servicesToSendTo,
+        fieldName: settings.fieldName,
+    };
+};
