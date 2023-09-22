@@ -864,7 +864,6 @@ async function mapCOconnect(): Promise<boolean> {
 //  |  main  |
 //  ----------
 
-let accuweatherTimeoutId: NodeJS.Timeout | null = null;
 function main() {
     process.on('uncaughtException', (e: Error) => {
         console.error('Uncaught exception:', e);
@@ -894,12 +893,7 @@ function main() {
 
     getModemInfo();
 
-    if (accuweatherTimeoutId) {
-        clearTimeout(accuweatherTimeoutId);
-        accuweatherTimeoutId = null;
-    }
-
-    accuweatherTimeoutId = setTimeout(() => {
+    setTimeout(() => {
         sendAccuweatherData(latitude, longitude);
     }, 1000 * settings.accuweather.refresh_period);
 }
