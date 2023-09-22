@@ -170,7 +170,11 @@ function readSettings(): Settings {
     }
 }
 function isSetup(): boolean {
-    return settings.modem.device !== null && settings.modem.token !== '' && (co !== null || mapCO !== null);
+    return (
+        settings.modem.device !== null &&
+        settings.modem.token !== '' &&
+        (co !== null || mapCO !== null || accuweatherCOconfigured())
+    );
 }
 function coSetup(): void {
     const coCamera = settings.co_camera;

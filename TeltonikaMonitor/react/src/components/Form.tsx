@@ -47,7 +47,6 @@ export function Form({ initialized, setInitialized }: Props) {
     } = useForm<FormInput>({ mode: 'onChange', defaultValues });
 
     const onSubmit: SubmitHandler<FormInput> = async (toPost) => {
-        console.log(toPost);
         convertValueToNumber(toPost);
         try {
             if (toPost.overlay.scale != null) {
@@ -816,7 +815,8 @@ export function Form({ initialized, setInitialized }: Props) {
                                                     fullWidth
                                                     label="CustomGraphics service ID"
                                                     {...register(
-                                                        `accuweather.location.serviceIds.${index}.id` as const
+                                                        `accuweather.location.serviceIds.${index}.id` as const,
+                                                        { valueAsNumber: true }
                                                     )}
                                                 />
                                                 <span>
@@ -855,7 +855,8 @@ export function Form({ initialized, setInitialized }: Props) {
                                                     fullWidth
                                                     label="CustomGraphics service ID"
                                                     {...register(
-                                                        `accuweather.temperature.serviceIds.${index}.id` as const
+                                                        `accuweather.temperature.serviceIds.${index}.id` as const,
+                                                        { valueAsNumber: true }
                                                     )}
                                                 />
                                                 <span>
@@ -893,7 +894,9 @@ export function Form({ initialized, setInitialized }: Props) {
                                                     className="service-id-input"
                                                     fullWidth
                                                     label="CustomGraphics service ID"
-                                                    {...register(`accuweather.wind.serviceIds.${index}.id` as const)}
+                                                    {...register(`accuweather.wind.serviceIds.${index}.id` as const, {
+                                                        valueAsNumber: true,
+                                                    })}
                                                 />
                                                 <span>
                                                     {windFields.length === 1 ? null : (
@@ -931,7 +934,8 @@ export function Form({ initialized, setInitialized }: Props) {
                                                     fullWidth
                                                     label="CustomGraphics service ID"
                                                     {...register(
-                                                        `accuweather.wind_gust.serviceIds.${index}.id` as const
+                                                        `accuweather.wind_gust.serviceIds.${index}.id` as const,
+                                                        { valueAsNumber: true }
                                                     )}
                                                 />
                                                 <span>
@@ -970,7 +974,8 @@ export function Form({ initialized, setInitialized }: Props) {
                                                     fullWidth
                                                     label="CustomGraphics service ID"
                                                     {...register(
-                                                        `accuweather.humidity.serviceIds.${index}.id` as const
+                                                        `accuweather.humidity.serviceIds.${index}.id` as const,
+                                                        { valueAsNumber: true }
                                                     )}
                                                 />
                                                 <span>
