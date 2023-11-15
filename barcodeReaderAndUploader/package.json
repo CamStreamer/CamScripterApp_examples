@@ -28,20 +28,22 @@
     },
     "author": "CamStreamer s.r.o",
     "license": "ISC",
-    "dependencies": {
-        "camstreamerlib": "^1.8.8"
-    },
     "devDependencies": {
+        "@camstreamer/prettier-config": "^2.0.4",
+        "@types/node": "^18.0.6",
         "@typescript-eslint/eslint-plugin": "^6.3.0",
         "@typescript-eslint/parser": "^6.3.0",
         "eslint": "^8.47.0",
         "eslint-plugin-react": "^7.33.2",
-        "@camstreamer/prettier-config": "^2.0.4",
-        "@types/node": "^18.0.6",
         "npm-run-all": "^4.1.5",
         "prettier": "^2.7.1",
         "rimraf": "^3.0.2",
         "ts-node": "^10.9.1",
         "typescript": "^4.7.4"
+    },
+    "dependencies": {
+        "camstreamerlib": "^2.0.2",
+        "memorystream": "^0.3.1",
+        "qrcode": "^1.5.3"
     }
 }
