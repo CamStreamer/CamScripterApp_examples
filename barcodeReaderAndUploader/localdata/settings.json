@@ -1,1 +1,34 @@
-{}
+{
+    "camera": {
+        "protocol": "http",
+        "ip": "127.0.0.1",
+        "port": 80,
+        "user": "root",
+        "pass": ""
+    },
+    "overlay": {
+        "x": 10,
+        "y": 10,
+        "alignment": "top_left",
+        "width": 1920,
+        "height": 1080,
+        "scale": 1
+    },
+    "storage": {
+        "url": "",
+        "outputDir": "",
+        "clientSecret": "",
+        "clientId": "",
+        "tenantId": "",
+        "connectionTimeoutS": 30,
+        "uploadTimeoutS": 60,
+        "numberOfRetries": 3
+    },
+    "leddSettings": {
+        "greenPort": 0,
+        "redPort": 0
+    },
+    "barcodeSettings": {
+        "displayTimeS": 3
+    }
+}
