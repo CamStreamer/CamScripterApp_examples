@@ -3,10 +3,10 @@
     "version": "1.0.0",
     "private": true,
     "dependencies": {
-        "@emotion/react": "^11.11.1",
-        "@emotion/styled": "^11.11.0",
-        "@mui/material": "^5.14.3",
+        "@hookform/resolvers": "^3.3.2",
         "@mui/icons-material": "^5.11.16",
+        "@mui/material": "^5.14.3",
+        "@mui/styled-engine-sc": "^6.0.0-alpha.6",
         "@types/node": "^16.18.31",
         "@types/react": "^18.2.6",
         "@types/react-dom": "^18.2.4",
@@ -14,7 +14,9 @@
         "react-dom": "^18.2.0",
         "react-hook-form": "^7.43.9",
         "react-scripts": "^5.0.1",
-        "typescript": "^4.9.5"
+        "styled-components": "^6.1.1",
+        "typescript": "^4.9.5",
+        "zod": "^3.22.4"
     },
     "scripts": {
         "start": "react-scripts start",
