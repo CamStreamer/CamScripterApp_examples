@@ -1,0 +1,8 @@
+{
+    "package_name": "barcodeReaderAndUploader",
+    "package_menu_name": "Barcode Reader & Uploader",
+    "package_version": "1.0.0",
+    "vendor": "Camstreamer s.r.o.",
+    "required_camscripter_version": "1.5.4",
+    "ui_link": "/local/camscripter/package/barcodeReaderAndUploader/index.html"
+}

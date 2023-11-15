@@ -1,0 +1,37 @@
+{
+    "name": "react_app",
+    "version": "1.0.0",
+    "private": true,
+    "dependencies": {
+        "@emotion/react": "^11.11.1",
+        "@emotion/styled": "^11.11.0",
+        "@mui/material": "^5.14.3",
+        "@mui/icons-material": "^5.11.16",
+        "@types/node": "^16.18.31",
+        "@types/react": "^18.2.6",
+        "@types/react-dom": "^18.2.4",
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0",
+        "react-hook-form": "^7.43.9",
+        "react-scripts": "^5.0.1",
+        "typescript": "^4.9.5"
+    },
+    "scripts": {
+        "start": "react-scripts start",
+        "build": "react-scripts build && cp -rT build ../html",
+        "test": "react-scripts test --env=jsdom",
+        "eject": "react-scripts eject"
+    },
+    "browserslist": {
+        "production": [
+            ">0.2%",
+            "not dead",
+            "not op_mini all"
+        ],
+        "development": [
+            "last 1 chrome version",
+            "last 1 firefox version",
+            "last 1 safari version"
+        ]
+    }
+}

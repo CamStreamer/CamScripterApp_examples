@@ -1,0 +1,9 @@
+node_modules/
+production_modules/
+dist/
+html/
+.vs/
+*.zip
+
+react/node_modules
+react/build
