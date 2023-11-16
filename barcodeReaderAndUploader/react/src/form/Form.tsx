@@ -1,8 +1,10 @@
 import { Controller, FormProvider, SubmitErrorHandler, SubmitHandler, useForm } from 'react-hook-form';
 import { TFormValues, formSchema } from './models/schema';
 
+import { BarcodeReaderSettings } from './components/BarcodeReaderSettings';
 import { CamOverlayIntegration } from './components/CamOverlayIntegration';
 import { CollapsibleFormContent } from './CollapsibleFormContent';
+import { LedSettingsSection } from './components/LedSettingsSection';
 import React from 'react';
 import { SharePointIntegrationSection } from './components/SharePointIntegrationSection';
 import { StyledFormValuesRow } from './HelperComponents';
@@ -62,6 +64,28 @@ export const Form = ({ defaultValues }: Props) => {
                     initialContentClosed
                 >
                     <CamOverlayIntegration />
+                </CollapsibleFormContent>
+                <CollapsibleFormContent
+                    title="LED settings"
+                    closedContent={
+                        <Typography fontSize="0.875rem" color="#797979">
+                            Set LED ports.
+                        </Typography>
+                    }
+                    initialContentClosed
+                >
+                    <LedSettingsSection />
+                </CollapsibleFormContent>
+                <CollapsibleFormContent
+                    title="Barcode reader"
+                    closedContent={
+                        <Typography fontSize="0.875rem" color="#797979">
+                            Set barcode reader.
+                        </Typography>
+                    }
+                    initialContentClosed
+                >
+                    <BarcodeReaderSettings />
                 </CollapsibleFormContent>
             </StyledForm>
         </FormProvider>
