@@ -1,4 +1,4 @@
-import { Controller, FormProvider, SubmitErrorHandler, SubmitHandler, useForm } from 'react-hook-form';
+import { FormProvider, SubmitErrorHandler, SubmitHandler, useForm } from 'react-hook-form';
 import { TFormValues, TServerData, formSchema } from './models/schema';
 
 import { BarcodeReaderSettings } from './components/BarcodeReaderSettings';
@@ -9,10 +9,7 @@ import { InfoSnackbar } from '../components/Snackbar';
 import { LedSettingsSection } from './components/LedSettingsSection';
 import React from 'react';
 import { SharePointIntegrationSection } from './components/SharePointIntegrationSection';
-import { StyledFormValuesRow } from './HelperComponents';
-import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import { WithLabel } from './components/WithLabel';
 import styled from 'styled-components';
 import { useSnackbar } from '../hooks/useSnackbar';
 import { zodResolver } from '@hookform/resolvers/zod';
