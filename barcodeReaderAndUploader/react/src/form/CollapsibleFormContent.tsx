@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
+import styled, { css } from 'styled-components';
 
 import Collapse from '@mui/material/Collapse';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Typography } from '@mui/material';
-import styled from 'styled-components';
 
 type Props = {
     initialContentClosed?: boolean;
@@ -16,7 +16,7 @@ type Props = {
 export const CollapsibleFormContent = ({ initialContentClosed, title, closedContent, children }: Props) => {
     const [contentExpanded, setContentExpanded] = useState(!initialContentClosed);
     return (
-        <StyledWrapper>
+        <StyledWrapper $contentExpanded={contentExpanded}>
             <StyledHeader onClick={() => setContentExpanded(!contentExpanded)}>
                 <Typography fontWeight={500} textTransform="uppercase" color="#313F53">
                     {title}
@@ -31,9 +31,14 @@ export const CollapsibleFormContent = ({ initialContentClosed, title, closedCont
     );
 };
 
-const StyledWrapper = styled.div`
+const StyledWrapper = styled.div<{ $contentExpanded: boolean }>`
     display: flex;
     flex-direction: column;
+    ${({ $contentExpanded }) =>
+        $contentExpanded &&
+        css`
+            gap: 0.5rem;
+        `}
 
     .MuiIcon-root {
         color: #999;
