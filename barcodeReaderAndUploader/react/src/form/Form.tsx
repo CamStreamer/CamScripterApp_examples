@@ -145,23 +145,30 @@ export const Form = ({ defaultValues }: Props) => {
                 >
                     <BarcodeReaderSettings />
                 </CollapsibleFormContent>
-                <Button
+                <StyledConfirmButton
                     type="submit"
                     variant="contained"
                     disabled={form.formState.isSubmitting || !form.formState.isValid}
                 >
                     Submit
-                </Button>
+                </StyledConfirmButton>
             </StyledForm>
         </FormProvider>
     );
 };
 
-export const StyledForm = styled.form`
+const StyledForm = styled.form`
     max-width: 700px;
     margin-inline: auto;
     display: flex;
     flex-direction: column;
     gap: 1rem;
     padding-block: 1.5rem;
+`;
+
+const StyledConfirmButton = styled(Button)`
+    &.MuiButtonBase-root {
+        font-size: 1rem;
+        height: 56px; //same as inputs
+    }
 `;
