@@ -1,12 +1,32 @@
 import * as fs from 'fs';
+import { loadSettings, settings } from 'settings';
 
-let settings = null;
-try {
-    const data = fs.readFileSync(process.env.PERSISTENT_DATA_PATH + 'settings.json');
-    settings = JSON.parse(data.toString());
-} catch (err) {
-    console.log('No settings file found');
-    process.exit(1);
+process.on('SIGINT', async () => {
+    console.log('Configuration changed');
+    cleanExit();
+});
+
+process.on('SIGTERM', async () => {
+    console.log('App exit');
+    cleanExit();
+});
+
+const start = async () => {
+    await loadSettings();
+
+    console.log('started');
+};
+
+async function cleanExit() {
+    try {
+        //        if (co && coConnected) {
+        //            await co.removeImage();
+        //        }
+    } catch (err) {
+        console.error('Hide graphics: ', err);
+    } finally {
+        process.exit();
+    }
 }
 
-console.log('Hello world');
+start();
