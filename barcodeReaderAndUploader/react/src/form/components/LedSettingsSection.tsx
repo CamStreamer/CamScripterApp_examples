@@ -6,13 +6,11 @@ import { TFormValues } from '../models/schema';
 import TextField from '@mui/material/TextField';
 import { WithLabel } from './WithLabel';
 
-type Props = {};
-
-export const LedSettingsSection = (props: Props) => {
+export const LedSettingsSection = () => {
     const { control } = useFormContext<TFormValues>();
     return (
         <StyledFormValuesRow>
-            <WithLabel label="Green LED" htmlFor="greenLed">
+            <WithLabel label="Green LED port" htmlFor="greenLed">
                 <Controller
                     name="greenPort"
                     control={control}
@@ -28,7 +26,7 @@ export const LedSettingsSection = (props: Props) => {
                     )}
                 />
             </WithLabel>
-            <WithLabel label="Red LED" htmlFor="redPort">
+            <WithLabel label="Red LED port" htmlFor="redPort">
                 <Controller
                     name="redPort"
                     control={control}

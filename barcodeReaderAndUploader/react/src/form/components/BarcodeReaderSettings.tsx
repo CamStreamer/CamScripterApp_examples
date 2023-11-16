@@ -6,9 +6,7 @@ import { StyledFormValuesRow } from '../HelperComponents';
 import { TFormValues } from '../models/schema';
 import { WithLabel } from './WithLabel';
 
-type Props = {};
-
-export const BarcodeReaderSettings = (props: Props) => {
+export const BarcodeReaderSettings = () => {
     const { control } = useFormContext<TFormValues>();
     return (
         <StyledFormValuesRow>

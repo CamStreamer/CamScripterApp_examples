@@ -18,9 +18,7 @@ export const positionOptionLabels: Record<TFormValues['alignment'], string> = {
     bottom_right: 'Bottom Right',
 };
 
-type Props = {};
-
-export const CamOverlaySettings = (props: Props) => {
+export const CamOverlaySettings = () => {
     const { control, formState, setValue } = useFormContext<TFormValues>();
 
     const scale = useWatch<TFormValues, 'scale'>({
