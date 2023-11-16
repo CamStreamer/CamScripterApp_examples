@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 const cameraSchema = z.object({
     protocol: z.string(),
-    ip: z.string().ip(),
+    ip: z.union([z.string().ip(), z.literal('')]),
     port: z.number().nonnegative(),
     user: z.string(),
     pass: z.string(),
@@ -30,7 +30,7 @@ const overlaySchema = z.object({
 });
 
 const storageSchema = z.object({
-    url: z.string().url(),
+    url: z.union([z.string().url(), z.literal('')]),
     outputDir: z.string(),
     clientSecret: z.string(),
     clientId: z.string(),
@@ -40,7 +40,7 @@ const storageSchema = z.object({
     numberOfRetries: z.number().nonnegative(),
 });
 
-const ledSchema = z.object({
+const ledSettingsSchema = z.object({
     greenPort: z.number().nonnegative(),
     redPort: z.number().nonnegative(),
 });
@@ -52,7 +52,17 @@ const barcodeSettingsSchema = z.object({
 export const formSchema = cameraSchema
     .merge(overlaySchema)
     .merge(storageSchema)
-    .merge(ledSchema)
+    .merge(ledSettingsSchema)
     .merge(barcodeSettingsSchema);
 
 export type TFormValues = z.infer<typeof formSchema>;
+
+export const serverDataSchema = z.object({
+    camera: cameraSchema,
+    overlay: overlaySchema,
+    storage: storageSchema,
+    leddSettings: ledSettingsSchema,
+    barcodeSettings: barcodeSettingsSchema,
+});
+
+export type TServerData = z.infer<typeof serverDataSchema>;
