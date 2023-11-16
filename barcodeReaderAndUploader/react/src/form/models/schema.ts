@@ -35,9 +35,9 @@ const storageSchema = z.object({
     clientSecret: z.string(),
     clientId: z.string(),
     tenantId: z.string(),
-    connectionTimeoutS: z.number().nonnegative(),
-    uploadTimeoutS: z.number().nonnegative(),
-    numberOfRetries: z.number().nonnegative(),
+    connectionTimeoutS: z.number().nonnegative().optional(),
+    uploadTimeoutS: z.number().nonnegative().optional(),
+    numberOfRetries: z.number().nonnegative().optional(),
 });
 
 const ledSettingsSchema = z.object({

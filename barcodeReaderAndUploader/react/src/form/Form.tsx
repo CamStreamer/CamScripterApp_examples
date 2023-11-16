@@ -1,7 +1,14 @@
-import { FormProvider, SubmitErrorHandler, SubmitHandler, useForm } from 'react-hook-form';
+import { Controller, FormProvider, SubmitErrorHandler, SubmitHandler, useForm } from 'react-hook-form';
 import { TFormValues, formSchema } from './models/schema';
 
+import { CollapsibleFormContent } from './CollapsibleFormContent';
 import React from 'react';
+import { SharePointIntegrationSection } from './components/SharePointIntegrationSection';
+import { StyledFormValuesRow } from './HelperComponents';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
+import { WithLabel } from './components/WithLabel';
+import styled from 'styled-components';
 import { useSnackbar } from '../hooks/useSnackbar';
 import { zodResolver } from '@hookform/resolvers/zod';
 
@@ -33,7 +40,27 @@ export const Form = ({ defaultValues }: Props) => {
 
     return (
         <FormProvider {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit, onError)}></form>
+            <StyledForm onSubmit={form.handleSubmit(onSubmit, onError)}>
+                <CollapsibleFormContent
+                    title="SharePoint intergation"
+                    closedContent={
+                        <Typography fontSize="0.875rem" color="#797979">
+                            Set SharePoint service.
+                        </Typography>
+                    }
+                >
+                    <SharePointIntegrationSection />
+                </CollapsibleFormContent>
+            </StyledForm>
         </FormProvider>
     );
 };
+
+export const StyledForm = styled.form`
+    max-width: 700px;
+    margin-inline: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1.5rem;
+`;
