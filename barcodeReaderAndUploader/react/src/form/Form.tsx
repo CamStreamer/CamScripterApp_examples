@@ -1,6 +1,7 @@
 import { Controller, FormProvider, SubmitErrorHandler, SubmitHandler, useForm } from 'react-hook-form';
 import { TFormValues, formSchema } from './models/schema';
 
+import { CamOverlayIntegration } from './components/CamOverlayIntegration';
 import { CollapsibleFormContent } from './CollapsibleFormContent';
 import React from 'react';
 import { SharePointIntegrationSection } from './components/SharePointIntegrationSection';
@@ -51,6 +52,17 @@ export const Form = ({ defaultValues }: Props) => {
                 >
                     <SharePointIntegrationSection />
                 </CollapsibleFormContent>
+                <CollapsibleFormContent
+                    title="CamOverlay intergation"
+                    closedContent={
+                        <Typography fontSize="0.875rem" color="#797979">
+                            Set remote camera and CamOverlay integration.
+                        </Typography>
+                    }
+                    initialContentClosed
+                >
+                    <CamOverlayIntegration />
+                </CollapsibleFormContent>
             </StyledForm>
         </FormProvider>
     );
@@ -62,5 +74,5 @@ export const StyledForm = styled.form`
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    margin-top: 1.5rem;
+    padding-block: 1.5rem;
 `;

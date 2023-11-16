@@ -7,7 +7,7 @@ type Props = {
     label: string;
     htmlFor?: string;
     fullWidth?: boolean;
-    children?: React.ReactNode;
+    children: React.ReactNode;
 };
 
 export const WithLabel = ({ label, htmlFor, fullWidth, children }: Props) => {

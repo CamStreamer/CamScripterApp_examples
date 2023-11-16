@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 const cameraSchema = z.object({
-    protocol: z.string(),
+    protocol: z.union([z.literal('http'), z.literal('https'), z.literal('https_insecure')]),
     ip: z.union([z.string().ip(), z.literal('')]),
     port: z.number().nonnegative(),
     user: z.string(),
@@ -26,7 +26,7 @@ const overlaySchema = z.object({
     alignment: alignmentSchema,
     width: z.number().nonnegative(),
     height: z.number().nonnegative(),
-    scale: z.number(),
+    scale: z.number().nonnegative(),
 });
 
 const storageSchema = z.object({

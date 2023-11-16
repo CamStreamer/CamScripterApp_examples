@@ -12,6 +12,7 @@ html {
 
 body {
     height: 100%;
+    min-height: 100%;
     background-color: #fff;
 }
 
@@ -30,5 +31,5 @@ ul {
     font-weight: normal;
 }
 #root {
-    height: 100%;
+    min-height: 100%;
 }
