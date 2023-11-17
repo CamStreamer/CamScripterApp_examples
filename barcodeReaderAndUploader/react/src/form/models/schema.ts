@@ -61,7 +61,7 @@ export const serverDataSchema = z.object({
     camera: cameraSchema,
     overlay: overlaySchema,
     storage: storageSchema,
-    leddSettings: ledSettingsSchema,
+    ledSettings: ledSettingsSchema,
     barcodeSettings: barcodeSettingsSchema,
 });
 

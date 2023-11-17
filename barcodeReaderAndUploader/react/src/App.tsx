@@ -1,19 +1,34 @@
-import { CircularProgress, Container } from '@mui/material';
-import React, { useEffect, useState } from 'react';
-import { TFormValues, TServerData, formSchema, serverDataSchema } from './form/models/schema';
+import { InfoSnackbar, TSnackBarData } from './components/Snackbar';
+import React, { useRef, useState } from 'react';
+import { TFormValues, TServerData, serverDataSchema } from './form/models/schema';
 
+import { Container } from '@mui/material';
 import { ContainerLoader } from './components/ContainerLoader';
 import { Form } from './form/Form';
-import { InfoSnackbar } from './components/Snackbar';
 import { Nav } from './components/Nav';
 import { ZodError } from 'zod';
 import styled from 'styled-components';
 import { useInitializeOnMount } from './hooks/useInitializeOnMount';
-import { useSnackbar } from './hooks/useSnackbar';
 
 export const App = () => {
     const [defaultValues, setDefaultValues] = useState<TFormValues | null>(null);
-    const { snackbarData, displaySnackbar, closeSnackbar } = useSnackbar();
+    const [snackbarData, setSnackbarData] = useState<TSnackBarData | null>(null);
+
+    const lastSnackIdRef = useRef<TSnackBarData['id'] | null>(null);
+
+    const displaySnackbar = (val: TSnackBarData) => {
+        if (lastSnackIdRef.current === val.id) {
+            return;
+        } else {
+            lastSnackIdRef.current = val.id;
+            setSnackbarData(val);
+        }
+    };
+
+    const closeSnackbar = () => {
+        lastSnackIdRef.current = null;
+        setSnackbarData(null);
+    };
 
     useInitializeOnMount(async () => {
         let response: Response;
@@ -38,11 +53,13 @@ export const App = () => {
         } catch (e) {
             if (e instanceof ZodError) {
                 displaySnackbar({
+                    id: 'initialDataFetchInfo',
                     type: 'error',
                     message: 'Data from server do not match expected data',
                 });
             } else {
                 displaySnackbar({
+                    id: 'initialDataFetchInfo',
                     type: 'error',
                     message: 'Error fetching form data.',
                 });
@@ -57,9 +74,13 @@ export const App = () => {
         <>
             <Nav />
             <StyledContainer>
-                <InfoSnackbar snackbarData={snackbarData} closeSnackbar={closeSnackbar} />
-                {defaultValues ? <Form defaultValues={defaultValues} /> : <ContainerLoader size={80} />}
+                {defaultValues ? (
+                    <Form defaultValues={defaultValues} displaySnackbar={displaySnackbar} />
+                ) : (
+                    <ContainerLoader size={80} />
+                )}
             </StyledContainer>
+            <InfoSnackbar snackbarData={snackbarData} closeSnackbar={closeSnackbar} />
         </>
     );
 };

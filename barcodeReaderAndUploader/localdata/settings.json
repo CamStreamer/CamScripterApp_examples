@@ -24,7 +24,7 @@
         "uploadTimeoutS": 60,
         "numberOfRetries": 3
     },
-    "leddSettings": {
+    "ledSettings": {
         "greenPort": 0,
         "redPort": 0
     },

@@ -1,26 +1,24 @@
 import { FormProvider, SubmitErrorHandler, SubmitHandler, useForm } from 'react-hook-form';
+import { InfoSnackbar, TSnackBarData } from '../components/Snackbar';
+import React, { useEffect, useRef, useState } from 'react';
 import { TFormValues, TServerData, formSchema } from './models/schema';
 
 import { BarcodeReaderSettings } from './components/BarcodeReaderSettings';
 import { Button } from '@mui/material';
 import { CamOverlayIntegration } from './components/CamOverlayIntegration';
 import { CollapsibleFormContent } from './CollapsibleFormContent';
-import { InfoSnackbar } from '../components/Snackbar';
 import { LedSettingsSection } from './components/LedSettingsSection';
-import React from 'react';
 import { SharePointIntegrationSection } from './components/SharePointIntegrationSection';
 import Typography from '@mui/material/Typography';
 import styled from 'styled-components';
-import { useSnackbar } from '../hooks/useSnackbar';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 type Props = {
     defaultValues: TFormValues;
+    displaySnackbar: (val: TSnackBarData) => void;
 };
 
-export const Form = ({ defaultValues }: Props) => {
-    const { snackbarData, displaySnackbar, closeSnackbar } = useSnackbar();
-
+export const Form = ({ defaultValues, displaySnackbar }: Props) => {
     const form = useForm<TFormValues>({
         resolver: zodResolver(formSchema),
         mode: 'onChange',
@@ -29,6 +27,12 @@ export const Form = ({ defaultValues }: Props) => {
     });
 
     const onSubmit: SubmitHandler<TFormValues> = async (data) => {
+        displaySnackbar({
+            id: 'isSubmittingInfo',
+            type: 'info',
+            message: 'Submitting...',
+        });
+
         const serverData: TServerData = {
             camera: {
                 protocol: data.protocol,
@@ -55,7 +59,7 @@ export const Form = ({ defaultValues }: Props) => {
                 numberOfRetries: data.numberOfRetries || defaultValues.numberOfRetries,
                 uploadTimeoutS: data.uploadTimeoutS || defaultValues.uploadTimeoutS,
             },
-            leddSettings: {
+            ledSettings: {
                 greenPort: data.greenPort,
                 redPort: data.redPort,
             },
@@ -78,14 +82,16 @@ export const Form = ({ defaultValues }: Props) => {
             if (!res.ok) throw new Error(`${res.status}: ${res.statusText}`);
 
             displaySnackbar({
+                id: 'settingsSavedSuccess',
                 type: 'success',
                 message: 'Settings successfully saved.',
             });
         } catch (e) {
             console.error('Error while submitting data: ', e);
             displaySnackbar({
+                id: 'settingsSaveError',
                 type: 'error',
-                message: 'Error submitting data.',
+                message: 'Error saving settings.',
             });
         }
     };
@@ -93,6 +99,7 @@ export const Form = ({ defaultValues }: Props) => {
     const onError: SubmitErrorHandler<TFormValues> = (errors) => {
         console.error(`FORM ERROR: ${JSON.stringify(errors)}`);
         displaySnackbar({
+            id: 'submitError',
             type: 'error',
             message: 'Error submitting the form.',
         });
@@ -101,7 +108,6 @@ export const Form = ({ defaultValues }: Props) => {
     return (
         <FormProvider {...form}>
             <StyledForm onSubmit={form.handleSubmit(onSubmit, onError)}>
-                <InfoSnackbar snackbarData={snackbarData} closeSnackbar={closeSnackbar} />
                 <CollapsibleFormContent
                     title="SharePoint intergation"
                     closedContent={

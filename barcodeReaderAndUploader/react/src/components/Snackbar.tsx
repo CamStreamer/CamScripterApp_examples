@@ -1,16 +1,20 @@
+import Alert, { AlertProps } from '@mui/material/Alert';
 import Slide, { SlideProps } from '@mui/material/Slide';
 import Snackbar, { SnackbarOrigin } from '@mui/material/Snackbar';
 
-import Alert from '@mui/material/Alert';
 import React from 'react';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
-type SnackData = {
-    type: 'error' | 'success';
+const SNACK_TIMEOUT = 5000;
+
+export type TSnackBarData = {
+    id: string;
+    type: AlertProps['severity'];
     message: string;
 };
+
 type Props = {
-    snackbarData: SnackData | null;
+    snackbarData: TSnackBarData | null;
     closeSnackbar: () => void;
 };
 
@@ -27,6 +31,8 @@ export const InfoSnackbar = ({ snackbarData, closeSnackbar }: Props) => {
             TransitionComponent={(props: SlideProps) => (
                 <Slide {...props} direction={matchesSmallScreen ? 'down' : 'up'} />
             )}
+            autoHideDuration={SNACK_TIMEOUT}
+            onClose={closeSnackbar}
         >
             <Alert severity={snackbarData?.type} variant="filled" onClose={closeSnackbar}>
                 {snackbarData && snackbarData.message}
