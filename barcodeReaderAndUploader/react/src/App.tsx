@@ -86,5 +86,5 @@ export const App = () => {
 };
 
 const StyledContainer = styled(Container)`
-    height: 100%;
+    min-height: 100%;
 `;

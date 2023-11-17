@@ -16,4 +16,6 @@ const StyledContent = styled.div`
     height: 100%;
     display: grid;
     place-items: center;
+
+    padding-block: 1.5rem;
 `;
