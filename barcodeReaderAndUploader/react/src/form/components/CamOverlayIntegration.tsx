@@ -1,12 +1,14 @@
 import { Controller, useFormContext } from 'react-hook-form';
-import { FormLabel, MenuItem, Select, TextField, Typography } from '@mui/material';
 import { StyledFormValuesRow, StyledHorizontalDivider } from '../HelperComponents';
 
 import { CamOverlaySettings } from './CamOverlaySettings';
+import MenuItem from '@mui/material/MenuItem';
 import { PasswordInput } from './PasswordInput';
 import React from 'react';
+import Select from '@mui/material/Select';
 import { SubSectionLabel } from './SubSectionLabel';
 import { TFormValues } from '../models/schema';
+import TextField from '@mui/material/TextField';
 import { WithLabel } from './WithLabel';
 
 export const CamOverlayIntegration = () => {
@@ -21,9 +23,15 @@ export const CamOverlayIntegration = () => {
                         control={control}
                         render={({ field }) => (
                             <Select id="cameraProtocol" aria-labelledby="cameraProtocol" {...field} fullWidth>
-                                <MenuItem key="http" value="http">HTTP</MenuItem>
-                                <MenuItem key="https" value="https">HTTPS</MenuItem>
-                                <MenuItem key="https_insecure" value="https_insecure">HTTPS (insecure)</MenuItem>
+                                <MenuItem key="http" value="http">
+                                    HTTP
+                                </MenuItem>
+                                <MenuItem key="https" value="https">
+                                    HTTPS
+                                </MenuItem>
+                                <MenuItem key="https_insecure" value="https_insecure">
+                                    HTTPS (insecure)
+                                </MenuItem>
                             </Select>
                         )}
                     />

@@ -1,9 +1,10 @@
 import { Controller, useFormContext } from 'react-hook-form';
-import { InputAdornment, TextField } from '@mui/material';
 import { StyledFormValuesRow, StyledHorizontalDivider } from '../HelperComponents';
 
+import InputAdornment from '@mui/material/InputAdornment';
 import React from 'react';
 import { TFormValues } from '../models/schema';
+import TextField from '@mui/material/TextField';
 import { WithLabel } from './WithLabel';
 
 export const SharePointIntegrationSection = () => {

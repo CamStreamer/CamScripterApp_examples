@@ -1,5 +1,4 @@
 import TextField, { TextFieldProps } from '@mui/material/TextField';
-import styled, { css } from 'styled-components';
 
 import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
@@ -7,9 +6,7 @@ import React from 'react';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
-type Props = {} & TextFieldProps;
-
-export const PasswordInput = React.forwardRef<HTMLInputElement, Props>(({ ...props }, ref) => {
+export const PasswordInput = React.forwardRef<HTMLInputElement, TextFieldProps>(({ ...props }, ref) => {
     const [showPassword, setShowPassword] = React.useState(false);
 
     const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {

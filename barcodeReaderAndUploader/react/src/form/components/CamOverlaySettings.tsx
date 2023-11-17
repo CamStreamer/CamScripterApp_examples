@@ -1,9 +1,12 @@
 import { Controller, useFormContext, useWatch } from 'react-hook-form';
-import { InputAdornment, MenuItem, Select, TextField } from '@mui/material';
 
+import InputAdornment from '@mui/material/InputAdornment';
+import MenuItem from '@mui/material/MenuItem';
 import React from 'react';
+import Select from '@mui/material/Select';
 import { StyledFormValuesRow } from '../HelperComponents';
 import { TFormValues } from '../models/schema';
+import TextField from '@mui/material/TextField';
 import { WithLabel } from './WithLabel';
 
 export const positionOptionLabels: Record<TFormValues['alignment'], string> = {

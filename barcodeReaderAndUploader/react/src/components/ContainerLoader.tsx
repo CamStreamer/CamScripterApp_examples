@@ -3,9 +3,7 @@ import CircularProgress, { CircularProgressProps } from '@mui/material/CircularP
 import React from 'react';
 import styled from 'styled-components';
 
-type Props = {} & CircularProgressProps;
-
-export const ContainerLoader = ({ ...props }: Props) => {
+export const ContainerLoader = ({ ...props }: CircularProgressProps) => {
     return (
         <StyledContent>
             <CircularProgress {...props} />

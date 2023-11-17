@@ -4,7 +4,7 @@ import styled, { css } from 'styled-components';
 import Collapse from '@mui/material/Collapse';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { Typography } from '@mui/material';
+import Typography from '@mui/material/Typography';
 
 type Props = {
     initialContentClosed?: boolean;

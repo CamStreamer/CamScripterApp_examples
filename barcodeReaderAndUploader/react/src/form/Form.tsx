@@ -2,7 +2,7 @@ import { FormProvider, SubmitErrorHandler, SubmitHandler, useForm } from 'react-
 import { TFormValues, formSchema } from './models/schema';
 
 import { BarcodeReaderSettings } from './components/BarcodeReaderSettings';
-import { Button } from '@mui/material';
+import Button from '@mui/material/Button';
 import { CamOverlayIntegration } from './components/CamOverlayIntegration';
 import { CollapsibleFormContent } from './CollapsibleFormContent';
 import { LedSettingsSection } from './components/LedSettingsSection';

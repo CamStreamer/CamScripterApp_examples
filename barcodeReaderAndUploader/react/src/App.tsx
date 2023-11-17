@@ -2,7 +2,7 @@ import { InfoSnackbar, TSnackBarData } from './components/Snackbar';
 import React, { useRef, useState } from 'react';
 import { TFormValues, TServerData, serverDataSchema } from './form/models/schema';
 
-import { Container } from '@mui/material';
+import Container from '@mui/material/Container';
 import { ContainerLoader } from './components/ContainerLoader';
 import { Form } from './form/Form';
 import { Nav } from './components/Nav';
