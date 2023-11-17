@@ -1,5 +1,5 @@
-import * as fs from 'fs';
 import * as Joi from 'joi';
+import * as fs from 'fs';
 
 let settings = {
     camera: {
@@ -62,7 +62,7 @@ const schema = Joi.object({
         uploadTimeoutS: Joi.number(),
         numberOfRetries: Joi.number(),
     }),
-    leddSettings: Joi.object({
+    ledSettings: Joi.object({
         greenPort: Joi.number().port(),
         redPort: Joi.number().port(),
     }),
