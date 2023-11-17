@@ -1,15 +1,16 @@
 import { FormProvider, SubmitErrorHandler, SubmitHandler, useForm } from 'react-hook-form';
-import { InfoSnackbar, TSnackBarData } from '../components/Snackbar';
-import React, { useEffect, useRef, useState } from 'react';
-import { TFormValues, TServerData, formSchema } from './models/schema';
+import { TFormValues, formSchema } from './models/schema';
 
 import { BarcodeReaderSettings } from './components/BarcodeReaderSettings';
 import { Button } from '@mui/material';
 import { CamOverlayIntegration } from './components/CamOverlayIntegration';
 import { CollapsibleFormContent } from './CollapsibleFormContent';
 import { LedSettingsSection } from './components/LedSettingsSection';
+import React from 'react';
 import { SharePointIntegrationSection } from './components/SharePointIntegrationSection';
+import { TSnackBarData } from '../components/Snackbar';
 import Typography from '@mui/material/Typography';
+import { covertFlatFormDataIntoServerData } from '../utils';
 import styled from 'styled-components';
 import { zodResolver } from '@hookform/resolvers/zod';
 
@@ -33,40 +34,7 @@ export const Form = ({ defaultValues, displaySnackbar }: Props) => {
             message: 'Submitting...',
         });
 
-        const serverData: TServerData = {
-            camera: {
-                protocol: data.protocol,
-                ip: data.ip,
-                port: data.port,
-                user: data.user,
-                pass: data.pass,
-            },
-            overlay: {
-                alignment: data.alignment,
-                height: data.height,
-                width: data.width,
-                scale: data.scale,
-                x: data.x,
-                y: data.y,
-            },
-            storage: {
-                clientId: data.clientId,
-                clientSecret: data.clientSecret,
-                outputDir: data.outputDir,
-                tenantId: data.tenantId,
-                url: data.url,
-                connectionTimeoutS: data.connectionTimeoutS || defaultValues.connectionTimeoutS,
-                numberOfRetries: data.numberOfRetries || defaultValues.numberOfRetries,
-                uploadTimeoutS: data.uploadTimeoutS || defaultValues.uploadTimeoutS,
-            },
-            ledSettings: {
-                greenPort: data.greenPort,
-                redPort: data.redPort,
-            },
-            barcodeSettings: {
-                displayTimeS: data.displayTimeS,
-            },
-        };
+        const serverData = covertFlatFormDataIntoServerData(data, defaultValues);
 
         try {
             const res = await fetch(
