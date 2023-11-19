@@ -10,6 +10,7 @@ import { SubSectionLabel } from './SubSectionLabel';
 import { TFormValues } from '../models/schema';
 import TextField from '@mui/material/TextField';
 import { WithLabel } from './WithLabel';
+import { parseValueAsInt } from '../utils';
 
 export const CamOverlayIntegration = () => {
     const { control } = useFormContext<TFormValues>();
@@ -61,6 +62,9 @@ export const CamOverlayIntegration = () => {
                                 id="cameraPort"
                                 aria-labelledby="cameraPort"
                                 {...field}
+                                onChange={(e) => {
+                                    field.onChange(parseValueAsInt(e.target.value));
+                                }}
                                 fullWidth
                                 error={!!formState.errors.port}
                                 helperText={formState.errors.port?.message}

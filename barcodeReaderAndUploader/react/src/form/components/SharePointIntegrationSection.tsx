@@ -6,6 +6,7 @@ import React from 'react';
 import { TFormValues } from '../models/schema';
 import TextField from '@mui/material/TextField';
 import { WithLabel } from './WithLabel';
+import { parseValueAsInt } from '../utils';
 
 export const SharePointIntegrationSection = () => {
     const { control } = useFormContext<TFormValues>();
@@ -106,6 +107,9 @@ export const SharePointIntegrationSection = () => {
                                 aria-labelledby="sharePointConnetionTimeout"
                                 type="number"
                                 {...field}
+                                onChange={(e) => {
+                                    field.onChange(parseValueAsInt(e.target.value));
+                                }}
                                 fullWidth
                                 error={!!formState.errors.connectionTimeoutS}
                                 helperText={formState.errors.connectionTimeoutS?.message}
@@ -130,6 +134,9 @@ export const SharePointIntegrationSection = () => {
                                 aria-labelledby="sharePointUploadTimeout"
                                 type="number"
                                 {...field}
+                                onChange={(e) => {
+                                    field.onChange(parseValueAsInt(e.target.value));
+                                }}
                                 fullWidth
                                 error={!!formState.errors.uploadTimeoutS}
                                 helperText={formState.errors.uploadTimeoutS?.message}
@@ -154,6 +161,9 @@ export const SharePointIntegrationSection = () => {
                                 aria-labelledby="sharePointNumOfRetries"
                                 type="number"
                                 {...field}
+                                onChange={(e) => {
+                                    field.onChange(parseValueAsInt(e.target.value));
+                                }}
                                 fullWidth
                                 error={!!formState.errors.numberOfRetries}
                                 helperText={formState.errors.numberOfRetries?.message}

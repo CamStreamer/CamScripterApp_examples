@@ -5,6 +5,7 @@ import { StyledFormValuesRow } from '../HelperComponents';
 import { TFormValues } from '../models/schema';
 import TextField from '@mui/material/TextField';
 import { WithLabel } from './WithLabel';
+import { parseValueAsInt } from '../utils';
 
 export const LedSettingsSection = () => {
     const { control } = useFormContext<TFormValues>();
@@ -19,6 +20,9 @@ export const LedSettingsSection = () => {
                             id="greenLed"
                             aria-labelledby="greenLed"
                             {...field}
+                            onChange={(e) => {
+                                field.onChange(parseValueAsInt(e.target.value));
+                            }}
                             fullWidth
                             error={!!formState.errors.greenPort}
                             helperText={formState.errors.greenPort?.message}
@@ -35,6 +39,9 @@ export const LedSettingsSection = () => {
                             id="redPort"
                             aria-labelledby="redPort"
                             {...field}
+                            onChange={(e) => {
+                                field.onChange(parseValueAsInt(e.target.value));
+                            }}
                             fullWidth
                             error={!!formState.errors.redPort}
                             helperText={formState.errors.redPort?.message}

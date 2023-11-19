@@ -1,4 +1,5 @@
 import { Controller, useFormContext, useWatch } from 'react-hook-form';
+import { parseScaledDisplayValue, parseScaledValue, parseValueAsInt } from '../utils';
 
 import InputAdornment from '@mui/material/InputAdornment';
 import MenuItem from '@mui/material/MenuItem';
@@ -22,12 +23,7 @@ export const positionOptionLabels: Record<TFormValues['alignment'], string> = {
 };
 
 export const CamOverlaySettings = () => {
-    const { control, formState, setValue } = useFormContext<TFormValues>();
-
-    const scale = useWatch<TFormValues, 'scale'>({
-        name: 'scale',
-    });
-    const scaleValue = Math.floor(scale * 100);
+    const { control } = useFormContext<TFormValues>();
 
     return (
         <StyledFormValuesRow>
@@ -54,7 +50,11 @@ export const CamOverlaySettings = () => {
                         <TextField
                             id="cameraX"
                             aria-labelledby="cameraX"
+                            type="number"
                             {...field}
+                            onChange={(e) => {
+                                field.onChange(parseValueAsInt(e.target.value));
+                            }}
                             fullWidth
                             error={!!formState.errors.x}
                             helperText={formState.errors.x?.message}
@@ -77,7 +77,11 @@ export const CamOverlaySettings = () => {
                         <TextField
                             id="cameraY"
                             aria-labelledby="cameraY"
+                            type="number"
                             {...field}
+                            onChange={(e) => {
+                                field.onChange(parseValueAsInt(e.target.value));
+                            }}
                             fullWidth
                             error={!!formState.errors.y}
                             helperText={formState.errors.y?.message}
@@ -93,32 +97,33 @@ export const CamOverlaySettings = () => {
                 />
             </WithLabel>
             <WithLabel label="Scale" htmlFor="cameraScale">
-                <TextField
-                    id="cameraScale"
-                    aria-labelledby="cameraScale"
-                    value={scaleValue}
-                    fullWidth
-                    type="number"
-                    onChange={(e) => {
-                        console.log(e.target.value);
-                        const parsedVal = parseInt(e.target.value);
-                        const newVal = isNaN(parsedVal) ? 0 : parsedVal;
-                        setValue('scale', parseFloat((newVal / 100).toFixed(2)), {
-                            shouldValidate: true,
-                        });
-                    }}
-                    error={!!formState.errors.scale}
-                    helperText={formState.errors.scale?.message}
-                    InputProps={{
-                        endAdornment: (
-                            <InputAdornment position="end" disableTypography>
-                                %
-                            </InputAdornment>
-                        ),
-                    }}
-                    inputProps={{
-                        step: 5,
-                    }}
+                <Controller
+                    name="scale"
+                    control={control}
+                    render={({ field, formState }) => (
+                        <TextField
+                            id="cameraScale"
+                            aria-labelledby="cameraScale"
+                            value={parseScaledDisplayValue(field.value, 100)}
+                            fullWidth
+                            type="number"
+                            onChange={(e) => {
+                                field.onChange(parseScaledValue(e.target.value, 2));
+                            }}
+                            error={!!formState.errors.scale}
+                            helperText={formState.errors.scale?.message}
+                            InputProps={{
+                                endAdornment: (
+                                    <InputAdornment position="end" disableTypography>
+                                        %
+                                    </InputAdornment>
+                                ),
+                            }}
+                            inputProps={{
+                                step: 5,
+                            }}
+                        />
+                    )}
                 />
             </WithLabel>
             <WithLabel label="Stream width" htmlFor="cameraStreamWidth">
@@ -129,7 +134,11 @@ export const CamOverlaySettings = () => {
                         <TextField
                             id="cameraStreamWidth"
                             aria-labelledby="cameraStreamWidth"
+                            type="number"
                             {...field}
+                            onChange={(e) => {
+                                field.onChange(parseValueAsInt(e.target.value));
+                            }}
                             fullWidth
                             error={!!formState.errors.width}
                             helperText={formState.errors.width?.message}
@@ -152,7 +161,11 @@ export const CamOverlaySettings = () => {
                         <TextField
                             id="cameraStreamHeight"
                             aria-labelledby="cameraStreamHeight"
+                            type="number"
                             {...field}
+                            onChange={(e) => {
+                                field.onChange(parseValueAsInt(e.target.value));
+                            }}
                             fullWidth
                             error={!!formState.errors.height}
                             helperText={formState.errors.height?.message}

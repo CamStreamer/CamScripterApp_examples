@@ -6,6 +6,7 @@ import { StyledFormValuesRow } from '../HelperComponents';
 import { TFormValues } from '../models/schema';
 import TextField from '@mui/material/TextField';
 import { WithLabel } from './WithLabel';
+import { parseValueAsInt } from '../utils';
 
 export const BarcodeReaderSettings = () => {
     const { control } = useFormContext<TFormValues>();
@@ -21,6 +22,9 @@ export const BarcodeReaderSettings = () => {
                             aria-labelledby="bcDisplayTime"
                             type="number"
                             {...field}
+                            onChange={(e) => {
+                                field.onChange(parseValueAsInt(e.target.value));
+                            }}
                             fullWidth
                             InputProps={{
                                 endAdornment: (
