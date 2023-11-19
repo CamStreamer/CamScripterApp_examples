@@ -77,7 +77,7 @@ export const App = () => {
                 {defaultValues ? (
                     <Form defaultValues={defaultValues} displaySnackbar={displaySnackbar} />
                 ) : (
-                    <ContainerLoader size={80} />
+                    <ContainerLoader size={80} infoText="Fetching settings..." />
                 )}
             </StyledContainer>
             <InfoSnackbar snackbarData={snackbarData} closeSnackbar={closeSnackbar} />

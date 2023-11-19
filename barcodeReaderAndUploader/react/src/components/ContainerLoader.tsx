@@ -1,12 +1,18 @@
 import CircularProgress, { CircularProgressProps } from '@mui/material/CircularProgress';
 
 import React from 'react';
+import Typography from '@mui/material/Typography';
 import styled from 'styled-components';
 
-export const ContainerLoader = ({ ...props }: CircularProgressProps) => {
+type Props = {
+    infoText?: string;
+} & CircularProgressProps;
+
+export const ContainerLoader = ({ infoText, ...props }: Props) => {
     return (
         <StyledContent>
             <CircularProgress {...props} />
+            {infoText && <Typography fontSize={20}>{infoText}</Typography>}
         </StyledContent>
     );
 };
@@ -18,4 +24,5 @@ const StyledContent = styled.div`
     place-items: center;
 
     padding-block: 1.5rem;
+    gap: 16px;
 `;
