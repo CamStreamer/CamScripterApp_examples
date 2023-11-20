@@ -31,6 +31,7 @@
     "devDependencies": {
         "@camstreamer/prettier-config": "^2.0.4",
         "@types/node": "^18.0.6",
+        "@types/node-fetch": "^2.6.9",
         "@typescript-eslint/eslint-plugin": "^6.3.0",
         "@typescript-eslint/parser": "^6.3.0",
         "eslint": "^8.47.0",
@@ -45,7 +46,7 @@
         "camstreamerlib": "^2.0.2",
         "joi": "^17.11.0",
         "memorystream": "^0.3.1",
-        "node-sp-auth": "^3.0.7",
+        "node-fetch": "^2.7.0",
         "qrcode": "^1.5.3"
     }
 }

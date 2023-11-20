@@ -1,5 +1,6 @@
-import * as fs from 'fs';
-import { loadSettings, settings } from 'settings';
+import { loadSettings, settings } from './settings';
+import { SharePoint } from './Upload/SharePoint/SharePoint';
+import { Uploader } from './Upload/Uploader';
 
 process.on('SIGINT', async () => {
     console.log('Configuration changed');
@@ -13,8 +14,15 @@ process.on('SIGTERM', async () => {
 
 const start = async () => {
     await loadSettings();
-
     console.log('started');
+
+    const storage = new SharePoint(settings.storage);
+    await storage.authenticate();
+    await storage.getWebEndpoint();
+
+    const uploader = new Uploader(storage, settings.storage);
+
+    console.log('uploaded');
 };
 
 async function cleanExit() {
