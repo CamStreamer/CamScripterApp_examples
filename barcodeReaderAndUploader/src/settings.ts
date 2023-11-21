@@ -3,9 +3,9 @@ import * as fs from 'fs';
 
 let settings = {
     camera: {
-        protocol: '',
-        ip: '',
-        port: 0,
+        protocol: 'http',
+        ip: '127.0.0.1',
+        port: 80,
         user: '',
         pass: '',
     },
@@ -83,5 +83,13 @@ const loadSettings = async () => {
         process.exit(1);
     }
 };
+
+export const getCameraHttpSettings = () => ({
+    tls: settings.camera.protocol !== 'http',
+    tlsInsecure: settings.camera.protocol === 'https_insecure',
+    ip: settings.camera.ip,
+    port: 80,
+    auth: 'root' + ':' + 'pass',
+});
 
 export { settings, loadSettings };

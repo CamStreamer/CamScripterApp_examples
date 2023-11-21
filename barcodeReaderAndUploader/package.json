@@ -44,9 +44,8 @@
     },
     "dependencies": {
         "camstreamerlib": "^2.0.2",
+        "fast-glob": "^3.3.2",
         "joi": "^17.11.0",
-        "memorystream": "^0.3.1",
-        "node-fetch": "^2.7.0",
-        "qrcode": "^1.5.3"
+        "node-fetch": "^2.7.0"
     }
 }
