@@ -1,7 +1,7 @@
 import { CameraVapix, CameraVapixOptions } from 'camstreamerlib/CameraVapix';
 
 import { promisify } from 'util';
-import { settings } from './settings';
+import { getCameraHttpSettings, settings } from './settings';
 
 const setTimeoutPromise = promisify(setTimeout);
 
@@ -21,15 +21,7 @@ export class LedIndicator {
     private abortFailure = false;
 
     constructor(private readonly indicatorSettings: TLedIndicatorSettings) {
-        const cameraVapixOptions: CameraVapixOptions = {
-            ip: indicatorSettings.camera.ip,
-            port: indicatorSettings.camera.port,
-            auth: `${indicatorSettings.camera.user}:${indicatorSettings.camera.pass}`,
-            tls: indicatorSettings.camera.protocol !== 'http',
-            tlsInsecure: indicatorSettings.camera.protocol === 'https_insecure',
-        };
-
-        this.cameraVapix = new CameraVapix(cameraVapixOptions);
+        this.cameraVapix = new CameraVapix(getCameraHttpSettings());
     }
 
     private async setGreenLedState(active: boolean) {
@@ -95,7 +87,7 @@ export class LedIndicator {
         }
     }
 
-    async indicateSuccess() {
+    async indicateSuccess(ms: number) {
         this.abortLed('failure');
 
         await this.indicateSuccessiveSameLedSignal('success');
@@ -109,7 +101,7 @@ export class LedIndicator {
         this.greenLedIndicationTimeoutId = setTimeout(() => {
             this.setGreenLedState(false);
             this.greenLedIndicationTimeoutId = null;
-        }, STATE_INDICATION_DURATION_MS);
+        }, ms);
     }
 
     async indicateFailure() {

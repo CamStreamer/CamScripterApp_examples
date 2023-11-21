@@ -9,6 +9,9 @@ import { DrawWidget } from './DrawWidget/DrawWidget';
 import { getCameraImage } from './getCameraImage';
 import { PortReader } from './QrReaderByPort/PortReader';
 
+const READ_BARCODE_HIGHLIGHT_DURATION_MS = 500;
+const UPLOADS_HIGHLIGHT_DURATION_MS = 3000;
+
 let ledIndicator: LedIndicator;
 
 process.on('SIGINT', async () => {
@@ -23,14 +26,6 @@ process.on('SIGTERM', async () => {
 
 const start = async () => {
     await loadSettings();
-    console.log('started');
-
-    ledIndicator = new LedIndicator({
-        camera: settings.camera,
-        ledSettings: settings.ledSettings,
-    });
-    ledIndicator.indicateOnScriptStart();
-
     const storage = new SharePoint(settings.storage);
     await storage.authenticate();
     await storage.getWebEndpoint();
@@ -40,13 +35,27 @@ const start = async () => {
     await drawWidget.connect();
     const portReader = new PortReader();
 
-    portReader.on('final_bar_code', async (data) => {
-        console.log('valid_reading - ', data);
-        await drawWidget.createBarcodeWidget(data);
-        const image = await getCameraImage();
-        if (image === undefined) return;
-        await uploader.uploadFile(image, 'test1.jpg');
+    ledIndicator = new LedIndicator({
+        camera: settings.camera,
+        ledSettings: settings.ledSettings,
     });
+
+    portReader.on('final_bar_code', async (barcode: string) => {
+        console.log('readed code - ', barcode);
+        try {
+            ledIndicator.indicateSuccess(READ_BARCODE_HIGHLIGHT_DURATION_MS);
+            await drawWidget.createBarcodeWidget(barcode);
+            const image = await getCameraImage();
+            if (image === undefined) return;
+            await uploader.uploadFile(image, `${barcode}.jpg`);
+            ledIndicator.indicateSuccess(UPLOADS_HIGHLIGHT_DURATION_MS);
+        } catch (error) {
+            console.error(error);
+            ledIndicator.indicateFailure();
+        }
+    });
+
+    ledIndicator.indicateOnScriptStart();
 
     console.log('App started');
 };
