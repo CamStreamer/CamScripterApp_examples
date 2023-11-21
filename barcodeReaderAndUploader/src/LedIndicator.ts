@@ -17,6 +17,8 @@ export class LedIndicator {
     private flashInterval: NodeJS.Timeout | null = null;
     private greenLedIndicationTimeoutId: NodeJS.Timeout | null = null;
     private redLedIndicationTimeoutId: NodeJS.Timeout | null = null;
+    private abortSuccess = false;
+    private abortFailure = false;
 
     constructor(private readonly indicatorSettings: TLedIndicatorSettings) {
         const cameraVapixOptions: CameraVapixOptions = {
@@ -28,14 +30,6 @@ export class LedIndicator {
         };
 
         this.cameraVapix = new CameraVapix(cameraVapixOptions);
-    }
-
-    async getGreenLedState() {
-        return await this.cameraVapix.getInputState(this.indicatorSettings.ledSettings.greenPort);
-    }
-
-    async getRedLedState() {
-        return await this.cameraVapix.getInputState(this.indicatorSettings.ledSettings.redPort);
     }
 
     private async setGreenLedState(active: boolean) {
@@ -69,12 +63,46 @@ export class LedIndicator {
         }, START_INDICATION_DURATION_MS);
     }
 
-    async indicateSuccess() {
-        if (this.greenLedIndicationTimeoutId) {
+    private abortLed(led: 'success' | 'failure') {
+        if (led === 'success' && this.greenLedIndicationTimeoutId) {
             clearTimeout(this.greenLedIndicationTimeoutId);
-            await this.setGreenLedState(false);
+            this.greenLedIndicationTimeoutId = null;
+            this.setGreenLedState(false);
+            this.abortSuccess = true;
+        } else if (led === 'failure' && this.redLedIndicationTimeoutId) {
+            clearTimeout(this.redLedIndicationTimeoutId);
+            this.redLedIndicationTimeoutId = null;
+            this.setRedLedState(false);
+            this.abortFailure = true;
+        }
+    }
+
+    private async indicateSuccessiveSameLedSignal(led: 'success' | 'failure') {
+        if (led === 'success' && this.greenLedIndicationTimeoutId) {
+            clearTimeout(this.greenLedIndicationTimeoutId);
+            this.greenLedIndicationTimeoutId = null;
+
             // blink to indicate change of successfull proccess in progress
+            await this.setGreenLedState(false);
             await setTimeoutPromise(500);
+        } else if (led === 'failure' && this.redLedIndicationTimeoutId) {
+            clearTimeout(this.redLedIndicationTimeoutId);
+            this.redLedIndicationTimeoutId = null;
+
+            // blink to indicate change of failed proccess in progress
+            await this.setRedLedState(false);
+            await setTimeoutPromise(500);
+        }
+    }
+
+    async indicateSuccess() {
+        this.abortLed('failure');
+
+        await this.indicateSuccessiveSameLedSignal('success');
+
+        if (this.abortSuccess) {
+            this.abortSuccess = false;
+            return;
         }
 
         this.setGreenLedState(true);
@@ -85,11 +113,13 @@ export class LedIndicator {
     }
 
     async indicateFailure() {
-        if (this.redLedIndicationTimeoutId) {
-            clearTimeout(this.redLedIndicationTimeoutId);
-            await this.setRedLedState(false);
-            // blink to indicate change of failed proccess in progress
-            await setTimeoutPromise(500);
+        this.abortLed('success');
+
+        await this.indicateSuccessiveSameLedSignal('failure');
+
+        if (this.abortFailure) {
+            this.abortFailure = false;
+            return;
         }
 
         this.setRedLedState(true);
@@ -102,13 +132,18 @@ export class LedIndicator {
     async destructor() {
         if (this.flashInterval) {
             clearInterval(this.flashInterval);
+            this.flashInterval = null;
         }
         if (this.greenLedIndicationTimeoutId) {
             clearTimeout(this.greenLedIndicationTimeoutId);
+            this.greenLedIndicationTimeoutId = null;
         }
         if (this.redLedIndicationTimeoutId) {
             clearTimeout(this.redLedIndicationTimeoutId);
+            this.redLedIndicationTimeoutId = null;
         }
+        this.abortSuccess = false;
+        this.abortFailure = false;
         await this.setBothLEDs(false);
     }
 }
