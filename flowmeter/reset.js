@@ -1,4 +1,3 @@
-const readline = require('readline');
 const SpinelDevice = require('./SpinelDevice');
 const fs = require('fs');
 
@@ -9,8 +8,8 @@ let device;
 
 process.on('SIGTERM', async ()=>{
     await device.close();
+    process.exit(0);
 });
-
 
 async function appRun() {
     device = new SpinelDevice(VENDOR_ID,PRODUCT_ID);

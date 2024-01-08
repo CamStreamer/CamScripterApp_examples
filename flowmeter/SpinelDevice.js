@@ -1,9 +1,6 @@
-const { parsers } = require('serialport');
 const EventEmitter = require('events');
-const SerialPort = require('serialport');
-const Delimiter = require('@serialport/parser-delimiter');
-const Ready = require('@serialport/parser-ready');
-const { log } = require('console');
+const { SerialPort } = require('serialport');
+const { DelimiterParser } = require('@serialport/parser-delimiter');
 
 class SpinelDevice extends EventEmitter{
 
@@ -49,10 +46,11 @@ class SpinelDevice extends EventEmitter{
             throw "404 No such device found!";
         }
         else{
-            this.port_handle = new SerialPort(our_port.path, {
+            this.port_handle = new SerialPort({
+                path: our_port.path,
                 baudRate: 115200
             });
-            this.parser = this.port_handle.pipe(new Delimiter({
+            this.parser = this.port_handle.pipe(new DelimiterParser({
                 delimiter: '\r',
                 includeDelimiter: true
             }));
@@ -193,7 +191,6 @@ class SpinelDevice extends EventEmitter{
         this.port_handle.destroy();
         await this.port_handle.close();
         console.log('closed serial port');
-
     }
 }
 

@@ -1,6 +1,5 @@
-const CamOverlayAPI = require("camstreamerlib/CamOverlayAPI");
+const { CamOverlayAPI } = require("camstreamerlib/CamOverlayAPI");
 const SpinelDevice = require("./SpinelDevice");
-const EventEmitter = require("events");
 const fs = require("fs");
 const CairoFrame = require("./CairoFrame");
 const CairoPainter = require("./CairoPainter");
@@ -17,22 +16,23 @@ let mm;
 process.on("SIGTERM", async () => {
   widget.close();
   await device.close();
+  process.exit(0);
 });
 
 function parseCounterData(data) {
+  let result = 0;
   let byte_number = data[0] / 8;
-  let results = [];
-
   for (let i = 1; i < data.length; i += byte_number) {
     let res = 0;
     for (let y = 0; y < byte_number; y++) {
       res = res << 8;
       res += data[i + y];
     }
-    results = res;
+    result = res;
   }
-  return results;
+  return result;
 }
+
 async function prepareApp(settings) {
   co = new CamOverlayAPI({
     ip: settings.camera_ip,
@@ -175,11 +175,13 @@ async function appRun(settings) {
     setBaseVolume(aggregate_volume);
     let time_passed = (now - last_update) / 1000;
 
-    console.log('Flow: ' + volume.toString() + '/' + time_passed.toString() + 's');
-    console.log('Volume: ' + aggregate_volume.toString());
+    console.log(
+      "Flow: " + volume.toString() + "/" + time_passed.toString() + "s"
+    );
+    console.log("Volume: " + aggregate_volume.toString());
     let date = new Date();
     let hours = date.getHours();
-    let minutes = date.getMinutes().toString().padStart(2);
+    let minutes = date.getMinutes().toString().padStart(2, '0');
     layout.current_time.setText(hours + ":" + minutes);
     layout.current_beer.setBgImage(
       await mm.image(getBeerIndex(aggregate_volume)),
@@ -207,25 +209,23 @@ function getBeerIndex(liters) {
   }
 }
 
-class TimeoutWidget extends EventEmitter {
-  constructor(prep_f, period_ms, period_f, co) {
-    super();
+class TimeoutWidget {
+  constructor(prep_f, period_ms, period_f) {
     this.period = period_ms;
     this.period_f = period_f;
     this.prep_f = prep_f;
     this.settings = undefined;
     this.timer = undefined;
-    this.enabled = false;
-    this.cam_overlay;
   }
 
   _loadSettings() {
-    const data = fs.readFileSync(process.env.PERSISTENT_DATA_PATH + "settings.json");
+    const data = fs.readFileSync(
+      process.env.PERSISTENT_DATA_PATH + "settings.json"
+    );
     this.settings = JSON.parse(data);
   }
 
   async start() {
-    this.enabled = true;
     this._loadSettings();
     await this.prep_f(this.settings);
     this.timer = setTimeout(() => {
@@ -233,12 +233,10 @@ class TimeoutWidget extends EventEmitter {
     }, this.period);
   }
   async _one_period() {
-    if (!this.enabled) return;
     try {
-      this.emit("period", this.settings);
       await this.period_f(this.settings);
     } catch (err) {
-      this.emit("error", err);
+      console.err(err);
     } finally {
       this.timer = setTimeout(() => {
         this._one_period();
@@ -247,7 +245,6 @@ class TimeoutWidget extends EventEmitter {
   }
 
   close() {
-    this.enabled = false;
     clearTimeout(this.timer);
   }
 }
