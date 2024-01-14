@@ -62,11 +62,11 @@ async function prepareApp(settings) {
 }
 
 function prepareImages(mm) {
-  mm.registerImage("1", "1.png");
-  mm.registerImage("2", "2.png");
-  mm.registerImage("3", "3.png");
-  mm.registerImage("4", "4.png");
-  mm.registerImage("bg", "WidgetPifko.gif");
+  mm.registerImage("1", "1-empty.png");
+  mm.registerImage("2", "2-almost-empty.png");
+  mm.registerImage("3", "3-almost-full.png");
+  mm.registerImage("4", "4-full.png");
+  mm.registerImage("bg", "axis_bg.png");
 }
 
 async function createLayout(resolution_w, resolution_h, mm, settings) {
@@ -84,59 +84,66 @@ async function createLayout(resolution_w, resolution_h, mm, settings) {
     null
   );
   layout.background.setBgImage(await mm.image("bg"), "fit");
+
   layout.start_time = new CairoFrame(
     35,
-    250,
+    205,
     180,
-    50,
+    48,
     null,
     "",
     [1.0, 1.0, 1.0]
   );
   layout.start_time.setText(settings.start_time, "A_CENTER");
+
   layout.current_time = new CairoFrame(
     260,
-    250,
+    205,
     180,
-    50,
+    48,
     null,
     "",
     [1.0, 1.0, 1.0]
   );
   layout.current_time.setText("12:20", "A_CENTER");
+
+  layout.beer_background = new CairoFrame(
+    90,
+    355,
+    110,
+    128,
+    null,
+    "",
+    [1.0, 1.0, 1.0]
+  );
+  layout.beer_background.setBgImage(await mm.image("4"), "fit");
+
   layout.current_beer = new CairoFrame(
     310,
-    420,
-    98,
-    126,
+    355,
+    110,
+    128,
     null,
     "",
     [1.0, 1.0, 1.0]
   );
   layout.current_beer.setBgImage(await mm.image("1"), "fit");
-  layout.beer_background = new CairoFrame(
-    90,
-    420,
-    98,
-    126,
-    null,
-    "",
-    [1.0, 1.0, 1.0]
-  );
-  layout.beer_background.setBgImage(await mm.image("1"), "fit");
+
   layout.beer_count = new CairoFrame(
+    45,
+    275,
     100,
-    445,
-    55,
-    55,
+    48,
     null,
     "",
     [1.0, 1.0, 1.0]
   );
-  layout.beer_count.setText("24", "A_CENTER");
-  layout.agegrate = new CairoFrame(50, 580, 400, 90, null, "", [1.0, 1.0, 1.0]);
+  layout.beer_count.setText("24", "A_RIGHT");
+
+  layout.agegrate = new CairoFrame(50, 500, 400, 80, null, "", [1.0, 1.0, 1.0]);
   layout.agegrate.setText("62.00 l", "A_CENTER");
-  layout.name = new CairoFrame(50, 690, 400, 40, null, "", [1.0, 1.0, 1.0]);
+
+  layout.name = new CairoFrame(50, 595, 400, 40, null, "", [1.0, 1.0, 1.0]);
   layout.name.setText(settings.group_name, "A_CENTER");
 
   layout.background.insert(layout.start_time);
@@ -236,7 +243,7 @@ class TimeoutWidget {
     try {
       await this.period_f(this.settings);
     } catch (err) {
-      console.err(err);
+      console.error(err);
     } finally {
       this.timer = setTimeout(() => {
         this._one_period();

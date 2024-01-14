@@ -13,12 +13,14 @@ http_server.on("access", function (msg) {
 });
 
 http_server.onRequest("/reset_counter.cgi", function (req, res) {
+    console.log('access: reset counter');
     clearCounter();
     res.statusCode = 200;
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.end();
 });
 http_server.onRequest("/calibrate.cgi", function (req, res) {
+    console.log('access: calibrate');
     var urlParts = url.parse(req.url, true);
     var query = urlParts.query;
     calibrate(query["volume"]);
@@ -27,6 +29,7 @@ http_server.onRequest("/calibrate.cgi", function (req, res) {
     res.end();
 });
 http_server.onRequest("/start.cgi", function (req, res) {
+    console.log('access: start');
     start();
     res.statusCode = 200;
     res.setHeader("Access-Control-Allow-Origin", "*");
