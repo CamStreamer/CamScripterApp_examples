@@ -1,5 +1,4 @@
 const url = require("url");
-const { exit } = require("process");
 const { fork } = require("child_process");
 const { HttpServer } = require("camstreamerlib/HttpServer");
 
@@ -14,12 +13,14 @@ http_server.on("access", function (msg) {
 });
 
 http_server.onRequest("/reset_counter.cgi", function (req, res) {
+    console.log('access: reset counter');
     clearCounter();
     res.statusCode = 200;
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.end();
 });
 http_server.onRequest("/calibrate.cgi", function (req, res) {
+    console.log('access: calibrate');
     var urlParts = url.parse(req.url, true);
     var query = urlParts.query;
     calibrate(query["volume"]);
@@ -28,34 +29,41 @@ http_server.onRequest("/calibrate.cgi", function (req, res) {
     res.end();
 });
 http_server.onRequest("/start.cgi", function (req, res) {
+    console.log('access: start');
     start();
     res.statusCode = 200;
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.end();
 });
+
 let main_process;
 let calibrating_process;
 let timeout;
 
-function calibrate(amount) {
+function stopMainProcess() {
+    if (main_process && main_process.exitCode === null) {
+        main_process.removeAllListeners();
+        main_process.kill("SIGTERM");
+    }
+    clearTimeout(timeout);
+}
+
+function stopCalibratingProcess() {
     if (calibrating_process && calibrating_process.exitCode === null) {
         calibrating_process.kill("SIGTERM");
     }
+}
 
+function calibrate(amount) {
+    stopCalibratingProcess();
     calibrating_process = fork("calibrate.js", [amount.toString()], {
         stdio: "inherit",
     });
 }
 
 function clearCounter() {
-    if (main_process && main_process.exitCode === null) {
-        main_process.removeAllListeners();
-        main_process.kill("SIGTERM");
-    }
-    clearTimeout(timeout);
-    if (calibrating_process && calibrating_process.exitCode === null) {
-        calibrating_process.kill("SIGTERM");
-    }
+    stopMainProcess();
+    stopCalibratingProcess();
 
     calibrating_process = fork("reset.js", {
         stdio: "inherit",
@@ -63,11 +71,7 @@ function clearCounter() {
 }
 
 function start() {
-    if (main_process) {
-        main_process.removeAllListeners();
-        main_process.kill("SIGTERM");
-    }
-    clearTimeout(timeout);
+    stopMainProcess();
     main_process = fork("feed.js", {
         stdio: "inherit",
     });
@@ -78,18 +82,13 @@ function start() {
 }
 
 process.on("SIGINT", (signal) => {
-    if (main_process && main_process.exitCode === null) {
-        main_process.kill("SIGINT");
-    }
+    stopMainProcess();
 });
 
 process.on("SIGTERM", async (signal) => {
-    if (main_process && main_process.exitCode === null) {
-        main_process.kill("SIGTERM");
-    }
-    if (calibrating_process && calibrating_process.exitCode === null) {
-        calibrating_process.kill("SIGTERM");
-    }
+    stopMainProcess();
+    stopCalibratingProcess();
+
     await http_server.close();
-    exit(0);
+    process.exit(0);
 });

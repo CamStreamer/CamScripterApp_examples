@@ -11,12 +11,12 @@ async function appRun(volume) {
   let device = new SpinelDevice(VENDOR_ID, PRODUCT_ID);
   await device.connect();
   let data = await device.send97Request(0xfe, Buffer.from("6081", "hex"));
-  settings.k_factor = Math.round(parseCounterData(data) / volume);
+  settings.k_factor = Math.round(parseCounterData(data.data) / volume);
 
   console.log(
     "Calibration done! K factor now set to: " +
       settings.k_factor +
-      "pulses/liter"
+      " pulses/liter"
   );
   SaveSettings(settings);
   await device.close();
@@ -38,16 +38,15 @@ function SaveSettings(object) {
 }
 
 function parseCounterData(data) {
+  let result = 0;
   let byte_number = data[0] / 8;
-  let results = [];
-
   for (let i = 1; i < data.length; i += byte_number) {
     let res = 0;
     for (let y = 0; y < byte_number; y++) {
       res = res << 8;
       res += data[i + y];
     }
-    results = res;
+    result = res;
   }
-  return results;
+  return result;
 }
