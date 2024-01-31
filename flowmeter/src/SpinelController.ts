@@ -45,6 +45,7 @@ export class SpinelController extends EventEmitter {
 
             this.spinel = new SpinelDevice(this.VENDOR_ID, this.PRODUCT_ID);
             await this.spinel.connect();
+            await this.spinel.send97Request(0xfe, Buffer.from('6081', 'hex'));
             this.intervalTimer = setInterval(async () => {
                 await this.getData();
             }, 1000);
