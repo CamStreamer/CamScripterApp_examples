@@ -5,6 +5,7 @@
     <title>QR & Barcode Reader</title>
     <link rel="icon" type="image/x-icon" href="qr-code.ico">
     <link rel="stylesheet" href="bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="bootstrap/bootstrap-select.min.css">
     <style>
         .form-control::-webkit-input-placeholder {
             opacity: 0.5;
@@ -86,6 +87,10 @@
                                             <option value="bar_code">Barcode</option>
                                         </select>
                                     </div>
+                                    <div class="form-group">
+                                        <label for="widgetCameraList">View Area(s)</label>
+                                        <select class="selectpicker form-control" id="widgetCameraList" multiple></select>
+                                      </div>
                                 </form>
                             </div>
                             <div class="col-md-6">
@@ -225,7 +230,8 @@
     </div>
 
     <script src="jquery-2.2.4/jquery-2.2.4.min.js"></script>
-    <script src="bootstrap/bootstrap.min.js"></script>
+    <script src="bootstrap/bootstrap.bundle.min.js"></script>
+    <script src="bootstrap/bootstrap-select.min.js"></script>
     <script src="index.js"></script>
 </body>
 
