@@ -8,14 +8,14 @@ import { QRCodeReader } from './qrCodeReader';
 
 const setTimeoutPromise = util.promisify(setTimeout);
 
-let co: CamOverlayDrawingAPI = null;
+let co: CamOverlayDrawingAPI | undefined;
 let coConnected = false;
-let barcodeFont = null;
-let displayTimer: NodeJS.Timeout = null;
+let barcodeFont = '';
+let displayTimer: NodeJS.Timeout | undefined;
 
 type CoordSystem = 'top_left' | 'top_right' | 'bottom_left' | 'bottom_right';
 
-let settings = null;
+let settings: any = null;
 try {
     const data = fs.readFileSync(process.env.PERSISTENT_DATA_PATH + 'settings.json');
     settings = JSON.parse(data.toString());
@@ -57,13 +57,15 @@ async function displayGraphics(text: string) {
             clearTimeout(displayTimer);
             if (settings.widget_visibility_time !== 0) {
                 displayTimer = setTimeout(() => {
-                    co.removeImage();
-                    displayTimer = null;
+                    if (co) {
+                        co.removeImage();
+                    }
+                    displayTimer = undefined;
                 }, settings.widget_visibility_time * 1000);
             }
         }
     } catch (err) {
-        console.error('Update image: ', err.message);
+        console.error('Update image: ', err instanceof Error ? err.message : 'Unknown Error');
     }
 }
 
@@ -75,6 +77,7 @@ async function initCamOverlay() {
             ip: settings.camera_ip,
             port: settings.camera_port,
             auth: settings.camera_user + ':' + settings.camera_pass,
+            camera: settings.widget_camera_list,
         });
 
         co.on('open', () => {
@@ -99,6 +102,10 @@ async function initCamOverlay() {
 }
 
 async function createQrCodeWidget(text: string) {
+    if (!co) {
+        return;
+    }
+
     const widgetWidth = Math.round(300 * settings.widget_scale);
     const widgetHeight = Math.round(320 * settings.widget_scale);
     const surfaceResponse = (await co.cairo(
@@ -144,6 +151,10 @@ async function createQrCodeWidget(text: string) {
 }
 
 async function createBarcodeWidget(text: string) {
+    if (!co) {
+        return;
+    }
+
     const widgetWidth = Math.round(600 * settings.widget_scale);
     const widgetHeight = Math.round(130 * settings.widget_scale);
     const surfaceResponse = (await co.cairo(
@@ -199,7 +210,7 @@ async function generateQrCode(text: string, size: number) {
     return new Promise<Buffer>((resolve) => {
         const chunks: Buffer[] = [];
         const memStream = new MemoryStream();
-        memStream.on('data', (chunk) => {
+        memStream.on('data', (chunk: Buffer) => {
             chunks.push(chunk);
         });
         memStream.on('end', () => {
@@ -217,9 +228,11 @@ async function generateQrCode(text: string, size: number) {
 }
 
 async function uploadFont() {
-    const imgData = fs.readFileSync('fre3of9x.ttf');
-    const fontRes = await co.uploadFontData(imgData);
-    barcodeFont = fontRes.var;
+    if (co) {
+        const imgData = fs.readFileSync('fre3of9x.ttf');
+        const fontRes = await co.uploadFontData(imgData);
+        barcodeFont = fontRes.var;
+    }
 }
 
 function computePosition(
@@ -292,11 +305,11 @@ async function sendAcsEvent(text: string) {
             eventData
         );
     } catch (err) {
-        console.error('Send ACS event: ', err.message);
+        console.error('Send ACS event: ', err instanceof Error ? err.message : 'Unknown Error');
     }
 }
 
-function pad(num, size) {
+function pad(num: number, size: number) {
     const sign = Math.sign(num) === -1 ? '-' : '';
     return (
         sign +

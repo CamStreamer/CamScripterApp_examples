@@ -2,9 +2,14 @@
     "compilerOptions": {
         "target": "es6",
         "module": "commonjs",
-        "declaration": true,
+        "declaration": false,
         "removeComments": true,
-        "outDir": "dist"
+        "outDir": "dist",
+        "noImplicitAny": true,
+        "noImplicitThis": true,
+        "noImplicitReturns": true,
+        "strict": true,
+        "allowJs": true
     },
     "include": ["src"],
     "exclude": ["node_modules"]
