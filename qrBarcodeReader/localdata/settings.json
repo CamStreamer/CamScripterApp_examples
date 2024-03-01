@@ -5,6 +5,7 @@
     "camera_user": "root",
     "camera_pass": "",
     "widget_graphic_type": "qr_code",
+    "widget_camera_list": [0],
     "widget_visibility_time": 10,
     "widget_coord_system": "top_left",
     "widget_pos_x": 10,
