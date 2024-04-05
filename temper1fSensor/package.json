@@ -1,6 +1,6 @@
 {
     "name": "@camstreamer/temper1f-sensor",
-    "version": "1.3.3",
+    "version": "1.3.4",
     "description": "",
     "prettier": "@camstreamer/prettier-config",
     "main": "main.js",

@@ -11,6 +11,7 @@ let sentActiveState = false;
 let cscConnected = false;
 let cscEventDeclared = false;
 let cscEventConditionTimer: NodeJS.Timeout = null;
+let coUpdating = false;
 
 let settings = null;
 try {
@@ -77,10 +78,10 @@ async function onePeriod() {
         const temperature = convertTemperature(sensorData.temp, settings.unit);
 
         if (coConfigured) {
-            updateCOGraphics(temperature);
+            updateCOGraphics(temperature.toFixed(1) + ' ' + UNITS[settings.unit]);
         }
         if (acsConfigured) {
-            checkCondtionAndSendAcsEvent(temperature);
+            checkConditionAndSendAcsEvent(temperature);
         }
 
         if (eventsConfigured) {
@@ -91,12 +92,7 @@ async function onePeriod() {
         sensorReader = null;
         console.error(error);
         if (coConfigured) {
-            await co.updateCGText(settings.service_id, [
-                {
-                    field_name: settings.field_name,
-                    text: 'No Data',
-                },
-            ]);
+            await updateCOGraphics('No Data');
         }
     } finally {
         setTimeout(onePeriod, nextCheckTimeout);
@@ -110,20 +106,28 @@ function convertTemperature(num: number, unitTag: string): number {
     return num * r[0] + r[1];
 }
 
-async function updateCOGraphics(temperature: number) {
+async function updateCOGraphics(text: string) {
     try {
+        if (coUpdating) {
+            return;
+        }
+        coUpdating = true;
         await co.updateCGText(settings.service_id, [
             {
                 field_name: settings.field_name,
-                text: temperature.toFixed(1) + ' ' + UNITS[settings.unit],
+                text,
             },
         ]);
+        coUpdating = false;
     } catch (err) {
         console.error('Update CamOverlay graphics error:', err);
+        setTimeout(() => {
+            coUpdating = false;
+        }, 10000);
     }
 }
 
-function checkCondtionAndSendAcsEvent(temperature: number) {
+function checkConditionAndSendAcsEvent(temperature: number) {
     if (isConditionActive(temperature, settings.acs_condition_operator, settings.acs_condition_value)) {
         if (acsConditionTimer) {
             if (
@@ -212,7 +216,7 @@ function sendAcsEvent(temperature: number) {
     return new Promise<void>((resolve, reject) => {
         const date = new Date();
         const year = date.getUTCFullYear();
-        const month = pad(date.getUTCMonth(), 2);
+        const month = pad(date.getUTCMonth() + 1, 2);
         const day = pad(date.getUTCDate(), 2);
         const hours = pad(date.getUTCHours(), 2);
         const minutes = pad(date.getUTCMinutes(), 2);
@@ -221,11 +225,10 @@ function sendAcsEvent(temperature: number) {
 
         const event = {
             addExternalDataRequest: {
-                occurenceTime: dateString,
+                occurrenceTime: dateString,
                 source: settings.acs_source_key,
                 externalDataType: 'temper1fSensor',
                 data: {
-                    timestamp: Math.floor(Date.now() / 1000).toString(),
                     temperature: temperature.toFixed(1),
                     unit: settings.unit.toUpperCase(),
                 },
