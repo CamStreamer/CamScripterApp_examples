@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    $.get('/local/camscripter/package/settings.cgi?package_name=lanScale&action=get', (settings) => {
+    $.get('/local/camscripter/package/settings.cgi?package_name=weighing_scale&action=get', (settings) => {
         console.log(settings);
 
         $('#scaleIP').val(settings.scale_ip);
@@ -92,5 +92,5 @@ function inputChanged() {
             .map((item) => parseInt(item))
     };
 
-    $.post('/local/camscripter/package/settings.cgi?package_name=lanScale&action=set', JSON.stringify(settings));
+    $.post('/local/camscripter/package/settings.cgi?package_name=weighing_scale&action=set', JSON.stringify(settings));
 }

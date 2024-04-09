@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Lantronix Scale Reader</title>
+    <title>Weighing Scale Integration</title>
     <link rel="icon" type="image/x-icon" href="logo_cs.ico" />
     <link rel="stylesheet" href="bootstrap/bootstrap.min.css">
 </head>
@@ -17,33 +17,33 @@
 
     <div class="jumbotron">
         <div class="container">
-            <h1 class="display-4">Lantronix Scale Reader</h1>
+            <h1 class="display-4">Weighing Scale Integration</h1>
             <p>Changes are saved automatically, you don't have to save them.</p>
         </div>
     </div>
 
     <div class="container">
-        <div id="accordionLantronix">
+        <div id="accordionConverter">
             <div class="card">
-                <div class="card-header" id="headingLantronix">
+                <div class="card-header" id="headingConverter">
                     <button class="btn" style="background-color: transparent;" data-toggle="collapse"
-                        data-target="#collapseLantronix" aria-expanded="true" aria-controls="collapseLantronix">
-                        <img src="logo_lantronix.png">
+                        data-target="#collapseConverter" aria-expanded="true" aria-controls="collapseConverter">
+                        <img src="rs232-ethernet.png" class="mr-2"> RS232 - LAN Converter
                     </button>
                 </div>
-                <div id="collapseLantronix" class="collapse show" aria-labelledby="headingLantronix"
+                <div id="collapseConverter" class="collapse show" aria-labelledby="headingConverter"
                     data-parent="#accordion">
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-6">
                                 <form class="myForm">
                                     <div class="form-group">
-                                        <label for="scaleIP">Lantronix IP</label>
+                                        <label for="scaleIP">Converter IP</label>
                                         <input type="text" class="form-control" id="scaleIP"
                                             placeholder="192.168.100.100">
                                     </div>
                                     <div class="form-group">
-                                        <label for="scalePort">Lantronix Port</label>
+                                        <label for="scalePort">Converter Port</label>
                                         <input type="text" class="form-control" id="scalePort" placeholder="10000">
                                     </div>
                                 </form>
