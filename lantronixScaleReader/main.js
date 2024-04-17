@@ -106,7 +106,7 @@ scaleClient.on('data', async (data) => {
         }
 
         // Send Camera Event
-        if (eventsConfigured && weight != 0 && unit.length) {
+        if (eventsConfigured && unit.length) {
             checkCondtionAndSendCameraEvent(weight);
         }
 
@@ -263,6 +263,7 @@ function declareCameraEvent() {
 
 async function sendCameraEventTimerCallback(conditionActive) {
     try {
+        console.error(`Camera events: condition active: ${conditionActive}`);
         await sendCameraEvent(conditionActive);
         sentActiveState = conditionActive;
         cscEventConditionTimer = null;
