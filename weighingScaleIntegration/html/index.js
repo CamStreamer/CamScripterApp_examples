@@ -26,6 +26,7 @@ $(document).ready(function () {
 
         $('#acsProtocol').val(settings.acs_protocol);
         $('#acsIP').val(settings.acs_ip);
+        $('#acsPort').val(settings.acs_port);
         $('#acsWinUser').val(settings.acs_user);
         $('#acsWinPass').val(settings.acs_pass);
         $('#acsSourceKey').val(settings.acs_source_key);
@@ -78,6 +79,7 @@ function inputChanged() {
 
         acs_protocol: $('#acsProtocol').val(),
         acs_ip: $('#acsIP').val(),
+        acs_port: parseInt($('#acsPort').val()),
         acs_user: $('#acsWinUser').val(),
         acs_pass: $('#acsWinPass').val(),
         acs_source_key: $('#acsSourceKey').val(),
