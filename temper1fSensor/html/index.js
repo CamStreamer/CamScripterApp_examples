@@ -74,7 +74,7 @@ function inputChanged() {
         field_name: $('#fieldName').val(),
         acs_protocol: $('#acsProtocol').val(),
         acs_ip: $('#acsIP').val(),
-        acs_port: $('#acsPort').val(),
+        acs_port: parseInt($('#acsPort').val()),
         acs_user: $('#acsWinUser').val(),
         acs_pass: $('#acsWinPass').val(),
         acs_source_key: $('#acsSourceKey').val(),
