@@ -293,7 +293,7 @@ async function sendAcsEvent(text: string) {
                 protocol: settings.acs_protocol === 'http' ? 'http:' : 'https:',
                 method: 'POST',
                 host: settings.acs_ip,
-                port: 55756,
+                port: settings.acs_port ?? 29204,
                 path: '/Acs/Api/ExternalDataFacade/AddExternalData',
                 auth: settings.acs_user + ':' + settings.acs_pass,
                 headers: {
