@@ -19,6 +19,7 @@ $(document).ready(() => {
         $('#widgetScale').val(settings.widget_scale);
         $('#acsProtocol').val(settings.acs_protocol);
         $('#acsIP').val(settings.acs_ip);
+        $('#acsPort').val(settings.acs_port ?? 29204);
         $('#acsWinUser').val(settings.acs_user);
         $('#acsWinPass').val(settings.acs_pass);
         $('#acsSourceKey').val(settings.acs_source_key);
@@ -61,6 +62,7 @@ function inputChanged() {
         widget_scale: parseFloat($('#widgetScale').val()),
         acs_protocol: $('#acsProtocol').val(),
         acs_ip: $('#acsIP').val(),
+        acs_port: $('#acsPort').val(),
         acs_user: $('#acsWinUser').val(),
         acs_pass: $('#acsWinPass').val(),
         acs_source_key: $('#acsSourceKey').val(),

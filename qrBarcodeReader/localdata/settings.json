@@ -15,6 +15,7 @@
     "widget_scale": 1.0,
     "acs_protocol": "https_insecure",
     "acs_ip": "",
+    "acs_port": 29204,
     "acs_user": "",
     "acs_pass": "",
     "acs_source_key": ""
