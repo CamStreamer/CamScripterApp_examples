@@ -1,13 +1,12 @@
 import * as fs from 'fs/promises';
 import * as url from 'url';
 
-import { https } from 'follow-redirects';
+import { https, FollowResponse } from 'follow-redirects';
 import { Options, Painter, Frame, ResourceManager } from 'camstreamerlib/CamOverlayPainter/Painter';
 
 type ImageCode = {
     text: string;
     img_file: string;
-    image: undefined;
     color: [number, number, number];
 };
 type AqiResponseType = {
@@ -42,48 +41,42 @@ let cam_height: number;
 let background: Painter;
 let value: Frame;
 let label: Frame;
+let text: Frame;
 
 const codes: Record<string, ImageCode> = {
     good: {
         text: 'Good',
         img_file: 'Good.png',
-        image: undefined,
         color: [0, 153 / 255, 76 / 255],
     },
     moderate: {
         text: 'Moderate',
         img_file: 'Moderate.png',
-        image: undefined,
         color: [1.0, 1.0, 51 / 255],
     },
     sensitive: {
         text: 'Unhealthy SG',
         img_file: 'sensitive_groups.png',
-        image: undefined,
         color: [1.0, 128 / 255, 0],
     },
     unhealthy: {
         text: 'Unhealthy',
         img_file: 'Unhealthy.png',
-        image: undefined,
         color: [1.0, 51 / 255, 51 / 255],
     },
-    vunhealthy: {
+    very_unhealthy: {
         text: 'Very Unhealthy',
         img_file: 'Very_Unhealthy.png',
-        image: undefined,
         color: [102 / 255, 0, 204 / 255],
     },
-    hazard: {
+    hazardous: {
         text: 'Hazardous',
         img_file: 'Hazardous.png',
-        image: undefined,
         color: [153 / 255, 0, 0],
     },
     error: {
         text: 'Error',
         img_file: 'Error.png',
-        image: undefined,
         color: [0, 0, 0],
     },
 };
@@ -99,11 +92,12 @@ function setCodeText() {
 function registerResources() {
     const rm = new ResourceManager();
     for (const c in codes) {
-        rm.registerImage(c, codes[c].img_file);
+        rm.registerImage(codes[c].img_file, codes[c].img_file);
     }
 
     rm.registerFont('OpenSans', 'OpenSans-Regular.ttf');
     rm.registerFont('ComicSans', 'ComicSans.ttf');
+    rm.registerFont('GenShinGothic', 'GenShinGothic-Medium.ttf');
 
     return rm;
 }
@@ -151,26 +145,25 @@ function mapData(data: AqiResponseType) {
         displayedValue = undefined;
     }
 
-    value.setText(displayedValue?.toString() ?? '', 'A_CENTER');
-    label.setText(settings.display_location, 'A_CENTER');
-
-    let code: string = '';
+    let code: ImageCode;
     if (displayedValue === undefined) {
-        code = 'error';
+        code = codes['error'];
     } else if (displayedValue <= 50) {
-        code = 'good';
+        code = codes['good'];
     } else if (displayedValue <= 100) {
-        code = 'moderate';
+        code = codes['moderate'];
     } else if (displayedValue <= 150) {
-        code = 'sensitive';
+        code = codes['sensitive'];
     } else if (displayedValue <= 200) {
-        code = 'unhealthy';
+        code = codes['unhealthy'];
     } else if (displayedValue <= 300) {
-        code = 'vunhealthy';
+        code = codes['very_unhealthy'];
     } else if (displayedValue > 300) {
-        code = 'hazard';
+        code = codes['hazardous'];
+    } else {
+        code = codes['error'];
     }
-    background.setBgImage(code, 'fit');
+
     value.setText(displayedValue?.toString() ?? '', 'A_CENTER');
     label.setText(settings.display_location, 'A_CENTER');
     text.setText(code.text, 'A_CENTER');
