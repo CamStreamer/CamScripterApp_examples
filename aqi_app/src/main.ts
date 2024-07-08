@@ -31,6 +31,9 @@ let settings: {
     pos_x: number;
     pos_y: number;
     resolution: string;
+
+    font: string;
+    translation: Record<string, string>;
 };
 
 let cam_width: number;
@@ -84,6 +87,14 @@ const codes: Record<string, ImageCode> = {
         color: [0, 0, 0],
     },
 };
+
+function setCodeText() {
+    for (const c in codes) {
+        if (settings.translation && settings.translation[c]) {
+            codes[c].text = settings.translation[c];
+        }
+    }
+}
 
 function registerResources() {
     const rm = new ResourceManager();
@@ -218,6 +229,7 @@ async function main() {
     try {
         const data = await fs.readFile(process.env.PERSISTENT_DATA_PATH + 'settings.json');
         settings = JSON.parse(data.toString());
+        setCodeText();
         const resolution = settings.resolution.split('x');
         cam_width = parseInt(resolution[0]);
         cam_height = parseInt(resolution[1]);
