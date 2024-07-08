@@ -171,6 +171,10 @@ function mapData(data: AqiResponseType) {
         code = 'hazard';
     }
     background.setBgImage(code, 'fit');
+    value.setText(displayedValue?.toString() ?? '', 'A_CENTER');
+    label.setText(settings.display_location, 'A_CENTER');
+    text.setText(code.text, 'A_CENTER');
+    background.setBgImage(code.img_file, 'fit');
 }
 
 function genLayout(background: Painter, rm: ResourceManager) {
@@ -196,10 +200,23 @@ function genLayout(background: Painter, rm: ResourceManager) {
         },
         rm
     );
+    text = new Frame(
+        {
+            x: 0,
+            y: 140,
+            height: 15,
+            width: 279,
+            text: '',
+            fontColor: [1.0, 1.0, 1.0],
+        },
+        rm
+    );
     background.insert(value);
     background.insert(label);
-    value.setFont('OpenSans');
-    label.setFont('OpenSans');
+    background.insert(text);
+    value.setFont(settings.font);
+    label.setFont(settings.font);
+    text.setFont(settings.font);
 }
 
 async function requestAQI(location: string, acc_token: string) {
