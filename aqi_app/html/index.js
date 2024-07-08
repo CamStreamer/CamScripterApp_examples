@@ -16,7 +16,18 @@ $(document).ready(function() {
         'update_frequency': 1,
         'pos_x': 0,
         'pos_y': 0,
-        'resolution': '1920x1080'
+        'resolution': '1920x1080',
+
+        'font': "OpenSans",
+        'translation': {
+            good: "Good",
+            moderate: "Moderate",
+            sensitive: "Unhealthy for Sensitive Groups",
+            unhealthy: "Unhealthy",
+            very_unhealthy: "Very Unhealthy",
+            hazardous: "Hazardous",
+            error: "Error"
+         }
       };
     }
     $('#camProtocol').val(settings.camera_protocol);
@@ -35,6 +46,15 @@ $(document).ready(function() {
     let resolution = settings.resolution.split("x");
     $('#resW').val(resolution[0]);
     $('#resH').val(resolution[1]);
+
+    $('#font').val(settings.font);
+    $('#good').val(settings.good);
+    $('#moderate').val(settings.moderate);
+    $('#sensitive').val(settings.sensitive);
+    $('#unhealthy').val(settings.unhealthy);
+    $('#very_unhealthy').val(settings.very_unhealthy);
+    $('#hazardous').val(settings.hazardous);
+    $('#error').val(settings.error);
   });
 
   $('#camProtocol').change(protocolChanged);
@@ -69,7 +89,18 @@ function inputChanged() {
     'pos_y': parseInt($('#posY').val()),
     'update_frequency': parseInt($('#updateFreq').val()),
     'scale': parseInt($('#scale').val()),
-    'resolution': $('#resW').val() + 'x' + $('#resH').val()
+    'resolution': $('#resW').val() + 'x' + $('#resH').val(),
+
+    'font': $('#font').val(),
+    'translation': {
+        good: $('#good').val(),
+        moderate: $('#moderate').val(),
+        sensitive: $('#sensitive').val(),
+        unhealthy: $('#unhealthy').val(),
+        very_unhealthy: $('#very_unhealthy').val(),
+        hazardous: $('#hazardous').val(),
+        error: $('#error').val()
+      }
   };
   $.post('/local/camscripter/package/settings.cgi?package_name=aqi&action=set', JSON.stringify(settings), function(data) {});
 }
