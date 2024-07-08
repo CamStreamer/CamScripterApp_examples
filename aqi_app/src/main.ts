@@ -55,7 +55,7 @@ const codes: Record<string, ImageCode> = {
         color: [1.0, 1.0, 51 / 255],
     },
     sensitive: {
-        text: 'Unhealthy SG',
+        text: 'Unhealthy for Sensitive Groups',
         img_file: 'sensitive_groups.png',
         color: [1.0, 128 / 255, 0],
     },
@@ -166,7 +166,7 @@ function mapData(data: AqiResponseType) {
 
     value.setText(displayedValue?.toString() ?? '', 'A_CENTER');
     label.setText(settings.display_location, 'A_CENTER');
-    text.setText(code.text, 'A_CENTER');
+    text.setText(code.text, 'A_CENTER', 'TFM_SCALE');
     background.setBgImage(code.img_file, 'fit');
 }
 
