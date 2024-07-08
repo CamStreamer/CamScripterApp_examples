@@ -13,7 +13,7 @@
     "pretty": "prettier --write \"./{src,doc}/**/*.{ts,tsx,md}\"",
     "pretty:check": "prettier --check \"./{src,doc}/**/*.{ts,tsx,md}\"",
     "zip:package": "node node_modules/camstreamerlib/CreatePackage -i",
-    "zip": "npm-run-all in:prod zip:package in:all"
+    "zip": "npm-run-all zip:package"
   },
   "engine": {
     "node": ">=18.0.0"
