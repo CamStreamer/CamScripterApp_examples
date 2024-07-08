@@ -6,11 +6,12 @@
     "camera_pass": "",
     "scale": 100,
     "update_frequency": 1,
-    "coordinates": "top_left",
+    "coordinates": "top_right",
     "access_token": "",
     "display_location": "",
     "location": "",
     "pos_x": 10,
     "pos_y": 10,
-    "resolution": "1920x1080"
+    "resolution": "1920x1080",
+    "font":  "OpenSans"
 }
