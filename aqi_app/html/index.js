@@ -1,4 +1,3 @@
-
 $(document).ready(function() {
   $.get('/local/camscripter/package/settings.cgi?package_name=aqi&action=get', function(settings) {
     console.log(settings);
@@ -48,13 +47,13 @@ $(document).ready(function() {
     $('#resH').val(resolution[1]);
 
     $('#font').val(settings.font);
-    $('#good').val(settings.good);
-    $('#moderate').val(settings.moderate);
-    $('#sensitive').val(settings.sensitive);
-    $('#unhealthy').val(settings.unhealthy);
-    $('#very_unhealthy').val(settings.very_unhealthy);
-    $('#hazardous').val(settings.hazardous);
-    $('#error').val(settings.error);
+    $('#good').val(settings.translation.good);
+    $('#moderate').val(settings.translation.moderate);
+    $('#sensitive').val(settings.translation.sensitive);
+    $('#unhealthy').val(settings.translation.unhealthy);
+    $('#very_unhealthy').val(settings.translation.very_unhealthy);
+    $('#hazardous').val(settings.translation.hazardous);
+    $('#error').val(settings.translation.error);
   });
 
   $('#camProtocol').change(protocolChanged);
