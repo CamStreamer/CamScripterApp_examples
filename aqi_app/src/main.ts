@@ -196,8 +196,8 @@ function genLayout(background: Painter, rm: ResourceManager) {
     text = new Frame(
         {
             x: 0,
-            y: 140,
-            height: 15,
+            y: 150,
+            height: 30,
             width: 279,
             text: '',
             fontColor: [1.0, 1.0, 1.0],
