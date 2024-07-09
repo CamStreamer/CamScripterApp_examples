@@ -45,37 +45,37 @@ let text: Frame;
 
 const codes: Record<string, ImageCode> = {
     good: {
-        text: 'Good',
+        text: 'GOOD',
         img_file: 'Good.png',
         color: [0, 153 / 255, 76 / 255],
     },
     moderate: {
-        text: 'Moderate',
+        text: 'MODERATE',
         img_file: 'Moderate.png',
         color: [1.0, 1.0, 51 / 255],
     },
     sensitive: {
-        text: 'Unhealthy for Sensitive Groups',
+        text: 'UNHEALTHY FOR SENSITIVE GROUPS',
         img_file: 'sensitive_groups.png',
         color: [1.0, 128 / 255, 0],
     },
     unhealthy: {
-        text: 'Unhealthy',
+        text: 'UNHEALTHY',
         img_file: 'Unhealthy.png',
         color: [1.0, 51 / 255, 51 / 255],
     },
     very_unhealthy: {
-        text: 'Very Unhealthy',
+        text: 'VERY UNHEALTHY',
         img_file: 'Very_Unhealthy.png',
         color: [102 / 255, 0, 204 / 255],
     },
     hazardous: {
-        text: 'Hazardous',
+        text: 'HAZARDOUS',
         img_file: 'Hazardous.png',
         color: [153 / 255, 0, 0],
     },
     error: {
-        text: 'Error',
+        text: 'ERROR',
         img_file: 'Error.png',
         color: [0, 0, 0],
     },
