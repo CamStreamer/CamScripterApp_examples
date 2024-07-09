@@ -174,9 +174,9 @@ function genLayout(background: Painter, rm: ResourceManager) {
     label = new Frame(
         {
             x: 0,
-            y: 10,
-            height: 30,
-            width: 279,
+            y: 5,
+            height: 25,
+            width: 273,
             text: '',
             fontColor: [1.0, 1.0, 1.0],
         },
@@ -185,9 +185,9 @@ function genLayout(background: Painter, rm: ResourceManager) {
     value = new Frame(
         {
             x: 0,
-            y: 35,
-            height: 100,
-            width: 279,
+            y: 20,
+            height: 90,
+            width: 273,
             text: '0',
             fontColor: [1.0, 1.0, 1.0],
         },
@@ -195,10 +195,10 @@ function genLayout(background: Painter, rm: ResourceManager) {
     );
     text = new Frame(
         {
-            x: 0,
-            y: 150,
+            x: 3,
+            y: 147,
             height: 30,
-            width: 279,
+            width: 273,
             text: '',
             fontColor: [1.0, 1.0, 1.0],
         },
