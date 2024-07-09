@@ -8,12 +8,13 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "in:prod": "npm install -production",
     "in:all": "npm install",
+    "tsc": "tsc",
     "lint": "eslint \"src/**/*.ts\"",
     "lint:fix": "eslint \"src/**/*.ts\" --fix",
     "pretty": "prettier --write \"./{src,doc}/**/*.{ts,tsx,md}\"",
     "pretty:check": "prettier --check \"./{src,doc}/**/*.{ts,tsx,md}\"",
     "zip:package": "node node_modules/camstreamerlib/CreatePackage -i",
-    "zip": "npm-run-all zip:package"
+    "zip": "npm-run-all tsc zip:package"
   },
   "engine": {
     "node": ">=18.0.0"
