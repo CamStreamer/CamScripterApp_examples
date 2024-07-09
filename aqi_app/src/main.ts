@@ -42,40 +42,42 @@ let background: Painter;
 let value: Frame;
 let label: Frame;
 let text: Frame;
+let upperText: Frame;
+let lowerText: Frame;
 
 const codes: Record<string, ImageCode> = {
     good: {
-        text: 'GOOD',
+        text: ['GOOD'],
         img_file: 'Good.png',
         color: [0, 153 / 255, 76 / 255],
     },
     moderate: {
-        text: 'MODERATE',
+        text: ['MODERATE'],
         img_file: 'Moderate.png',
         color: [1.0, 1.0, 51 / 255],
     },
     sensitive: {
-        text: 'UNHEALTHY FOR SENSITIVE GROUPS',
+        text: ['UNHEALTHY FOR', 'SENSITIVE GROUPS'],
         img_file: 'sensitive_groups.png',
         color: [1.0, 128 / 255, 0],
     },
     unhealthy: {
-        text: 'UNHEALTHY',
+        text: ['UNHEALTHY'],
         img_file: 'Unhealthy.png',
         color: [1.0, 51 / 255, 51 / 255],
     },
     very_unhealthy: {
-        text: 'VERY UNHEALTHY',
+        text: ['VERY UNHEALTHY'],
         img_file: 'Very_Unhealthy.png',
         color: [102 / 255, 0, 204 / 255],
     },
     hazardous: {
-        text: 'HAZARDOUS',
+        text: ['HAZARDOUS'],
         img_file: 'Hazardous.png',
         color: [153 / 255, 0, 0],
     },
     error: {
-        text: 'ERROR',
+        text: ['ERROR'],
         img_file: 'Error.png',
         color: [0, 0, 0],
     },
@@ -174,8 +176,8 @@ function genLayout(background: Painter, rm: ResourceManager) {
     label = new Frame(
         {
             x: 0,
-            y: 5,
-            height: 25,
+            y: 10,
+            height: 30,
             width: 273,
             text: '',
             fontColor: [1.0, 1.0, 1.0],
@@ -185,7 +187,7 @@ function genLayout(background: Painter, rm: ResourceManager) {
     value = new Frame(
         {
             x: 0,
-            y: 20,
+            y: 35,
             height: 90,
             width: 273,
             text: '0',
@@ -196,7 +198,7 @@ function genLayout(background: Painter, rm: ResourceManager) {
     text = new Frame(
         {
             x: 3,
-            y: 147,
+            y: 140,
             height: 30,
             width: 273,
             text: '',
@@ -204,12 +206,41 @@ function genLayout(background: Painter, rm: ResourceManager) {
         },
         rm
     );
+    upperText = new Frame(
+        {
+            x: 3,
+            y: 130,
+            height: 25,
+            width: 273,
+            text: '',
+            fontColor: [1.0, 1.0, 1.0],
+            enabled: false,
+        },
+        rm
+    );
+    lowerText = new Frame(
+        {
+            x: 3,
+            y: 160,
+            height: 25,
+            width: 273,
+            text: '',
+            fontColor: [1.0, 1.0, 1.0],
+            enabled: false,
+        },
+        rm
+    );
+
     background.insert(value);
     background.insert(label);
     background.insert(text);
+    background.insert(upperText);
+    background.insert(lowerText);
     value.setFont(settings.font);
     label.setFont(settings.font);
     text.setFont(settings.font);
+    upperText.setFont(settings.font);
+    lowerText.setFont(settings.font);
 }
 
 async function requestAQI(location: string, acc_token: string) {
