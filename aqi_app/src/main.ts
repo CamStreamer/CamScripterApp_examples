@@ -5,7 +5,7 @@ import { https } from 'follow-redirects';
 import { PainterOptions, Painter, Frame, ResourceManager } from 'camstreamerlib/CamOverlayPainter/Painter';
 
 type ImageCode = {
-    text: string;
+    text: string[];
     img_file: string;
     color: [number, number, number];
 };
@@ -83,10 +83,34 @@ const codes: Record<string, ImageCode> = {
     },
 };
 
+function split(text: string): string[] {
+    if (text.length <= 19) {
+        return [text];
+    }
+
+    const half = text.length / 2;
+    let middle_space = -1;
+    for (let f = 0; f < text.length; f += 1) {
+        if (text[f] === ' ') {
+            if (Math.abs(half - f) < Math.abs(half - middle_space)) {
+                middle_space = f;
+            } else {
+                break;
+            }
+        }
+    }
+    if (middle_space === -1) {
+        return [text];
+    } else {
+        return [text.substring(0, middle_space), text.substring(middle_space + 1)];
+    }
+}
+
 function setCodeText() {
+    settings.translation ??= {};
     for (const c in codes) {
-        if (settings.translation && settings.translation[c]) {
-            codes[c].text = settings.translation[c];
+        if (settings.translation[c]) {
+            codes[c].text = split(settings.translation[c]);
         }
     }
 }
@@ -166,9 +190,23 @@ function mapData(data: AqiResponseType) {
         code = codes['error'];
     }
 
+    if (code.text.length === 1) {
+        upperText.disable();
+        lowerText.disable();
+        text.enable();
+
+        text.setText(code.text[0], 'A_CENTER', 'TFM_SCALE');
+    } else {
+        upperText.enable();
+        lowerText.enable();
+        text.disable();
+
+        upperText.setText(code.text[0], 'A_CENTER', 'TFM_SCALE');
+        lowerText.setText(code.text[1], 'A_CENTER', 'TFM_SCALE');
+    }
+
     value.setText(displayedValue?.toString() ?? '', 'A_CENTER', 'TFM_SCALE');
     label.setText(settings.display_location, 'A_CENTER', 'TFM_SCALE');
-    text.setText(code.text, 'A_CENTER', 'TFM_SCALE');
     background.setBgImage(code.img_file, 'fit');
 }
 
