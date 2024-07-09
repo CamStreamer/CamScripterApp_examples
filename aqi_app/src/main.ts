@@ -1,8 +1,8 @@
 import * as fs from 'fs/promises';
 import * as url from 'url';
 
-import { https, FollowResponse } from 'follow-redirects';
-import { Options, Painter, Frame, ResourceManager } from 'camstreamerlib/CamOverlayPainter/Painter';
+import { https } from 'follow-redirects';
+import { PainterOptions, Painter, Frame, ResourceManager } from 'camstreamerlib/CamOverlayPainter/Painter';
 
 type ImageCode = {
     text: string;
@@ -164,8 +164,8 @@ function mapData(data: AqiResponseType) {
         code = codes['error'];
     }
 
-    value.setText(displayedValue?.toString() ?? '', 'A_CENTER');
-    label.setText(settings.display_location, 'A_CENTER');
+    value.setText(displayedValue?.toString() ?? '', 'A_CENTER', 'TFM_SCALE');
+    label.setText(settings.display_location, 'A_CENTER', 'TFM_SCALE');
     text.setText(code.text, 'A_CENTER', 'TFM_SCALE');
     background.setBgImage(code.img_file, 'fit');
 }
@@ -248,7 +248,7 @@ async function main() {
         return;
     }
 
-    const options: Options = {
+    const options: PainterOptions = {
         x: settings.pos_x,
         y: settings.pos_y,
         width: 279,
