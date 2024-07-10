@@ -31,6 +31,7 @@ let settings: {
     pos_y: number;
     resolution: string;
 
+    serviceName: string;
     font: string;
     translation: Record<string, string>;
 };
@@ -118,7 +119,7 @@ function setCodeText() {
 function registerResources() {
     const rm = new ResourceManager();
     for (const c in codes) {
-        rm.registerImage(codes[c].img_file, codes[c].img_file);
+        rm.registerImage(codes[c].img_file, `${settings.serviceName}/${codes[c].img_file}`);
     }
 
     rm.registerFont('OpenSans', 'OpenSans-Regular.ttf');
