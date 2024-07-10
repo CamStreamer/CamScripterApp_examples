@@ -2,7 +2,7 @@
 <html>
 <head>
   <title>Air Quality Index App</title>
-  <link rel="stylesheet" href="bootstrap/bootstrap.min.css">
+        <link rel="stylesheet" href="bootstrap/bootstrap.min.css" />
 </head>
 <body>
   <nav class="navbar navbar-dark bg-dark">
@@ -12,8 +12,11 @@
   <div class="jumbotron">
     <div class="container">
       <h1 class="display-3">Air Quality Index App</h1>
-      <p>Read Terms of Service on <a href="https://aqicn.org/api/" target="_blank">https://aqicn.org/api/</a>.
-        Changes are saved automatically, you don't have to save them.</p>
+                <p>
+                    Read Terms of Service on
+                    <a href="https://aqicn.org/api/" target="_blank">https://aqicn.org/api/</a>. Changes are saved
+                    automatically, you don't have to save them.
+                </p>
       <div class="container">
           <div class="row">
               <div class="col-md-6">
@@ -29,19 +32,25 @@
                       </div>
                       <div class="form-group">
                           <label for="camIP">Camera IP</label>
-                          <input type="text" class="form-control" id="camIP" placeholder="127.0.0.1">
+                                    <input type="text" class="form-control" id="camIP" placeholder="127.0.0.1" />
                       </div>
                       <div class="form-group">
                           <label for="camPort">Camera Port</label>
-                          <input type="text" class="form-control" id="camPort" placeholder="80">
+                                    <input type="text" class="form-control" id="camPort" placeholder="80" />
                       </div>
                       <div class="form-group">
                           <label for="userCam">Camera User</label>
-                          <input type="text" class="form-control" id="userCam" placeholder="root">
+                                    <input type="text" class="form-control" id="userCam" placeholder="root" />
                       </div>
                       <div class="form-group">
                           <label for="passCam">Camera Password</label>
-                          <input type="password" class="form-control" id="passCam" placeholder="password" autocomplete="new-password">
+                                    <input
+                                        type="password"
+                                        class="form-control"
+                                        id="passCam"
+                                        placeholder="password"
+                                        autocomplete="new-password"
+                                    />
                       </div>
                   </form>
               </div>
@@ -51,20 +60,24 @@
                   <form class="myForm">
                       <div class="form-group">
                           <label for="accessToken">Access Token</label>
-                          <input type="text" class="form-control" id="accessToken" placeholder="">
-                          <small>Get your own access token <a href="https://aqicn.org/data-platform/token/" target="_blank">here</a></small>
+                                    <input type="text" class="form-control" id="accessToken" placeholder="" />
+                                    <small
+                                        >Get your own access token
+                                        <a href="https://aqicn.org/data-platform/token/" target="_blank">here</a></small
+                                    >
                       </div>
 
                       <div class="form-group">
                           <label for="updateFreq">Update Frequency [min]</label>
-                          <input type="text" class="form-control" id="updateFreq" placeholder="1">
+                                    <input type="text" class="form-control" id="updateFreq" placeholder="1" />
                       </div>
                       <div class="form-group">
                           <label for="location">Location[path]</label>
-                          <input type="text" class="form-control" id="location" placeholder="">
+                                    <input type="text" class="form-control" id="location" placeholder="" />
                           <small>
-                              Check your location on <a href="https://aqicn.org/" target="_blank">https://aqicn.org/</a>.
-                              Valid entries are e.g. <b>London</b> or <b>united-kingdom/london-westminster</b>
+                                        Check your location on
+                                        <a href="https://aqicn.org/" target="_blank">https://aqicn.org/</a>. Valid
+                                        entries are e.g. <b>London</b> or <b>united-kingdom/london-westminster</b>
                               Do not use words city, country or station in the path.
                           </small>
                       </div>
@@ -84,31 +97,66 @@
                       </div>
                       <div class="form-group">
                           <label for="good">Good</label>
-                          <input type="text" class="form-control" id="good" placeholder="set translation for Good">
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        id="good"
+                                        placeholder="set translation for Good"
+                                    />
                       </div>
                       <div class="form-group">
                           <label for="moderate">Moderate</label>
-                          <input type="text" class="form-control" id="moderate" placeholder="set translation for Moderate">
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        id="moderate"
+                                        placeholder="set translation for Moderate"
+                                    />
                       </div>
                       <div class="form-group">
                           <label for="sensitive">Unhealthy for Sensitive Groups</label>
-                          <input type="text" class="form-control" id="sensitive" placeholder="set translation for Unhealthy for Sensitive Groups">
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        id="sensitive"
+                                        placeholder="set translation for Unhealthy for Sensitive Groups"
+                                    />
                       </div>
                       <div class="form-group">
                           <label for="unhealthy">Unhealthy</label>
-                          <input type="text" class="form-control" id="unhealthy" placeholder="set translation for Unhealthy">
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        id="unhealthy"
+                                        placeholder="set translation for Unhealthy"
+                                    />
                       </div>
                       <div class="form-group">
                           <label for="very_unhealthy">Very Unhealthy</label>
-                          <input type="text" class="form-control" id="very_unhealthy" placeholder="set translation for Very Unhealthy">
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        id="very_unhealthy"
+                                        placeholder="set translation for Very Unhealthy"
+                                    />
                       </div>
                       <div class="form-group">
                           <label for="hazardous">Hazardous</label>
-                          <input type="text" class="form-control" id="hazardous" placeholder="set translation for Hazardous">
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        id="hazardous"
+                                        placeholder="set translation for Hazardous"
+                                    />
                       </div>
                       <div class="form-group">
                           <label for="error">Error</label>
-                          <input type="text" class="form-control" id="error" placeholder="set translation for Error">
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        id="error"
+                                        placeholder="set translation for Error"
+                                    />
                       </div>
                   </form>
               </div>
@@ -118,17 +166,17 @@
                   <form class="myForm">
                       <div class="form-group">
                           <label for="displayLocation">Displayed Name of Location</label>
-                          <input type="text" class="form-control" id="displayLocation" placeholder="">
+                                    <input type="text" class="form-control" id="displayLocation" placeholder="" />
                       </div>
                       <div class="form-group">
                           <label for="scale">Scale[%]</label>
-                          <input type="text" class="form-control" id="scale" placeholder="100">
+                                    <input type="text" class="form-control" id="scale" placeholder="100" />
                       </div>
                       <div class="form-group">
                           <label for="resolutions">Resolution</label>
-                          <input type="text" class="form-control" id="resW" placeholder="1920">
+                                    <input type="text" class="form-control" id="resW" placeholder="1920" />
                           <span>x</span>
-                          <input type="text" class="form-control" id="resH" placeholder="1080">
+                                    <input type="text" class="form-control" id="resH" placeholder="1080" />
                       </div>
                       <div class="form-group">
                           <label for="coordinates">Coordinates</label>
@@ -147,7 +195,7 @@
                       <div class="form-group">
                           <label for="posX">Position X</label>
                           <div class="input-group">
-                              <input type="text" class="form-control" id="posX" placeholder="0">
+                                        <input type="text" class="form-control" id="posX" placeholder="0" />
                               <div class="input-group-append">
                                   <span class="input-group-text" id="basic-addon1">px</span>
                               </div>
@@ -156,7 +204,7 @@
                       <div class="form-group">
                           <label for="posY">Position Y</label>
                           <div class="input-group">
-                              <input type="text" class="form-control" id="posY" placeholder="0">
+                                        <input type="text" class="form-control" id="posY" placeholder="0" />
                               <div class="input-group-append">
                                   <span class="input-group-text" id="basic-addon2">px</span>
                               </div>
