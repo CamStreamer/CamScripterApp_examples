@@ -1,6 +1,6 @@
 {
   "name": "@camstreamer/aqi",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "",
   "prettier": "@camstreamer/prettier-config",
   "main": "main.js",
