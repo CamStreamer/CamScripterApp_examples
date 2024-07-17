@@ -7,8 +7,7 @@ import { LuxMeterReader } from './reader';
 async function loop(w: Widget, lmr: LuxMeterReader, period: number) {
     for await (const c of setInterval(period)) {
         const result = await lmr.readParsed();
-        console.log(result);
-        await w.display();
+        await w.display(result.value);
     }
 }
 
