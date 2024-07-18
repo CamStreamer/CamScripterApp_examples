@@ -1,19 +1,37 @@
 {
+  "luxmeter": {
+    "frequency": 10000,
+    "low": null,
+    "high": null,
+    "period": null
+  },
   "cameras": [
     {
+      "tls": false,
+      "tlsInsecure": false,
       "ip": "127.0.0.1",
       "port": 80,
-      "auth": "root:",
-      "tls": false,
-      "tlsInsecure": false
+      "auth": "root:"
     }
   ],
-
-  "x": 10,
-  "y": 10,
-  "scale": 1,
-  "period": 10000,
-  "screenWidth": 1920,
-  "screenHeight": 1080,
-  "coAlignment": "top_left"
+  "widget": {
+    "x": 10,
+    "y": 10,
+    "scale": 1,
+    "screenWidth": 1920,
+    "screenHeight": 1080,
+    "coAlignment": "top_left"
+  },
+  "events": {
+    "enabled": false
+  },
+  "acs": {
+    "enabled": false,
+    "tls": false,
+    "tlsInsecure": false,
+    "ip": "",
+    "port": 55756,
+    "auth": "",
+    "source_key": ""
+  }
 }
