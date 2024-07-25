@@ -110,7 +110,7 @@ function split(text: string): string[] {
 function setCodeText() {
     settings.translation ??= {};
     for (const c in codes) {
-        if (settings.translation[c]) {
+        if (settings.translation[c] !== undefined && settings.translation[c] !== "") {
             codes[c].text = split(settings.translation[c]);
         }
     }
