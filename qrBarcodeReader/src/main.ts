@@ -2,8 +2,8 @@ import * as fs from 'fs';
 import * as util from 'util';
 import * as QRCode from 'qrcode';
 import * as MemoryStream from 'memorystream';
-import { CamOverlayDrawingAPI, CairoCreateResponse } from 'camstreamerlib/CamOverlayDrawingAPI';
-import { httpRequest } from 'camstreamerlib/HttpRequest';
+import { CamOverlayDrawingAPI, TCairoCreateResponse } from 'camstreamerlib/CamOverlayDrawingAPI';
+import { sendRequest } from 'camstreamerlib/internal/HttpRequest';
 import { QRCodeReader } from './qrCodeReader';
 
 const setTimeoutPromise = util.promisify(setTimeout);
@@ -76,7 +76,8 @@ async function initCamOverlay() {
             tlsInsecure: settings.camera_protocol === 'https_insecure',
             ip: settings.camera_ip,
             port: settings.camera_port,
-            auth: settings.camera_user + ':' + settings.camera_pass,
+            user: settings.camera_user,
+            pass: settings.camera_pass,
             camera: settings.widget_camera_list,
         });
 
@@ -113,13 +114,13 @@ async function createQrCodeWidget(text: string) {
         'CAIRO_FORMAT_ARGB32',
         widgetWidth,
         widgetHeight
-    )) as CairoCreateResponse;
+    )) as TCairoCreateResponse;
     const surface = surfaceResponse.var;
-    const cairoResponse = (await co.cairo('cairo_create', surface)) as CairoCreateResponse;
+    const cairoResponse = (await co.cairo('cairo_create', surface)) as TCairoCreateResponse;
     const cairo = cairoResponse.var;
 
     const imageDataBuffer = await generateQrCode(text, widgetWidth);
-    const imgResponse = (await co.uploadImageData(imageDataBuffer)) as CairoCreateResponse;
+    const imgResponse = (await co.uploadImageData(imageDataBuffer)) as TCairoCreateResponse;
     const qrImage = imgResponse.var;
     co.cairo('cairo_translate', cairo, 0, 0);
     co.cairo('cairo_set_source_surface', cairo, qrImage, 0, 0);
@@ -162,9 +163,9 @@ async function createBarcodeWidget(text: string) {
         'CAIRO_FORMAT_ARGB32',
         widgetWidth,
         widgetHeight
-    )) as CairoCreateResponse;
+    )) as TCairoCreateResponse;
     const surface = surfaceResponse.var;
-    const cairoResponse = (await co.cairo('cairo_create', surface)) as CairoCreateResponse;
+    const cairoResponse = (await co.cairo('cairo_create', surface)) as TCairoCreateResponse;
     const cairo = cairoResponse.var;
 
     // Measure the size of the barcode
@@ -288,17 +289,18 @@ async function sendAcsEvent(text: string) {
             },
         };
         const eventData = JSON.stringify(event);
-        await httpRequest(
+        await sendRequest(
             {
                 protocol: settings.acs_protocol === 'http' ? 'http:' : 'https:',
                 method: 'POST',
                 host: settings.acs_ip,
                 port: settings.acs_port ?? 29204,
                 path: '/Acs/Api/ExternalDataFacade/AddExternalData',
-                auth: settings.acs_user + ':' + settings.acs_pass,
+                user: settings.acs_user,
+                pass: settings.acs_pass,
                 headers: {
                     'Content-Type': 'application/json',
-                    'Content-Length': eventData.length,
+                    'Content-Length': eventData.length.toString(),
                 },
                 rejectUnauthorized: settings.acs_protocol !== 'https_insecure',
             },
