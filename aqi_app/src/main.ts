@@ -2,7 +2,7 @@ import * as fs from 'fs/promises';
 import * as url from 'url';
 
 import { https } from 'follow-redirects';
-import { PainterOptions, Painter, Frame, ResourceManager } from 'camstreamerlib/CamOverlayPainter/Painter';
+import { PainterOptions, Painter, Frame, CamOverlayDrawingOptions } from 'camstreamerlib/CamOverlayPainter/Painter';
 
 type ImageCode = {
     text: string[];
@@ -110,23 +110,20 @@ function split(text: string): string[] {
 function setCodeText() {
     settings.translation ??= {};
     for (const c in codes) {
-        if (settings.translation[c] !== undefined && settings.translation[c] !== "") {
+        if (settings.translation[c] !== undefined && settings.translation[c] !== '') {
             codes[c].text = split(settings.translation[c]);
         }
     }
 }
 
-function registerResources() {
-    const rm = new ResourceManager();
+function registerResources(background: Painter) {
     for (const c in codes) {
-        rm.registerImage(codes[c].img_file, `${settings.serviceName}/${codes[c].img_file}`);
+        background.registerImage(codes[c].img_file, `${settings.serviceName}/${codes[c].img_file}`);
     }
 
-    rm.registerFont('OpenSans', 'OpenSans-Regular.ttf');
-    rm.registerFont('ComicSans', 'ComicSans.ttf');
-    rm.registerFont('GenShinGothic', 'GenShinGothic-Medium.ttf');
-
-    return rm;
+    background.registerFont('OpenSans', 'OpenSans-Regular.ttf');
+    background.registerFont('ComicSans', 'ComicSans.ttf');
+    background.registerFont('GenShinGothic', 'GenShinGothic-Medium.ttf');
 }
 
 function sendRequest(send_url: string, auth: string) {
@@ -211,64 +208,49 @@ function mapData(data: AqiResponseType) {
     background.setBgImage(code.img_file, 'fit');
 }
 
-function genLayout(background: Painter, rm: ResourceManager) {
-    label = new Frame(
-        {
-            x: 0,
-            y: 10,
-            height: 30,
-            width: 273,
-            text: '',
-            fontColor: [1.0, 1.0, 1.0],
-        },
-        rm
-    );
-    value = new Frame(
-        {
-            x: 0,
-            y: 35,
-            height: 90,
-            width: 273,
-            text: '0',
-            fontColor: [1.0, 1.0, 1.0],
-        },
-        rm
-    );
-    text = new Frame(
-        {
-            x: 3,
-            y: 140,
-            height: 30,
-            width: 273,
-            text: '',
-            fontColor: [1.0, 1.0, 1.0],
-        },
-        rm
-    );
-    upperText = new Frame(
-        {
-            x: 3,
-            y: 130,
-            height: 25,
-            width: 273,
-            text: '',
-            fontColor: [1.0, 1.0, 1.0],
-            enabled: false,
-        },
-        rm
-    );
-    lowerText = new Frame(
-        {
-            x: 3,
-            y: 160,
-            height: 25,
-            width: 273,
-            text: '',
-            fontColor: [1.0, 1.0, 1.0],
-            enabled: false,
-        },
-        rm
-    );
+function genLayout(background: Painter) {
+    label = new Frame({
+        x: 0,
+        y: 10,
+        height: 30,
+        width: 273,
+        text: '',
+        fontColor: [1.0, 1.0, 1.0],
+    });
+    value = new Frame({
+        x: 0,
+        y: 35,
+        height: 90,
+        width: 273,
+        text: '0',
+        fontColor: [1.0, 1.0, 1.0],
+    });
+    text = new Frame({
+        x: 3,
+        y: 140,
+        height: 30,
+        width: 273,
+        text: '',
+        fontColor: [1.0, 1.0, 1.0],
+    });
+    upperText = new Frame({
+        x: 3,
+        y: 130,
+        height: 25,
+        width: 273,
+        text: '',
+        fontColor: [1.0, 1.0, 1.0],
+        enabled: false,
+    });
+    lowerText = new Frame({
+        x: 3,
+        y: 160,
+        height: 25,
+        width: 273,
+        text: '',
+        fontColor: [1.0, 1.0, 1.0],
+        enabled: false,
+    });
 
     background.insert(value);
     background.insert(label);
@@ -327,19 +309,20 @@ async function main() {
         screenHeight: cam_height,
         coAlignment: settings.coordinates,
     };
-    const coOptions = {
+    const coOptions: CamOverlayDrawingOptions = {
         ip: settings.camera_ip,
         port: settings.camera_port,
-        auth: settings.camera_user + ':' + settings.camera_pass,
+        user: settings.camera_user,
+        pass: settings.camera_pass,
         tls: settings.camera_protocol !== 'http',
         tlsInsecure: settings.camera_protocol === 'https_insecure',
     };
-    const rm = registerResources();
-    background = new Painter(options, coOptions, rm);
+    background = new Painter(options, coOptions);
+    registerResources(background);
 
     try {
         await background.connect();
-        genLayout(background, rm);
+        genLayout(background);
         await oneAppPeriod();
     } catch {
         console.error('COAPI-Error: connection error');
