@@ -1,5 +1,5 @@
 import { CamOverlayDrawingOptions } from 'camstreamerlib/CamOverlayDrawingAPI';
-import { Painter, PainterOptions, Frame, ResourceManager } from 'camstreamerlib/CamOverlayPainter/Painter';
+import { Painter, PainterOptions, Frame } from 'camstreamerlib/CamOverlayPainter/Painter';
 
 const imageWidth = 325;
 const luxmeterHeight = 254;
@@ -15,7 +15,6 @@ function toString(value: number): string {
 }
 
 export class Widget {
-    private rm = new ResourceManager();
     private background: Painter;
     private camstreamer: Frame;
     private luxmeter: Frame;
@@ -27,42 +26,38 @@ export class Widget {
         coOpt: CamOverlayDrawingOptions
     ) {
         this.scale = opt.scale;
-        this.rm.registerFont('Digital', 'digital_font.ttf');
-        this.rm.registerImage('Luxmeter', 'luxmeter.png');
-        this.rm.registerImage('CamStreamer', 'camstreamer.png');
-
         this.background = new Painter(
             {
                 ...opt,
                 width: imageWidth,
                 height: luxmeterHeight + camstreamerHeight,
             },
-            coOpt,
-            this.rm
+            coOpt
         );
-        this.luxmeter = new Frame(
-            {
-                x: 0,
-                y: 0,
-                width: imageWidth,
-                height: luxmeterHeight,
-                bgImage: 'Luxmeter',
-            },
-            this.rm
-        );
-        this.camstreamer = new Frame(
-            { x: 0, y: luxmeterHeight, width: imageWidth, height: camstreamerHeight, bgImage: 'CamStreamer' },
-            this.rm
-        );
-        this.value = new Frame(
-            {
-                x: imageWidth / 8,
-                y: luxmeterHeight / 16,
-                width: imageWidth * (3 / 4),
-                height: luxmeterHeight * (3 / 4),
-            },
-            this.rm
-        );
+        this.luxmeter = new Frame({
+            x: 0,
+            y: 0,
+            width: imageWidth,
+            height: luxmeterHeight,
+            bgImage: 'Luxmeter',
+        });
+        this.camstreamer = new Frame({
+            x: 0,
+            y: luxmeterHeight,
+            width: imageWidth,
+            height: camstreamerHeight,
+            bgImage: 'CamStreamer',
+        });
+        this.value = new Frame({
+            x: imageWidth / 8,
+            y: luxmeterHeight / 16,
+            width: imageWidth * (3 / 4),
+            height: luxmeterHeight * (3 / 4),
+        });
+
+        this.background.registerFont('Digital', 'digital_font.ttf');
+        this.background.registerImage('Luxmeter', 'luxmeter.png');
+        this.background.registerImage('CamStreamer', 'camstreamer.png');
 
         this.value.setFont('Digital');
         this.background.insert(this.luxmeter, this.value, this.camstreamer);
