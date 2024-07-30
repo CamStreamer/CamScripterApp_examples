@@ -56,7 +56,7 @@ export const App = () => {
     useInitializeOnMount(async () => {
         let response: Response;
         try {
-            let url = '/local/camscripter/package/settings.cgi?package_name=video_checkpoint&action=get';
+            let url = '/local/camscripter/package/settings.cgi?package_name=lutron_luxmeter_integration&action=get';
             if (process.env!.NODE_ENV === 'development') {
                 url = 'http://localhost:52520' + url;
             }

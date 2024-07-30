@@ -67,7 +67,7 @@ export const FormWrapper = ({ defaultValues }: Props) => {
         }
 
         try {
-            let url = '/local/camscripter/package/settings.cgi?package_name=video_checkpoint&action=set';
+            let url = '/local/camscripter/package/settings.cgi?package_name=lutron_luxmeter_integration&action=set';
             if (process.env!.NODE_ENV === 'development') {
                 url = 'http://localhost:52520' + url;
             }
