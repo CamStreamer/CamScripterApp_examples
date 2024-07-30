@@ -4,16 +4,17 @@ import * as path from 'path';
 
 const luxmeterSchema = z.object({
     frequency: z.number(),
-    low: z.number().positive().nullable(),
-    high: z.number().positive().nullable(),
-    period: z.number().positive().nullable(),
+    low: z.number().positive().default(0),
+    high: z.number().positive().default(Number.MAX_VALUE),
+    period: z.number().positive().default(0),
 });
 const cameraSchema = z.object({
-    ip: z.string().ip(),
-    port: z.number().positive().lt(65535),
-    auth: z.string(),
     tls: z.boolean(),
     tlsInsecure: z.boolean(),
+    ip: z.string().ip(),
+    port: z.number().positive().lt(65535),
+    user: z.string(),
+    pass: z.string(),
 });
 const widgetSchema = z.object({
     x: z.number(),
@@ -32,7 +33,8 @@ const acsSchema = z.object({
     tlsInsecure: z.boolean(),
     ip: z.string().ip(),
     port: z.number().positive().lt(65535),
-    auth: z.string(),
+    user: z.string(),
+    pass: z.string(),
     source_key: z.string(),
 });
 
@@ -41,7 +43,7 @@ const settingsSchema = z.object({
     cameras: cameraSchema.array(),
     widget: widgetSchema,
     events: axisEventSchema,
-    acs: acsSchema
+    acs: acsSchema,
 });
 
 export type TLuxmeter = z.infer<typeof luxmeterSchema>;
