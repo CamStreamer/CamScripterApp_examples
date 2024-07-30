@@ -7,6 +7,8 @@ type EventGenerator = {
     eventDeclared: boolean;
 };
 
+const packageName: string = process.env.PACKAGE_NAME ?? 'lutron_luxmeter_integration';
+
 export class AxisEvents {
     private cscArray: EventGenerator[];
     private reconnectTimer?: NodeJS.Timeout;
@@ -21,19 +23,19 @@ export class AxisEvents {
         }
     }
 
-    sendEvent(text: string) {
+    sendEvent(type: 'low' | 'high') {
         this.cscArray.forEach((eg) => {
             if (!eg.connected || !eg.eventDeclared) {
                 console.error('AxisEvents: CSc API disconnected');
             }
 
             void eg.csc.sendEvent({
-                declaration_id: 'lutron_luxmeter_integration',
+                declaration_id: packageName + '_' + type,
                 event_data: [
                     {
                         namespace: '',
-                        key: 'code',
-                        value: text,
+                        key: 'intensity_alarm',
+                        value: type === 'low' ? 'Low intensity' : 'High intensity',
                         value_type: 'STRING',
                     },
                 ],
@@ -85,38 +87,40 @@ export class AxisEvents {
     }
 
     private async declareCameraEvent(csc: CamScripterAPICameraEventsGenerator) {
-        await csc.declareEvent({
-            declaration_id: 'lutron_luxmeter_integration',
-            stateless: true,
-            declaration: [
-                {
-                    namespace: 'tnsaxis',
-                    key: 'topic0',
-                    value: 'CameraApplicationPlatform',
-                    value_type: 'STRING',
-                },
-                {
-                    namespace: 'tnsaxis',
-                    key: 'topic1',
-                    value: 'CamScripter',
-                    value_type: 'STRING',
-                },
-                {
-                    namespace: 'tnsaxis',
-                    key: 'topic2',
-                    value: 'lutron_luxmeter_integration',
-                    value_type: 'STRING',
-                    value_nice_name: 'CamScripter: Lutron Luxmeter integration',
-                },
-                {
-                    type: 'DATA',
-                    namespace: '',
-                    key: 'code',
-                    value: '',
-                    value_type: 'STRING',
-                    key_nice_name: 'Code',
-                },
-            ],
-        });
+        for (const event of ['_low', '_high']) {
+            await csc.declareEvent({
+                declaration_id: packageName + event,
+                stateless: true,
+                declaration: [
+                    {
+                        namespace: 'tnsaxis',
+                        key: 'topic0',
+                        value: 'CameraApplicationPlatform',
+                        value_type: 'STRING',
+                    },
+                    {
+                        namespace: 'tnsaxis',
+                        key: 'topic1',
+                        value: 'CamScripter',
+                        value_type: 'STRING',
+                    },
+                    {
+                        namespace: 'tnsaxis',
+                        key: 'topic2',
+                        value: packageName + event,
+                        value_type: 'STRING',
+                        value_nice_name: 'CamScripter: Lutron Luxmeter integration',
+                    },
+                    {
+                        type: 'DATA',
+                        namespace: '',
+                        key: 'intensity_alarm',
+                        key_nice_name: 'Intensity alarm',
+                        value: '',
+                        value_type: 'STRING',
+                    },
+                ],
+            });
+        }
     }
 }
