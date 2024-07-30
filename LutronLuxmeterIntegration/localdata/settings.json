@@ -1,9 +1,6 @@
 {
   "luxmeter": {
-    "frequency": 10000,
-    "low": null,
-    "high": null,
-    "period": null
+    "frequency": 10000
   },
   "cameras": [
     {
@@ -32,7 +29,8 @@
     "tlsInsecure": false,
     "ip": "",
     "port": 55756,
-    "auth": "",
+    "user": "",
+    "pass": "",
     "source_key": ""
   }
 }

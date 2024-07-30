@@ -4,9 +4,9 @@ import * as path from 'path';
 
 const luxmeterSchema = z.object({
     frequency: z.number(),
-    low: z.number().positive().default(0),
-    high: z.number().positive().default(Number.MAX_VALUE),
-    period: z.number().positive().default(0),
+    low: z.number().nonnegative().default(0),
+    high: z.number().nonnegative().default(Number.MAX_VALUE),
+    period: z.number().nonnegative().default(0),
 });
 const cameraSchema = z.object({
     tls: z.boolean(),
@@ -17,12 +17,23 @@ const cameraSchema = z.object({
     pass: z.string(),
 });
 const widgetSchema = z.object({
-    x: z.number(),
-    y: z.number(),
-    scale: z.number(),
-    screenWidth: z.number(),
-    screenHeight: z.number(),
-    coAlignment: z.string(),
+    enabled: z.boolean(),
+    x: z.number().nonnegative(),
+    y: z.number().nonnegative(),
+    scale: z.number().positive(),
+    screenWidth: z.number().nonnegative(),
+    screenHeight: z.number().nonnegative(),
+    coAlignment: z.union([
+        z.literal('top_left'),
+        z.literal('top_center'),
+        z.literal('top_right'),
+        z.literal('center_left'),
+        z.literal('center'),
+        z.literal('center_right'),
+        z.literal('bottom_left'),
+        z.literal('bottom_center'),
+        z.literal('bottom_right'),
+    ]),
 });
 const axisEventSchema = z.object({
     enabled: z.boolean(),
@@ -31,7 +42,7 @@ const acsSchema = z.object({
     enabled: z.boolean(),
     tls: z.boolean(),
     tlsInsecure: z.boolean(),
-    ip: z.string().ip(),
+    ip: z.union([z.string().ip(), z.literal('')]),
     port: z.number().positive().lt(65535),
     user: z.string(),
     pass: z.string(),
