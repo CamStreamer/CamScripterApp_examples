@@ -1,10 +1,10 @@
 import styled from '@emotion/styled';
-import { Box } from '@mui/material';
 import { parseValueAsFloat } from '../utils';
 import { Title } from '../components/Title';
 import { TServerData } from '../models/schema';
 import { Control, Controller } from 'react-hook-form';
 import { StyledTextField } from '../components/FormInputs';
+import { Box, FormControlLabel, Switch } from '@mui/material';
 
 type Props = {
     control: Control<TServerData>;
@@ -31,6 +31,84 @@ export const LuxMeterSettings = ({ control }: Props) => {
                             }}
                             error={!!formState.errors.luxmeter?.frequency}
                             helperText={formState.errors.luxmeter?.frequency?.message}
+                        />
+                    )}
+                />
+            </StyledSection>
+
+            <StyledSection>
+                <Title text="Axis Events settings" />
+                <Controller
+                    name="events.enabled"
+                    control={control}
+                    render={({ field }) => (
+                        <FormControlLabel
+                            control={
+                                <Switch
+                                    checked={field.value}
+                                    onChange={(e, v) => {
+                                        field.onChange(v);
+                                    }}
+                                />
+                            }
+                            label={'Active'}
+                        />
+                    )}
+                />
+                <Controller
+                    name={'luxmeter.low'}
+                    control={control}
+                    render={({ field, formState }) => (
+                        <StyledTextField
+                            defaultValue={field.value}
+                            fullWidth
+                            label="Low level of intensity"
+                            InputLabelProps={{ shrink: true }}
+                            onBlur={(e) => {
+                                const val = parseValueAsFloat(e.target.value);
+                                field.onChange(val);
+                                e.target.value = val.toString();
+                            }}
+                            error={!!formState.errors.luxmeter?.low}
+                            helperText={formState.errors.luxmeter?.low?.message}
+                        />
+                    )}
+                />
+                <Controller
+                    name={'luxmeter.high'}
+                    control={control}
+                    render={({ field, formState }) => (
+                        <StyledTextField
+                            defaultValue={field.value}
+                            fullWidth
+                            label="High level of intensity"
+                            InputLabelProps={{ shrink: true }}
+                            onBlur={(e) => {
+                                const val = parseValueAsFloat(e.target.value);
+                                field.onChange(val);
+                                e.target.value = val.toString();
+                            }}
+                            error={!!formState.errors.luxmeter?.high}
+                            helperText={formState.errors.luxmeter?.high?.message}
+                        />
+                    )}
+                />
+                <Controller
+                    name={'luxmeter.period'}
+                    control={control}
+                    render={({ field, formState }) => (
+                        <StyledTextField
+                            defaultValue={field.value}
+                            fullWidth
+                            label="Period"
+                            InputLabelProps={{ shrink: true }}
+                            onBlur={(e) => {
+                                const val = parseValueAsFloat(e.target.value);
+                                field.onChange(val);
+                                e.target.value = val.toString();
+                            }}
+                            error={!!formState.errors.luxmeter?.period}
+                            helperText={formState.errors.luxmeter?.period?.message}
                         />
                     )}
                 />

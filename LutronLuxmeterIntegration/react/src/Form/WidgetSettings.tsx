@@ -1,9 +1,9 @@
 import styled from '@emotion/styled';
-import { Box, FormHelperText, InputAdornment, MenuItem } from '@mui/material';
 import { Control, Controller } from 'react-hook-form';
 import { TServerData } from '../models/schema';
 import { StyledSelect, StyledTextField } from '../components/FormInputs';
 import { COORD_LIST, coordOptionLabels, parseValueAsFloat, parseValueAsInt } from '../utils';
+import { Box, FormControlLabel, FormHelperText, InputAdornment, MenuItem, Switch } from '@mui/material';
 
 type Props = {
     control: Control<TServerData>;
@@ -13,6 +13,23 @@ export const WidgetSettings = ({ control }: Props) => {
     return (
         <StyledForm>
             <StyledSection>
+                <Controller
+                    name="widget.enabled"
+                    control={control}
+                    render={({ field }) => (
+                        <FormControlLabel
+                            control={
+                                <Switch
+                                    checked={field.value}
+                                    onChange={(e, v) => {
+                                        field.onChange(v);
+                                    }}
+                                />
+                            }
+                            label={'Active'}
+                        />
+                    )}
+                />
                 <Controller
                     name={'widget.coAlignment'}
                     control={control}
