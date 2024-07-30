@@ -3,7 +3,7 @@ import { TServerData } from './models/schema';
 export const coordOptionLabels: Record<TServerData['widget']['coAlignment'], string> = {
     top_left: 'Top Left',
     top_center: 'Top Center',
-    top_right: 'Center Right',
+    top_right: 'Top Right',
     center_left: 'Center Left',
     center: 'Center',
     center_right: 'Center Right',
