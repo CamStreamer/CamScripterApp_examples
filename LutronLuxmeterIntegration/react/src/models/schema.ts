@@ -1,27 +1,10 @@
 import { z } from 'zod';
 
-export const cameraServerSchema = z.object({
-    tls: z.boolean(),
-    tlsInsecure: z.boolean(),
-    ip: z.string().ip(),
-    port: z.number().positive().lt(65535),
-    auth: z.string(),
-});
-export const acsServerSchema = z.object({
-    enabled: z.boolean(),
-    tls: z.boolean(),
-    tlsInsecure: z.boolean(),
-    ip: z.string().ip(),
-    port: z.number().positive().lt(65535),
-    auth: z.string(),
-    source_key: z.string(),
-});
-
 export const luxmeterSchema = z.object({
     frequency: z.number().positive(),
-    low: z.number().positive().nullable(),
-    high: z.number().positive().nullable(),
-    period: z.number().positive().nullable(),
+    low: z.number().nonnegative().default(0),
+    high: z.number().nonnegative().default(Number.MAX_VALUE),
+    period: z.number().nonnegative().default(0),
 });
 export const cameraSchema = z.object({
     protocol: z.union([z.literal('http'), z.literal('https'), z.literal('https_insecure')]),
@@ -32,6 +15,11 @@ export const cameraSchema = z.object({
 });
 export const widgetSchema = z.object({
     enabled: z.boolean(),
+    x: z.number().nonnegative(),
+    y: z.number().nonnegative(),
+    scale: z.number().positive(),
+    screenWidth: z.number().nonnegative(),
+    screenHeight: z.number().nonnegative(),
     coAlignment: z.union([
         z.literal('top_left'),
         z.literal('top_center'),
@@ -43,11 +31,6 @@ export const widgetSchema = z.object({
         z.literal('bottom_center'),
         z.literal('bottom_right'),
     ]),
-    x: z.number().nonnegative(),
-    y: z.number().nonnegative(),
-    scale: z.number().positive(),
-    screenWidth: z.number().nonnegative(),
-    screenHeight: z.number().nonnegative(),
 });
 export const axisEventSchema = z.object({
     enabled: z.boolean(),
@@ -55,7 +38,7 @@ export const axisEventSchema = z.object({
 export const acsSchema = z.object({
     enabled: z.boolean(),
     protocol: z.union([z.literal('http'), z.literal('https'), z.literal('https_insecure')]),
-    ip: z.string().ip(),
+    ip: z.union([z.string().ip(), z.literal('')]),
     port: z.number().positive().lt(65535),
     user: z.string(),
     pass: z.string(),
@@ -78,5 +61,32 @@ export type TacsSchema = z.infer<typeof acsSchema>;
 
 export type TServerData = z.infer<typeof serverDataSchema>;
 
+export const cameraServerSchema = z.object({
+    tls: z.boolean(),
+    tlsInsecure: z.boolean(),
+    ip: z.string().ip(),
+    port: z.number().positive().lt(65535),
+    user: z.string(),
+    pass: z.string(),
+});
+export const acsServerSchema = z.object({
+    enabled: z.boolean(),
+    tls: z.boolean(),
+    tlsInsecure: z.boolean(),
+    ip: z.string().ip(),
+    port: z.number().positive().lt(65535),
+    user: z.string(),
+    pass: z.string(),
+    source_key: z.string(),
+});
+export const serverConvertedData = z.object({
+    luxmeter: luxmeterSchema,
+    cameras: cameraServerSchema.array(),
+    widget: widgetSchema,
+    events: axisEventSchema,
+    acs: acsServerSchema,
+});
+
 export type TCameraServer = z.infer<typeof cameraServerSchema>;
 export type TAcsServer = z.infer<typeof acsServerSchema>;
+export type TServerConvertedData = z.infer<typeof serverConvertedData>;
