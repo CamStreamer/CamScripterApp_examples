@@ -12,8 +12,9 @@ async function loop(w: Widget, lmr: LuxMeterReader, luxOpt: TLuxmeter) {
     let low: boolean = false;
 
     for await (const c of setInterval(luxOpt.frequency)) {
+        void c;
         const result = await lmr.readParsed();
-        await w.display(result.value);
+        await w.display(result);
 
         if (axisEvents) {
             if (luxOpt.low <= result.value && result.value <= luxOpt.high) {

@@ -1,5 +1,6 @@
 import { CamOverlayDrawingOptions } from 'camstreamerlib/CamOverlayDrawingAPI';
 import { Painter, PainterOptions, Frame } from 'camstreamerlib/CamOverlayPainter/Painter';
+import type { TResult } from './reader';
 
 const imageWidth = 325;
 const luxmeterHeight = 254;
@@ -31,6 +32,7 @@ export class Widget {
     private camstreamer: Frame;
     private luxmeter: Frame;
     private value: Frame;
+    private unit: Frame;
     private scale: number;
 
     public constructor(
@@ -52,10 +54,16 @@ export class Widget {
             bgImage: 'CamStreamer',
         });
         this.value = new Frame({
-            x: imageWidth / 8,
+            x: imageWidth * (3 / 32),
             y: luxmeterHeight / 16,
-            width: imageWidth * (3 / 4),
+            width: imageWidth * (11 / 16),
             height: luxmeterHeight * (3 / 4),
+        });
+        this.unit = new Frame({
+            x: imageWidth * (51 / 64),
+            y: luxmeterHeight * (7 / 16),
+            width: imageWidth / 8,
+            height: luxmeterHeight * (5 / 16),
         });
 
         this.scale = opt.scale;
@@ -71,6 +79,7 @@ export class Widget {
                     coOpt,
                     this.luxmeter,
                     this.value,
+                    this.unit,
                     this.camstreamer
                 )
             );
@@ -78,8 +87,9 @@ export class Widget {
 
         this.value.setFont('Digital');
     }
-    public async display(value: number): Promise<void> {
-        this.value.setText(toString(value), 'A_CENTER', 'TFM_SCALE', [0, 0, 0]);
+    public async display(result: TResult): Promise<void> {
+        this.value.setText(toString(result.value), 'A_CENTER', 'TFM_SCALE', [0, 0, 0]);
+        this.unit.setText(result.unit, 'A_CENTER', 'TFM_SCALE', [0, 0, 0]);
 
         const promises = new Array<Promise<void>>();
 
