@@ -7,11 +7,12 @@
   },
   "cameras": [
     {
-      "tls": false,
-      "tlsInsecure": false,
-      "ip": "127.0.0.1",
-      "port": 80,
-      "auth": "root:"
+        "tls": false,
+        "tlsInsecure": false,
+        "ip": "127.0.0.1",
+        "port": 80,
+        "user": "root",
+        "pass": ""
     }
   ],
   "widget": {
