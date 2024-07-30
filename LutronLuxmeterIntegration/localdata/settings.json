@@ -13,6 +13,7 @@
     }
   ],
   "widget": {
+    "enabled":  true,
     "x": 10,
     "y": 10,
     "scale": 1,

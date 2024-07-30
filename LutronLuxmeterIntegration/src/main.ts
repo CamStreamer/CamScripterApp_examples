@@ -5,16 +5,20 @@ import { AxisEvents } from './events';
 import { LuxMeterReader } from './reader';
 import { TLuxmeter, readSettings } from './settings';
 
+let widget: Widget | undefined;
 let axisEvents: AxisEvents | undefined;
 
-async function loop(w: Widget, lmr: LuxMeterReader, luxOpt: TLuxmeter) {
+async function loop(lmr: LuxMeterReader, luxOpt: TLuxmeter) {
     let eventTimeout: NodeJS.Timeout | undefined;
     let low: boolean = false;
 
     for await (const c of setInterval(luxOpt.frequency)) {
         void c;
         const result = await lmr.readParsed();
-        await w.display(result);
+
+        if (widget) {
+            await widget.display(result);
+        }
 
         if (axisEvents) {
             if (luxOpt.low <= result.value && result.value <= luxOpt.high) {
@@ -42,13 +46,16 @@ async function loop(w: Widget, lmr: LuxMeterReader, luxOpt: TLuxmeter) {
 async function main() {
     const settings = readSettings();
     const lmr = await LuxMeterReader.connect();
-    const w = new Widget(settings.widget, settings.cameras);
+
+    if (settings.widget.enabled) {
+        widget = new Widget(settings.widget, settings.cameras);
+    }
 
     if (settings.events.enabled) {
         axisEvents = new AxisEvents(settings.cameras);
     }
 
-    await loop(w, lmr, settings.luxmeter);
+    await loop(lmr, settings.luxmeter);
 }
 
 main().catch((err) => console.error(err));
