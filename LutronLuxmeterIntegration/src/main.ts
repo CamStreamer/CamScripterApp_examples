@@ -12,11 +12,20 @@ let acsEvents: AxisCameraStationEvents | undefined;
 
 function sendEvent(type: 'low' | 'high') {
     if (axisEvents) {
-        axisEvents.sendEvent(type);
+        try {
+            axisEvents.sendEvent(type);
+        } catch (err) {
+            console.error(err);
+        }
     }
 
     if (acsEvents) {
-        void acsEvents.sendEvent(type === 'low' ? 'Low intensity' : 'High intensity', 'lutron_luxmeter_integration');
+        const message = type === 'low' ? 'Low intensity' : 'High intensity';
+        try {
+            void acsEvents.sendEvent(message, 'lutron_luxmeter_integration');
+        } catch (err) {
+            console.error(err);
+        }
     }
 }
 
@@ -29,7 +38,11 @@ async function loop(lmr: LuxMeterReader, luxOpt: TLuxmeter) {
         const result = await lmr.readParsed();
 
         if (widget) {
-            await widget.display(result);
+            try {
+                await widget.display(result);
+            } catch (err) {
+                console.error(err);
+            }
         }
 
         if (luxOpt.low <= result.value && result.value <= luxOpt.high) {
