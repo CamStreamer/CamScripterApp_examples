@@ -1,12 +1,24 @@
 import { setInterval } from 'timers/promises';
+import { AxisCameraStationEvents } from 'camstreamerlib/events/AxisCameraStationEvents';
 
 import { Widget } from './widget';
 import { AxisEvents } from './events';
-import { LuxMeterReader } from './reader';
+import { LuxMeterReader } from './LuxMeterReader';
 import { TLuxmeter, readSettings } from './settings';
 
 let widget: Widget | undefined;
 let axisEvents: AxisEvents | undefined;
+let acsEvents: AxisCameraStationEvents | undefined;
+
+function sendEvent(type: 'low' | 'high') {
+    if (axisEvents) {
+        axisEvents.sendEvent(type);
+    }
+
+    if (acsEvents) {
+        void acsEvents.sendEvent(type === 'low' ? 'Low intensity' : 'High intensity', 'lutron_luxmeter_integration');
+    }
+}
 
 async function loop(lmr: LuxMeterReader, luxOpt: TLuxmeter) {
     let eventTimeout: NodeJS.Timeout | undefined;
@@ -20,24 +32,22 @@ async function loop(lmr: LuxMeterReader, luxOpt: TLuxmeter) {
             await widget.display(result);
         }
 
-        if (axisEvents) {
-            if (luxOpt.low <= result.value && result.value <= luxOpt.high) {
-                clearTimeout(eventTimeout);
-                eventTimeout = undefined;
-            } else if (result.value < luxOpt.low) {
-                if (!low || eventTimeout === undefined) {
-                    low = true;
-                    eventTimeout = setTimeout(() => {
-                        axisEvents?.sendEvent('low');
-                    }, luxOpt.period);
-                }
-            } else if (result.value > luxOpt.high) {
-                if (low || eventTimeout === undefined) {
-                    low = false;
-                    eventTimeout = setTimeout(() => {
-                        axisEvents?.sendEvent('high');
-                    }, luxOpt.period);
-                }
+        if (luxOpt.low <= result.value && result.value <= luxOpt.high) {
+            clearTimeout(eventTimeout);
+            eventTimeout = undefined;
+        } else if (result.value < luxOpt.low) {
+            if (!low || eventTimeout === undefined) {
+                low = true;
+                eventTimeout = setTimeout(() => {
+                    sendEvent('low');
+                }, luxOpt.period);
+            }
+        } else if (result.value > luxOpt.high) {
+            if (low || eventTimeout === undefined) {
+                low = false;
+                eventTimeout = setTimeout(() => {
+                    sendEvent('high');
+                }, luxOpt.period);
             }
         }
     }
@@ -53,6 +63,10 @@ async function main() {
 
     if (settings.events.enabled) {
         axisEvents = new AxisEvents(settings.cameras);
+    }
+
+    if (settings.acs.enabled) {
+        acsEvents = new AxisCameraStationEvents(settings.acs.source_key, settings.acs);
     }
 
     await loop(lmr, settings.luxmeter);
