@@ -29,17 +29,21 @@ export class AxisEvents {
                 console.error('AxisEvents: CSc API disconnected');
             }
 
-            void eg.csc.sendEvent({
-                declaration_id: packageName + '_' + type,
-                event_data: [
-                    {
-                        namespace: '',
-                        key: 'intensity_alarm',
-                        value: type === 'low' ? 'Low intensity' : 'High intensity',
-                        value_type: 'STRING',
-                    },
-                ],
-            });
+            eg.csc
+                .sendEvent({
+                    declaration_id: packageName + '_' + type,
+                    event_data: [
+                        {
+                            namespace: '',
+                            key: 'intensity_alarm',
+                            value: type === 'low' ? 'Low intensity' : 'High intensity',
+                            value_type: 'STRING',
+                        },
+                    ],
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
         });
     }
 
