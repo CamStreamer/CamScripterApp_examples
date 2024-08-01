@@ -27,13 +27,13 @@ export const App = () => {
             luxmeter: fetched.luxmeter,
             events: fetched.events,
             acs: {
-                enabled: false,
-                protocol: 'http',
-                ip: '',
-                port: 55756,
-                user: '',
-                pass: '',
-                source_key: '',
+                enabled: fetched.acs.enabled,
+                protocol: !fetched.acs.tls ? 'http' : fetched.acs.tlsInsecure ? 'https_insecure' : 'https',
+                ip: fetched.acs.ip,
+                port: fetched.acs.port,
+                user: fetched.acs.user,
+                pass: fetched.acs.pass,
+                source_key: fetched.acs.source_key,
             },
         };
 

@@ -27,14 +27,14 @@ export const FormWrapper = ({ defaultValues }: Props) => {
             luxmeter: toPost.luxmeter,
             events: toPost.events,
             acs: {
-                enabled: false,
-                tls: false,
-                tlsInsecure: false,
-                ip: '',
-                port: 55756,
-                user: '',
-                pass: '',
-                source_key: '',
+                enabled: toPost.acs.enabled,
+                tls: toPost.acs.protocol !== 'http',
+                tlsInsecure: toPost.acs.protocol === 'https_insecure',
+                ip: toPost.acs.ip,
+                port: toPost.acs.port,
+                user: toPost.acs.user,
+                pass: toPost.acs.pass,
+                source_key: toPost.acs.source_key,
             },
         };
 
