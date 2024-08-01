@@ -54,16 +54,16 @@ export class Widget {
             bgImage: 'CamStreamer',
         });
         this.value = new Frame({
-            x: imageWidth * (3 / 32),
-            y: luxmeterHeight / 16,
-            width: imageWidth * (11 / 16),
-            height: luxmeterHeight * (3 / 4),
+            x: 30,
+            y: 15,
+            width: 223,
+            height: 190,
         });
         this.unit = new Frame({
-            x: imageWidth * (51 / 64),
-            y: luxmeterHeight * (7 / 16),
-            width: imageWidth / 8,
-            height: luxmeterHeight * (5 / 16),
+            x: 259,
+            y: 111,
+            width: 40,
+            height: 79,
         });
 
         this.scale = opt.scale;
