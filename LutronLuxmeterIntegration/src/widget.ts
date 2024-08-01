@@ -1,6 +1,6 @@
 import { CamOverlayDrawingOptions } from 'camstreamerlib/CamOverlayDrawingAPI';
 import { Painter, PainterOptions, Frame } from 'camstreamerlib/CamOverlayPainter/Painter';
-import type { TResult } from './reader';
+import type { TResult } from './LuxMeterReader';
 
 const imageWidth = 325;
 const luxmeterHeight = 254;
