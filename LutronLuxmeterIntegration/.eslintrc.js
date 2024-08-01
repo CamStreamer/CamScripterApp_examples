@@ -7,5 +7,5 @@ module.exports = {
     },
     extends: ['@camstreamer/eslint-config'],
     root: true,
-    ignorePatterns: ['.eslintrc.js'],
+    ignorePatterns: ['.eslintrc.js', 'node_modules/**/*'],
 };
