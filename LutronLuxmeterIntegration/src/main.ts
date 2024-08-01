@@ -85,4 +85,7 @@ async function main() {
     await loop(lmr, settings.luxmeter);
 }
 
-main().catch((err) => console.error(err));
+main().catch((err) => {
+    console.error(err);
+    process.exit(1);
+});
