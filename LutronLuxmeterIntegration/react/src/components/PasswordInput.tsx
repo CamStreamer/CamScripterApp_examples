@@ -10,7 +10,7 @@ import { StyledTextField } from './FormInputs';
 
 type Props = {
     control: Control<TServerData>;
-    name: `cameras.${number}.pass`;
+    name: `cameras.${number}.pass` | 'acs.pass';
 };
 
 export function PasswordInput({ control, name }: Props) {
