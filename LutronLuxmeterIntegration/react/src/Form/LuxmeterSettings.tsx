@@ -182,6 +182,20 @@ export const LuxMeterSettings = ({ control }: Props) => {
                     )}
                 />
                 <Controller
+                    name={'acs.source_key'}
+                    control={control}
+                    render={({ field, formState }) => (
+                        <StyledTextField
+                            {...field}
+                            InputLabelProps={{ shrink: true }}
+                            fullWidth
+                            label="Source Key"
+                            error={formState.errors.acs?.source_key !== undefined}
+                            helperText={formState.errors.acs?.source_key?.message}
+                        />
+                    )}
+                />
+                <Controller
                     name={'acs.user'}
                     control={control}
                     render={({ field, formState }) => (
