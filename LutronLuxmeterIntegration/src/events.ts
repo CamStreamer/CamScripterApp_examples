@@ -87,6 +87,10 @@ export class AxisEvents {
     }
 
     private async declareCameraEvent(csc: CamScripterAPICameraEventsGenerator) {
+        const type: Record<string, string> = {
+            _low: 'Low intensity',
+            _high: 'HIgh intensity',
+        };
         for (const event of ['_low', '_high']) {
             await csc.declareEvent({
                 declaration_id: packageName + event,
@@ -109,13 +113,13 @@ export class AxisEvents {
                         key: 'topic2',
                         value: packageName + event,
                         value_type: 'STRING',
-                        value_nice_name: 'CamScripter: Lutron Luxmeter integration',
+                        value_nice_name: 'CamScripter: Lutron Luxmeter integration (' + type[event] + ')',
                     },
                     {
                         type: 'DATA',
                         namespace: '',
                         key: 'intensity_alarm',
-                        key_nice_name: 'Intensity alarm',
+                        key_nice_name: type[event] + ' alarm',
                         value: '',
                         value_type: 'STRING',
                     },
