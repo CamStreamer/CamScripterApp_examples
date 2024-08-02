@@ -1,8 +1,8 @@
 import { setInterval } from 'timers/promises';
 import { AxisCameraStationEvents } from 'camstreamerlib/events/AxisCameraStationEvents';
 
-import { Widget } from './widget';
-import { AxisEvents } from './events';
+import { Widget } from './Widget';
+import { AxisEvents } from './AxisEvents';
 import { LuxMeterReader } from './LuxMeterReader';
 import { TLuxmeter, readSettings } from './settings';
 
