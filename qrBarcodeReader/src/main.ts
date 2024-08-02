@@ -3,12 +3,13 @@ import * as util from 'util';
 import * as QRCode from 'qrcode';
 import * as MemoryStream from 'memorystream';
 import { CamOverlayDrawingAPI, TCairoCreateResponse } from 'camstreamerlib/CamOverlayDrawingAPI';
-import { sendRequest } from 'camstreamerlib/internal/HttpRequest';
+import { AxisCameraStationEvents } from 'camstreamerlib/events/AxisCameraStationEvents';
 import { QRCodeReader } from './qrCodeReader';
 
 const setTimeoutPromise = util.promisify(setTimeout);
 
 let co: CamOverlayDrawingAPI | undefined;
+let acs: AxisCameraStationEvents | undefined;
 let coConnected = false;
 let barcodeFont = '';
 let displayTimer: NodeJS.Timeout | undefined;
@@ -262,64 +263,35 @@ function computePosition(
     return { x, y };
 }
 
+async function initAcs() {
+    if (acs !== undefined && acsConfigured) {
+        acs = new AxisCameraStationEvents(settings.acs_source_key, {
+            tls: settings.acs_protocol !== 'http',
+            tlsInsecure: settings.acs_protocol === 'https_insecure',
+            ip: settings.acs_ip,
+            port: settings.acs_port,
+            user: settings.acs_user,
+            pass: settings.acs_pass,
+        });
+    }
+}
+
 async function sendAcsEvent(text: string) {
     try {
         if (!acsConfigured) {
             return;
         }
-
-        const date = new Date();
-        const year = date.getUTCFullYear();
-        const month = pad(date.getUTCMonth(), 2);
-        const day = pad(date.getUTCDate(), 2);
-        const hours = pad(date.getUTCHours(), 2);
-        const minutes = pad(date.getUTCMinutes(), 2);
-        const seconds = pad(date.getUTCSeconds(), 2);
-        const dateString = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-
-        const event = {
-            addExternalDataRequest: {
-                occurenceTime: dateString,
-                source: settings.acs_source_key,
-                externalDataType: 'qrBarCodeReader',
-                data: {
+        await initAcs();
+        await acs!.sendEvent(
+            {
                     timestamp: Math.floor(Date.now() / 1000).toString(),
                     text,
                 },
-            },
-        };
-        const eventData = JSON.stringify(event);
-        await sendRequest(
-            {
-                protocol: settings.acs_protocol === 'http' ? 'http:' : 'https:',
-                method: 'POST',
-                host: settings.acs_ip,
-                port: settings.acs_port ?? 29204,
-                path: '/Acs/Api/ExternalDataFacade/AddExternalData',
-                user: settings.acs_user,
-                pass: settings.acs_pass,
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Content-Length': eventData.length.toString(),
-                },
-                rejectUnauthorized: settings.acs_protocol !== 'https_insecure',
-            },
-            eventData
+            'qrBarCodeReader'
         );
     } catch (err) {
         console.error('Send ACS event: ', err instanceof Error ? err.message : 'Unknown Error');
     }
-}
-
-function pad(num: number, size: number) {
-    const sign = Math.sign(num) === -1 ? '-' : '';
-    return (
-        sign +
-        new Array(size)
-            .concat([Math.abs(num)])
-            .join('0')
-            .slice(-size)
-    );
 }
 
 process.on('SIGINT', async () => {
