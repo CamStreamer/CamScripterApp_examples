@@ -15,8 +15,30 @@ let barcodeFont = '';
 let displayTimer: NodeJS.Timeout | undefined;
 
 type CoordSystem = 'top_left' | 'top_right' | 'bottom_left' | 'bottom_right';
+type TSettings = {
+    camera_protocol: 'http' | 'https' | 'https_insecure';
+    camera_ip: string;
+    camera_port: number;
+    camera_user: string;
+    camera_pass: string;
+    widget_graphic_type: 'qr_code' | 'bar_code';
+    widget_camera_list: [number];
+    widget_visibility_time: number;
+    widget_coord_system: CoordSystem;
+    widget_pos_x: number;
+    widget_pos_y: number;
+    widget_stream_width: number;
+    widget_stream_height: number;
+    widget_scale: number;
+    acs_protocol: 'http' | 'https' | 'https_insecure';
+    acs_ip: string;
+    acs_port: number;
+    acs_user: string;
+    acs_pass: string;
+    acs_source_key: string;
+};
 
-let settings: any = null;
+let settings: TSettings;
 try {
     const data = fs.readFileSync(process.env.PERSISTENT_DATA_PATH + 'settings.json');
     settings = JSON.parse(data.toString());
@@ -284,9 +306,9 @@ async function sendAcsEvent(text: string) {
         await initAcs();
         await acs!.sendEvent(
             {
-                    timestamp: Math.floor(Date.now() / 1000).toString(),
-                    text,
-                },
+                timestamp: Math.floor(Date.now() / 1000).toString(),
+                text,
+            },
             'qrBarCodeReader'
         );
     } catch (err) {
