@@ -49,7 +49,6 @@ export const App = () => {
                 pass: camera.pass,
             });
         }
-        console.log(out);
         return out;
     };
 

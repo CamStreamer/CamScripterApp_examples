@@ -51,8 +51,6 @@ export const FormWrapper = ({ defaultValues }: Props) => {
                 pass: camera.pass,
             });
         }
-
-        console.log(out);
         return out;
     };
     const onSubmit: SubmitHandler<TServerData> = async (toPost) => {
