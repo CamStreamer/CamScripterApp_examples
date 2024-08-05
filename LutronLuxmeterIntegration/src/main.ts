@@ -20,7 +20,10 @@ function sendEvent(type: 'low' | 'high') {
     }
 
     if (acsEvents) {
-        const message = type === 'low' ? 'Low intensity' : 'High intensity';
+        const message = {
+            Code: type === 'low' ? 'Low intensity' : 'High intensity',
+        };
+
         acsEvents.sendEvent(message, 'lutron_luxmeter_integration').catch((err) => console.error(err));
     }
 }
