@@ -1,7 +1,7 @@
 import { TServerData } from './schema';
 
 export const mockedSettings: TServerData = {
-    luxmeter: { frequency: 10, low: 0, high: Number.MAX_VALUE, period: 0 },
+    luxmeter: { frequency: 10, low: 0, high: 400_000, period: 0 },
     cameras: [
         {
             protocol: 'http',
