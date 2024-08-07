@@ -285,8 +285,8 @@ function computePosition(
     return { x, y };
 }
 
-async function initAcs() {
-    if (acs !== undefined && acsConfigured) {
+function initAcs() {
+    if (acs === undefined && acsConfigured) {
         acs = new AxisCameraStationEvents(settings.acs_source_key, {
             tls: settings.acs_protocol !== 'http',
             tlsInsecure: settings.acs_protocol === 'https_insecure',
@@ -303,7 +303,7 @@ async function sendAcsEvent(text: string) {
         if (!acsConfigured) {
             return;
         }
-        await initAcs();
+        initAcs();
         await acs!.sendEvent(
             {
                 timestamp: Math.floor(Date.now() / 1000).toString(),
