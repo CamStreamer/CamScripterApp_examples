@@ -1,6 +1,6 @@
 {
     "name": "@camstreamer/qr-barcode-reader",
-    "version": "1.1.1",
+    "version": "1.1.2",
     "description": "",
     "prettier": "@camstreamer/prettier-config",
     "main": "main.js",
@@ -12,15 +12,13 @@
         "pretty": "prettier --write \"./src/*.{ts,tsx}\"",
         "pretty:check": "prettier --check \"./src/*.{ts,tsx}\"",
         "test": "echo \"Error: no test specified\" && exit 1",
-        "in:prod": "npm install -production",
-        "in:all": "npm install",
         "zip:package": "node node_modules/camstreamerlib/CreatePackage -i",
-        "zip": "npm-run-all build in:prod zip:package in:all"
+        "zip": "npm-run-all build zip:package"
     },
     "author": "CamStreamer s.r.o",
     "license": "ISC",
     "dependencies": {
-        "camstreamerlib": "^2.0.6",
+        "camstreamerlib": "^3.1.0",
         "fast-glob": "^3.2.12",
         "memorystream": "^0.3.1",
         "qrcode": "^1.5.3"

@@ -2,20 +2,43 @@ import * as fs from 'fs';
 import * as util from 'util';
 import * as QRCode from 'qrcode';
 import * as MemoryStream from 'memorystream';
-import { CamOverlayDrawingAPI, CairoCreateResponse } from 'camstreamerlib/CamOverlayDrawingAPI';
-import { httpRequest } from 'camstreamerlib/HttpRequest';
+import { CamOverlayDrawingAPI, TCairoCreateResponse } from 'camstreamerlib/CamOverlayDrawingAPI';
+import { AxisCameraStationEvents } from 'camstreamerlib/events/AxisCameraStationEvents';
 import { QRCodeReader } from './qrCodeReader';
 
 const setTimeoutPromise = util.promisify(setTimeout);
 
 let co: CamOverlayDrawingAPI | undefined;
+let acs: AxisCameraStationEvents | undefined;
 let coConnected = false;
 let barcodeFont = '';
 let displayTimer: NodeJS.Timeout | undefined;
 
 type CoordSystem = 'top_left' | 'top_right' | 'bottom_left' | 'bottom_right';
+type TSettings = {
+    camera_protocol: 'http' | 'https' | 'https_insecure';
+    camera_ip: string;
+    camera_port: number;
+    camera_user: string;
+    camera_pass: string;
+    widget_graphic_type: 'qr_code' | 'bar_code';
+    widget_camera_list: [number];
+    widget_visibility_time: number;
+    widget_coord_system: CoordSystem;
+    widget_pos_x: number;
+    widget_pos_y: number;
+    widget_stream_width: number;
+    widget_stream_height: number;
+    widget_scale: number;
+    acs_protocol: 'http' | 'https' | 'https_insecure';
+    acs_ip: string;
+    acs_port: number;
+    acs_user: string;
+    acs_pass: string;
+    acs_source_key: string;
+};
 
-let settings: any = null;
+let settings: TSettings;
 try {
     const data = fs.readFileSync(process.env.PERSISTENT_DATA_PATH + 'settings.json');
     settings = JSON.parse(data.toString());
@@ -76,7 +99,8 @@ async function initCamOverlay() {
             tlsInsecure: settings.camera_protocol === 'https_insecure',
             ip: settings.camera_ip,
             port: settings.camera_port,
-            auth: settings.camera_user + ':' + settings.camera_pass,
+            user: settings.camera_user,
+            pass: settings.camera_pass,
             camera: settings.widget_camera_list,
         });
 
@@ -113,13 +137,13 @@ async function createQrCodeWidget(text: string) {
         'CAIRO_FORMAT_ARGB32',
         widgetWidth,
         widgetHeight
-    )) as CairoCreateResponse;
+    )) as TCairoCreateResponse;
     const surface = surfaceResponse.var;
-    const cairoResponse = (await co.cairo('cairo_create', surface)) as CairoCreateResponse;
+    const cairoResponse = (await co.cairo('cairo_create', surface)) as TCairoCreateResponse;
     const cairo = cairoResponse.var;
 
     const imageDataBuffer = await generateQrCode(text, widgetWidth);
-    const imgResponse = (await co.uploadImageData(imageDataBuffer)) as CairoCreateResponse;
+    const imgResponse = (await co.uploadImageData(imageDataBuffer)) as TCairoCreateResponse;
     const qrImage = imgResponse.var;
     co.cairo('cairo_translate', cairo, 0, 0);
     co.cairo('cairo_set_source_surface', cairo, qrImage, 0, 0);
@@ -162,9 +186,9 @@ async function createBarcodeWidget(text: string) {
         'CAIRO_FORMAT_ARGB32',
         widgetWidth,
         widgetHeight
-    )) as CairoCreateResponse;
+    )) as TCairoCreateResponse;
     const surface = surfaceResponse.var;
-    const cairoResponse = (await co.cairo('cairo_create', surface)) as CairoCreateResponse;
+    const cairoResponse = (await co.cairo('cairo_create', surface)) as TCairoCreateResponse;
     const cairo = cairoResponse.var;
 
     // Measure the size of the barcode
@@ -261,63 +285,35 @@ function computePosition(
     return { x, y };
 }
 
+function initAcs() {
+    if (acs === undefined && acsConfigured) {
+        acs = new AxisCameraStationEvents(settings.acs_source_key, {
+            tls: settings.acs_protocol !== 'http',
+            tlsInsecure: settings.acs_protocol === 'https_insecure',
+            ip: settings.acs_ip,
+            port: settings.acs_port,
+            user: settings.acs_user,
+            pass: settings.acs_pass,
+        });
+    }
+}
+
 async function sendAcsEvent(text: string) {
     try {
         if (!acsConfigured) {
             return;
         }
-
-        const date = new Date();
-        const year = date.getUTCFullYear();
-        const month = pad(date.getUTCMonth(), 2);
-        const day = pad(date.getUTCDate(), 2);
-        const hours = pad(date.getUTCHours(), 2);
-        const minutes = pad(date.getUTCMinutes(), 2);
-        const seconds = pad(date.getUTCSeconds(), 2);
-        const dateString = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-
-        const event = {
-            addExternalDataRequest: {
-                occurenceTime: dateString,
-                source: settings.acs_source_key,
-                externalDataType: 'qrBarCodeReader',
-                data: {
-                    timestamp: Math.floor(Date.now() / 1000).toString(),
-                    text,
-                },
-            },
-        };
-        const eventData = JSON.stringify(event);
-        await httpRequest(
+        initAcs();
+        await acs!.sendEvent(
             {
-                protocol: settings.acs_protocol === 'http' ? 'http:' : 'https:',
-                method: 'POST',
-                host: settings.acs_ip,
-                port: settings.acs_port ?? 29204,
-                path: '/Acs/Api/ExternalDataFacade/AddExternalData',
-                auth: settings.acs_user + ':' + settings.acs_pass,
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Content-Length': eventData.length,
-                },
-                rejectUnauthorized: settings.acs_protocol !== 'https_insecure',
+                timestamp: Math.floor(Date.now() / 1000).toString(),
+                text,
             },
-            eventData
+            'qrBarCodeReader'
         );
     } catch (err) {
         console.error('Send ACS event: ', err instanceof Error ? err.message : 'Unknown Error');
     }
-}
-
-function pad(num: number, size: number) {
-    const sign = Math.sign(num) === -1 ? '-' : '';
-    return (
-        sign +
-        new Array(size)
-            .concat([Math.abs(num)])
-            .join('0')
-            .slice(-size)
-    );
 }
 
 process.on('SIGINT', async () => {

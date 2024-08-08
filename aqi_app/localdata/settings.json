@@ -12,5 +12,7 @@
     "location": "",
     "pos_x": 10,
     "pos_y": 10,
-    "resolution": "1920x1080"
+    "resolution": "1920x1080",
+    "serviceName":  "english",
+    "font":  "OpenSans"
 }
