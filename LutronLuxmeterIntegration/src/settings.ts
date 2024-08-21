@@ -2,19 +2,38 @@ import { z } from 'zod';
 import * as fs from 'fs';
 import * as path from 'path';
 
-const luxmeterSchema = z.object({
-    frequency: z.number(),
-    low: z.number().nonnegative().default(0),
-    high: z.number().nonnegative().default(Number.MAX_VALUE),
-    period: z.number().nonnegative().default(0),
-});
-const cameraSchema = z.object({
-    tls: z.boolean(),
-    tlsInsecure: z.boolean(),
+const connectionParams = {
+    protocol: z.union([z.literal('http'), z.literal('https'), z.literal('https_insecure')]),
     ip: z.string().ip(),
     port: z.number().positive().lt(65535),
     user: z.string(),
     pass: z.string(),
+};
+const cameraSchema = z.object({
+    ...connectionParams,
+    cameraList: z.number().array().nonempty(),
+});
+const acsSchema = z.object({
+    enabled: z.boolean(),
+    ...connectionParams,
+    source_key: z.string(),
+});
+const axisEventSchema = z.object({
+    enabled: z.boolean(),
+});
+const eventSchema = z.object({
+    enabled: z.boolean(),
+    triggerDelay: z.number().nonnegative(),
+    repeatDelay: z.number().nonnegative(),
+    value: z.number().nonnegative(),
+    condition: z.union([
+        z.literal('='),
+        z.literal('<'),
+        z.literal('<='),
+        z.literal('>'),
+        z.literal('>='),
+        z.literal('<'),
+    ]),
 });
 const widgetSchema = z.object({
     enabled: z.boolean(),
@@ -35,33 +54,22 @@ const widgetSchema = z.object({
         z.literal('bottom_right'),
     ]),
 });
-const axisEventSchema = z.object({
-    enabled: z.boolean(),
-});
-const acsSchema = z.object({
-    enabled: z.boolean(),
-    tls: z.boolean(),
-    tlsInsecure: z.boolean(),
-    ip: z.union([z.string().ip(), z.literal('')]),
-    port: z.number().positive().lt(65535),
-    user: z.string(),
-    pass: z.string(),
-    source_key: z.string(),
-});
 
 const settingsSchema = z.object({
-    luxmeter: luxmeterSchema,
+    updateFrequency: z.number(),
     cameras: cameraSchema.array(),
-    widget: widgetSchema,
-    events: axisEventSchema,
     acs: acsSchema,
+    events: axisEventSchema,
+    lowEvent: eventSchema,
+    highEvent: eventSchema,
+    widget: widgetSchema,
 });
 
-export type TLuxmeter = z.infer<typeof luxmeterSchema>;
 export type TCamera = z.infer<typeof cameraSchema>;
-export type TWidget = z.infer<typeof widgetSchema>;
-export type TAxisEvent = z.infer<typeof axisEventSchema>;
 export type TAcs = z.infer<typeof acsSchema>;
+export type TAxisEvent = z.infer<typeof axisEventSchema>;
+export type TEvent = z.infer<typeof eventSchema>;
+export type TWidget = z.infer<typeof widgetSchema>;
 export type TSettings = z.infer<typeof settingsSchema>;
 
 export function readSettings(): TSettings {

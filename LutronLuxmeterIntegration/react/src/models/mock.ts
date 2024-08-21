@@ -1,16 +1,29 @@
-import { TServerData } from './schema';
+import { TSettings } from './schema';
 
-export const mockedSettings: TServerData = {
-    luxmeter: { frequency: 10, low: 0, high: 400_000, period: 0 },
+export const mockedSettings: TSettings = {
+    updateFrequency: 10,
     cameras: [
         {
             protocol: 'http',
-            ip: '127.0.0.1',
+            ip: '',
             port: 80,
             user: 'root',
             pass: '',
+            cameraList: [0],
         },
     ],
+    acs: {
+        enabled: false,
+        protocol: 'https_insecure',
+        ip: '',
+        port: 29204,
+        user: '',
+        pass: '',
+        source_key: '',
+    },
+    events: {
+        enabled: false,
+    },
     widget: {
         enabled: true,
         scale: 1,
@@ -20,16 +33,18 @@ export const mockedSettings: TServerData = {
         screenWidth: 1920,
         screenHeight: 1080,
     },
-    events: {
+    lowEvent: {
         enabled: false,
+        triggerDelay: 0,
+        repeatDelay: 0,
+        value: 0,
+        condition: '<',
     },
-    acs: {
+    highEvent: {
         enabled: false,
-        protocol: 'https_insecure',
-        ip: '',
-        port: 55756,
-        user: '',
-        pass: '',
-        source_key: '',
+        triggerDelay: 0,
+        repeatDelay: 0,
+        value: 400000,
+        condition: '>',
     },
 };

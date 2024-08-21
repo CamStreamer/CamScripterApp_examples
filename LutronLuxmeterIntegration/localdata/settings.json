@@ -1,37 +1,48 @@
 {
-  "luxmeter": {
-    "frequency": 10000
-  },
-  "cameras": [
-    {
-        "tls": false,
-        "tlsInsecure": false,
-        "ip": "127.0.0.1",
-        "port": 80,
-        "user": "root",
-        "pass": ""
+    "updateFrequency": 10,
+    "cameras": [
+        {
+            "protocol": "http",
+            "ip": "",
+            "port": 80,
+            "user": "root",
+            "pass": "",
+            "cameraList": [ 0 ]
+        }
+    ],
+    "acs": {
+        "enabled": false,
+        "protocol": "https_insecure",
+        "ip": "",
+        "port": 29204,
+        "user": "",
+        "pass": "",
+        "source_key": ""
+    },
+    "events": {
+        "enabled": false
+    },
+    "widget": {
+        "enabled": true,
+        "scale": 1,
+        "coAlignment": "top_left",
+        "x": 0,
+        "y": 0,
+        "screenWidth": 1920,
+        "screenHeight": 1080
+    },
+    "lowEvent": {
+        "enabled": false,
+        "triggerDelay": 0,
+        "repeatDelay": 0,
+        "value": 0,
+        "condition": "<"
+    },
+    "highEvent": {
+        "enabled": false,
+        "triggerDelay": 0,
+        "repeatDelay": 0,
+        "value": 400000,
+        "condition": ">"
     }
-  ],
-  "widget": {
-    "enabled":  true,
-    "x": 10,
-    "y": 10,
-    "scale": 1,
-    "screenWidth": 1920,
-    "screenHeight": 1080,
-    "coAlignment": "top_left"
-  },
-  "events": {
-    "enabled": false
-  },
-  "acs": {
-    "enabled": false,
-    "tls": false,
-    "tlsInsecure": false,
-    "ip": "",
-    "port": 55756,
-    "user": "",
-    "pass": "",
-    "source_key": ""
-  }
 }
