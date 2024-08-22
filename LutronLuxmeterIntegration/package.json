@@ -8,19 +8,24 @@
   },
   "prettier": "@camstreamer/prettier-config",
   "scripts": {
-    "lint": "eslint \"./{src,react/src}/**/*.ts\"",
-    "lint:fix": "eslint \"src/**/*.ts\" --fix",
-    "pretty": "prettier --write \"./{src,react/src,react/src/*}/*.{ts,tsx}\"",
-    "pretty:check": "prettier --check \"./{src,react/src,react/src/*}/*.{ts,tsx}\"",
+    "lint": "eslint \"./{src,react/src}/**/*.{ts,tsx}\"",
+    "lint:fix": "eslint \"./{src,react/src}/**/*.{ts,tsx}\" --fix",
+    "pretty": "prettier --write \"./{src,react/src}/**/*.{ts,tsx}\"",
+    "pretty:check": "prettier --check \"./{src,react/src}/**/*.{ts,tsx}\"",
+      
     "try": "PERSISTENT_DATA_PATH=\"./localdata/\" ts-node src/main.ts",
     "start": "cd react && npm run start",
-    "clean": "rimraf dist/* html/*",
-    "in:ui": "cd react && npm install",
-    "build:BE": "tsc",
+
+    "clean": "rimraf dist",
+    "build": "npm run clean && tsc",
     "build:FE": "cd react && npm run build",
-    "build": "npm-run-all build:BE build:FE",
-    "zip:package": "node node_modules/camstreamerlib/CreatePackage -i -e=react,testing",
-    "zip": "npm-run-all clean in:ui build zip:package"
+    "build:all": "npm-run-all build build:FE",
+
+    "in:ui": "cd react && npm install",
+    "zip:package": "node node_modules/camstreamerlib/CreatePackage -i -e='react,testing'  -w='C:/Users/vasst/Downloads'",
+    "zip:BE": "npm-run-all build zip:package",
+    "zip:FE": "npm-run-all build:FE zip:package",
+    "zip": "npm-run-all in:ui build:all zip:package"
   },
   "devDependencies": {
     "@camstreamer/eslint-config": "^1.0.0",

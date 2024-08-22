@@ -3,8 +3,9 @@
   "private": true,
   "version": "0.0.0",
   "scripts": {
+    "clean": "cd .. && rimraf html",
     "start": "react-scripts start",
-    "build": "react-scripts build && cp -rT build ../html",
+    "build": "react-scripts build && npm run clean && cp -rT build ../html",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
   },
