@@ -1,49 +1,45 @@
 import { CamOverlayDrawingOptions } from 'camstreamerlib/CamOverlayDrawingAPI';
 import { Painter, PainterOptions, Frame } from 'camstreamerlib/CamOverlayPainter/Painter';
 import type { TResult } from './LuxMeterReader';
-import type { TCamera } from "./settings"
+import type { TCamera } from './settings';
 
-const imageWidth = 325;
-const luxmeterHeight = 254;
-const camstreamerHeight = 92;
+const imageWidth = 720;
+const imageHeight = 480;
 
 export class Widget {
     private painters: Painter[];
-    private camstreamer: Frame;
     private luxmeter: Frame;
+    private message: Frame;
     private value: Frame;
     private unit: Frame;
     private scale: number;
 
-    public constructor(
-        opt: Omit<PainterOptions, 'width' | 'height'> & { scale: number },
-        cameras: TCamera[]
-    ) {
+    public constructor(opt: Omit<PainterOptions, 'width' | 'height'> & { scale: number }, cameras: TCamera[]) {
         this.luxmeter = new Frame({
             x: 0,
             y: 0,
             width: imageWidth,
-            height: luxmeterHeight,
+            height: imageHeight,
             bgImage: 'Luxmeter',
         });
-        this.camstreamer = new Frame({
-            x: 0,
-            y: luxmeterHeight,
-            width: imageWidth,
-            height: camstreamerHeight,
-            bgImage: 'CamStreamer',
+        this.message = new Frame({
+            x: 65,
+            y: 100,
+            width: 590,
+            height: 180,
+            enabled: false,
         });
         this.value = new Frame({
-            x: 30,
-            y: 15,
-            width: 223,
-            height: 190,
+            x: 75,
+            y: 90,
+            width: 375,
+            height: 180,
         });
         this.unit = new Frame({
-            x: 259,
-            y: 111,
-            width: 40,
-            height: 79,
+            x: 485,
+            y: 95,
+            width: 160,
+            height: 180,
         });
 
         this.scale = opt.scale;
@@ -54,22 +50,33 @@ export class Widget {
                     {
                         ...opt,
                         width: imageWidth,
-                        height: luxmeterHeight + camstreamerHeight,
+                        height: imageHeight,
                     },
                     coOpt,
                     this.luxmeter,
+                    this.message,
                     this.value,
-                    this.unit,
-                    this.camstreamer
+                    this.unit
                 )
             );
         }
 
         this.value.setFont('Digital');
+        this.message.setFont('Digital');
+        this.message.setText('OUT OF RANGE', 'A_CENTER', 'TFM_SCALE', [0, 0, 0]);
     }
     public async display(result: TResult): Promise<void> {
-        this.value.setText(this.toString(result.value), 'A_CENTER', 'TFM_SCALE', [0, 0, 0]);
-        this.unit.setText(result.unit, 'A_CENTER', 'TFM_SCALE', [0, 0, 0]);
+        if (result.value === 0 || isNaN(result.value)) {
+            this.message.enable();
+            this.value.disable();
+            this.unit.disable();
+        } else {
+            this.message.disable();
+            this.value.enable();
+            this.unit.enable();
+            this.value.setText(this.toString(result.value), 'A_RIGHT', 'TFM_SCALE', [0, 0, 0]);
+            this.unit.setText(result.unit, 'A_CENTER', 'TFM_SCALE', [0, 0, 0]);
+        }
 
         const promises = new Array<Promise<void>>();
 
@@ -80,12 +87,8 @@ export class Widget {
     }
 
     private toString(value: number): string {
-        if (value === 0 || isNaN(value)) {
-            return 'ERROR';
-        } else {
-            const text = value.toPrecision(4);
-            return text.substring(0, 6);
-        }
+        const text = value.toPrecision(4);
+        return text.substring(0, 6);
     }
     private initialisePainter(opt: PainterOptions, coOpt: TCamera, ...frames: Frame[]) {
         const coOptions: CamOverlayDrawingOptions = {
@@ -98,7 +101,6 @@ export class Widget {
 
         p.registerFont('Digital', 'digital_font.ttf');
         p.registerImage('Luxmeter', 'luxmeter.png');
-        p.registerImage('CamStreamer', 'camstreamer.png');
 
         p.insert(...frames);
         void p.connect();
