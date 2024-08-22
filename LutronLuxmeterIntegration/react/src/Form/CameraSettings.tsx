@@ -1,11 +1,11 @@
 import styled from '@emotion/styled';
 import { Box } from '@mui/material';
 import { Control } from 'react-hook-form';
-import { TServerData } from '../models/schema';
+import { TSettings } from '../models/schema';
 import { CameraList } from './CameraList';
 
 type Props = {
-    control: Control<TServerData>;
+    control: Control<TSettings>;
 };
 
 export const DataProcess = ({ control }: Props) => {

@@ -1,6 +1,6 @@
-import { TServerData } from './models/schema';
+import { TWidget } from './models/schema';
 
-export const coordOptionLabels: Record<TServerData['widget']['coAlignment'], string> = {
+export const coordOptionLabels: Record<TWidget['coAlignment'], string> = {
     top_left: 'Top Left',
     top_center: 'Top Center',
     top_right: 'Top Right',
@@ -11,7 +11,7 @@ export const coordOptionLabels: Record<TServerData['widget']['coAlignment'], str
     bottom_center: 'Bottom Center',
     bottom_right: 'Bottom Right',
 };
-export const COORD_LIST = Object.keys(coordOptionLabels) as TServerData['widget']['coAlignment'][];
+export const COORD_LIST = Object.keys(coordOptionLabels) as TWidget['coAlignment'][];
 
 export const parseValueAsInt = (value: string) => {
     const parsedValue = parseInt(value);

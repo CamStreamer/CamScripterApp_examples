@@ -6,7 +6,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 
 import { Nav } from './components/Nav';
 import { ContainerLoader } from './components/ContainerLoader';
-import { TServerData, TServerConvertedData, serverDataSchema } from './models/schema';
+import { TSettings, settingsSchema } from './models/schema';
 import { useInitializeOnMount } from './hooks/useInitializeOnMount';
 import { ZodError } from 'zod';
 import { useSnackbar } from './hooks/Snackbar';
@@ -18,39 +18,7 @@ import { mockedSettings } from './models/mock';
 export const App = () => {
     const { displaySnackbar } = useSnackbar();
 
-    const [defaultValues, setDefaultValues] = useState<TServerData | null>(null);
-
-    const convert = (fetched: TServerConvertedData) => {
-        const out: TServerData = {
-            cameras: new Array(),
-            widget: fetched.widget,
-            luxmeter: fetched.luxmeter,
-            events: fetched.events,
-            acs: {
-                enabled: fetched.acs.enabled,
-                protocol: !fetched.acs.tls ? 'http' : fetched.acs.tlsInsecure ? 'https_insecure' : 'https',
-                ip: fetched.acs.ip,
-                port: fetched.acs.port,
-                user: fetched.acs.user,
-                pass: fetched.acs.pass,
-                source_key: fetched.acs.source_key,
-            },
-        };
-
-        out.widget.scale *= 100;
-        out.luxmeter.frequency /= 1000;
-
-        for (const camera of fetched.cameras) {
-            out.cameras.push({
-                protocol: !camera.tls ? 'http' : camera.tlsInsecure ? 'https_insecure' : 'https',
-                ip: camera.ip,
-                port: camera.port,
-                user: camera.user,
-                pass: camera.pass,
-            });
-        }
-        return out;
-    };
+    const [defaultValues, setDefaultValues] = useState<TSettings | null>(null);
 
     useInitializeOnMount(async () => {
         let response: Response;
@@ -61,8 +29,7 @@ export const App = () => {
             }
 
             response = await fetch(url);
-            const data = convert(await response.json());
-            const parsedData = serverDataSchema.parse(data);
+            const parsedData = settingsSchema.parse(await response.json());
             setDefaultValues(parsedData);
         } catch (e) {
             if (e instanceof ZodError) {
@@ -91,10 +58,8 @@ export const App = () => {
                     <StyledHeader>
                         <Headline text={'Lutron Luxmeter integration'} />
                         <Typography>
-                            Clients in retail, warehousing, manufacturing are looking for a solution to retrieve data in
-                            the form of relatively short text string from barcode reader, external IP source or even via
-                            OCR, overlay the data on video stream and upload media content somewhere or push event to
-                            VMS. See documentation here.
+                            Integration of Luxmeter Lutron LX 1180. Before using the device, select the unit range and
+                            turn on the recording ti prevent the device from turning off. Set the USB stick to position 2.
                         </Typography>
                     </StyledHeader>
                     {defaultValues ? (

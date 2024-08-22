@@ -5,11 +5,11 @@ import InputAdornment from '@mui/material/InputAdornment';
 import { Control, Controller } from 'react-hook-form';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import { TServerData } from '../models/schema';
+import { TSettings } from '../models/schema';
 import { StyledTextField } from './FormInputs';
 
 type Props = {
-    control: Control<TServerData>;
+    control: Control<TSettings>;
     name: `cameras.${number}.pass` | 'acs.pass';
 };
 

@@ -1,14 +1,14 @@
 import styled from '@emotion/styled';
 import { parseValueAsFloat } from '../utils';
 import { Title } from '../components/Title';
-import { TServerData } from '../models/schema';
+import { TSettings } from '../models/schema';
 import { Control, Controller } from 'react-hook-form';
 import { StyledSelect, StyledTextField } from '../components/FormInputs';
 import { Box, FormControlLabel, Switch, MenuItem } from '@mui/material';
 import { PasswordInput } from '../components/PasswordInput';
 
 type Props = {
-    control: Control<TServerData>;
+    control: Control<TSettings>;
 };
 
 export const LuxMeterSettings = ({ control }: Props) => {
@@ -17,7 +17,7 @@ export const LuxMeterSettings = ({ control }: Props) => {
             <StyledSection>
                 <Title text="Select how often should luxmeter send results of measurement" />
                 <Controller
-                    name={'luxmeter.frequency'}
+                    name={'updateFrequency'}
                     control={control}
                     render={({ field, formState }) => (
                         <StyledTextField
@@ -30,8 +30,8 @@ export const LuxMeterSettings = ({ control }: Props) => {
                                 field.onChange(val);
                                 e.target.value = val.toString();
                             }}
-                            error={!!formState.errors.luxmeter?.frequency}
-                            helperText={formState.errors.luxmeter?.frequency?.message}
+                            error={!!formState.errors.updateFrequency}
+                            helperText={formState.errors.updateFrequency?.message}
                         />
                     )}
                 />
@@ -229,9 +229,9 @@ const StyledSection = styled(Box)`
     gap: 8px;
 `;
 
-const PROTOCOL_LABELS: Record<TServerData['cameras'][0]['protocol'], string> = {
+const PROTOCOL_LABELS: Record<TSettings['cameras'][0]['protocol'], string> = {
     http: 'HTTP',
     https: 'HTTPS',
     https_insecure: 'HTTPS (insecure)',
 };
-const PROTOCOLS = Object.keys(PROTOCOL_LABELS) as TServerData['cameras'][0]['protocol'][];
+const PROTOCOLS = Object.keys(PROTOCOL_LABELS) as TSettings['cameras'][0]['protocol'][];

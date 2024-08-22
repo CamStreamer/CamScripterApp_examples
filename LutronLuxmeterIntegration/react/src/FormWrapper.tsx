@@ -1,5 +1,5 @@
 import { FormProvider, SubmitErrorHandler, SubmitHandler, useForm } from 'react-hook-form';
-import { TServerData, TServerConvertedData, TCameraServer, serverDataSchema } from './models/schema';
+import { TSettings, settingsSchema } from './models/schema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useSnackbar } from './hooks/Snackbar';
 import { Form } from './Form/Form';
@@ -8,52 +8,19 @@ import { CircularProgress, Typography, Fab } from '@mui/material';
 import { InfoSnackbar } from './components/Snackbar';
 
 type Props = {
-    defaultValues: TServerData;
+    defaultValues: TSettings;
 };
 
 export const FormWrapper = ({ defaultValues }: Props) => {
     const { snackbarData, displaySnackbar, closeSnackbar } = useSnackbar();
-    const form = useForm<TServerData>({
-        resolver: zodResolver(serverDataSchema),
+    const form = useForm<TSettings>({
+        resolver: zodResolver(settingsSchema),
         mode: 'onChange',
         reValidateMode: 'onChange',
         defaultValues,
     });
 
-    const convert = (toPost: TServerData) => {
-        const out: TServerConvertedData = {
-            cameras: new Array<TCameraServer>(),
-            widget: toPost.widget,
-            luxmeter: toPost.luxmeter,
-            events: toPost.events,
-            acs: {
-                enabled: toPost.acs.enabled,
-                tls: toPost.acs.protocol !== 'http',
-                tlsInsecure: toPost.acs.protocol === 'https_insecure',
-                ip: toPost.acs.ip,
-                port: toPost.acs.port,
-                user: toPost.acs.user,
-                pass: toPost.acs.pass,
-                source_key: toPost.acs.source_key,
-            },
-        };
-
-        out.widget.scale /= 100;
-        out.luxmeter.frequency *= 1000;
-
-        for (const camera of toPost.cameras) {
-            out.cameras.push({
-                tls: camera.protocol !== 'http',
-                tlsInsecure: camera.protocol === 'https_insecure',
-                ip: camera.ip,
-                port: camera.port,
-                user: camera.user,
-                pass: camera.pass,
-            });
-        }
-        return out;
-    };
-    const onSubmit: SubmitHandler<TServerData> = async (toPost) => {
+    const onSubmit: SubmitHandler<TSettings> = async (toPost) => {
         for (const camera of toPost.cameras) {
             if (camera.user === '' || camera.pass === '') {
                 displaySnackbar({
@@ -74,7 +41,7 @@ export const FormWrapper = ({ defaultValues }: Props) => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(convert(toPost)),
+                body: JSON.stringify(toPost),
             });
             if (!res.ok) {
                 throw new Error(`${res.status}: ${res.statusText}`);
@@ -93,7 +60,7 @@ export const FormWrapper = ({ defaultValues }: Props) => {
         }
     };
 
-    const onError: SubmitErrorHandler<TServerData> = (errors) => {
+    const onError: SubmitErrorHandler<TSettings> = (errors) => {
         console.error(`FORM ERROR: ${JSON.stringify(errors)}`);
         displaySnackbar({
             type: 'error',
