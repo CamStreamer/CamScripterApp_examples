@@ -4,13 +4,13 @@ import { AxisCameraStationEvents } from 'camstreamerlib/events/AxisCameraStation
 import { Widget } from './Widget';
 import { AxisEvents } from './AxisEvents';
 import { LuxMeterReader } from './LuxMeterReader';
-import { TLuxmeter, readSettings } from './settings';
+import { readSettings, TEvent } from './settings';
 
 let widget: Widget | undefined;
 let axisEvents: AxisEvents | undefined;
 let acsEvents: AxisCameraStationEvents | undefined;
 
-function sendEvent(type: 'low' | 'high') {
+function sendEvent(type: 'low' | 'high'): void {
     if (axisEvents) {
         try {
             axisEvents.sendEvent(type);
@@ -28,11 +28,26 @@ function sendEvent(type: 'low' | 'high') {
     }
 }
 
-async function loop(lmr: LuxMeterReader, luxOpt: TLuxmeter) {
-    let eventTimeout: NodeJS.Timeout | undefined;
-    let low: boolean = false;
+function compare(measuredValue: number, triggerValue: number, condition: '=' | '<' | '<=' | '>' | '>='): boolean {
+    switch (condition) {
+        case '=':
+            return measuredValue === triggerValue;
+        case '<':
+            return measuredValue < triggerValue;
+        case '<=':
+            return measuredValue <= triggerValue;
+        case '>':
+            return measuredValue > triggerValue;
+        case '>=':
+            return measuredValue >= triggerValue;
+    }
+}
 
-    for await (const c of setInterval(luxOpt.frequency)) {
+async function loop(lmr: LuxMeterReader, updateFrequency: number, lowEvent: TEvent, highEvent: TEvent) {
+    let lowEventTimeout: NodeJS.Timeout | undefined;
+    let highEventTimeout: NodeJS.Timeout | undefined;
+
+    for await (const c of setInterval(updateFrequency)) {
         void c;
         const result = await lmr.readParsed();
 
@@ -44,22 +59,32 @@ async function loop(lmr: LuxMeterReader, luxOpt: TLuxmeter) {
             }
         }
 
-        if (luxOpt.low <= result.value && result.value <= luxOpt.high) {
-            clearTimeout(eventTimeout);
-            eventTimeout = undefined;
-        } else if (result.value < luxOpt.low) {
-            if (!low || eventTimeout === undefined) {
-                low = true;
-                eventTimeout = setTimeout(() => {
+        if (lowEvent.enabled && lowEventTimeout === undefined) {
+            if (compare(result.value, lowEvent.value, lowEvent.condition)) {
+                const triggerEvent = () => {
                     sendEvent('low');
-                }, luxOpt.period);
+                    if (lowEvent.repeatDelay > 0) {
+                        lowEventTimeout = setTimeout(triggerEvent, lowEvent.repeatDelay);
+                    }
+                };
+                lowEventTimeout = setTimeout(() => triggerEvent(), lowEvent.triggerDelay);
+            } else {
+                clearTimeout(lowEventTimeout);
+                lowEventTimeout = undefined;
             }
-        } else if (result.value > luxOpt.high) {
-            if (low || eventTimeout === undefined) {
-                low = false;
-                eventTimeout = setTimeout(() => {
-                    sendEvent('high');
-                }, luxOpt.period);
+        }
+        if (highEvent.enabled && highEventTimeout === undefined) {
+            if (compare(result.value, highEvent.value, highEvent.condition)) {
+                const triggerEvent = () => {
+                    sendEvent('low');
+                    if (highEvent.repeatDelay > 0) {
+                        highEventTimeout = setTimeout(triggerEvent, highEvent.repeatDelay);
+                    }
+                };
+                highEventTimeout = setTimeout(() => triggerEvent(), highEvent.triggerDelay);
+            } else {
+                clearTimeout(highEventTimeout);
+                highEventTimeout = undefined;
             }
         }
     }
@@ -81,10 +106,15 @@ async function main() {
         acsEvents = new AxisCameraStationEvents(settings.acs.source_key, settings.acs);
     }
 
-    await loop(lmr, settings.luxmeter);
+    await loop(lmr, settings.updateFrequency, settings.lowEvent, settings.highEvent);
 }
 
-main().catch((err) => {
-    console.error(err);
+process.on('uncaughtException', (error) => {
+    console.warn(error);
     process.exit(1);
 });
+process.on('unhandledRejection', (error) => {
+    console.warn(error);
+    process.exit(1);
+});
+void main();
