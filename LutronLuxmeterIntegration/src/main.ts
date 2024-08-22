@@ -1,10 +1,10 @@
 import { setInterval } from 'timers/promises';
-import { AxisCameraStationEvents } from 'camstreamerlib/events/AxisCameraStationEvents';
+import { AxisCameraStationEvents, AcsEventsOptions } from 'camstreamerlib/events/AxisCameraStationEvents';
 
 import { Widget } from './Widget';
 import { AxisEvents } from './AxisEvents';
 import { LuxMeterReader } from './LuxMeterReader';
-import { readSettings, TEvent } from './settings';
+import { readSettings, TSettings, TEvent } from './settings';
 
 let widget: Widget | undefined;
 let axisEvents: AxisEvents | undefined;
@@ -90,6 +90,14 @@ async function loop(lmr: LuxMeterReader, updateFrequency: number, lowEvent: TEve
     }
 }
 
+function convertTimes(settings: TSettings): void {
+    settings.updateFrequency *= 1000;
+    settings.lowEvent.triggerDelay *= 1000;
+    settings.lowEvent.repeatDelay *= 1000;
+    settings.highEvent.triggerDelay *= 1000;
+    settings.highEvent.repeatDelay *= 1000;
+}
+
 async function main() {
     const settings = readSettings();
     const lmr = await LuxMeterReader.connect();
@@ -103,9 +111,15 @@ async function main() {
     }
 
     if (settings.acs.enabled) {
-        acsEvents = new AxisCameraStationEvents(settings.acs.source_key, settings.acs);
+        const options: AcsEventsOptions = {
+            ...settings.acs,
+            tls: settings.acs.protocol !== 'http',
+            tlsInsecure: settings.acs.protocol === 'https',
+        };
+        acsEvents = new AxisCameraStationEvents(settings.acs.source_key, options);
     }
 
+    convertTimes(settings);
     await loop(lmr, settings.updateFrequency, settings.lowEvent, settings.highEvent);
 }
 

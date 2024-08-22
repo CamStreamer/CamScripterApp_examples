@@ -1,6 +1,7 @@
 import { CamOverlayDrawingOptions } from 'camstreamerlib/CamOverlayDrawingAPI';
 import { Painter, PainterOptions, Frame } from 'camstreamerlib/CamOverlayPainter/Painter';
 import type { TResult } from './LuxMeterReader';
+import type { TCamera } from "./settings"
 
 const imageWidth = 325;
 const luxmeterHeight = 254;
@@ -16,7 +17,7 @@ export class Widget {
 
     public constructor(
         opt: Omit<PainterOptions, 'width' | 'height'> & { scale: number },
-        cameras: CamOverlayDrawingOptions[]
+        cameras: TCamera[]
     ) {
         this.luxmeter = new Frame({
             x: 0,
@@ -86,8 +87,14 @@ export class Widget {
             return text.substring(0, 6);
         }
     }
-    private initialisePainter(opt: PainterOptions, coOpt: CamOverlayDrawingOptions, ...frames: Frame[]) {
-        const p = new Painter(opt, coOpt);
+    private initialisePainter(opt: PainterOptions, coOpt: TCamera, ...frames: Frame[]) {
+        const coOptions: CamOverlayDrawingOptions = {
+            ...coOpt,
+            camera: coOpt.cameraList,
+            tls: coOpt.protocol !== 'http',
+            tlsInsecure: coOpt.protocol === 'https',
+        };
+        const p = new Painter(opt, coOptions);
 
         p.registerFont('Digital', 'digital_font.ttf');
         p.registerImage('Luxmeter', 'luxmeter.png');

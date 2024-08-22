@@ -1,5 +1,8 @@
 import { TCamera } from './settings';
-import { CamScripterAPICameraEventsGenerator } from 'camstreamerlib/CamScripterAPICameraEventsGenerator';
+import {
+    CamScripterAPICameraEventsGenerator,
+    CamScripterOptions,
+} from 'camstreamerlib/CamScripterAPICameraEventsGenerator';
 
 type EventGenerator = {
     csc: CamScripterAPICameraEventsGenerator;
@@ -16,7 +19,12 @@ export class AxisEvents {
     constructor(cscConnectionParams: TCamera[]) {
         this.cscArray = [];
         for (const connection of cscConnectionParams) {
-            const csc = new CamScripterAPICameraEventsGenerator(connection);
+            const options: CamScripterOptions = {
+                ...connection,
+                tls: connection.protocol !== 'http',
+                tlsInsecure: connection.protocol === 'https',
+            };
+            const csc = new CamScripterAPICameraEventsGenerator(options);
             const eg: EventGenerator = { csc, connected: false, eventDeclared: false };
             this.cscArray.push(eg);
             void this.prepareEvents(eg);
