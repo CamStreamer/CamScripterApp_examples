@@ -12,6 +12,7 @@ import { CameraList } from './CameraList';
 import { WidgetSettings } from './WidgetSettings';
 import { EventSettings } from './EventSettings';
 import { AcsConnectParams } from './AcsConnectParams';
+import { Title } from '../components/Title';
 
 export function Form() {
     const { control } = useFormContext<TSettings>();
@@ -50,6 +51,7 @@ export function Form() {
                     <EventSettings />
                 </CollapsibleFormSection>
                 <CollapsibleFormSection label="ACS integration" defaultExpanded={false}>
+                    <Title text="Axis Camera Station settings" />
                     <AcsConnectParams
                         areCredentialsValid={areCredentialsValid}
                         setAreCredentialsValid={setAreCredentialsValid}

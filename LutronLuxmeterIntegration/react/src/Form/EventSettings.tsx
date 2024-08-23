@@ -3,6 +3,7 @@ import { Controller, useFormContext } from 'react-hook-form';
 import { StyledTextField, StyledSelect, StyledSwitch } from '../components/FormInputs';
 import { InputAdornment, FormControlLabel, MenuItem, Grid, FormControl, FormHelperText } from '@mui/material';
 import { TSettings, TEvent } from '../models/schema';
+import { Title } from '../components/Title';
 import styled from '@mui/material/styles/styled';
 
 type EventProps = {
@@ -141,9 +142,11 @@ export const EventSettings = () => {
     return (
         <Grid container spacing={2}>
             <StyledGrid item xs={12} md={6}>
+                <Title text="Low intensity event" />
                 <EventForm type="low" />
             </StyledGrid>
             <StyledGrid item xs={12} md={6}>
+                <Title text="High intensity event" />
                 <EventForm type="high" />
             </StyledGrid>
         </Grid>

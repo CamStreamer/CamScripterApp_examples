@@ -4,11 +4,15 @@ import { TSettings } from '../models/schema';
 import { StyledSelect, StyledTextField, StyledSwitch } from '../components/FormInputs';
 import { COORD_LIST, coordOptionLabels, parseValueAsFloat, parseValueAsInt } from '../utils';
 import { Grid, FormControlLabel, InputAdornment, MenuItem, Stack } from '@mui/material';
+import { Title } from '../components/Title';
 
 export const WidgetSettings = () => {
     const { control } = useFormContext<TSettings>();
     return (
         <Grid container>
+            <Grid item xs={12}>
+                <Title text="Widget Settings" />
+            </Grid>
             <Grid item xs={12}>
                 <Controller
                     name="widget.enabled"
