@@ -59,29 +59,33 @@ async function loop(lmr: LuxMeterReader, updateFrequency: number, lowEvent: TEve
             }
         }
 
-        if (lowEvent.enabled && lowEventTimeout === undefined) {
+        if (lowEvent.enabled) {
             if (compare(result.value, lowEvent.value, lowEvent.condition)) {
-                const triggerEvent = () => {
-                    sendEvent('low');
-                    if (lowEvent.repeatDelay > 0) {
-                        lowEventTimeout = setTimeout(triggerEvent, lowEvent.repeatDelay);
-                    }
-                };
-                lowEventTimeout = setTimeout(() => triggerEvent(), lowEvent.triggerDelay);
+                if (lowEventTimeout === undefined) {
+                    const triggerEvent = () => {
+                        sendEvent('low');
+                        if (lowEvent.repeatDelay > 0) {
+                            lowEventTimeout = setTimeout(triggerEvent, lowEvent.repeatDelay);
+                        }
+                    };
+                    lowEventTimeout = setTimeout(() => triggerEvent(), lowEvent.triggerDelay);
+                }
             } else {
                 clearTimeout(lowEventTimeout);
                 lowEventTimeout = undefined;
             }
         }
-        if (highEvent.enabled && highEventTimeout === undefined) {
+        if (highEvent.enabled) {
             if (compare(result.value, highEvent.value, highEvent.condition)) {
-                const triggerEvent = () => {
-                    sendEvent('high');
-                    if (highEvent.repeatDelay > 0) {
-                        highEventTimeout = setTimeout(triggerEvent, highEvent.repeatDelay);
-                    }
-                };
-                highEventTimeout = setTimeout(() => triggerEvent(), highEvent.triggerDelay);
+                if (highEventTimeout === undefined) {
+                    const triggerEvent = () => {
+                        sendEvent('high');
+                        if (highEvent.repeatDelay > 0) {
+                            highEventTimeout = setTimeout(triggerEvent, highEvent.repeatDelay);
+                        }
+                    };
+                    highEventTimeout = setTimeout(() => triggerEvent(), highEvent.triggerDelay);
+                }
             } else {
                 clearTimeout(highEventTimeout);
                 highEventTimeout = undefined;
