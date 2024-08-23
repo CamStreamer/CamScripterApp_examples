@@ -5,10 +5,7 @@ module.exports = {
         tsconfigRootDir: __dirname,
         sourceType: 'module',
     },
-    extends: ['@camstreamer/eslint-config'],
+    extends: ['@camstreamer/eslint-config/react.json'],
     root: true,
-    ignorePatterns: ['.eslintrc.js'],
-    rules: {
-        "@typescript-eslint/strict-boolean-expressions": "off"
-    }
+    ignorePatterns: ['.eslintrc.js', 'node_modules/**/*'],
 };

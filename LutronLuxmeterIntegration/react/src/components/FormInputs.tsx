@@ -13,19 +13,21 @@ type Props<T> = SelectProps<T> & {
 };
 
 export const StyledSwitch = styled(Switch)({ marginLeft: '15px' });
-export const StyledSelect = forwardRef(
-    <T,>({ label, helperText, children, ...props }: Props<T>, ref: ForwardedRef<typeof Select>) => {
-        return (
-            <StyledSelectField>
-                <InputLabel id="coord-id">{label}</InputLabel>
-                <Select {...props} label={label} labelId="coord-id" ref={ref}>
-                    {children}
-                </Select>
-                <FormHelperText error={props.error}>{helperText ?? ''}</FormHelperText>
-            </StyledSelectField>
-        );
-    }
-);
+const StyledSelectWithRef = <T,>(
+    { label, helperText, children, ...props }: Props<T>,
+    ref: ForwardedRef<typeof Select>
+) => {
+    return (
+        <StyledSelectField>
+            <InputLabel id="coord-id">{label}</InputLabel>
+            <Select {...props} label={label} labelId="coord-id" ref={ref}>
+                {children}
+            </Select>
+            <FormHelperText error={props.error}>{helperText ?? ''}</FormHelperText>
+        </StyledSelectField>
+    );
+};
+export const StyledSelect = forwardRef(StyledSelectWithRef);
 
 export const StyledSelectField = styled(FormControl)({
     '& .MuiInputBase-root': { backgroundColor: 'white' },
