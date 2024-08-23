@@ -95,7 +95,7 @@ export class Widget {
             ...coOpt,
             camera: coOpt.cameraList,
             tls: coOpt.protocol !== 'http',
-            tlsInsecure: coOpt.protocol === 'https',
+            tlsInsecure: coOpt.protocol !== 'https',
         };
         const p = new Painter(opt, coOptions);
 

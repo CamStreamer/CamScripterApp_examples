@@ -120,7 +120,7 @@ async function main() {
         const options: AcsEventsOptions = {
             ...settings.acs,
             tls: settings.acs.protocol !== 'http',
-            tlsInsecure: settings.acs.protocol === 'https',
+            tlsInsecure: settings.acs.protocol !== 'https',
         };
         acsEvents = new AxisCameraStationEvents(settings.acs.source_key, options);
     }
