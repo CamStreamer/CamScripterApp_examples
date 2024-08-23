@@ -4,7 +4,7 @@ import * as path from 'path';
 
 const connectionParams = {
     protocol: z.union([z.literal('http'), z.literal('https'), z.literal('https_insecure')]),
-    ip: z.string().ip(),
+    ip: z.union([z.string().ip().default('127.0.0.1'), z.literal('')]),
     port: z.number().positive().lt(65535),
     user: z.string(),
     pass: z.string(),
@@ -17,9 +17,6 @@ const acsSchema = z.object({
     enabled: z.boolean(),
     ...connectionParams,
     source_key: z.string(),
-});
-const axisEventSchema = z.object({
-    enabled: z.boolean(),
 });
 const eventSchema = z.object({
     enabled: z.boolean(),
@@ -59,7 +56,6 @@ const settingsSchema = z.object({
     updateFrequency: z.number(),
     cameras: cameraSchema.array(),
     acs: acsSchema,
-    events: axisEventSchema,
     lowEvent: eventSchema,
     highEvent: eventSchema,
     widget: widgetSchema,
@@ -67,7 +63,6 @@ const settingsSchema = z.object({
 
 export type TCamera = z.infer<typeof cameraSchema>;
 export type TAcs = z.infer<typeof acsSchema>;
-export type TAxisEvent = z.infer<typeof axisEventSchema>;
 export type TEvent = z.infer<typeof eventSchema>;
 export type TWidget = z.infer<typeof widgetSchema>;
 export type TSettings = z.infer<typeof settingsSchema>;

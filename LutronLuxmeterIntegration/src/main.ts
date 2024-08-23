@@ -76,7 +76,7 @@ async function loop(lmr: LuxMeterReader, updateFrequency: number, lowEvent: TEve
         if (highEvent.enabled && highEventTimeout === undefined) {
             if (compare(result.value, highEvent.value, highEvent.condition)) {
                 const triggerEvent = () => {
-                    sendEvent('low');
+                    sendEvent('high');
                     if (highEvent.repeatDelay > 0) {
                         highEventTimeout = setTimeout(triggerEvent, highEvent.repeatDelay);
                     }
@@ -90,23 +90,25 @@ async function loop(lmr: LuxMeterReader, updateFrequency: number, lowEvent: TEve
     }
 }
 
-function convertTimes(settings: TSettings): void {
+function convertSettings(settings: TSettings): void {
     settings.updateFrequency *= 1000;
     settings.lowEvent.triggerDelay *= 1000;
     settings.lowEvent.repeatDelay *= 1000;
     settings.highEvent.triggerDelay *= 1000;
     settings.highEvent.repeatDelay *= 1000;
+    settings.widget.scale /= 100;
 }
 
 async function main() {
     const settings = readSettings();
+    convertSettings(settings);
     const lmr = await LuxMeterReader.connect();
 
     if (settings.widget.enabled) {
         widget = new Widget(settings.widget, settings.cameras);
     }
 
-    if (settings.events.enabled) {
+    if (settings.lowEvent.enabled || settings.highEvent.enabled) {
         axisEvents = new AxisEvents(settings.cameras);
     }
 
@@ -119,16 +121,15 @@ async function main() {
         acsEvents = new AxisCameraStationEvents(settings.acs.source_key, options);
     }
 
-    convertTimes(settings);
     await loop(lmr, settings.updateFrequency, settings.lowEvent, settings.highEvent);
 }
 
 process.on('uncaughtException', (error) => {
-    console.warn(error);
+    console.warn('uncaughtException', error);
     process.exit(1);
 });
 process.on('unhandledRejection', (error) => {
-    console.warn(error);
+    console.warn('unhandledRejection', error);
     process.exit(1);
 });
 void main();

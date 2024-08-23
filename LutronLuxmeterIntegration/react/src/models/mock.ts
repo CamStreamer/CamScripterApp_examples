@@ -21,12 +21,9 @@ export const mockedSettings: TSettings = {
         pass: '',
         source_key: '',
     },
-    events: {
-        enabled: false,
-    },
     widget: {
         enabled: true,
-        scale: 1,
+        scale: 100,
         coAlignment: 'top_left',
         x: 0,
         y: 0,
