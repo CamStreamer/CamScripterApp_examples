@@ -1,123 +1,54 @@
-import { Control, Controller, useFieldArray, UseFieldArrayRemove } from 'react-hook-form';
-import { TServerData } from '../models/schema';
-import { MenuItem, Typography, Grid, Button, Divider } from '@mui/material';
-import { StyledSelect, StyledTextField } from '../components/FormInputs';
-import { PasswordInput } from '../components/PasswordInput';
-import DeleteIcon from '@mui/icons-material/Delete';
+import { useState, useEffect, useRef } from 'react';
+import Grid from '@mui/material/Grid';
+import Stack from '@mui/material/Stack';
+import Card from '@mui/material/Card';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import Button from '@mui/material/Button';
+import styled from '@mui/material/styles/styled';
+import Typography from '@mui/material/Typography';
+import { useFieldArray, UseFieldArrayRemove, useFormContext } from 'react-hook-form';
+import { TSettings } from '../models/schema';
+import { CameraConnectParams } from './CameraConnectParams';
+import { useCameraList } from '../hooks/useCameraList';
+import { useInitializeOnMount } from '../hooks/useInitializeOnMount';
 
-type Props = {
-    index: number;
-    control: Control<TServerData>;
-    remove: UseFieldArrayRemove;
-};
-export const FormConnectParams = ({ control, index, remove }: Props) => {
-    return (
-        <Grid item container rowSpacing={2}>
-            <Grid item xs={6}>
-                <Controller
-                    name={`cameras.${index}.protocol`}
-                    control={control}
-                    render={({ field }) => (
-                        <StyledSelect
-                            {...field}
-                            onChange={(...e) => {
-                                field.onChange(...e);
-                            }}
-                            label="Protocol"
-                        >
-                            {PROTOCOLS.map((value) => (
-                                <MenuItem key={value} value={value}>
-                                    {PROTOCOL_LABELS[value]}
-                                </MenuItem>
-                            ))}
-                        </StyledSelect>
-                    )}
-                />
-            </Grid>
-            <Grid item xs={6}>
-                <Controller
-                    name={`cameras.${index}.ip`}
-                    control={control}
-                    render={({ field, formState }) => (
-                        <StyledTextField
-                            {...field}
-                            InputLabelProps={{ shrink: true }}
-                            fullWidth
-                            label="IP address"
-                            error={formState.errors.cameras?.[index]?.ip !== undefined}
-                            helperText={formState.errors.cameras?.[index]?.ip?.message}
-                        />
-                    )}
-                />
-            </Grid>
-            <Grid item xs={6}>
-                <Controller
-                    name={`cameras.${index}.port`}
-                    control={control}
-                    render={({ field, formState }) => (
-                        <StyledTextField
-                            defaultValue={field.value}
-                            InputLabelProps={{ shrink: true }}
-                            fullWidth
-                            label="Port"
-                            error={formState.errors.cameras?.[index]?.port !== undefined}
-                            helperText={formState.errors.cameras?.[index]?.port?.message}
-                        />
-                    )}
-                />
-            </Grid>
-            <Grid item xs={6}>
-                <Controller
-                    name={`cameras.${index}.user`}
-                    control={control}
-                    render={({ field, formState }) => (
-                        <StyledTextField
-                            {...field}
-                            InputLabelProps={{ shrink: true }}
-                            fullWidth
-                            label="User"
-                            error={formState.errors.cameras?.[index]?.user !== undefined}
-                            helperText={formState.errors.cameras?.[index]?.user?.message}
-                        />
-                    )}
-                />
-            </Grid>
-            <Grid item xs={6}>
-                <PasswordInput control={control} name={`cameras.${index}.pass`} />
-            </Grid>
-            <Grid item xs={6}>
-                <Button variant="contained" color="error" onClick={() => remove(index)}>
-                    <DeleteIcon />
-                </Button>
-            </Grid>
-            <Grid item xs={12}>
-                <Divider sx={{ color: 'black' }} />
-            </Grid>
-        </Grid>
-    );
-};
+import ErrorIcon from '@mui/icons-material/ErrorOutline';
+import MenuIcon from '@mui/icons-material/MoreVert';
+import IconButton from '@mui/material/IconButton';
+import Backdrop from '@mui/material/Backdrop';
 
-type CameraListProps = {
-    control: Control<TServerData>;
-};
-
-export const CameraList = ({ control }: CameraListProps) => {
+export const CameraList = () => {
+    const loading = useRef(true);
+    const { control } = useFormContext<TSettings>();
     const { fields, append, remove } = useFieldArray({
         control,
         name: 'cameras',
     });
 
+    useEffect(() => {
+        loading.current = false;
+    }, []);
+
     return (
         <>
             <Grid container direction="column" rowGap={2}>
-                {fields.map((item, i) => (
-                    <FormConnectParams key={item.id} control={control} index={i} remove={remove} />
-                ))}
+                <Grid item container direction="row" spacing={2}>
+                    {fields.map((item, index, items) => (
+                        <CameraField
+                            key={item.id}
+                            index={index}
+                            remove={remove}
+                            appending={index === items.length - 1 && !loading.current}
+                        />
+                    ))}
+                </Grid>
                 <Grid item>
                     <Button
                         variant="contained"
-                        color="success"
-                        onClick={() => append({ protocol: 'http', ip: '127.0.0.1', port: 80, user: 'root', pass: '' })}
+                        onClick={() => {
+                            append({ protocol: 'http', ip: '', port: 80, user: 'root', pass: '', cameraList: [0] });
+                        }}
                     >
                         <Typography>Add new camera</Typography>
                     </Button>
@@ -127,9 +58,129 @@ export const CameraList = ({ control }: CameraListProps) => {
     );
 };
 
-const PROTOCOL_LABELS: Record<TServerData['cameras'][0]['protocol'], string> = {
-    http: 'HTTP',
-    https: 'HTTPS',
-    https_insecure: 'HTTPS (insecure)',
+type FieldProps = {
+    index: number;
+    remove: UseFieldArrayRemove;
+    appending: boolean;
 };
-const PROTOCOLS = Object.keys(PROTOCOL_LABELS) as TServerData['cameras'][0]['protocol'][];
+const CameraField = ({ index, remove, appending }: FieldProps) => {
+    const [areCredentialsValid, setAreCredentialsValid] = useState(true);
+    const [anchor, setAnchor] = useState<null | HTMLElement>(null);
+    const [backdropOpen, setBackdropOpen] = useState(appending);
+
+    return (
+        <Grid item xs={12} md={6} lg={4}>
+            <Card sx={{ p: 2 }}>
+                <Grid container direction="row" alignItems="center">
+                    <Grid item xs={5}>
+                        <Typography fontSize="120%">Camera {index + 1}</Typography>
+                    </Grid>
+                    <Grid item xs={6}>
+                        {!areCredentialsValid && (
+                            <Stack direction="row">
+                                <ErrorIcon color="error" />
+                                <RedTypography>Wrong credentials</RedTypography>
+                            </Stack>
+                        )}
+                    </Grid>
+                    <Grid item xs={1}>
+                        <RawButton onClick={(event) => setAnchor(event.currentTarget)}>
+                            <MenuIcon />
+                        </RawButton>
+                    </Grid>
+                </Grid>
+
+                <Menu anchorEl={anchor} open={anchor !== null} onClose={() => setAnchor(null)}>
+                    <MenuItem
+                        onClick={() => {
+                            setBackdropOpen(true);
+                            setAnchor(null);
+                        }}
+                    >
+                        Edit
+                    </MenuItem>
+                    <MenuItem
+                        onClick={() => {
+                            remove(index);
+                            setAnchor(null);
+                        }}
+                    >
+                        Remove
+                    </MenuItem>
+                </Menu>
+                <CameraBackdrop
+                    appending={appending}
+                    index={index}
+                    remove={remove}
+                    open={backdropOpen}
+                    setOpen={setBackdropOpen}
+                    validCredentials={areCredentialsValid}
+                    setValidCredentials={setAreCredentialsValid}
+                />
+            </Card>
+        </Grid>
+    );
+};
+
+type BackdropProps = {
+    index: number;
+    open: boolean;
+    remove: UseFieldArrayRemove;
+    appending: boolean;
+    setOpen: (open: boolean) => void;
+    validCredentials: boolean;
+    setValidCredentials: (open: boolean) => void;
+};
+const CameraBackdrop = ({ index, open, setOpen, validCredentials, setValidCredentials }: BackdropProps) => {
+    const { getValues, setValue } = useFormContext<TSettings>();
+    const [lastValues, setLastValues] = useState(getValues(`cameras.${index}`));
+    const [viewAreaList, fetchCameraList] = useCameraList(index);
+    useInitializeOnMount(fetchCameraList);
+
+    return (
+        <Backdrop open={open} sx={{ color: '#f5f5f5', zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+            <CameraSettingsCard>
+                <Typography>
+                    <h2>Add camera</h2>
+                </Typography>
+                <CameraConnectParams
+                    index={index}
+                    viewAreaList={viewAreaList}
+                    areCredentialsValid={validCredentials}
+                    setAreCredentialsValid={setValidCredentials}
+                />
+                <Grid container flexDirection="row-reverse" spacing={2}>
+                    <StyledGrid item>
+                        <Button
+                            variant="contained"
+                            onClick={() => {
+                                setOpen(false);
+                                setLastValues(getValues(`cameras.${index}`));
+                            }}
+                        >
+                            SAVE
+                        </Button>
+                    </StyledGrid>
+                    <StyledGrid item>
+                        <Button
+                            onClick={() => {
+                                setOpen(false);
+                                setValue(`cameras.${index}`, lastValues);
+                            }}
+                        >
+                            CANCEL
+                        </Button>
+                    </StyledGrid>
+                </Grid>
+            </CameraSettingsCard>
+        </Backdrop>
+    );
+};
+const StyledGrid = styled(Grid)({
+    marginTop: 15,
+    marginBottom: 15,
+});
+const CameraSettingsCard = styled(Card)({ paddingLeft: 30, paddingRight: 30 });
+
+const RedTypography = styled(Typography)({ color: '#d32f2f', fontWeight: '80%', marginLeft: '5px' });
+const RawButton = styled(IconButton)({ padding: 0 });

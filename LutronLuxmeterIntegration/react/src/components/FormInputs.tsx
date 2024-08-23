@@ -1,4 +1,4 @@
-import { FormControl, FormHelperText, InputLabel, Select, SelectProps, TextareaAutosize } from '@mui/material';
+import { FormControl, FormHelperText, InputLabel, Select, SelectProps, TextareaAutosize, Switch } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import TextField from '@mui/material/TextField';
 import { ForwardedRef, forwardRef } from 'react';
@@ -12,6 +12,7 @@ type Props<T> = SelectProps<T> & {
     helperText?: string;
 };
 
+export const StyledSwitch = styled(Switch)({ marginLeft: '15px' });
 export const StyledSelect = forwardRef(
     <T,>({ label, helperText, children, ...props }: Props<T>, ref: ForwardedRef<typeof Select>) => {
         return (

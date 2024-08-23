@@ -1,36 +1,60 @@
-import { Control } from 'react-hook-form';
-
+import { useState } from 'react';
 import Fade from '@mui/material/Fade';
 import styled from '@mui/material/styles/styled';
-import { TServerData } from '../models/schema';
-import { Tab, Tabs } from '@mui/material';
-import { useState } from 'react';
-import { LuxMeterSettings } from './LuxmeterSettings';
-import { DataProcess } from './CameraSettings';
+import { Controller, useFormContext } from 'react-hook-form';
+
+import { TSettings } from '../models/schema';
+import { parseValueAsFloat } from '../utils';
+import { CollapsibleFormSection } from '../components/CollapsibleFormSection';
+
+import { StyledTextField } from '../components/FormInputs';
+import { CameraList } from './CameraList';
 import { WidgetSettings } from './WidgetSettings';
+import { EventSettings } from './EventSettings';
+import { AcsConnectParams } from './AcsConnectParams';
 
-type Props = {
-    control: Control<TServerData>;
-};
-
-type TTab = 'luxmeter' | 'cameras' | 'widget';
-
-export function Form({ control }: Props) {
-    const [openedTab, setOpenedTab] = useState<TTab>('luxmeter');
-
+export function Form() {
+    const { control } = useFormContext<TSettings>();
+    const [areCredentialsValid, setAreCredentialsValid] = useState(true);
     return (
         <Fade in={true} timeout={1000}>
             <StyledForm>
-                <Tabs value={openedTab} onChange={(e, v) => setOpenedTab(v)} centered>
-                    <StyledTab label="Luxmeter settings" value={'luxmeter'} />
-                    <StyledTab label="Camera settings" value={'cameras'} />
-                    <StyledTab label="Widget settings" value={'widget'} />
-                </Tabs>
-                <StyledBody>
-                    {openedTab === 'luxmeter' && <LuxMeterSettings control={control} />}
-                    {openedTab === 'cameras' && <DataProcess control={control} />}
-                    {openedTab === 'widget' && <WidgetSettings control={control} />}
-                </StyledBody>
+                <CollapsibleFormSection label="Luxmeter settings" defaultExpanded={true}>
+                    <Controller
+                        name={'updateFrequency'}
+                        control={control}
+                        render={({ field, formState }) => (
+                            <StyledTextField
+                                defaultValue={field.value}
+                                fullWidth
+                                label="Update Frequency"
+                                InputLabelProps={{ shrink: true }}
+                                onBlur={(e) => {
+                                    const val = parseValueAsFloat(e.target.value);
+                                    field.onChange(val);
+                                    e.target.value = val.toString();
+                                }}
+                                error={!!formState.errors.updateFrequency}
+                                helperText={formState.errors.updateFrequency?.message}
+                            />
+                        )}
+                    />
+                </CollapsibleFormSection>
+                <CollapsibleFormSection label="Camera source" defaultExpanded={false}>
+                    <CameraList />
+                </CollapsibleFormSection>
+                <CollapsibleFormSection label="CamOverlay integration" defaultExpanded={false}>
+                    <WidgetSettings />
+                </CollapsibleFormSection>
+                <CollapsibleFormSection label="Axis camera event" defaultExpanded={false}>
+                    <EventSettings />
+                </CollapsibleFormSection>
+                <CollapsibleFormSection label="ACS integration" defaultExpanded={false}>
+                    <AcsConnectParams
+                        areCredentialsValid={areCredentialsValid}
+                        setAreCredentialsValid={setAreCredentialsValid}
+                    />
+                </CollapsibleFormSection>
             </StyledForm>
         </Fade>
     );
@@ -38,19 +62,7 @@ export function Form({ control }: Props) {
 
 const StyledForm = styled('div')({
     width: '100%',
-    flex: '1',
     display: 'flex',
     justifyContent: 'center',
     flexDirection: 'column',
-});
-
-const StyledTab = styled(Tab)({
-    flex: '1',
-});
-
-const StyledBody = styled('div')({
-    width: '100%',
-    flex: '1',
-    backgroundColor: 'white',
-    padding: '20px',
 });

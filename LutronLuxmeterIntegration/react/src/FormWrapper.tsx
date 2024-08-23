@@ -71,7 +71,7 @@ export const FormWrapper = ({ defaultValues }: Props) => {
     return (
         <FormProvider {...form}>
             <InfoSnackbar snackbarData={snackbarData} closeSnackbar={closeSnackbar} />
-            <Form control={form.control} />
+            <Form />
             <StyledFab
                 color="info"
                 variant="extended"

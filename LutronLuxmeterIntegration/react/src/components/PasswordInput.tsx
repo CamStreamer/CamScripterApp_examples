@@ -7,16 +7,18 @@ import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { TSettings } from '../models/schema';
 import { StyledTextField } from './FormInputs';
+import { getErrorObject } from '../utils';
 
 type Props = {
+    areCredentialsValid?: boolean;
     control: Control<TSettings>;
-    name: `cameras.${number}.pass` | 'acs.pass';
+    name: 'acs.pass' | `cameras.${number}.pass`;
+    onBlur?: () => void;
 };
 
-export function PasswordInput({ control, name }: Props) {
+export const PasswordInput = ({ control, name, onBlur, areCredentialsValid = true }: Props) => {
     const [showPassword, setShowPassword] = useState(false);
     const handleClickShowPassword = () => setShowPassword((show) => !show);
-    const index = parseInt(name.split(':')[1]);
 
     return (
         <Controller
@@ -25,10 +27,10 @@ export function PasswordInput({ control, name }: Props) {
             render={({ field, formState }) => (
                 <StyledTextField
                     {...field}
-                    InputLabelProps={{ shrink: true }}
                     type={showPassword ? 'text' : 'password'}
                     fullWidth
                     label="Password"
+                    InputLabelProps={{ shrink: true }}
                     InputProps={{
                         endAdornment: (
                             <InputAdornment position="end">
@@ -43,10 +45,18 @@ export function PasswordInput({ control, name }: Props) {
                             </InputAdornment>
                         ),
                     }}
-                    error={formState?.errors?.['cameras']?.[index]?.['pass'] !== undefined}
-                    helperText={formState?.errors?.['cameras']?.[index]?.['pass']?.message}
+                    error={!areCredentialsValid || getErrorObject(formState.errors, name)?.pass !== undefined}
+                    helperText={
+                        areCredentialsValid
+                            ? getErrorObject(formState.errors, name)?.pass?.message
+                            : 'Wrong credentials'
+                    }
+                    onBlur={() => {
+                        field.onBlur();
+                        onBlur?.();
+                    }}
                 />
             )}
         />
     );
-}
+};
