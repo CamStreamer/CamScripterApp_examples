@@ -14,9 +14,10 @@ type Props = {
     control: Control<TSettings>;
     name: 'acs.pass' | `cameras.${number}.pass`;
     onBlur?: () => void;
+    onChange?: () => void;
 };
 
-export const PasswordInput = ({ control, name, onBlur, areCredentialsValid = true }: Props) => {
+export const PasswordInput = ({ control, name, onBlur, onChange, areCredentialsValid = true }: Props) => {
     const [showPassword, setShowPassword] = useState(false);
     const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -54,6 +55,10 @@ export const PasswordInput = ({ control, name, onBlur, areCredentialsValid = tru
                     onBlur={() => {
                         field.onBlur();
                         onBlur?.();
+                    }}
+                    onChange={(event) => {
+                        field.onChange(event);
+                        onChange?.();
                     }}
                 />
             )}

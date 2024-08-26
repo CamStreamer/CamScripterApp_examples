@@ -148,6 +148,7 @@ const CameraBackdrop = ({ index, open, setOpen, validCredentials, setValidCreden
                     viewAreaList={viewAreaList}
                     areCredentialsValid={validCredentials}
                     setAreCredentialsValid={setValidCredentials}
+                    onChange={fetchCameraList}
                 />
                 <Grid container flexDirection="row-reverse" spacing={2}>
                     <StyledGrid item>
@@ -158,7 +159,7 @@ const CameraBackdrop = ({ index, open, setOpen, validCredentials, setValidCreden
                                 setLastValues(getValues(`cameras.${index}`));
                             }}
                         >
-                            SAVE
+                            CLOSE
                         </Button>
                     </StyledGrid>
                     <StyledGrid item>

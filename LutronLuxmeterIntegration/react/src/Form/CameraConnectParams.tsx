@@ -15,6 +15,7 @@ type Props = {
     setAreCredentialsValid: (open: boolean) => void;
     viewAreaList: TCameraListOption[];
     onBlur?: () => void;
+    onChange: () => void;
 };
 export const CameraConnectParams = ({
     onBlur,
@@ -22,6 +23,7 @@ export const CameraConnectParams = ({
     areCredentialsValid,
     setAreCredentialsValid,
     viewAreaList,
+    onChange,
 }: Props) => {
     const { control, setValue } = useFormContext<TSettings>();
     const [lastRequestAborter, setLastRequestAborter] = useState<AbortController | null>(null);
@@ -63,6 +65,7 @@ export const CameraConnectParams = ({
                             });
 
                             field.onChange(event);
+                            onChange();
                             onBlur?.();
                         }}
                     >
@@ -92,6 +95,10 @@ export const CameraConnectParams = ({
                             field.onBlur();
                             onBlur?.();
                         }}
+                        onChange={(event) => {
+                            field.onChange(event);
+                            onChange();
+                        }}
                     />
                 )}
             />
@@ -108,6 +115,7 @@ export const CameraConnectParams = ({
                             field.onChange(val);
                             e.target.value = val.toString();
                             field.onBlur();
+                            onChange();
                             onBlur?.();
                         }}
                         fullWidth
@@ -128,6 +136,10 @@ export const CameraConnectParams = ({
                         label="User"
                         error={getErrorObject(formState.errors, name)?.user !== undefined}
                         helperText={getErrorObject(formState.errors, name)?.user?.message}
+                        onChange={(event) => {
+                            field.onChange(event);
+                            onChange();
+                        }}
                         onBlur={() => {
                             field.onBlur();
                             onBlur?.();
@@ -139,6 +151,7 @@ export const CameraConnectParams = ({
                 areCredentialsValid={areCredentialsValid}
                 control={control}
                 name={`cameras.${index}.pass`}
+                onChange={onChange}
                 onBlur={onBlur}
             />
             <Controller
