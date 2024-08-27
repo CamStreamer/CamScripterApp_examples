@@ -10,24 +10,13 @@ let widget: Widget | undefined;
 let axisEvents: AxisEvents | undefined;
 let acsEvents: AxisCameraStationEvents | undefined;
 
-function sendEvent(result: TResult, type: 'low' | 'high'): void {
-    if (axisEvents) {
-        try {
-            axisEvents.sendEvent(type);
-        } catch (err) {
-            console.error(err);
-        }
-    }
+function sendAcsEvent(result: TResult): void {
+    const message = {
+        Intensity: result.value.toString(),
+        Unit: result.unit,
+    };
 
-    if (acsEvents) {
-        const message = {
-            Code: type === 'low' ? 'Low intensity' : 'High intensity',
-            Intensity: result.value.toString(),
-            Unit: result.unit,
-        };
-
-        acsEvents.sendEvent(message, 'lutron_luxmeter_integration').catch((err) => console.error(err));
-    }
+    acsEvents?.sendEvent(message, 'lutron_luxmeter_integration').catch((err) => console.error(err));
 }
 
 function compare(measuredValue: number, triggerValue: number, condition: '=' | '<' | '<=' | '>' | '>='): boolean {
@@ -66,7 +55,7 @@ async function loop(lmr: LuxMeterReader, updateFrequency: number, lowEvent: TEve
             if (compare(result.value, lowEvent.value, lowEvent.condition)) {
                 if (lowEventTimeout === undefined) {
                     const triggerEvent = () => {
-                        sendEvent(result, 'low');
+                        axisEvents?.sendEvent('low');
                         if (lowEvent.repeatDelay > 0) {
                             lowEventTimeout = setTimeout(triggerEvent, lowEvent.repeatDelay);
                         }
@@ -82,7 +71,7 @@ async function loop(lmr: LuxMeterReader, updateFrequency: number, lowEvent: TEve
             if (compare(result.value, highEvent.value, highEvent.condition)) {
                 if (highEventTimeout === undefined) {
                     const triggerEvent = () => {
-                        sendEvent(result, 'high');
+                        axisEvents?.sendEvent('high');
                         if (highEvent.repeatDelay > 0) {
                             highEventTimeout = setTimeout(triggerEvent, highEvent.repeatDelay);
                         }
@@ -98,7 +87,7 @@ async function loop(lmr: LuxMeterReader, updateFrequency: number, lowEvent: TEve
             if (compare(result.value, acs.value, acs.condition)) {
                 if (acsEventTimeout === undefined) {
                     const triggerEvent = () => {
-                        sendEvent(result, 'high');
+                        sendAcsEvent(result);
                         if (acs.repeatDelay > 0) {
                             acsEventTimeout = setTimeout(triggerEvent, acs.repeatDelay);
                         }
