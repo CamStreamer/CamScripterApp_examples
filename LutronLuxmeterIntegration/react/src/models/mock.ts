@@ -20,6 +20,10 @@ export const mockedSettings: TSettings = {
         user: '',
         pass: '',
         source_key: '',
+        triggerDelay: 0,
+        repeatDelay: 0,
+        value: 100,
+        condition: '<',
     },
     widget: {
         enabled: true,

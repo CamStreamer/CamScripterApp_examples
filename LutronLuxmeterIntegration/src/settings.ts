@@ -9,16 +9,7 @@ const connectionParams = {
     user: z.string(),
     pass: z.string(),
 };
-const cameraSchema = z.object({
-    ...connectionParams,
-    cameraList: z.number().array().nonempty(),
-});
-const acsSchema = z.object({
-    enabled: z.boolean(),
-    ...connectionParams,
-    source_key: z.string(),
-});
-const eventSchema = z.object({
+const eventParams = {
     enabled: z.boolean(),
     triggerDelay: z.number().nonnegative(),
     repeatDelay: z.number().nonnegative(),
@@ -31,7 +22,18 @@ const eventSchema = z.object({
         z.literal('>='),
         z.literal('<'),
     ]),
+};
+
+const cameraSchema = z.object({
+    ...connectionParams,
+    cameraList: z.number().array().nonempty(),
 });
+const acsSchema = z.object({
+    ...connectionParams,
+    ...eventParams,
+    source_key: z.string(),
+});
+const eventSchema = z.object(eventParams);
 const widgetSchema = z.object({
     enabled: z.boolean(),
     x: z.number().nonnegative(),
@@ -55,7 +57,7 @@ const widgetSchema = z.object({
 const settingsSchema = z.object({
     updateFrequency: z.number(),
     cameras: cameraSchema.array(),
-    acs: acsSchema,
+    acs: acsSchema.merge(eventSchema),
     lowEvent: eventSchema,
     highEvent: eventSchema,
     widget: widgetSchema,
