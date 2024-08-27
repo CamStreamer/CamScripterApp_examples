@@ -1,5 +1,5 @@
 {
-    "updateFrequency": 10,
+    "updateFrequency": 1,
     "cameras": [
         {
             "protocol": "http",

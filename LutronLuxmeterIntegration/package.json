@@ -22,7 +22,7 @@
     "build:all": "npm-run-all build build:FE",
 
     "in:ui": "cd react && npm install",
-    "zip:package": "node node_modules/camstreamerlib/CreatePackage -i -e='react,testing'  -w='C:/Users/vasst/Downloads'",
+    "zip:package": "node node_modules/camstreamerlib/CreatePackage -i -e='react,testing'",
     "zip:BE": "npm-run-all build zip:package",
     "zip:FE": "npm-run-all build:FE zip:package",
     "zip": "npm-run-all in:ui build:all zip:package"

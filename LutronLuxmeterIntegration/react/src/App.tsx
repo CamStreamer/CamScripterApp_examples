@@ -59,7 +59,7 @@ export const App = () => {
                         <Headline text={'Lutron Luxmeter integration'} />
                         <Typography>
                             Integration of Luxmeter Lutron LX 1180. Before using the device, select the unit range and
-                            turn on the recording ti prevent the device from turning off. Set the USB stick to position
+                            turn on the recording to prevent the device from turning off. Set the USB stick to position
                             2.
                         </Typography>
                     </StyledHeader>

@@ -1,7 +1,7 @@
 import { TSettings } from './schema';
 
 export const mockedSettings: TSettings = {
-    updateFrequency: 10,
+    updateFrequency: 1,
     cameras: [
         {
             protocol: 'http',
