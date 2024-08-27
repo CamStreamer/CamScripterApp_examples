@@ -10,7 +10,7 @@ let widget: Widget | undefined;
 let axisEvents: AxisEvents | undefined;
 let acsEvents: AxisCameraStationEvents | undefined;
 
-function sendEvent(result: TResult,type: 'low' | 'high'): void {
+function sendEvent(result: TResult, type: 'low' | 'high'): void {
     if (axisEvents) {
         try {
             axisEvents.sendEvent(type);
@@ -23,7 +23,7 @@ function sendEvent(result: TResult,type: 'low' | 'high'): void {
         const message = {
             Code: type === 'low' ? 'Low intensity' : 'High intensity',
             Intensity: result.value.toString(),
-            Unit: result.unit
+            Unit: result.unit,
         };
 
         acsEvents.sendEvent(message, 'lutron_luxmeter_integration').catch((err) => console.error(err));
@@ -45,9 +45,10 @@ function compare(measuredValue: number, triggerValue: number, condition: '=' | '
     }
 }
 
-async function loop(lmr: LuxMeterReader, updateFrequency: number, lowEvent: TEvent, highEvent: TEvent) {
+async function loop(lmr: LuxMeterReader, updateFrequency: number, lowEvent: TEvent, highEvent: TEvent, acs: TEvent) {
     let lowEventTimeout: NodeJS.Timeout | undefined;
     let highEventTimeout: NodeJS.Timeout | undefined;
+    let acsEventTimeout: NodeJS.Timeout | undefined;
 
     for await (const c of setInterval(updateFrequency)) {
         void c;
@@ -81,7 +82,7 @@ async function loop(lmr: LuxMeterReader, updateFrequency: number, lowEvent: TEve
             if (compare(result.value, highEvent.value, highEvent.condition)) {
                 if (highEventTimeout === undefined) {
                     const triggerEvent = () => {
-                        sendEvent(result,'high');
+                        sendEvent(result, 'high');
                         if (highEvent.repeatDelay > 0) {
                             highEventTimeout = setTimeout(triggerEvent, highEvent.repeatDelay);
                         }
@@ -91,6 +92,22 @@ async function loop(lmr: LuxMeterReader, updateFrequency: number, lowEvent: TEve
             } else {
                 clearTimeout(highEventTimeout);
                 highEventTimeout = undefined;
+            }
+        }
+        if (acs.enabled) {
+            if (compare(result.value, acs.value, acs.condition)) {
+                if (acsEventTimeout === undefined) {
+                    const triggerEvent = () => {
+                        sendEvent(result, 'high');
+                        if (acs.repeatDelay > 0) {
+                            acsEventTimeout = setTimeout(triggerEvent, acs.repeatDelay);
+                        }
+                    };
+                    acsEventTimeout = setTimeout(() => triggerEvent(), acs.triggerDelay);
+                }
+            } else {
+                clearTimeout(acsEventTimeout);
+                acsEventTimeout = undefined;
             }
         }
     }
@@ -127,7 +144,7 @@ async function main() {
         acsEvents = new AxisCameraStationEvents(settings.acs.source_key, options);
     }
 
-    await loop(lmr, settings.updateFrequency, settings.lowEvent, settings.highEvent);
+    await loop(lmr, settings.updateFrequency, settings.lowEvent, settings.highEvent, settings.acs);
 }
 
 process.on('uncaughtException', (error) => {
