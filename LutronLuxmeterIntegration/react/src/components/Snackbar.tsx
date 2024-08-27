@@ -13,7 +13,7 @@ type Props = {
     closeSnackbar: () => void;
 };
 
-const TRANSITION_PROPS_LARGE: SnackbarOrigin = { vertical: 'bottom', horizontal: 'right' };
+const TRANSITION_PROPS_LARGE: SnackbarOrigin = { vertical: 'bottom', horizontal: 'left' };
 const TRANSITION_PROPS_SMALL: SnackbarOrigin = { vertical: 'top', horizontal: 'center' };
 
 export const InfoSnackbar = ({ snackbarData, closeSnackbar }: Props) => {
