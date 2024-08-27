@@ -148,7 +148,7 @@ const CameraBackdrop = ({ index, open, setOpen, validCredentials, setValidCreden
                     viewAreaList={viewAreaList}
                     areCredentialsValid={validCredentials}
                     setAreCredentialsValid={setValidCredentials}
-                    onChange={fetchCameraList}
+                    onBlur={fetchCameraList}
                 />
                 <Grid container flexDirection="row-reverse" spacing={2}>
                     <StyledGrid item>

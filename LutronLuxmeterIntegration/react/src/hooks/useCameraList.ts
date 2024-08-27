@@ -13,6 +13,7 @@ export const useCameraList = (index: number) => {
     const [options, setOptions] = useState<TCameraListOption[]>([]);
     const [isFetching, setIsFetching] = useState(false);
     const fetchIdsInProgress = useRef<number[]>([]);
+
     const abortControllers = useRef<AbortController | null>(null);
 
     const fetchCameraList = async () => {
@@ -26,20 +27,20 @@ export const useCameraList = (index: number) => {
         }
 
         try {
-            const controller = new AbortController();
-            abortControllers.current = controller;
-            const signal = controller.signal;
-            const res = await fetch('/local/camscripter/proxy.cgi', {
-                headers: new Headers({
+            const req = new Request(window.location.origin + '/local/camscripter/proxy.cgi', {
+                headers: {
                     'x-target-camera-protocol': `${getValues(`cameras.${index}.protocol`)}`,
                     'x-target-camera-ip': `${getValues(`cameras.${index}.ip`)}`,
                     'x-target-camera-port': `${getValues(`cameras.${index}.port`)}`,
                     'x-target-camera-user': `${getValues(`cameras.${index}.user`)}`,
                     'x-target-camera-pass': `${getValues(`cameras.${index}.pass`)}`,
                     'x-target-camera-path': '/axis-cgi/param.cgi?action=list&group=root.Image',
-                }),
-                signal: signal,
+                },
             });
+            const controller = new AbortController();
+
+            abortControllers.current = controller;
+            const res = await fetch(req, { signal: controller.signal });
 
             const textRes = await res.text();
 
