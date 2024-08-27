@@ -7,11 +7,10 @@ import { Title } from '../components/Title';
 import styled from '@mui/material/styles/styled';
 
 type EventProps = {
-    type: 'low' | 'high';
+    name: 'lowEvent' | 'highEvent' | 'acs';
 };
-const EventForm = ({ type }: EventProps) => {
+export const EventForm = ({ name }: EventProps) => {
     const { control } = useFormContext<TSettings>();
-    const name = `${type}Event` as `${'low' | 'high'}Event`;
     return (
         <Grid container spacing={1.5} direction="column">
             <Grid item>
@@ -143,11 +142,11 @@ export const EventSettings = () => {
         <Grid container spacing={2}>
             <StyledGrid item xs={12} md={6}>
                 <Title text="Low intensity event" />
-                <EventForm type="low" />
+                <EventForm name="lowEvent" />
             </StyledGrid>
             <StyledGrid item xs={12} md={6}>
                 <Title text="High intensity event" />
-                <EventForm type="high" />
+                <EventForm name="highEvent" />
             </StyledGrid>
         </Grid>
     );

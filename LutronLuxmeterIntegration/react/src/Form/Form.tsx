@@ -11,7 +11,7 @@ import { StyledTextField } from '../components/FormInputs';
 import { CameraList } from './CameraList';
 import { WidgetSettings } from './WidgetSettings';
 import { EventSettings } from './EventSettings';
-import { AcsConnectParams } from './AcsConnectParams';
+import { AcsSettings } from './AcsSettings';
 import { Title } from '../components/Title';
 
 export function Form() {
@@ -52,7 +52,7 @@ export function Form() {
                 </CollapsibleFormSection>
                 <CollapsibleFormSection label="ACS integration" defaultExpanded={false}>
                     <Title text="Axis Camera Station settings" />
-                    <AcsConnectParams
+                    <AcsSettings
                         areCredentialsValid={areCredentialsValid}
                         setAreCredentialsValid={setAreCredentialsValid}
                     />
