@@ -1,0 +1,9 @@
+{
+    "package_name": "aoa_counter",
+    "package_menu_name": "AOA Counter",
+    "package_version": "1.0.0-preview",
+    "vendor": "Camstreamer s.r.o.",
+    "required_camscripter_version": "1.4.7",
+    "required_camscripter_rbi_version": "1.0.0",
+    "ui_link": "/local/camscripter/package/aoa_counter/index.html"
+}
