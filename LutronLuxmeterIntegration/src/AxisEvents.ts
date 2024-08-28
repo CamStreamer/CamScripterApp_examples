@@ -72,11 +72,12 @@ export class AxisEvents {
         }
     }
 
-    async connectCameraEvents(eg: EventGenerator) {
+    private async connectCameraEvents(eg: EventGenerator) {
         if (!eg.connected) {
             eg.csc.removeAllListeners();
             eg.csc.on('open', () => {
                 console.log('CSc: connected');
+                this.prepareEvents(eg).catch(() => console.error('AxisEvents: unhandled prepare event'));
                 eg.connected = true;
             });
 
@@ -101,7 +102,7 @@ export class AxisEvents {
     private async declareCameraEvent(csc: CamScripterAPICameraEventsGenerator) {
         const type: Record<string, string> = {
             _low: 'Low intensity',
-            _high: 'HIgh intensity',
+            _high: 'High intensity',
         };
         for (const event of ['_low', '_high']) {
             await csc.declareEvent({
