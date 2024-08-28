@@ -1,7 +1,7 @@
 {
   "package_name": "lutron_luxmeter_integration",
   "package_menu_name": "Lutron Luxmeter Integration",
-  "package_version": "1.0.0",
+  "package_version": "1.0.1",
   "vendor": "Camstreamer s.r.o.",
   "required_camscripter_version": "1.4.7",
   "required_camscripter_rbi_version": "1.0.0",
