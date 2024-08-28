@@ -1,0 +1,43 @@
+{
+  "name": "lutron_luxmeter_integration",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "clean": "cd .. && rimraf html",
+    "start": "react-scripts start",
+    "build": "react-scripts build && npm run clean && cp -rT build ../html",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "dependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
+    "@hookform/resolvers": "^3.3.4",
+    "@mui/icons-material": "^5.11.16",
+    "@mui/material": "^5.14.3",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-hook-form": "^7.43.9",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/node": "^16.18.31",
+    "@types/react": "^18.2.6",
+    "@types/react-dom": "^18.2.4",
+    "react-scripts": "^5.0.1",
+    "typescript": "^4.9.5"
+  }
+}
