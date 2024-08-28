@@ -69,8 +69,25 @@ export type TEvent = z.infer<typeof eventSchema>;
 export type TWidget = z.infer<typeof widgetSchema>;
 export type TSettings = z.infer<typeof settingsSchema>;
 
+function isConfigured(camera: TCamera): boolean {
+    return camera.ip !== '' && camera.user !== '' && camera.pass !== '';
+}
+function convertSettings(settings: TSettings): void {
+    settings.updateFrequency *= 1000;
+    settings.lowEvent.triggerDelay *= 1000;
+    settings.lowEvent.repeatDelay *= 1000;
+    settings.highEvent.triggerDelay *= 1000;
+    settings.highEvent.repeatDelay *= 1000;
+    settings.acs.triggerDelay *= 1000;
+    settings.acs.repeatDelay *= 1000;
+    settings.widget.scale /= 100;
+}
 export function readSettings(): TSettings {
     const localdata = process.env.PERSISTENT_DATA_PATH ?? 'localdata';
-    const data = fs.readFileSync(path.join(localdata, 'settings.json'));
-    return settingsSchema.parse(JSON.parse(data.toString()));
+    const buffer = fs.readFileSync(path.join(localdata, 'settings.json'));
+    const data = settingsSchema.parse(JSON.parse(buffer.toString()));
+
+    convertSettings(data);
+    data.cameras = data.cameras.filter((camera) => isConfigured(camera));
+    return data;
 }

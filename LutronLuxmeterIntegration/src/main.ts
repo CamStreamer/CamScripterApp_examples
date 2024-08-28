@@ -4,7 +4,7 @@ import { AxisCameraStationEvents, AcsEventsOptions } from 'camstreamerlib/events
 import { Widget } from './Widget';
 import { AxisEvents } from './AxisEvents';
 import { LuxMeterReader, TResult } from './LuxMeterReader';
-import { readSettings, TSettings, TEvent } from './settings';
+import { readSettings, TEvent } from './settings';
 
 let widget: Widget | undefined;
 let axisEvents: AxisEvents | undefined;
@@ -102,18 +102,8 @@ async function loop(lmr: LuxMeterReader, updateFrequency: number, lowEvent: TEve
     }
 }
 
-function convertSettings(settings: TSettings): void {
-    settings.updateFrequency *= 1000;
-    settings.lowEvent.triggerDelay *= 1000;
-    settings.lowEvent.repeatDelay *= 1000;
-    settings.highEvent.triggerDelay *= 1000;
-    settings.highEvent.repeatDelay *= 1000;
-    settings.widget.scale /= 100;
-}
-
 async function main() {
     const settings = readSettings();
-    convertSettings(settings);
     const lmr = await LuxMeterReader.connect();
 
     if (settings.widget.enabled) {
