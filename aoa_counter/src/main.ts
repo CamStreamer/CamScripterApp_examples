@@ -36,16 +36,17 @@ async function main() {
 
         try {
             const res = await agent.post('/local/objectanalytics/control.cgi', JSON.stringify(req));
+            const json = (await res.json()) as any;
 
-            if (res.ok) {
-                const json = JSON.parse(await res.text());
-
+            if (res.ok && Object.hasOwn(json, 'data') && Object.hasOwn(json.data, 'total')) {
                 await co.updateCGText(settings.camera.serviceID, [
                     {
                         field_name: settings.camera.fieldName,
                         text: json.data.total,
                     },
                 ]);
+            } else if (Object.hasOwn(json, 'error')) {
+                throw new Error(JSON.stringify(json.error));
             } else {
                 throw new Error(JSON.stringify(res));
             }
