@@ -39,7 +39,7 @@ const Aoa = () => {
                     <StyledTextField
                         defaultValue={field.value}
                         fullWidth
-                        label="Scenatio ID"
+                        label="Scenario ID"
                         InputLabelProps={{ shrink: true }}
                         onBlur={(e) => {
                             const val = parseValueAsFloat(e.target.value);

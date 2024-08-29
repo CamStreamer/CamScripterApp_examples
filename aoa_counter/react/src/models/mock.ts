@@ -8,7 +8,7 @@ export const mockedSettings: TSettings = {
         user: 'root',
         pass: '',
         serviceID: 1,
-        fieldName: '',
+        fieldName: 'field1',
     },
     aoa: {
         protocol: 'http',
