@@ -5,17 +5,23 @@ import { CamOverlayAPI } from 'camstreamerlib/CamOverlayAPI';
 
 async function main() {
     const settings = readSettings();
-    const options = {
+
+    const agent = new DefaultAgent({
+        tls: settings.aoa.protocol !== 'http',
+        tlsInsecure: settings.aoa.protocol !== 'https',
+        ip: settings.aoa.ip,
+        port: settings.aoa.port,
+        user: settings.aoa.user,
+        pass: settings.aoa.pass,
+    });
+    const co = new CamOverlayAPI({
         tls: settings.camera.protocol !== 'http',
         tlsInsecure: settings.camera.protocol !== 'https',
         ip: settings.camera.ip,
         port: settings.camera.port,
         user: settings.camera.user,
         pass: settings.camera.pass,
-    };
-
-    const agent = new DefaultAgent(options);
-    const co = new CamOverlayAPI(agent);
+    });
 
     for await (const c of setInterval(1000 * settings.aoa.updateFrequency)) {
         void c;

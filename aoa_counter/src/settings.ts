@@ -2,19 +2,23 @@ import { z } from 'zod';
 import * as fs from 'fs';
 import * as path from 'path';
 
-const cameraSchema = z.object({
+const connectionParams = {
     protocol: z.union([z.literal('http'), z.literal('https'), z.literal('https_insecure')]),
     ip: z.string(),
     port: z.number(),
     user: z.string(),
     pass: z.string(),
+};
+const cameraSchema = z.object({
+    ...connectionParams,
     serviceID: z.number(),
     fieldName: z.string(),
 });
 const aoaSchema = z.object({
+    ...connectionParams,
     updateFrequency: z.number(),
-    scenarioId: z.string(),
-    method: z.union([z.literal('getOccupancy'), z.literal('getAccumulatedCounts ')]),
+    scenarioId: z.number(),
+    method: z.union([z.literal('getOccupancy'), z.literal('getAccumulatedCounts')]),
 });
 const settingsSchema = z.object({
     camera: cameraSchema,
