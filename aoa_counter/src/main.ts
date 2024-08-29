@@ -1,7 +1,15 @@
+import * as fs from 'fs';
+import * as path from 'path';
 import { setInterval } from 'timers/promises';
-import { readSettings } from './settings';
+import { settingsSchema, type TSettings } from './schema';
 import { DefaultAgent } from 'camstreamerlib/DefaultAgent';
 import { CamOverlayAPI } from 'camstreamerlib/CamOverlayAPI';
+
+function readSettings(): TSettings {
+    const localdata = process.env.PERSISTENT_DATA_PATH ?? 'localdata';
+    const buffer = fs.readFileSync(path.join(localdata, 'settings.json'));
+    return settingsSchema.parse(JSON.parse(buffer.toString()));
+}
 
 async function main() {
     const settings = readSettings();
