@@ -10,7 +10,6 @@ import { TSettings, settingsSchema } from './models/schema';
 import { useInitializeOnMount } from './hooks/useInitializeOnMount';
 import { ZodError } from 'zod';
 import { useSnackbar } from './hooks/Snackbar';
-import { Typography } from '@mui/material';
 import { Headline } from './components/Title';
 import { FormWrapper } from './FormWrapper';
 import { mockedSettings } from './models/mock';

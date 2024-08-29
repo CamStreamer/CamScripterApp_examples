@@ -1,27 +1,9 @@
-import type { TWidget, TSettings } from './models/schema';
+import type { TSettings } from './models/schema';
 import type { FieldErrors } from 'react-hook-form';
 
-export const getErrorObject = (errorObject: FieldErrors<TSettings>, name: string) => {
-    const [name1, name2] = name.split('.') as ['acs', void] | ['cameras', string]; // hack
-    if (name1 === 'acs') {
-        return errorObject[name1];
-    } else {
-        return errorObject[name1]?.[Number.parseInt(name2)];
-    }
+export const getErrorObject = (errorObject: FieldErrors<TSettings>, name: 'camera' | 'aoa') => {
+    return errorObject[name];
 };
-
-export const coordOptionLabels: Record<TWidget['coAlignment'], string> = {
-    top_left: 'Top Left',
-    top_center: 'Top Center',
-    top_right: 'Top Right',
-    center_left: 'Center Left',
-    center: 'Center',
-    center_right: 'Center Right',
-    bottom_left: 'Bottom Left',
-    bottom_center: 'Bottom Center',
-    bottom_right: 'Bottom Right',
-};
-export const COORD_LIST = Object.keys(coordOptionLabels) as TWidget['coAlignment'][];
 
 export const parseValueAsInt = (value: string) => {
     const parsedValue = parseInt(value);

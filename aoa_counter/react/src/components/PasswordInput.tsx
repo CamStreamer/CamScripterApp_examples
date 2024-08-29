@@ -7,12 +7,11 @@ import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { TSettings } from '../models/schema';
 import { StyledTextField } from './FormInputs';
-import { getErrorObject } from '../utils';
 
 type Props = {
     areCredentialsValid?: boolean;
     control: Control<TSettings>;
-    name: `camera.pass`;
+    name: `camera` | `aoa`;
     onBlur?: () => void;
     onChange?: () => void;
 };
@@ -23,7 +22,7 @@ export const PasswordInput = ({ control, name, onBlur, onChange, areCredentialsV
 
     return (
         <Controller
-            name={name}
+            name={`${name}.pass`}
             control={control}
             render={({ field, formState }) => (
                 <StyledTextField
@@ -46,12 +45,8 @@ export const PasswordInput = ({ control, name, onBlur, onChange, areCredentialsV
                             </InputAdornment>
                         ),
                     }}
-                    error={!areCredentialsValid || getErrorObject(formState.errors, name)?.pass !== undefined}
-                    helperText={
-                        areCredentialsValid
-                            ? getErrorObject(formState.errors, name)?.pass?.message
-                            : 'Wrong credentials'
-                    }
+                    error={!areCredentialsValid || formState.errors?.[name]?.pass !== undefined}
+                    helperText={areCredentialsValid ? formState.errors?.[name]?.pass?.message : 'Wrong credentials'}
                     onBlur={() => {
                         field.onBlur();
                         onBlur?.();
