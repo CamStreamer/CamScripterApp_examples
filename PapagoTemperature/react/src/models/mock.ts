@@ -5,7 +5,7 @@ export const mockedSettings: TSettings = {
         protocol: 'http',
         ip: '192.168.91.247',
         port: 80,
-        portID: 1,
+        portID: '1',
         updateFrequency: 1,
     },
     camera: {

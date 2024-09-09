@@ -16,7 +16,7 @@ export const papagoSchema = z.object({
     protocol: z.union([z.literal('http'), z.literal('https'), z.literal('https_insecure')]),
     ip: z.string(),
     port: z.number(),
-    portID: z.number(),
+    portID: z.string(),
     updateFrequency: z.number(),
 });
 export const settingsSchema = z.object({
