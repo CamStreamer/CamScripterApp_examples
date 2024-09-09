@@ -21,10 +21,7 @@ export const FormWrapper = ({ defaultValues }: Props) => {
     });
 
     const onSubmit: SubmitHandler<TSettings> = async (toPost) => {
-        if (
-            toPost.camera.user === '' ||
-            toPost.camera.pass === ''
-        ) {
+        if (toPost.camera.user === '' || toPost.camera.pass === '') {
             displaySnackbar({
                 type: 'error',
                 message: 'Please fill in credentials for the media source.',
