@@ -1,0 +1,9 @@
+{
+    "package_name": "papago_temperature",
+    "package_menu_name": "PAPAGO Temperature (IP device)",
+    "package_version": "1.0.0-preview",
+    "vendor": "Camstreamer s.r.o.",
+    "required_camscripter_version": "1.4.7",
+    "required_camscripter_rbi_version": "1.0.0",
+    "ui_link": "/local/camscripter/package/papago_temperature/index.html"
+}
