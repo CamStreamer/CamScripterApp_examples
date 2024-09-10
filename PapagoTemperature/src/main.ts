@@ -52,7 +52,7 @@ async function main() {
         try {
             const temperature = await getTemperature(agent, settings.papago.portID);
             await co.updateCGText(settings.camera.serviceID, [
-                { field_name: settings.camera.fieldName, text: temperature.toString() },
+                { field_name: settings.camera.fieldName, text: `${temperature} °C` },
             ]);
         } catch (err) {
             console.warn(err);
