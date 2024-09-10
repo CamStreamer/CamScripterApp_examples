@@ -1,6 +1,6 @@
 {
     "name": "papago_temperature",
-    "version": "1.0.0-preview",
+    "version": "1.0.0",
     "main": "main.js",
     "author": "CamStreamer s.r.o",
     "engine": {
