@@ -1,0 +1,1 @@
+../react/src/models/schema.ts
