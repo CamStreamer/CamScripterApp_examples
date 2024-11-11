@@ -25,7 +25,7 @@ export const App = () => {
   useInitializeOnMount(async () => {
     let response: Response;
     try {
-      let url = `/local/camscripter/package/settings.cgi?package_name=${appInfo.packageName}&action=get`;
+      let url = BASE_URL;
       if (process.env!.NODE_ENV === "development") {
         url = "http://localhost:52520" + url;
       }
@@ -97,3 +97,5 @@ const StyledHeader = styled(Box)`
   padding: 35px 16px 25px;
   gap: 8px;
 `;
+
+const BASE_URL = appInfo.getUrl();

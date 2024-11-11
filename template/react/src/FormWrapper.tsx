@@ -36,7 +36,7 @@ export const FormWrapper = ({ defaultValues }: Props) => {
     }
 
     try {
-      let url = `/local/camscripter/package/settings.cgi?package_name=${appInfo.packageName}&action=set`;
+      let url = BASE_URL;
       if (process.env!.NODE_ENV === "development") {
         url = "http://localhost:52520" + url;
       }
@@ -100,3 +100,5 @@ const StyledFab = styled(Fab)`
   width: min-content;
   white-space: nowrap;
 `;
+
+const BASE_URL = appInfo.getUrl();
