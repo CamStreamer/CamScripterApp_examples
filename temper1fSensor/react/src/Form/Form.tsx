@@ -9,10 +9,16 @@ export function Form() {
   return (
     <Fade in={true} timeout={1000}>
       <StyledForm>
-        <CollapsibleFormSection label="Data source" defaultExpanded={true}>
+        <CollapsibleFormSection label="Temperature settings" defaultExpanded={true}>
           <ApplicationSettings />
         </CollapsibleFormSection>
-        <CollapsibleFormSection label="Data output" defaultExpanded={false}>
+        <CollapsibleFormSection label="Camoverlay app integration" defaultExpanded={false}>
+          <CameraSettings />
+        </CollapsibleFormSection>
+        <CollapsibleFormSection label="axis camera station" defaultExpanded={false}>
+          <CameraSettings />
+        </CollapsibleFormSection>
+        <CollapsibleFormSection label="axis camera events" defaultExpanded={false}>
           <CameraSettings />
         </CollapsibleFormSection>
       </StyledForm>

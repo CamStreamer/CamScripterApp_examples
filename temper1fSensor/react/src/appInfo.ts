@@ -1,6 +1,6 @@
 export const appInfo = {
   //adjust application accodingly
-  name: "Papago",
+  name: "TEMPer1F",
   packageName: "papago_temperature",
   headline: "TEMPer1F Sensor",
   title: "TEMPer1F Sensor",

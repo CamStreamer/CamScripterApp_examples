@@ -1,6 +1,6 @@
 import { appInfo } from "./appInfo";
 import { useState } from "react";
-import Box from "@mui/material/Box";
+import { Box } from "@mui/material";
 import Container from "@mui/material/Container";
 import styled from "@mui/material/styles/styled";
 import CssBaseline from "@mui/material/CssBaseline";

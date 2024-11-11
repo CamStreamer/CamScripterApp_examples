@@ -1,37 +1,44 @@
 import { z } from "zod";
 
-const connectionParams = {
-  protocol: z.union([
-    z.literal("http"),
-    z.literal("https"),
-    z.literal("https_insecure"),
-  ]),
-  ip: z.string(),
-  port: z.number(),
-  user: z.string(),
-  pass: z.string(),
-};
-export const cameraSchema = z.object({
-  ...connectionParams,
-  serviceID: z.number(),
-  fieldName: z.string(),
-});
 export const applicationSchema = z.object({
-  protocol: z.union([
+  camera_protocol: z.union([
     z.literal("http"),
     z.literal("https"),
     z.literal("https_insecure"),
   ]),
-  ip: z.string(),
-  port: z.number(),
-  portID: z.string(),
-  updateFrequency: z.number(),
-});
-export const settingsSchema = z.object({
-  camera: cameraSchema,
-  application: applicationSchema,
+  camera_ip: z.string(),
+  camera_port: z.number(),
+  camera_user: z.string(),
+  camera_pass: z.string(),
+  unit: z.string(),
+  service_id: z.number(),
+  field_name: z.string(),
+  acs_protocol: z.union([
+    z.literal("http"),
+    z.literal("https"),
+    z.literal("https_insecure"),
+  ]),
+  acs_ip: z.string(),
+  acs_port: z.number(),
+  acs_user: z.string(),
+  acs_pass: z.string(),
+  acs_source_key: z.string(),
+  acs_condition_delay: z.number(),
+  acs_condition_operator: z.number(),
+  acs_condition_value: z.number(),
+  acs_repeat_after: z.number(),
+  event_camera_protocol: z.union([
+    z.literal("http"),
+    z.literal("https"),
+    z.literal("https_insecure"),
+  ]),
+  event_camera_ip: z.string(),
+  event_camera_port: z.number(),
+  event_camera_user: z.string(),
+  event_camera_pass: z.string(),
+  event_condition_delay: z.number(),
+  event_condition_operator: z.number(),
+  event_condition_value: z.number()
 });
 
-export type TCamera = z.infer<typeof cameraSchema>;
-export type TPapago = z.infer<typeof applicationSchema>;
-export type TSettings = z.infer<typeof settingsSchema>;
+export type TAppSchema = z.infer<typeof applicationSchema>;
