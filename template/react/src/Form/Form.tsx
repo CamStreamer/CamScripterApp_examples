@@ -20,9 +20,9 @@ export function Form() {
   );
 }
 
-const StyledForm = styled("div")({
-  width: "100%",
-  display: "flex",
-  justifyContent: "center",
-  flexDirection: "column",
-});
+const StyledForm = styled("div")`
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+`;

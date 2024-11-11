@@ -15,6 +15,8 @@ import { Headline } from "./components/Title";
 import { FormWrapper } from "./FormWrapper";
 import { mockedSettings } from "./models/mock";
 
+document.title = appInfo.title;
+
 export const App = () => {
   const { displaySnackbar } = useSnackbar();
 
@@ -81,12 +83,12 @@ const StyledContainer = styled(Container)`
   }
 `;
 
-const StyledContentWrapper = styled(Box)({
-  width: "100%",
-  display: "flex",
-  flexDirection: "column",
-  position: "relative",
-});
+const StyledContentWrapper = styled(Box)`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+`;
 
 const StyledHeader = styled(Box)`
   display: flex;
