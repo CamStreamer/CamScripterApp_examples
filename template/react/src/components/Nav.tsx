@@ -1,11 +1,12 @@
 import Typography from "@mui/material/Typography";
 import { styled } from "@mui/material/styles";
+import logo from "../assets/CS-icon.svg";
 
 export const Nav = () => {
   return (
     <StyledNav>
       <StyledLink href="/local/camscripter/settings.html">
-        <StyledImage src="./assets/images/CS-icon.svg" alt="camscripter-logo" />{" "}
+        <StyledImage src={logo} alt="camscripter-logo" />{" "}
         <StyledText>CamScripter</StyledText>
       </StyledLink>
     </StyledNav>
