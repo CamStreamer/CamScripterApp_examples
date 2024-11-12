@@ -7,7 +7,7 @@ import CssBaseline from "@mui/material/CssBaseline";
 
 import { Nav } from "./components/Nav";
 import { ContainerLoader } from "./components/ContainerLoader";
-import { TSettings, settingsSchema } from "./models/schema";
+import { TAppSchema, applicationSchema } from "./models/schema";
 import { useInitializeOnMount } from "./hooks/useInitializeOnMount";
 import { ZodError } from "zod";
 import { useSnackbar } from "./hooks/Snackbar";
@@ -20,7 +20,7 @@ document.title = appInfo.title;
 export const App = () => {
   const { displaySnackbar } = useSnackbar();
 
-  const [defaultValues, setDefaultValues] = useState<TSettings | null>(null);
+  const [defaultValues, setDefaultValues] = useState<TAppSchema | null>(null);
 
   useInitializeOnMount(async () => {
     let response: Response;
@@ -31,7 +31,7 @@ export const App = () => {
       }
 
       response = await fetch(url);
-      const parsedData = settingsSchema.parse(await response.json());
+      const parsedData = applicationSchema.parse(await response.json());
       setDefaultValues(parsedData);
     } catch (e) {
       if (e instanceof ZodError) {

@@ -5,7 +5,7 @@ import {
   SubmitHandler,
   useForm,
 } from "react-hook-form";
-import { TSettings, settingsSchema } from "./models/schema";
+import { TAppSchema, applicationSchema } from "./models/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSnackbar } from "./hooks/Snackbar";
 import { Form } from "./Form/Form";
@@ -14,20 +14,20 @@ import { CircularProgress, Typography, Fab } from "@mui/material";
 import { InfoSnackbar } from "./components/Snackbar";
 
 type Props = {
-  defaultValues: TSettings;
+  defaultValues: TAppSchema;
 };
 
 export const FormWrapper = ({ defaultValues }: Props) => {
   const { snackbarData, displaySnackbar, closeSnackbar } = useSnackbar();
-  const form = useForm<TSettings>({
-    resolver: zodResolver(settingsSchema),
+  const form = useForm<TAppSchema>({
+    resolver: zodResolver(applicationSchema),
     mode: "onChange",
     reValidateMode: "onChange",
     defaultValues,
   });
 
-  const onSubmit: SubmitHandler<TSettings> = async (toPost) => {
-    if (toPost.camera.user === "" || toPost.camera.pass === "") {
+  const onSubmit: SubmitHandler<TAppSchema> = async (toPost) => {
+    if (toPost.camera_user === "" || toPost.camera_pass === "") {
       displaySnackbar({
         type: "error",
         message: "Please fill in credentials for the media source.",
@@ -64,7 +64,7 @@ export const FormWrapper = ({ defaultValues }: Props) => {
     }
   };
 
-  const onError: SubmitErrorHandler<TSettings> = (errors) => {
+  const onError: SubmitErrorHandler<TAppSchema> = (errors) => {
     console.error(`FORM ERROR: ${JSON.stringify(errors)}`);
     displaySnackbar({
       type: "error",
