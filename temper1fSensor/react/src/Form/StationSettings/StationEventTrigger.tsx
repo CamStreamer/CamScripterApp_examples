@@ -108,7 +108,11 @@ export const StationEventTrigger = () => {
               field.onBlur();
             }}
             error={formState.errors.acs_repeat_after !== undefined}
-            helperText={formState.errors.acs_repeat_after?.message}
+            helperText={
+              formState.errors.acs_repeat_after?.message
+                ? formState.errors.acs_repeat_after?.message
+                : 'Set to zero for non-repetition.'
+            }
             onBlur={() => {
               field.onBlur();
             }}

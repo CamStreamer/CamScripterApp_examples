@@ -113,7 +113,11 @@ export const EventTrigger = () => {
               field.onBlur();
             }}
             error={formState.errors.event_repeat_after !== undefined}
-            helperText={formState.errors.event_repeat_after?.message}
+            helperText={
+              formState.errors.event_repeat_after?.message
+                ? formState.errors.event_repeat_after?.message
+                : 'Set to zero for non-repetition.'
+            }
             onBlur={() => {
               field.onBlur();
             }}

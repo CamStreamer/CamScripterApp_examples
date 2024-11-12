@@ -76,7 +76,11 @@ export const CameraStationSettings = () => {
               field.onBlur();
             }}
             error={formState.errors.acs_port !== undefined}
-            helperText={formState.errors.acs_port?.message}
+            helperText={
+              formState.errors.acs_port?.message
+                ? formState.errors.acs_port?.message
+                : 'Default ports are 29204 or 55756.'
+            }
           />
         )}
       />

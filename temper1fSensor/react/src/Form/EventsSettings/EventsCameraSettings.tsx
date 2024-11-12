@@ -8,9 +8,10 @@ import {
   RadioGroup,
   FormControlLabel,
   Radio,
+  InputAdornment,
+  Button,
 } from '@mui/material';
 import { PasswordInput } from '../../components/PasswordInput';
-import { IPAdressInput } from '../../components/IPAddressInput';
 import { TAppSchema } from '../../models/schema';
 import {
   VIEW_AREAS,
@@ -54,7 +55,34 @@ export const EventsCameraSettings = () => {
         )}
       />
       {/*------IP ADDRESS------*/}
-      <IPAdressInput control={control} />
+      <Controller
+        name={`event_camera_ip`}
+        control={control}
+        render={({ field, formState }) => (
+          <StyledTextField
+            {...field}
+            type="text"
+            fullWidth
+            placeholder={field.value || 'IP Address'}
+            InputLabelProps={{ shrink: true }}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <Button variant="text">FIND CAMERA</Button>
+                </InputAdornment>
+              ),
+            }}
+            error={formState.errors?.event_camera_ip !== undefined}
+            helperText={formState.errors?.event_camera_ip?.message}
+            onBlur={() => {
+              field.onBlur();
+            }}
+            onChange={(event) => {
+              field.onChange(event);
+            }}
+          />
+        )}
+      />
       {/*------PORT------*/}
       <Controller
         name={`event_camera_port`}
