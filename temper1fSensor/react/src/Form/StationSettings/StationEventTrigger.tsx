@@ -17,7 +17,7 @@ import {
   WHEN,
 } from '../constants';
 
-export const AxisCameraEventTrigger = () => {
+export const StationEventTrigger = () => {
   const { control } = useFormContext<TAppSchema>();
   console.log(control._formValues.acs_active);
 

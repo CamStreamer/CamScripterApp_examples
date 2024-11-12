@@ -3,9 +3,9 @@ import styled from '@mui/material/styles/styled';
 import { CollapsibleFormSection } from '../components/CollapsibleFormSection';
 
 import { TemperatureSettings } from './TemperatureSettings';
-import { CamOverlayIntegrationSettings } from './CamOverlayIntegrationSettings/CamOverlayIntegrationSettings';
-import { AxisCameraStationSettings } from './AxisCameraStationSettings/AxisCameraStationSettings';
-import { CameraEventsSettings } from './CameraEventsSettings/CameraEventsSettings';
+import { IntegrationSettings } from './IntegrationSettings/IntegrationSettings';
+import { StationSettings } from './StationSettings/StationSettings';
+import { EventsSettings } from './EventsSettings/EventsSettings';
 
 export function Form() {
   return (
@@ -21,19 +21,19 @@ export function Form() {
           label="Camoverlay app integration"
           defaultExpanded={false}
         >
-          <CamOverlayIntegrationSettings />
+          <IntegrationSettings />
         </CollapsibleFormSection>
         <CollapsibleFormSection
           label="axis camera station"
           defaultExpanded={false}
         >
-          <AxisCameraStationSettings />
+          <StationSettings />
         </CollapsibleFormSection>
         <CollapsibleFormSection
           label="axis camera events"
           defaultExpanded={false}
         >
-          <CameraEventsSettings />
+          <EventsSettings />
         </CollapsibleFormSection>
       </StyledForm>
     </Fade>

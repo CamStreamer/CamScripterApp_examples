@@ -1,12 +1,12 @@
 import { Grid } from '@mui/material';
-import { CameraSettings } from './CameraSettings';
+import { EventsCameraSettings } from './EventsCameraSettings';
 import { EventTrigger } from './EventTrigger';
 
-export const CameraEventsSettings = () => {
+export const EventsSettings = () => {
   return (
     <Grid container>
       <Grid item md={6} xs={12}>
-        <CameraSettings />
+        <EventsCameraSettings />
       </Grid>
       <Grid item md={6} xs={12}>
         <EventTrigger />

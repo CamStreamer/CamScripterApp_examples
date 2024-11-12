@@ -1,12 +1,12 @@
 import { Grid } from '@mui/material';
-import { CamOverlayCameraSettings } from './CamOverlayCameraSettings';
+import { IntegrationCameraSettings } from './IntegrationCameraSettings';
 import { WidgetSettings } from './WidgetSettings';
 
-export const CamOverlayIntegrationSettings = () => {
+export const IntegrationSettings = () => {
   return (
     <Grid container>
       <Grid item md={6} xs={12}>
-        <CamOverlayCameraSettings />
+        <IntegrationCameraSettings />
       </Grid>
       <Grid item md={6} xs={12}>
         <WidgetSettings />

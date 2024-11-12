@@ -2,7 +2,7 @@ import { TAppSchema } from './schema';
 
 export const mockedSettings: TAppSchema = {
   camera_protocol: 'http',
-  camera_ip: '',
+  camera_ip: '10.5.7.2.',
   camera_port: 80,
   camera_user: 'root',
   camera_pass: '',

@@ -10,6 +10,7 @@ import {
   Radio,
 } from '@mui/material';
 import { PasswordInput } from '../../components/PasswordInput';
+import { IPAdressInput } from '../../components/IPAddressInput';
 import { TAppSchema } from '../../models/schema';
 import {
   VIEW_AREAS,
@@ -18,7 +19,7 @@ import {
   PROTOCOL_LABELS,
 } from '../constants';
 
-export const CamOverlayCameraSettings = () => {
+export const EventsCameraSettings = () => {
   const { control, setValue } = useFormContext<TAppSchema>();
 
   return (
@@ -26,7 +27,7 @@ export const CamOverlayCameraSettings = () => {
       <Title text="Camera Settings" />
       {/*------PROTOCOL------*/}
       <Controller
-        name={`camera_protocol`}
+        name={`event_camera_protocol`}
         control={control}
         render={({ field }) => (
           <RadioGroup
@@ -34,7 +35,7 @@ export const CamOverlayCameraSettings = () => {
             defaultValue={field.value}
             onChange={(event) => {
               const protocol = event.target.value;
-              setValue(`camera_port`, protocol === 'http' ? 80 : 443, {
+              setValue(`event_camera_port`, protocol === 'http' ? 80 : 443, {
                 shouldTouch: true,
               });
 
@@ -53,26 +54,10 @@ export const CamOverlayCameraSettings = () => {
         )}
       />
       {/*------IP ADDRESS------*/}
-      <Controller
-        name={`camera_ip`}
-        control={control}
-        render={({ field, formState }) => (
-          <StyledTextField
-            {...field}
-            InputLabelProps={{ shrink: true }}
-            fullWidth
-            label="IP address"
-            error={formState.errors.camera_ip !== undefined}
-            helperText={formState.errors.camera_ip?.message}
-            onBlur={() => {
-              field.onBlur();
-            }}
-          />
-        )}
-      />
+      <IPAdressInput control={control} />
       {/*------PORT------*/}
       <Controller
-        name={`camera_port`}
+        name={`event_camera_port`}
         control={control}
         render={({ field, formState }) => (
           <StyledTextField
@@ -86,14 +71,14 @@ export const CamOverlayCameraSettings = () => {
               e.target.value = val.toString();
               field.onBlur();
             }}
-            error={formState.errors.camera_port !== undefined}
-            helperText={formState.errors.camera_port?.message}
+            error={formState.errors.event_camera_port !== undefined}
+            helperText={formState.errors.event_camera_port?.message}
           />
         )}
       />
       {/*------USER------*/}
       <Controller
-        name={`camera_user`}
+        name={`event_camera_user`}
         control={control}
         render={({ field, formState }) => (
           <StyledTextField
@@ -101,8 +86,8 @@ export const CamOverlayCameraSettings = () => {
             InputLabelProps={{ shrink: true }}
             fullWidth
             label="User"
-            error={formState.errors.camera_user !== undefined}
-            helperText={formState.errors.camera_user?.message}
+            error={formState.errors.event_camera_user !== undefined}
+            helperText={formState.errors.event_camera_user?.message}
             onBlur={() => {
               field.onBlur();
             }}
@@ -117,7 +102,7 @@ export const CamOverlayCameraSettings = () => {
       />
       {/*------VIEW AREA(S)------*/}
       <Controller
-        name={`view_areas`}
+        name={`event_view_areas`}
         control={control}
         render={({ field }) => (
           <StyledSelect {...field} label="View area(s)">
