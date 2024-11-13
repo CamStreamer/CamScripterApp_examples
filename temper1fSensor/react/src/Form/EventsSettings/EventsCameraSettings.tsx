@@ -63,8 +63,7 @@ export const EventsCameraSettings = () => {
             {...field}
             type="text"
             fullWidth
-            placeholder={field.value || 'IP Address'}
-            InputLabelProps={{ shrink: true }}
+            label="IP Address"
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
@@ -111,7 +110,6 @@ export const EventsCameraSettings = () => {
         render={({ field, formState }) => (
           <StyledTextField
             {...field}
-            InputLabelProps={{ shrink: true }}
             fullWidth
             label="User"
             error={formState.errors.event_camera_user !== undefined}
@@ -123,11 +121,7 @@ export const EventsCameraSettings = () => {
         )}
       />
       {/*------PASSWORD------*/}
-      <PasswordInput
-        areCredentialsValid={true}
-        control={control}
-        placeholder="Password"
-      />
+      <PasswordInput areCredentialsValid={true} control={control} />
       {/*------VIEW AREA(S)------*/}
       <Controller
         name={`event_view_areas`}

@@ -63,8 +63,7 @@ export const IntegrationCameraSettings = () => {
             {...field}
             type="text"
             fullWidth
-            placeholder={field.value || 'IP Address'}
-            InputLabelProps={{ shrink: true }}
+            label="IP Address"
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
@@ -111,7 +110,6 @@ export const IntegrationCameraSettings = () => {
         render={({ field, formState }) => (
           <StyledTextField
             {...field}
-            InputLabelProps={{ shrink: true }}
             fullWidth
             label="User"
             error={formState.errors.camera_user !== undefined}
@@ -123,11 +121,7 @@ export const IntegrationCameraSettings = () => {
         )}
       />
       {/*------PASSWORD------*/}
-      <PasswordInput
-        areCredentialsValid={true}
-        control={control}
-        placeholder="Password"
-      />
+      <PasswordInput areCredentialsValid={true} control={control} />
       {/*------VIEW AREA(S)------*/}
       <Controller
         name={`view_areas`}

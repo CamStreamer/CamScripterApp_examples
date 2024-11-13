@@ -42,7 +42,6 @@ export const WidgetSettings = () => {
         render={({ field, formState }) => (
           <StyledTextField
             {...field}
-            InputLabelProps={{ shrink: true }}
             fullWidth
             label="Field Name"
             onChange={(e) => {

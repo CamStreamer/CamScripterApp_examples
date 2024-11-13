@@ -48,7 +48,6 @@ export const CameraStationSettings = () => {
         render={({ field, formState }) => (
           <StyledTextField
             {...field}
-            InputLabelProps={{ shrink: true }}
             fullWidth
             label="IP address"
             error={formState.errors.acs_ip !== undefined}
@@ -91,7 +90,6 @@ export const CameraStationSettings = () => {
         render={({ field, formState }) => (
           <StyledTextField
             {...field}
-            InputLabelProps={{ shrink: true }}
             fullWidth
             label="User"
             error={formState.errors.acs_user !== undefined}
@@ -103,11 +101,7 @@ export const CameraStationSettings = () => {
         )}
       />
       {/*------PASSWORD------*/}
-      <PasswordInput
-        areCredentialsValid={true}
-        control={control}
-        placeholder="Password"
-      />
+      <PasswordInput areCredentialsValid={true} control={control} />
       {/*------SOURCE KEY------*/}
       <Controller
         name={`acs_source_key`}
@@ -115,9 +109,8 @@ export const CameraStationSettings = () => {
         render={({ field, formState }) => (
           <StyledTextField
             {...field}
-            InputLabelProps={{ shrink: true }}
             fullWidth
-            placeholder="Source key"
+            label="Source key"
             error={formState.errors.acs_source_key !== undefined}
             helperText={formState.errors.acs_source_key?.message}
             onBlur={() => {

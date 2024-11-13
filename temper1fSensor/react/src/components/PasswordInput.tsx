@@ -11,14 +11,12 @@ import { StyledTextField } from './FormInputs';
 type Props = {
   areCredentialsValid?: boolean;
   control: Control<TAppSchema>;
-  placeholder?: string;
   onBlur?: () => void;
   onChange?: () => void;
 };
 
 export const PasswordInput = ({
   control,
-  placeholder,
   onBlur,
   onChange,
   areCredentialsValid = true,
@@ -35,8 +33,7 @@ export const PasswordInput = ({
           {...field}
           type={showPassword ? 'text' : 'password'}
           fullWidth
-          placeholder={placeholder}
-          InputLabelProps={{ shrink: true }}
+          label="Password"
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">
