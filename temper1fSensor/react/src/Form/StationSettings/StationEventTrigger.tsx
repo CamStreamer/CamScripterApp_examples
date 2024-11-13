@@ -18,8 +18,8 @@ import {
 } from '../constants';
 
 export const StationEventTrigger = () => {
-  const { control } = useFormContext<TAppSchema>();
-  console.log(control._formValues.acs_active);
+  const { control, watch } = useFormContext<TAppSchema>();
+  const unit = watch('unit');
 
   return (
     <Stack spacing={1.5}>
@@ -86,7 +86,11 @@ export const StationEventTrigger = () => {
               field.onBlur();
             }}
             InputProps={{
-              endAdornment: <InputAdornment position="end">°C</InputAdornment>,
+              endAdornment: (
+                <InputAdornment position="end">
+                  {unit === 'c' ? '°C' : '°F'}
+                </InputAdornment>
+              ),
             }}
           />
         )}

@@ -18,7 +18,8 @@ import {
 } from '../constants';
 
 export const EventTrigger = () => {
-  const { control } = useFormContext<TAppSchema>();
+  const { control, watch } = useFormContext<TAppSchema>();
+  const unit = watch('unit');
 
   return (
     <Stack spacing={1.5}>
@@ -74,7 +75,6 @@ export const EventTrigger = () => {
             fullWidth
             label="Value"
             onChange={(e) => {
-              console.log(field);
               const val = parseValueAsInt(e.target.value);
               field.onChange(val);
               e.target.value = val.toString();
@@ -88,8 +88,7 @@ export const EventTrigger = () => {
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
-                  {/* {field.value === 'c' ? '°C' : '°F'} */}
-                  °C
+                  {unit === 'c' ? '°C' : '°F'}
                 </InputAdornment>
               ),
             }}

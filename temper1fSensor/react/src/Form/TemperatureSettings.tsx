@@ -8,8 +8,10 @@ import {
 } from '@mui/material';
 import { TAppSchema } from '../models/schema';
 
+type Temp = 'c' | 'f';
+
 export const TemperatureSettings = () => {
-  const { control, setValue } = useFormContext<TAppSchema>();
+  const { control } = useFormContext<TAppSchema>();
 
   return (
     <Grid container>
@@ -20,14 +22,9 @@ export const TemperatureSettings = () => {
           render={({ field }) => (
             <RadioGroup
               row
-              defaultValue={field.value}
+              value={field.value}
               onChange={(event) => {
-                const temperature = event.target.value;
-                setValue(`unit`, temperature === 'c' ? 'c' : 'f', {
-                  shouldTouch: true,
-                });
-
-                field.onChange(event);
+                field.onChange(event.target.value as Temp);
               }}
             >
               {TEMPERATURES.map((value) => (
