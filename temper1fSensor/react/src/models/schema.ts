@@ -40,10 +40,20 @@ export const applicationSchema = z.object({
   event_condition_operator: z.number().int().min(0).max(4),
   event_condition_value: z.number(),
 
-  event_view_areas: z.array(z.number()),
+  event_view_areas: z.array(
+    z.object({
+      value: z.number(),
+      label: z.string(),
+    })
+  ),
   event_active: z.boolean(),
   event_repeat_after: z.number(),
-  view_areas: z.array(z.number()),
+  view_areas: z.array(
+    z.object({
+      value: z.number(),
+      label: z.string(),
+    })
+  ),
   acs_active: z.boolean(),
 });
 
