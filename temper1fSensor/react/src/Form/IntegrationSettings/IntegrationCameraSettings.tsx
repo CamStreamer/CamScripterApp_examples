@@ -2,13 +2,19 @@ import { parseValueAsInt } from '../../utils';
 import { Controller, useFormContext } from 'react-hook-form';
 import { StyledTextField } from '../../components/FormInputs';
 import { Title } from '../../components/Title';
-import { Stack, RadioGroup, FormControlLabel, Radio, InputAdornment, Button } from '@mui/material';
+import { Stack, RadioGroup, FormControlLabel, Radio } from '@mui/material';
+import { FormInputWithDialog } from '../../components/FormInputWithDialog';
 import { PasswordInput } from '../../components/PasswordInput';
 import { ViewAreaPicker } from '../../components/VIewAreaPicker';
+import { TCameraListOption } from '../../hooks/useCameraList';
 import { TAppSchema } from '../../models/schema';
 import { PROTOCOLS, PROTOCOL_LABELS } from '../constants';
 
-export const IntegrationCameraSettings = () => {
+type Props = {
+    viewAreaList: TCameraListOption[];
+};
+
+export const IntegrationCameraSettings = ({ viewAreaList }: Props) => {
     const { control, setValue } = useFormContext<TAppSchema>();
 
     return (
@@ -46,29 +52,7 @@ export const IntegrationCameraSettings = () => {
             <Controller
                 name={`camera_ip`}
                 control={control}
-                render={({ field, formState }) => (
-                    <StyledTextField
-                        {...field}
-                        type="text"
-                        fullWidth
-                        label="IP Address"
-                        InputProps={{
-                            endAdornment: (
-                                <InputAdornment position="end">
-                                    <Button variant="text">FIND CAMERA</Button>
-                                </InputAdornment>
-                            ),
-                        }}
-                        error={formState.errors?.camera_ip !== undefined}
-                        helperText={formState.errors?.camera_ip?.message}
-                        onBlur={() => {
-                            field.onBlur();
-                        }}
-                        onChange={(event) => {
-                            field.onChange(event);
-                        }}
-                    />
-                )}
+                render={({ field }) => <FormInputWithDialog {...field} value={field.value} keyName="camera_ip" />}
             />
             {/*------PORT------*/}
             <Controller
@@ -117,6 +101,7 @@ export const IntegrationCameraSettings = () => {
                 render={({ field, formState }) => (
                     <ViewAreaPicker
                         {...field}
+                        viewAreaList={viewAreaList}
                         onChange={(data) => field.onChange(data)}
                         error={!!formState.errors.event_view_areas}
                         helperText={formState.errors.event_view_areas?.message}
