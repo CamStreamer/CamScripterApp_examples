@@ -8,6 +8,7 @@ export type TCameraListOption = {
 };
 
 type Props = {
+    view_areas: Path<TAppSchema>;
     protocol: Path<TAppSchema>;
     ipAddress: Path<TAppSchema>;
     port: Path<TAppSchema>;
@@ -22,7 +23,7 @@ export const useCameraList = () => {
     const fetchIdsInProgress = useRef<number[]>([]);
     const abortControllers = useRef<AbortController | null>(null);
 
-    const fetchCameraList = async ({ protocol, ipAddress, port, user, pass }: Props) => {
+    const fetchCameraList = async ({ view_areas, protocol, ipAddress, port, user, pass }: Props) => {
         const fetchId = Math.round(Math.random() * 10000);
         fetchIdsInProgress.current.push(fetchId);
         setIsFetching(true);
@@ -87,7 +88,7 @@ export const useCameraList = () => {
             setIsFetching(false);
         } catch (e) {
             if ((e as Error).name !== 'AbortError') {
-                setValue('event_view_areas', []);
+                setValue(view_areas, []);
                 setOptions([]);
                 setIsFetching(false);
             }
