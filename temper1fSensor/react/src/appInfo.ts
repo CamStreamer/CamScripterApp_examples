@@ -1,10 +1,12 @@
 export const appInfo = {
-  //adjust application accodingly
-  name: "TEMPer1F",
-  packageName: "papago_temperature",
-  headline: "TEMPer1F Sensor",
-  title: "TEMPer1F Sensor",
-  getUrl() {
-    return `/local/camscripter/package/settings.cgi?package_name=${this.packageName}&action=get`;
-  },
+    //adjust application accodingly
+    name: 'TEMPer1F',
+    packageName: 'temper1fSensor',
+    headline: 'TEMPer1F Sensor',
+    title: 'TEMPer1F Sensor',
+    description:
+        'Script that reads data from TEMPer1F USB thermometer. Before use, check that the thermometer cable is fully inserted into the USB stick.',
+    getUrl() {
+        return `/local/camscripter/package/settings.cgi?package_name=${this.packageName}&action=get`;
+    },
 };
