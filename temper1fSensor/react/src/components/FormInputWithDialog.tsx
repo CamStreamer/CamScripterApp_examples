@@ -28,25 +28,25 @@ type Props = {
 
 const CameraList = ({ onClose, open, value, cameraOptions, isFetching }: CameraProps) => {
     return (
-        <StyledDialog onClose={() => onClose(value)} open={open}>
+        <StyledDialog fullWidth maxWidth="md" onClose={() => onClose(value)} open={open}>
             <Title text="Network camera list" />
             {isFetching ? (
                 <ContainerLoader size={80} infoText="Fetching camera list..." />
             ) : (
                 <StyledList>
                     {cameraOptions.map((option) => (
-                        <Box key={option.ip}>
+                        <StyledBox key={option.ip}>
                             <StyledListItem disableGutters key={option.ip}>
-                                <>
-                                    <Typography>{option.name}</Typography>
-                                    <Typography>{option.ip}</Typography>
-                                </>
+                                <StyledListDiv>
+                                    <StyledTypography>{option.name}</StyledTypography>
+                                    <StyledTypography>{option.ip}</StyledTypography>
+                                </StyledListDiv>
                                 <Button variant="contained" onClick={() => onClose(option.ip)}>
                                     SELECT
                                 </Button>
                             </StyledListItem>
                             <Divider />
-                        </Box>
+                        </StyledBox>
                     ))}
                 </StyledList>
             )}
@@ -108,31 +108,74 @@ export const FormInputWithDialog = forwardRef(
 
 const StyledDialog = styled(Dialog)`
     & .MuiDialog-paper {
-        width: 30%;
-        max-width: 90vw;
+        width: 90%;
+        max-width: 600px;
         margin: 0 auto;
         padding: 30px;
+
+        @media (max-width: 600px) {
+            padding: 16px;
+        }
     }
+
     & .MuiDialogContent-root {
         padding: 20px;
     }
+
     & .MuiDialogActions-root {
         padding: 20px;
+    }
+`;
+
+const StyledBox = styled(Box)`
+    height: 48px;
+    margin-bottom: 4px;
+
+    & :hover {
+        & button {
+            opacity: 1;
+            visibility: visible;
+        }
+    }
+
+    & button {
+        visibility: hidden;
     }
 `;
 
 const StyledListItem = styled(ListItem)`
     display: flex;
     justify-content: space-between;
+
+    @media (max-width: 600px) {
+    }
 `;
 
 const StyledList = styled(List)`
     padding: 8px;
 `;
 
+const StyledListDiv = styled('div')`
+    display: flex;
+
+    @media (max-width: 600px) {
+        padding-right: 20px;
+        align-items: center;
+    }
+`;
+
+const StyledTypography = styled(Typography)`
+    font-size: 0.9rem;
+    margin-right: 50px;
+
+    @media (max-width: 600px) {
+        margin-right: 10px;
+    }
+`;
+
 const DEFAULT_CAMERA_LIST: TCameraOption[] = [
-    { name: 'AXIS A8105-E - ACC8EFF250F', ip: '1.2.3.4.5' },
-    { name: 'AXIS A8105-E - ACC8EFF250F', ip: '1.1.1.1.1' },
-    { name: 'AXIS A8105-E - ACC8EFF250F', ip: '5.5.5.5.5' },
-    { name: 'AXIS A8105-E - ACC8EFF250F', ip: '79.55.3.410.5' },
+    { name: 'AXIS A8105-E - ACC8EFF250F', ip: '192.168.91.213' },
+    { name: 'AXIS A8105-E - ACC8EFF250F', ip: '192.168.91.214' },
+    { name: 'AXIS A8105-E - ACC8EFF250F', ip: '192.168.91.215' },
+    { name: 'AXIS A8105-E - ACC8EFF250F', ip: '192.168.91.216' },
 ];
