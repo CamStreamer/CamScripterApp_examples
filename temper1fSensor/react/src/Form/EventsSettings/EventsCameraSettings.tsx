@@ -1,8 +1,8 @@
 import { parseValueAsInt } from '../../utils';
 import { Controller, useFormContext } from 'react-hook-form';
-import { StyledTextField } from '../../components/FormInputs';
+import { StyledTextField, StyledRadioGroup, StyledRadioControlLabel } from '../../components/FormInputs';
 import { Title } from '../../components/Title';
-import { Stack, RadioGroup, FormControlLabel, Radio } from '@mui/material';
+import { Stack, Radio } from '@mui/material';
 import { FormInputWithDialog } from '../../components/FormInputWithDialog';
 import { PasswordInput } from '../../components/PasswordInput';
 import { ViewAreaPicker } from '../../components/VIewAreaPicker';
@@ -25,9 +25,9 @@ export const EventsCameraSettings = ({ viewAreaList }: Props) => {
                 name={`event_camera_protocol`}
                 control={control}
                 render={({ field }) => (
-                    <RadioGroup
+                    <StyledRadioGroup
                         row
-                        defaultValue={field.value}
+                        value={field.value}
                         onChange={(event) => {
                             const protocol = event.target.value;
                             setValue(`event_camera_port`, protocol === 'http' ? 80 : 443, {
@@ -38,21 +38,29 @@ export const EventsCameraSettings = ({ viewAreaList }: Props) => {
                         }}
                     >
                         {PROTOCOLS.map((value) => (
-                            <FormControlLabel
+                            <StyledRadioControlLabel
                                 key={value}
                                 value={value}
                                 control={<Radio />}
                                 label={PROTOCOL_LABELS[value]}
                             />
                         ))}
-                    </RadioGroup>
+                    </StyledRadioGroup>
                 )}
             />
             {/*------IP ADDRESS------*/}
             <Controller
                 name={`event_camera_ip`}
                 control={control}
-                render={({ field }) => <FormInputWithDialog {...field} value={field.value} keyName="event_camera_ip" />}
+                render={({ field, formState }) => (
+                    <FormInputWithDialog
+                        {...field}
+                        value={field.value}
+                        keyName="event_camera_ip"
+                        error={!!formState.errors.event_camera_ip}
+                        helperText={formState.errors.event_camera_ip?.message}
+                    />
+                )}
             />
             {/*------PORT------*/}
             <Controller

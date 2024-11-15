@@ -1,4 +1,5 @@
 import { Grid } from '@mui/material';
+import styled from '@mui/material/styles/styled';
 import { IntegrationCameraSettings } from './IntegrationCameraSettings';
 import { WidgetSettings } from './WidgetSettings';
 import { useCameraList } from '../../hooks/useCameraList';
@@ -18,13 +19,17 @@ export const IntegrationSettings = () => {
         });
     });
     return (
-        <Grid container>
+        <StyledGrid container>
             <Grid item md={6} xs={12}>
                 <IntegrationCameraSettings viewAreaList={viewAreaList} />
             </Grid>
             <Grid item md={6} xs={12}>
                 <WidgetSettings />
             </Grid>
-        </Grid>
+        </StyledGrid>
     );
 };
+
+const StyledGrid = styled(Grid)`
+    margin-bottom: 15px;
+`;

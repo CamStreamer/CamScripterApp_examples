@@ -1,8 +1,8 @@
 import { parseValueAsInt } from '../../utils';
 import { Controller, useFormContext } from 'react-hook-form';
-import { StyledTextField } from '../../components/FormInputs';
+import { StyledTextField, StyledRadioGroup, StyledRadioControlLabel } from '../../components/FormInputs';
 import { Title } from '../../components/Title';
-import { Stack, RadioGroup, FormControlLabel, Radio } from '@mui/material';
+import { Stack, Radio } from '@mui/material';
 import { PasswordInput } from '../../components/PasswordInput';
 import { TAppSchema } from '../../models/schema';
 import { PROTOCOLS, PROTOCOL_LABELS } from '../constants';
@@ -18,9 +18,9 @@ export const CameraStationSettings = () => {
                 name={`acs_protocol`}
                 control={control}
                 render={({ field }) => (
-                    <RadioGroup
+                    <StyledRadioGroup
                         row
-                        defaultValue={field.value}
+                        value={field.value}
                         onChange={(event) => {
                             const protocol = event.target.value;
                             setValue(`acs_port`, protocol === 'http' ? 80 : 443, {
@@ -31,14 +31,14 @@ export const CameraStationSettings = () => {
                         }}
                     >
                         {PROTOCOLS.map((value) => (
-                            <FormControlLabel
+                            <StyledRadioControlLabel
                                 key={value}
                                 value={value}
                                 control={<Radio />}
                                 label={PROTOCOL_LABELS[value]}
                             />
                         ))}
-                    </RadioGroup>
+                    </StyledRadioGroup>
                 )}
             />
             {/*------IP ADDRESS------*/}
