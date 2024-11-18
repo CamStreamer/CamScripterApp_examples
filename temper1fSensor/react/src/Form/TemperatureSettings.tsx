@@ -27,7 +27,7 @@ export const TemperatureSettings = () => {
                                 <StyledRadioControlLabel
                                     key={value}
                                     value={value}
-                                    control={<Radio />}
+                                    control={<Radio color="info" />}
                                     label={TEMEPRATURES_LABELS[value]}
                                 />
                             ))}

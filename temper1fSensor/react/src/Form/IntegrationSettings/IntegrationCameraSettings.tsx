@@ -41,7 +41,7 @@ export const IntegrationCameraSettings = ({ viewAreaList }: Props) => {
                             <StyledRadioControlLabel
                                 key={value}
                                 value={value}
-                                control={<Radio />}
+                                control={<Radio color="info" />}
                                 label={PROTOCOL_LABELS[value]}
                             />
                         ))}
