@@ -104,15 +104,15 @@ export const IntegrationCameraSettings = ({ viewAreaList }: Props) => {
             <PasswordInput name="camera_pass" areCredentialsValid={true} control={control} />
             {/*------VIEW AREA(S)------*/}
             <Controller
-                name={`view_areas`}
+                name={`camera_list`}
                 control={control}
                 render={({ field, formState }) => (
                     <ViewAreaPicker
                         {...field}
                         viewAreaList={viewAreaList}
                         onChange={(data) => field.onChange(data)}
-                        error={!!formState.errors.event_view_areas}
-                        helperText={formState.errors.event_view_areas?.message}
+                        error={!!formState.errors.camera_list}
+                        helperText={formState.errors.camera_list?.message}
                     />
                 )}
             />

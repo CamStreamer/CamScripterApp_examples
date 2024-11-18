@@ -28,15 +28,9 @@ export const mockedSettings: TAppSchema = {
     event_condition_operator: 3,
     event_condition_value: 10,
 
-    event_view_areas: [
-        { value: 2, label: 'View Area 3' },
-        { value: 3, label: 'View Area 4' },
-    ],
+    event_camera_list: [2, 3],
     event_active: true,
     event_repeat_after: 30,
-    view_areas: [
-        { value: 0, label: 'View Area 1' },
-        { value: 1, label: 'View Area 2' },
-    ],
+    camera_list: [0, 1],
     acs_active: true,
 };

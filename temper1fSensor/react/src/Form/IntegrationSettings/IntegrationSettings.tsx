@@ -10,7 +10,7 @@ export const IntegrationSettings = () => {
 
     useInitializeOnMount(() => {
         fetchCameraList({
-            view_areas: 'view_areas',
+            camera_list: 'camera_list',
             protocol: 'camera_protocol',
             ipAddress: 'camera_ip',
             port: 'camera_port',

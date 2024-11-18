@@ -104,15 +104,15 @@ export const EventsCameraSettings = ({ viewAreaList }: Props) => {
             <PasswordInput name="event_camera_pass" areCredentialsValid={true} control={control} />
             {/*------VIEW AREA(S)------*/}
             <Controller
-                name={`event_view_areas`}
+                name={`event_camera_list`}
                 control={control}
                 render={({ field, formState }) => (
                     <ViewAreaPicker
                         {...field}
                         viewAreaList={viewAreaList}
                         onChange={(data) => field.onChange(data)}
-                        error={!!formState.errors.event_view_areas}
-                        helperText={formState.errors.event_view_areas?.message}
+                        error={!!formState.errors.event_camera_list}
+                        helperText={formState.errors.event_camera_list?.message}
                     />
                 )}
             />
