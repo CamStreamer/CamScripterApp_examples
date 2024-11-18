@@ -5,7 +5,7 @@ import { ForwardedRef, forwardRef } from 'react';
 
 type Props = {
     viewAreaList?: TCameraListOption[];
-    onChange?: (data: number[]) => void;
+    onChange?: (data: TCameraListOption[]) => void;
     value: { value: number; label: string }[];
     helperText?: string;
     disabled?: boolean;
@@ -15,33 +15,36 @@ type Props = {
 export const ViewAreaPicker = forwardRef(
     ({ viewAreaList, disabled, onChange, value }: Props, ref: ForwardedRef<typeof Select>) => {
         const list = viewAreaList ?? DEFAULT_VALUES;
-        const selectedValues = value.map((item) => item.value);
 
         return (
             <StyledSelect
                 multiple
-                value={selectedValues}
+                value={value.map((item) => item.value)}
                 label="View area(s)"
                 renderValue={(selected) => {
-                    return (selected as number[])
-                        .map((v: number) => {
-                            const selectedOptions = list.find((o) => o.value === v);
-                            return selectedOptions?.label ?? '';
-                        })
-                        .filter((v: string) => !!v)
-                        .join(', ');
+                    if (list.length === 0) {
+                        return value.map((v) => v.label).join(', ');
+                    } else {
+                        return (selected as number[])
+                            .map((v: number) => {
+                                const selectedOptions = list.find((o) => o.value === v);
+                                return selectedOptions?.label ?? '';
+                            })
+                            .filter((v: string) => !!v)
+                            .join(', ');
+                    }
                 }}
                 onChange={(e) => {
-                    const val = e.target.value;
-                    const toSave = typeof val === 'string' ? [] : val;
-                    onChange?.(toSave as number[]);
+                    const selectedValues = e.target.value as number[];
+                    const selectedOptions = list.filter((option) => selectedValues.includes(option.value));
+                    onChange?.(selectedOptions);
                 }}
                 disabled={disabled ?? list.length === 0}
                 ref={ref}
             >
                 {list.map((option) => (
                     <MenuItem key={option.value} value={option.value}>
-                        <Checkbox checked={selectedValues.indexOf(option.value) > -1} />
+                        <Checkbox checked={value.some((selected) => selected.value === option.value)} />
                         <ListItemText primary={option.label} />
                     </MenuItem>
                 ))}
