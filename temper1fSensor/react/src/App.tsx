@@ -10,7 +10,7 @@ import { ContainerLoader } from './components/ContainerLoader';
 import { TAppSchema, applicationSchema } from './models/schema';
 import { useInitializeOnMount } from './hooks/useInitializeOnMount';
 import { ZodError } from 'zod';
-import { useSnackbar } from './hooks/Snackbar';
+import { useSnackbar } from './hooks/useSnackbar';
 import { Headline } from './components/Title';
 import { FormWrapper } from './FormWrapper';
 import { mockedSettings } from './models/mock';
