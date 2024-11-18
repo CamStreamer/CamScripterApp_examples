@@ -85,7 +85,9 @@ export const FormInputWithDialog = forwardRef(
                     endAdornment: (
                         <InputAdornment position="end">
                             <Button variant="text" color="info" onClick={handleClickOpen}>
-                                <Typography variant="button">FIND CAMERA</Typography>
+                                <Typography variant="button" fontWeight={700}>
+                                    FIND CAMERA
+                                </Typography>
                             </Button>
                             <CameraList
                                 open={open}
