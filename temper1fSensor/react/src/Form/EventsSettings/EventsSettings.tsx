@@ -9,7 +9,7 @@ export const EventsSettings = () => {
 
     useInitializeOnMount(() => {
         fetchCameraList({
-            camera_list: 'camera_list',
+            camera_list: 'event_camera_list',
             protocol: 'event_camera_protocol',
             ipAddress: 'event_camera_ip',
             port: 'event_camera_port',
