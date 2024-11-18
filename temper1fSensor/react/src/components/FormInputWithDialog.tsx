@@ -85,7 +85,7 @@ export const FormInputWithDialog = forwardRef(
                     endAdornment: (
                         <InputAdornment position="end">
                             <Button variant="text" color="info" onClick={handleClickOpen}>
-                                <strong>FIND CAMERA</strong>
+                                <Typography variant="button">FIND CAMERA</Typography>
                             </Button>
                             <CameraList
                                 open={open}
@@ -148,9 +148,6 @@ const StyledListItem = styled(ListItem)`
     display: flex;
     align-items: center;
     justify-content: space-between;
-
-    @media (max-width: 600px) {
-    }
 `;
 
 const StyledListDiv = styled('div')`
@@ -159,6 +156,11 @@ const StyledListDiv = styled('div')`
 
     @media (max-width: 600px) {
         padding-right: 20px;
+        align-items: center;
+    }
+
+    @media (max-width: 530px) {
+        padding-right: 16px;
         align-items: center;
     }
 `;
@@ -172,10 +174,20 @@ const StyledTypography = styled(Typography)`
     @media (max-width: 600px) {
         margin-right: 10px;
     }
+
+    @media (max-width: 530px) {
+        width: 120px;
+        margin: 0;
+        padding: 0 10px;
+    }
 `;
 
 const StyledButton = styled(Button)`
     margin-right: 30px;
+
+    @media (max-width: 530px) {
+        margin: 0 16px;
+    }
 `;
 
 const DEFAULT_CAMERA_LIST: TCameraOption[] = [
