@@ -92,4 +92,4 @@ const StyledFab = styled(Fab)`
     white-space: nowrap;
 `;
 
-const BASE_URL = appInfo.getUrl();
+const BASE_URL = appInfo.getPostUrl();

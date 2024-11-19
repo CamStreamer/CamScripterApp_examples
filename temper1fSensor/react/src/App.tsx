@@ -110,4 +110,4 @@ const StyledHeader = styled(Box)`
     gap: 8px;
 `;
 
-const BASE_URL = appInfo.getUrl();
+const BASE_URL = appInfo.getGetUrl();
