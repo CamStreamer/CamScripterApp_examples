@@ -4,6 +4,7 @@
     "camera_port": 80,
     "camera_user": "root",
     "camera_pass": "",
+    "camera_list": [0],
     "unit": "c",
     "service_id": 1,
     "field_name": "field1",
@@ -13,6 +14,7 @@
     "acs_user": "",
     "acs_pass": "",
     "acs_source_key": "",
+    "acs_active": true,
     "acs_condition_delay": 0,
     "acs_condition_operator": 1,
     "acs_condition_value": 10,
@@ -24,5 +26,8 @@
     "event_camera_pass": "",
     "event_condition_delay": 0,
     "event_condition_operator": 1,
-    "event_condition_value": 10
+    "event_condition_value": 10,
+    "event_camera_list": [0],
+    "event_active": true,
+    "event_repeat_after": 30
 }
