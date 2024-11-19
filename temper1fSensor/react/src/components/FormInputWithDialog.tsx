@@ -34,20 +34,28 @@ const CameraList = ({ onClose, open, value, cameraOptions, isFetching }: CameraP
                 <ContainerLoader size={80} infoText="Fetching camera list..." />
             ) : (
                 <List>
-                    {cameraOptions.map((option) => (
-                        <StyledBox key={option.ip}>
-                            <StyledListItem disableGutters key={option.ip}>
-                                <StyledListDiv>
-                                    <StyledTypography variant="body2">{option.name}</StyledTypography>
-                                    <Typography variant="body2">{option.ip}</Typography>
-                                </StyledListDiv>
-                                <StyledButton variant="contained" color="info" onClick={() => onClose(option.ip)}>
-                                    SELECT
-                                </StyledButton>
-                            </StyledListItem>
-                            <Divider />
-                        </StyledBox>
-                    ))}
+                    {cameraOptions.length === 0 ? (
+                        <Typography>No camera options found.</Typography>
+                    ) : (
+                        cameraOptions.map((option) => (
+                            <StyledBox key={option.name}>
+                                <StyledListItem disableGutters key={option.name}>
+                                    <StyledListDiv>
+                                        <StyledTypography variant="body2">{option.name}</StyledTypography>
+                                        <Typography variant="body2">{option.ip[0]}</Typography>
+                                    </StyledListDiv>
+                                    <StyledButton
+                                        variant="contained"
+                                        color="info"
+                                        onClick={() => onClose(option.ip[0])}
+                                    >
+                                        SELECT
+                                    </StyledButton>
+                                </StyledListItem>
+                                <Divider />
+                            </StyledBox>
+                        ))
+                    )}
                 </List>
             )}
         </StyledDialog>
@@ -62,8 +70,8 @@ export const FormInputWithDialog = forwardRef(
         const [list, setList] = useState<TCameraOption[]>([]);
 
         const handleClickOpen = () => {
-            fetchCameraOptions();
             setOpen(true);
+            fetchCameraOptions();
         };
 
         const handleSelectCamera = (ip: string) => {
@@ -72,7 +80,9 @@ export const FormInputWithDialog = forwardRef(
         };
 
         useEffect(() => {
-            setList(options.length > 0 ? options : DEFAULT_CAMERA_LIST);
+            if (options) {
+                setList(options);
+            }
         }, [options]);
 
         return (
@@ -191,10 +201,3 @@ const StyledButton = styled(Button)`
         margin: 0 16px;
     }
 `;
-
-const DEFAULT_CAMERA_LIST: TCameraOption[] = [
-    { name: 'AXIS A8105-E - ACC8EFF250F', ip: '192.168.91.213' },
-    { name: 'AXIS A8105-E - ACC8EFF250F', ip: '192.168.91.214' },
-    { name: 'AXIS A8105-E - ACC8EFF250F', ip: '192.168.91.215' },
-    { name: 'AXIS A8105-E - ACC8EFF250F', ip: '192.168.91.216' },
-];

@@ -2,11 +2,11 @@ import { useRef, useState } from 'react';
 
 export type TCameraOption = {
     name: string;
-    ip: string;
+    ip: string[];
 };
 
 type TCameraOptionResponse = {
-    camera_list: TCameraOption[];
+    message: string;
 };
 
 export const useCameraOptions = () => {
@@ -28,7 +28,7 @@ export const useCameraOptions = () => {
             if (fetchId !== fetchIdsInProgress.current[fetchIdsInProgress.current.length - 1]) {
                 return;
             }
-            setOptions(resData.camera_list);
+            setOptions(JSON.parse(resData.message));
             setIsFetching(false);
         } catch (e) {
             if ((e as Error).name !== 'AbortError') {
