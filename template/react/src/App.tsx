@@ -1,6 +1,6 @@
 import { appInfo } from './appInfo';
 import { useState } from 'react';
-import { Box, Container, CssBaseline } from '@mui/material';
+import { Box, Container, CssBaseline, Divider } from '@mui/material';
 import styled from '@mui/material/styles/styled';
 
 import { Nav } from './components/Nav';
@@ -58,6 +58,7 @@ export const App = () => {
                     <StyledHeader>
                         <Headline text={appInfo.headline} />
                     </StyledHeader>
+                    <Divider />
                     {defaultValues ? (
                         <FormWrapper defaultValues={defaultValues} />
                     ) : (
@@ -75,6 +76,7 @@ const StyledContainer = styled(Container)`
     flex-direction: column;
     flex: 1;
     align-items: center;
+    background-color: white;
 
     & > div {
         flex: 1;
@@ -85,14 +87,23 @@ const StyledContentWrapper = styled(Box)`
     width: 100%;
     display: flex;
     flex-direction: column;
+    align-items: center;
     position: relative;
+
+    & hr {
+        width: calc(100% + 48px);
+
+        @media (max-width: 600px) {
+            width: calc(100% + 32px);
+        }
+    }
 `;
 
 const StyledHeader = styled(Box)`
     display: flex;
     flex-direction: column;
     width: 100%;
-    padding: 35px 16px 25px;
+    padding: 20px 0;
     gap: 8px;
 `;
 

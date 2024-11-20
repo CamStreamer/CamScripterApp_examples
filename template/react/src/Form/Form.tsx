@@ -25,4 +25,6 @@ const StyledForm = styled('div')`
     display: flex;
     justify-content: center;
     flex-direction: column;
+    padding: 0 20px;
+    margin-top: 20px;
 `;

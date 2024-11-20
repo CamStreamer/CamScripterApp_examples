@@ -1,8 +1,8 @@
 import { Controller, useFormContext } from 'react-hook-form';
 import { TSettings, TCamera } from '../models/schema';
 import { useCredentialsValidate } from '../hooks/useCredentialsValidate';
-import { Radio, RadioGroup, Stack, FormControlLabel } from '@mui/material';
-import { StyledTextField } from '../components/FormInputs';
+import { Radio, RadioGroup, Stack } from '@mui/material';
+import { StyledTextField, StyledRadioControlLabel } from '../components/FormInputs';
 import { PasswordInput } from '../components/PasswordInput';
 import { parseValueAsInt, getErrorObject } from '../utils';
 import { Title } from '../components/Title';
@@ -37,10 +37,10 @@ export const CameraConnectParams = ({ onBlur, name }: Props) => {
                         }}
                     >
                         {PROTOCOLS.map((value) => (
-                            <FormControlLabel
+                            <StyledRadioControlLabel
                                 key={value}
                                 value={value}
-                                control={<Radio />}
+                                control={<Radio color="info" />}
                                 label={PROTOCOL_LABELS[value]}
                             />
                         ))}
