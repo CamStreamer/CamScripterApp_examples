@@ -1,7 +1,7 @@
 import type { TSettings } from './models/schema';
 import type { FieldErrors } from 'react-hook-form';
 
-export const getErrorObject = (errorObject: FieldErrors<TSettings>, name: 'camera') => {
+export const getErrorObject = (errorObject: FieldErrors<TSettings>, name: 'camera' | 'application') => {
     return errorObject[name];
 };
 
