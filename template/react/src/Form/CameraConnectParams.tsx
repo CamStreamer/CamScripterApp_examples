@@ -1,41 +1,20 @@
-import { useState, useEffect } from 'react';
-import { Controller, useFormContext, useWatch } from 'react-hook-form';
+import { Controller, useFormContext } from 'react-hook-form';
 import { TSettings, TCamera } from '../models/schema';
-import { Radio, RadioGroup, FormControlLabel } from '@mui/material';
+import { useCredentialsValidate } from '../hooks/useCredentialsValidate';
+import { Radio, RadioGroup, Stack, FormControlLabel } from '@mui/material';
 import { StyledTextField } from '../components/FormInputs';
 import { PasswordInput } from '../components/PasswordInput';
-import { parseValueAsInt, getErrorObject, TWatches, validateCredentials } from '../utils';
+import { parseValueAsInt, getErrorObject } from '../utils';
 import { Title } from '../components/Title';
-import Stack from '@mui/material/Stack';
 
 type Props = {
     name: 'camera';
     onBlur?: () => void;
 };
+
 export const CameraConnectParams = ({ onBlur, name }: Props) => {
     const { control, setValue } = useFormContext<TSettings>();
-    const [areCredentialsValid, setAreCredentialsValid] = useState<boolean>(true);
-    const [lastRequestAborter, setLastRequestAborter] = useState<AbortController | null>(null);
-    const proxy: TWatches = {
-        protocol: useWatch({ control, name: `${name}.protocol` }),
-        ip: useWatch({ control, name: `${name}.ip` }),
-        port: useWatch({ control, name: `${name}.port` }),
-        user: useWatch({ control, name: `${name}.user` }),
-        pass: useWatch({ control, name: `${name}.pass` }),
-    };
-
-    useEffect(() => {
-        lastRequestAborter?.abort();
-        const [aborter, areValidPromise] = validateCredentials(proxy);
-        setLastRequestAborter(aborter);
-
-        areValidPromise
-            .then((areValid) => {
-                setAreCredentialsValid(areValid);
-                setLastRequestAborter(null);
-            })
-            .catch(console.error);
-    }, [proxy.protocol, proxy.ip, proxy.port, proxy.user, proxy.pass]);
+    const [areCredentialsValid] = useCredentialsValidate({ name });
 
     return (
         <Stack spacing={1.5}>
