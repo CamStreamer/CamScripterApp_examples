@@ -1,12 +1,12 @@
-import { appInfo } from './appInfo';
+import { appInfo } from '../appInfo';
 import { FormProvider, SubmitErrorHandler, SubmitHandler, useForm } from 'react-hook-form';
-import { TSettings, settingsSchema } from './models/schema';
+import { TSettings, settingsSchema } from '../models/schema';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useSnackbar } from './hooks/useSnackbar';
-import { Form } from './Form/Form';
+import { useSnackbar } from '../hooks/useSnackbar';
+import { Form } from '../Form/Form';
 import styled from '@emotion/styled';
 import { CircularProgress, Typography, Fab } from '@mui/material';
-import { InfoSnackbar } from './components/Snackbar';
+import { InfoSnackbar } from '../components/Snackbar';
 
 type Props = {
     defaultValues: TSettings;

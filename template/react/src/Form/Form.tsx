@@ -2,18 +2,18 @@ import { Fade } from '@mui/material';
 import styled from '@mui/material/styles/styled';
 import { CollapsibleFormSection } from '../components/CollapsibleFormSection';
 
-import { ApplicationSettings } from './ApplicationSettings';
-import { CameraSettings } from './CameraSettings';
+import { FormSectionTwo } from './FormSectionTwo/FormSectionTwo';
+import { FormSectionOne } from './FormSectionOne/FormSectionOne';
 
 export function Form() {
     return (
         <Fade in={true} timeout={1000}>
             <StyledForm>
                 <CollapsibleFormSection label="Data source" defaultExpanded={true}>
-                    <ApplicationSettings />
+                    <FormSectionOne />
                 </CollapsibleFormSection>
                 <CollapsibleFormSection label="Data output" defaultExpanded={false}>
-                    <CameraSettings />
+                    <FormSectionTwo />
                 </CollapsibleFormSection>
             </StyledForm>
         </Fade>

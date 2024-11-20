@@ -1,25 +1,27 @@
 import { Controller, useFormContext } from 'react-hook-form';
-import { TSettings } from '../models/schema';
-import { StyledTextField } from '../components/FormInputs';
-import { parseValueAsInt } from '../utils';
-import { Title } from '../components/Title';
+import { TSettings } from '../../models/schema';
+import { StyledTextField } from '../../components/FormInputs';
+import { parseValueAsInt } from '../../utils';
+import { Title } from '../../components/Title';
 import { Stack } from '@mui/material';
 
 type Props = {
+    name: 'camera';
     onBlur?: () => void;
 };
-export const CustomGraphicsSettings = ({ onBlur }: Props) => {
+export const RightCamSettings = ({ onBlur, name }: Props) => {
     const { control } = useFormContext<TSettings>();
+
     return (
         <Stack spacing={1.5}>
             <Title text="Custom Graphics Widget settings" />
             <Controller
-                name={`camera.serviceID`}
+                name={`${name}.serviceID`}
                 control={control}
                 render={({ field, formState }) => (
                     <StyledTextField
                         {...field}
-                        defaultValue={field.value}
+                        value={field.value}
                         InputLabelProps={{ shrink: true }}
                         onChange={(e) => {
                             const val = parseValueAsInt(e.target.value);
@@ -36,7 +38,7 @@ export const CustomGraphicsSettings = ({ onBlur }: Props) => {
                 )}
             />
             <Controller
-                name={`camera.fieldName`}
+                name={`${name}.fieldName`}
                 control={control}
                 render={({ field, formState }) => (
                     <StyledTextField

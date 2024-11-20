@@ -1,31 +1,31 @@
 import { Controller, useFormContext } from 'react-hook-form';
-import { TSettings, TCamera } from '../models/schema';
-import { useCredentialsValidate } from '../hooks/useCredentialsValidate';
+import { TSettings, TCamera } from '../../models/schema';
+import { useCredentialsValidate } from '../../hooks/useCredentialsValidate';
 import { Radio, RadioGroup, Stack } from '@mui/material';
-import { StyledTextField, StyledRadioControlLabel } from '../components/FormInputs';
-import { PasswordInput } from '../components/PasswordInput';
-import { parseValueAsInt, getErrorObject } from '../utils';
-import { Title } from '../components/Title';
+import { StyledTextField, StyledRadioControlLabel } from '../../components/FormInputs';
+import { PasswordInput } from '../../components/PasswordInput';
+import { parseValueAsInt, getErrorObject } from '../../utils';
+import { Title } from '../../components/Title';
 
 type Props = {
     name: 'camera';
     onBlur?: () => void;
 };
 
-export const CameraConnectParams = ({ onBlur, name }: Props) => {
+export const LeftCamSettings = ({ onBlur, name }: Props) => {
     const { control, setValue } = useFormContext<TSettings>();
     const [areCredentialsValid] = useCredentialsValidate({ name });
 
     return (
         <Stack spacing={1.5}>
-            <Title text="Camera Connection settings" />
+            <Title text="Camera Connection Settings" />
             <Controller
                 name={`${name}.protocol`}
                 control={control}
                 render={({ field }) => (
                     <RadioGroup
                         row
-                        defaultValue={field.value}
+                        value={field.value}
                         onChange={(event) => {
                             const protocol = event.target.value;
                             setValue(`${name}.port`, protocol === 'http' ? 80 : 443, {
@@ -71,7 +71,7 @@ export const CameraConnectParams = ({ onBlur, name }: Props) => {
                 render={({ field, formState }) => (
                     <StyledTextField
                         {...field}
-                        defaultValue={field.value}
+                        value={field.value}
                         InputLabelProps={{ shrink: true }}
                         onChange={(e) => {
                             const val = parseValueAsInt(e.target.value);
@@ -96,8 +96,8 @@ export const CameraConnectParams = ({ onBlur, name }: Props) => {
                         InputLabelProps={{ shrink: true }}
                         fullWidth
                         label="User"
-                        error={getErrorObject(formState.errors, name)?.user !== undefined}
-                        helperText={getErrorObject(formState.errors, name)?.user?.message}
+                        error={formState.errors[name]?.user !== undefined}
+                        helperText={formState.errors[name]?.user?.message}
                         onBlur={() => {
                             field.onBlur();
                             onBlur?.();
