@@ -7,6 +7,7 @@ import { FormInputWithDialog } from '../../components/FormInputWithDialog';
 import { PasswordInput } from '../../components/PasswordInput';
 import { ViewAreaPicker } from '../../components/VIewAreaPicker';
 import { TCameraListOption } from '../../hooks/useCameraList';
+import { useCredentialsValidate } from '../../hooks/useCredentialsValidate';
 import { TAppSchema } from '../../models/schema';
 import { PROTOCOLS, PROTOCOL_LABELS } from '../constants';
 
@@ -16,6 +17,13 @@ type Props = {
 
 export const IntegrationCameraSettings = ({ viewAreaList }: Props) => {
     const { control, setValue } = useFormContext<TAppSchema>();
+    const [areCredentialsValid] = useCredentialsValidate({
+        protocol: 'camera_protocol',
+        ipAddress: 'camera_ip',
+        port: 'camera_port',
+        user: 'camera_user',
+        pass: 'camera_pass',
+    });
 
     return (
         <Stack spacing={1.5}>
@@ -101,7 +109,7 @@ export const IntegrationCameraSettings = ({ viewAreaList }: Props) => {
                 )}
             />
             {/*------PASSWORD------*/}
-            <PasswordInput name="camera_pass" areCredentialsValid={true} control={control} />
+            <PasswordInput name="camera_pass" areCredentialsValid={areCredentialsValid} control={control} />
             {/*------VIEW AREA(S)------*/}
             <Controller
                 name={`camera_list`}

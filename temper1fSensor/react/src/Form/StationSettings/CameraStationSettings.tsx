@@ -4,11 +4,19 @@ import { StyledTextField, StyledRadioGroup, StyledRadioControlLabel } from '../.
 import { Title } from '../../components/Title';
 import { Stack, Radio } from '@mui/material';
 import { PasswordInput } from '../../components/PasswordInput';
+import { useCredentialsValidate } from '../../hooks/useCredentialsValidate';
 import { TAppSchema } from '../../models/schema';
 import { PROTOCOLS, PROTOCOL_LABELS } from '../constants';
 
 export const CameraStationSettings = () => {
     const { control, setValue } = useFormContext<TAppSchema>();
+    const [areCredentialsValid] = useCredentialsValidate({
+        protocol: 'acs_protocol',
+        ipAddress: 'acs_ip',
+        port: 'acs_port',
+        user: 'acs_user',
+        pass: 'acs_pass',
+    });
 
     return (
         <Stack spacing={1.5}>
@@ -101,7 +109,7 @@ export const CameraStationSettings = () => {
                 )}
             />
             {/*------PASSWORD------*/}
-            <PasswordInput name="acs_pass" areCredentialsValid={true} control={control} />
+            <PasswordInput name="acs_pass" areCredentialsValid={areCredentialsValid} control={control} />
             {/*------SOURCE KEY------*/}
             <Controller
                 name={`acs_source_key`}
