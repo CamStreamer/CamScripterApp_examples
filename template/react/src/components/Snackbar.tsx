@@ -1,8 +1,6 @@
-import Slide, { SlideProps } from '@mui/material/Slide';
-import Snackbar, { SnackbarOrigin } from '@mui/material/Snackbar';
-
-import Alert from '@mui/material/Alert';
-import useMediaQuery from '@mui/material/useMediaQuery';
+import { SlideProps } from '@mui/material/Slide';
+import { SnackbarOrigin } from '@mui/material/Snackbar';
+import { Alert, useMediaQuery, Snackbar, Slide } from '@mui/material';
 
 type SnackData = {
     type: 'error' | 'success';

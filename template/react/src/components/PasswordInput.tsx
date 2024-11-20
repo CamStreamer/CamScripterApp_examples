@@ -1,7 +1,6 @@
 import { useState } from 'react';
 
-import IconButton from '@mui/material/IconButton';
-import InputAdornment from '@mui/material/InputAdornment';
+import { IconButton, InputAdornment } from '@mui/material';
 import { Control, Controller } from 'react-hook-form';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';

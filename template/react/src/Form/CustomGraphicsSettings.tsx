@@ -3,7 +3,7 @@ import { TSettings } from '../models/schema';
 import { StyledTextField } from '../components/FormInputs';
 import { parseValueAsInt } from '../utils';
 import { Title } from '../components/Title';
-import Stack from '@mui/material/Stack';
+import { Stack } from '@mui/material';
 
 type Props = {
     onBlur?: () => void;
