@@ -6,7 +6,7 @@
     "prettier": "@camstreamer/prettier-config",
     "scripts": {
         "dev": "vite",
-        "build": "tsc -b && vite build",
+        "build": "tsc -b && vite build && cp -rT dist ../html",
         "lint": "eslint .",
         "preview": "vite preview"
     },
