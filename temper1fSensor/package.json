@@ -15,7 +15,7 @@
         "pretty:check": "prettier --check \"./src/*.{ts,tsx}\"",
         "test": "echo \"Error: no test specified\" && exit 1",
         "in:ui": "cd react && yarn install",
-        "zip:package": "node node_modules/camstreamerlib/CreatePackage -i",
+        "zip:package": "node node_modules/camstreamerlib/CreatePackage -i -e=react,testing,settings_in_the_field,pythonHelpers,readme.md",
         "zip": "npm-run-all clean in:ui build:all zip:package"
     },
     "author": "CamStreamer s.r.o",
