@@ -20,11 +20,12 @@ export const RightAppSettings = ({ onBlur, name }: Props) => {
                 control={control}
                 render={({ field, formState }) => (
                     <StyledTextField
+                        {...field}
                         value={field.value}
                         fullWidth
                         label="Update Frequency"
                         InputLabelProps={{ shrink: true }}
-                        onBlur={(e) => {
+                        onChange={(e) => {
                             const val = parseValueAsFloat(e.target.value);
                             field.onChange(val);
                             e.target.value = val.toString();
