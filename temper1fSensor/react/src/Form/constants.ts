@@ -25,9 +25,9 @@ export const EVENT_DELAYS = Object.keys(EVENT_DELAYS_LABELS).map(Number);
 
 export const WHEN_LABELS: Record<TAppSchema['event_condition_operator'], string> = {
     0: 'Equal',
-    1: 'Greater than',
+    1: 'Higher than',
     2: 'Lower than',
-    3: 'Greater or equal',
+    3: 'Higher or equal',
     4: 'Lower or equal',
 };
 
