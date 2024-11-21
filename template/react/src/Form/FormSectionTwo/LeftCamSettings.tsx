@@ -4,7 +4,7 @@ import { useCredentialsValidate } from '../../hooks/useCredentialsValidate';
 import { Radio, RadioGroup, Stack } from '@mui/material';
 import { StyledTextField, StyledRadioControlLabel } from '../../components/FormInputs';
 import { PasswordInput } from '../../components/PasswordInput';
-import { parseValueAsInt, getErrorObject } from '../../utils';
+import { parseValueAsInt } from '../../utils';
 import { Title } from '../../components/Title';
 
 type Props = {
@@ -56,8 +56,8 @@ export const LeftCamSettings = ({ onBlur, name }: Props) => {
                         InputLabelProps={{ shrink: true }}
                         fullWidth
                         label="IP address"
-                        error={getErrorObject(formState.errors, name)?.ip !== undefined}
-                        helperText={getErrorObject(formState.errors, name)?.ip?.message}
+                        error={formState.errors[name]?.ip !== undefined}
+                        helperText={formState.errors[name]?.ip?.message}
                         onBlur={() => {
                             field.onBlur();
                             onBlur?.();
@@ -82,8 +82,8 @@ export const LeftCamSettings = ({ onBlur, name }: Props) => {
                         }}
                         fullWidth
                         label="Port"
-                        error={getErrorObject(formState.errors, name)?.port !== undefined}
-                        helperText={getErrorObject(formState.errors, name)?.port?.message}
+                        error={formState.errors[name]?.port !== undefined}
+                        helperText={formState.errors[name]?.port?.message}
                     />
                 )}
             />

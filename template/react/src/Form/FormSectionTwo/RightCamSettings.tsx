@@ -32,8 +32,8 @@ export const RightCamSettings = ({ onBlur, name }: Props) => {
                         }}
                         fullWidth
                         label="Service ID"
-                        error={formState.errors.camera?.serviceID !== undefined}
-                        helperText={formState.errors.camera?.serviceID?.message}
+                        error={formState.errors[name]?.serviceID !== undefined}
+                        helperText={formState.errors[name]?.serviceID?.message}
                     />
                 )}
             />
@@ -46,8 +46,8 @@ export const RightCamSettings = ({ onBlur, name }: Props) => {
                         InputLabelProps={{ shrink: true }}
                         fullWidth
                         label="Field Name"
-                        error={formState.errors.camera?.fieldName !== undefined}
-                        helperText={formState.errors.camera?.fieldName?.message}
+                        error={formState.errors[name]?.fieldName !== undefined}
+                        helperText={formState.errors[name]?.fieldName?.message}
                         onBlur={() => {
                             field.onBlur();
                             onBlur?.();

@@ -1,4 +1,4 @@
-import { parseValueAsInt, getErrorObject } from '../../utils';
+import { parseValueAsInt } from '../../utils';
 import { Controller, useFormContext } from 'react-hook-form';
 import { StyledTextField, StyledRadioControlLabel } from '../../components/FormInputs';
 import { Stack, Radio, RadioGroup } from '@mui/material';
@@ -51,8 +51,8 @@ export const LeftAppSettings = ({ onBlur, name }: Props) => {
                         InputLabelProps={{ shrink: true }}
                         fullWidth
                         label="IP address"
-                        error={getErrorObject(formState.errors, name)?.ip !== undefined}
-                        helperText={getErrorObject(formState.errors, name)?.ip?.message}
+                        error={formState.errors[name]?.ip !== undefined}
+                        helperText={formState.errors[name]?.ip?.message}
                         onBlur={() => {
                             field.onBlur();
                             onBlur?.();
@@ -77,8 +77,8 @@ export const LeftAppSettings = ({ onBlur, name }: Props) => {
                         }}
                         fullWidth
                         label="Port"
-                        error={getErrorObject(formState.errors, name)?.port !== undefined}
-                        helperText={getErrorObject(formState.errors, name)?.port?.message}
+                        error={formState.errors[name]?.port !== undefined}
+                        helperText={formState.errors[name]?.port?.message}
                     />
                 )}
             />
