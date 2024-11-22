@@ -80,37 +80,6 @@ export const EventTrigger = () => {
                     />
                 )}
             />
-            {/*------REPEAT AFTER TIME------*/}
-            <Controller
-                name={`event_repeat_after`}
-                control={control}
-                render={({ field, formState }) => (
-                    <StyledTextField
-                        {...field}
-                        InputLabelProps={{ shrink: true }}
-                        fullWidth
-                        label="Repeat after time"
-                        onChange={(e) => {
-                            const val = parseValueAsInt(e.target.value);
-                            field.onChange(val);
-                            e.target.value = val.toString();
-                            field.onBlur();
-                        }}
-                        error={formState.errors.event_repeat_after !== undefined}
-                        helperText={
-                            formState.errors.event_repeat_after?.message
-                                ? formState.errors.event_repeat_after?.message
-                                : 'Set to zero for non-repetition.'
-                        }
-                        onBlur={() => {
-                            field.onBlur();
-                        }}
-                        InputProps={{
-                            endAdornment: <InputAdornment position="end">s</InputAdornment>,
-                        }}
-                    />
-                )}
-            />
         </Stack>
     );
 };
