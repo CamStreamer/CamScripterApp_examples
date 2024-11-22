@@ -25,6 +25,10 @@ export const useCredentialsValidate = ({ protocol, ipAddress, port, user, pass }
     };
 
     useEffect(() => {
+        if (!proxy.ip || !proxy.port || !proxy.user || !proxy.pass) {
+            return;
+        }
+
         lastRequestAborter?.abort();
         const [aborter, areValidPromise] = validateCredentials(proxy);
         setLastRequestAborter(aborter);
