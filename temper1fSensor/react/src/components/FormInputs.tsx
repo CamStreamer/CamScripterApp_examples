@@ -3,7 +3,6 @@ import {
     FormControlLabel,
     FormHelperText,
     InputLabel,
-    RadioGroup,
     Select,
     SelectProps,
     TextareaAutosize,
@@ -74,10 +73,6 @@ export const StyledTextareaAutosize = styled(TextareaAutosize)`
         border-color: #1976d2;
         box-shadow: 0px 2px 2px #1976d2;
     }
-`;
-
-export const StyledRadioGroup = styled(RadioGroup)`
-    padding: 0 12px;
 `;
 
 interface StyledFormControlLabelProps extends FormControlLabelProps {
