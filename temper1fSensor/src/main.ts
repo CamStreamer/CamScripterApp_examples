@@ -80,11 +80,11 @@ async function onePeriod() {
         if (coConfigured) {
             updateCOGraphics(temperature.toFixed(1) + ' ' + UNITS[settings.unit]);
         }
-        if (acsConfigured) {
+        if (acsConfigured && settings.acs_active) {
             checkConditionAndSendAcsEvent(temperature);
         }
 
-        if (eventsConfigured) {
+        if (eventsConfigured && settings.event_active) {
             checkCondtionAndSendCameraEvent(temperature);
         }
     } catch (error) {
@@ -161,7 +161,7 @@ async function sendAcsEventTimerCallback(temperature: number) {
 
 async function checkCondtionAndSendCameraEvent(temperature: number) {
     try {
-        const conditionActive = isConditionActive(
+        const conditionActive = isConditionEventActive(
             temperature,
             settings.event_condition_operator,
             settings.event_condition_value
@@ -176,10 +176,14 @@ async function checkCondtionAndSendCameraEvent(temperature: number) {
             cscEventDeclared = true;
         }
 
-        if (conditionActive != sentActiveState && (!cscEventConditionTimer || !conditionActive)) {
+        if (conditionActive && conditionActive !== sentActiveState) {
             const timerTime = conditionActive ? settings.event_condition_delay * 1000 : 0;
             clearTimeout(cscEventConditionTimer);
-            cscEventConditionTimer = setTimeout(() => sendCameraEventTimerCallback(conditionActive), timerTime);
+            cscEventConditionTimer = setTimeout(async () => {
+                await sendCameraEventTimerCallback(conditionActive);
+                sentActiveState = conditionActive;
+                cscEventConditionTimer = null;
+            }, timerTime);
         }
     } catch (err) {
         console.error('Camera events error:', err);
@@ -209,6 +213,21 @@ function isConditionActive(temperature: number, operator: number, conditionValue
             return temperature >= conditionValue;
         case 4:
             return temperature <= conditionValue;
+    }
+}
+
+function isConditionEventActive(temperature: number, operator: number, conditionValue: number) {
+    switch (operator) {
+        case 0:
+            return temperature !== conditionValue;
+        case 1:
+            return temperature < conditionValue;
+        case 2:
+            return temperature > conditionValue;
+        case 3:
+            return temperature <= conditionValue;
+        case 4:
+            return temperature >= conditionValue;
     }
 }
 
