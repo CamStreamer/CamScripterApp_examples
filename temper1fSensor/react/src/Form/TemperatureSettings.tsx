@@ -1,7 +1,7 @@
 import { Controller, useFormContext } from 'react-hook-form';
 import styled from '@mui/material/styles/styled';
-import { StyledRadioGroup, StyledRadioControlLabel } from '../components/FormInputs';
-import { Stack, Grid, Radio } from '@mui/material';
+import { StyledRadioControlLabel } from '../components/FormInputs';
+import { Stack, Grid, Radio, RadioGroup } from '@mui/material';
 import { TAppSchema } from '../models/schema';
 
 type Temp = 'c' | 'f';
@@ -16,7 +16,7 @@ export const TemperatureSettings = () => {
                     name={`unit`}
                     control={control}
                     render={({ field }) => (
-                        <StyledRadioGroup
+                        <RadioGroup
                             row
                             value={field.value}
                             onChange={(event) => {
@@ -31,7 +31,7 @@ export const TemperatureSettings = () => {
                                     label={TEMEPRATURES_LABELS[value]}
                                 />
                             ))}
-                        </StyledRadioGroup>
+                        </RadioGroup>
                     )}
                 />
             </Stack>
