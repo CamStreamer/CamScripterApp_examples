@@ -1,15 +1,15 @@
 import { parseValueAsInt } from '../../utils';
 import { Controller, useFormContext } from 'react-hook-form';
-import { StyledTextField, StyledRadioGroup, StyledRadioControlLabel } from '../../components/FormInputs';
+import { StyledTextField, StyledRadioControlLabel } from '../../components/FormInputs';
 import { Title } from '../../components/Title';
-import { Stack, Radio } from '@mui/material';
+import { Stack, Radio, RadioGroup } from '@mui/material';
 import { PasswordInput } from '../../components/PasswordInput';
 import { useCredentialsValidate } from '../../hooks/useCredentialsValidate';
 import { TAppSchema } from '../../models/schema';
 import { PROTOCOLS, PROTOCOL_LABELS } from '../constants';
 
 export const CameraStationSettings = () => {
-    const { control, setValue } = useFormContext<TAppSchema>();
+    const { control } = useFormContext<TAppSchema>();
     const [areCredentialsValid] = useCredentialsValidate({
         protocol: 'acs_protocol',
         ipAddress: 'acs_ip',
@@ -26,15 +26,10 @@ export const CameraStationSettings = () => {
                 name={`acs_protocol`}
                 control={control}
                 render={({ field }) => (
-                    <StyledRadioGroup
+                    <RadioGroup
                         row
                         value={field.value}
                         onChange={(event) => {
-                            const protocol = event.target.value;
-                            setValue(`acs_port`, protocol === 'http' ? 80 : 443, {
-                                shouldTouch: true,
-                            });
-
                             field.onChange(event);
                         }}
                     >
@@ -46,7 +41,7 @@ export const CameraStationSettings = () => {
                                 label={PROTOCOL_LABELS[value]}
                             />
                         ))}
-                    </StyledRadioGroup>
+                    </RadioGroup>
                 )}
             />
             {/*------IP ADDRESS------*/}
