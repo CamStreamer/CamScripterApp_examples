@@ -6,7 +6,7 @@ import styled from '@mui/material/styles/styled';
 import { StyledTextField } from './FormInputs';
 import { Title } from './Title';
 import { ContainerLoader } from '../components/ContainerLoader';
-import { Path, useFormContext } from 'react-hook-form';
+import { Path } from 'react-hook-form';
 import { TAppSchema } from '../models/schema';
 
 type CameraProps = {
@@ -15,6 +15,7 @@ type CameraProps = {
     value: string;
     isFetching?: boolean;
     onClose: (value: string) => void;
+    handleFetch: () => void;
 };
 
 type Props = {
@@ -26,29 +27,27 @@ type Props = {
     onChange?: (ip: string) => void;
 };
 
-const CameraList = ({ onClose, open, value, cameraOptions, isFetching }: CameraProps) => {
+const CameraList = ({ onClose, open, value, cameraOptions, isFetching, handleFetch }: CameraProps) => {
     return (
         <StyledDialog fullWidth maxWidth="md" onClose={() => onClose(value)} open={open}>
-            <Title text="Network camera list" />
+            <Title text="Network device list" />
             {isFetching ? (
-                <ContainerLoader size={80} infoText="Fetching camera list..." />
+                <ContainerLoader size={80} infoText="Fetching device list..." />
             ) : (
                 <List>
                     {cameraOptions.length === 0 ? (
-                        <Typography>No camera options found.</Typography>
+                        <StyledTypographyBox>
+                            No device found. Try it <StyledLink onClick={handleFetch}>again</StyledLink>.
+                        </StyledTypographyBox>
                     ) : (
                         cameraOptions.map((option) => (
                             <StyledBox key={option.name}>
                                 <StyledListItem disableGutters key={option.name}>
                                     <StyledListDiv>
                                         <StyledTypography variant="body2">{option.name}</StyledTypography>
-                                        <Typography variant="body2">{option.ip[0]}</Typography>
+                                        <Typography variant="body2">{option.ip}</Typography>
                                     </StyledListDiv>
-                                    <StyledButton
-                                        variant="contained"
-                                        color="info"
-                                        onClick={() => onClose(option.ip[0])}
-                                    >
+                                    <StyledButton variant="contained" color="info" onClick={() => onClose(option.ip)}>
                                         SELECT
                                     </StyledButton>
                                 </StyledListItem>
@@ -62,61 +61,59 @@ const CameraList = ({ onClose, open, value, cameraOptions, isFetching }: CameraP
     );
 };
 
-export const FormInputWithDialog = forwardRef(
-    ({ value, keyName, onChange }: Props, ref: ForwardedRef<HTMLDivElement>) => {
-        const [options, fetchCameraOptions, isFetching] = useCameraOptions();
-        const { setValue } = useFormContext();
-        const [open, setOpen] = useState(false);
-        const [list, setList] = useState<TCameraOption[]>([]);
+export const FormInputWithDialog = forwardRef(({ value, onChange }: Props, ref: ForwardedRef<HTMLDivElement>) => {
+    const [options, fetchCameraOptions, isFetching] = useCameraOptions();
+    const [open, setOpen] = useState(false);
+    const [list, setList] = useState<TCameraOption[]>([]);
 
-        const handleClickOpen = () => {
-            setOpen(true);
-            fetchCameraOptions();
-        };
+    const handleClickOpen = () => {
+        setOpen(true);
+        fetchCameraOptions();
+    };
 
-        const handleSelectCamera = (ip: string) => {
-            setValue(keyName, ip);
-            setOpen(false);
-        };
+    const handleSelectCamera = (ip: string) => {
+        onChange?.(ip);
+        setOpen(false);
+    };
 
-        useEffect(() => {
-            if (options) {
-                setList(options);
-            }
-        }, [options]);
+    useEffect(() => {
+        if (options) {
+            setList(options);
+        }
+    }, [options]);
 
-        return (
-            <StyledTextField
-                value={value}
-                type="text"
-                fullWidth
-                label="IP Address"
-                InputProps={{
-                    endAdornment: (
-                        <InputAdornment position="end">
-                            <Button variant="text" color="info" onClick={handleClickOpen}>
-                                <Typography variant="button" fontWeight={700}>
-                                    FIND DEVICE
-                                </Typography>
-                            </Button>
-                            <CameraList
-                                open={open}
-                                value={value}
-                                onClose={handleSelectCamera}
-                                cameraOptions={list}
-                                isFetching={isFetching}
-                            />
-                        </InputAdornment>
-                    ),
-                }}
-                onChange={(e) => {
-                    onChange?.(e.target.value as string);
-                }}
-                ref={ref}
-            />
-        );
-    }
-);
+    return (
+        <StyledTextField
+            value={value}
+            type="text"
+            fullWidth
+            label="IP Address"
+            InputProps={{
+                endAdornment: (
+                    <InputAdornment position="end">
+                        <Button variant="text" color="info" onClick={handleClickOpen}>
+                            <Typography variant="button" fontWeight={700}>
+                                FIND DEVICE
+                            </Typography>
+                        </Button>
+                        <CameraList
+                            open={open}
+                            value={value}
+                            onClose={handleSelectCamera}
+                            handleFetch={fetchCameraOptions}
+                            cameraOptions={list}
+                            isFetching={isFetching}
+                        />
+                    </InputAdornment>
+                ),
+            }}
+            onChange={(e) => {
+                onChange?.(e.target.value as string);
+            }}
+            ref={ref}
+        />
+    );
+});
 
 const StyledDialog = styled(Dialog)`
     & .MuiDialog-paper {
@@ -200,4 +197,13 @@ const StyledButton = styled(Button)`
     @media (max-width: 530px) {
         margin: 0 16px;
     }
+`;
+
+const StyledLink = styled('span')`
+    text-decoration: underline;
+    cursor: pointer;
+`;
+
+const StyledTypographyBox = styled(Typography)`
+    margin-bottom: 200px;
 `;

@@ -2,11 +2,11 @@ import { useRef, useState } from 'react';
 
 export type TCameraOption = {
     name: string;
-    ip: string[];
+    ip: string;
 };
 
 type TCameraOptionResponse = {
-    message: string;
+    camera_list: TCameraOption[];
 };
 
 export const useCameraOptions = () => {
@@ -22,13 +22,14 @@ export const useCameraOptions = () => {
 
         try {
             const res = await fetch('/local/camscripter/network_camera_list.cgi');
-            const resData: TCameraOptionResponse = await res.json();
+            const resData = await res.json();
+            const data: TCameraOptionResponse = JSON.parse(resData.message);
 
             // this req is not the latest one -> cancel
             if (fetchId !== fetchIdsInProgress.current[fetchIdsInProgress.current.length - 1]) {
                 return;
             }
-            setOptions(JSON.parse(resData.message));
+            setOptions(data.camera_list);
             setIsFetching(false);
         } catch (e) {
             if ((e as Error).name !== 'AbortError') {
