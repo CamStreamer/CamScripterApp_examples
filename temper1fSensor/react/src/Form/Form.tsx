@@ -17,10 +17,10 @@ export function Form() {
                 <CollapsibleFormSection label="Camoverlay app integration" defaultExpanded={false}>
                     <IntegrationSettings />
                 </CollapsibleFormSection>
-                <CollapsibleFormSection label="axis camera station" defaultExpanded={false}>
+                <CollapsibleFormSection label="Axis camera station integration" defaultExpanded={false}>
                     <StationSettings />
                 </CollapsibleFormSection>
-                <CollapsibleFormSection label="axis camera events" defaultExpanded={false}>
+                <CollapsibleFormSection label="Axis device events" defaultExpanded={false}>
                     <EventsSettings />
                 </CollapsibleFormSection>
             </StyledForm>

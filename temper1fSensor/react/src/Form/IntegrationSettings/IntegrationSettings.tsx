@@ -1,13 +1,13 @@
 import { Grid } from '@mui/material';
 import styled from '@mui/material/styles/styled';
-import { IntegrationCameraSettings } from './IntegrationCameraSettings';
+import { IntegrationDeviceSettings } from './IntegrationDeviceSettings';
 import { WidgetSettings } from './WidgetSettings';
 
 export const IntegrationSettings = () => {
     return (
         <StyledGrid container>
             <Grid item md={6} xs={12}>
-                <IntegrationCameraSettings />
+                <IntegrationDeviceSettings />
             </Grid>
             <Grid item md={6} xs={12}>
                 <WidgetSettings />

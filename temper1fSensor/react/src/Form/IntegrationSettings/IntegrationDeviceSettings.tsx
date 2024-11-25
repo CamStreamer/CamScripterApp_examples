@@ -5,11 +5,12 @@ import { Title } from '../../components/Title';
 import { Stack, Radio, RadioGroup } from '@mui/material';
 import { FormInputWithDialog } from '../../components/FormInputWithDialog';
 import { PasswordInput } from '../../components/PasswordInput';
+import { ConnectionCheck } from '../../components/ConnectionCheck';
 import { useCredentialsValidate } from '../../hooks/useCredentialsValidate';
 import { TAppSchema } from '../../models/schema';
 import { PROTOCOLS, PROTOCOL_LABELS } from '../constants';
 
-export const IntegrationCameraSettings = () => {
+export const IntegrationDeviceSettings = () => {
     const { control, setValue } = useFormContext<TAppSchema>();
     const [areCredentialsValid] = useCredentialsValidate({
         protocol: 'camera_protocol',
@@ -21,7 +22,7 @@ export const IntegrationCameraSettings = () => {
 
     return (
         <Stack spacing={1.5}>
-            <Title text="Camera Settings" />
+            <Title text="Device Settings" />
             {/*------PROTOCOL------*/}
             <Controller
                 name={`camera_protocol`}
@@ -104,6 +105,14 @@ export const IntegrationCameraSettings = () => {
             />
             {/*------PASSWORD------*/}
             <PasswordInput name="camera_pass" areCredentialsValid={areCredentialsValid} control={control} />
+            {/*------CONNECTION CHECK------*/}
+            <ConnectionCheck
+                protocol="camera_protocol"
+                port="camera_port"
+                ipAddress="camera_ip"
+                areCredentialsValid={areCredentialsValid}
+                credentials={['camera_user', 'camera_pass']}
+            />
         </Stack>
     );
 };
