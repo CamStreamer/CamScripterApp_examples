@@ -1,4 +1,4 @@
-import { parseValueAsInt } from '../../utils';
+import { parseValueAsFloat } from '../../utils';
 import { Controller, useFormContext } from 'react-hook-form';
 import { StyledTextField, StyledSelect } from '../../components/FormInputs';
 import { Title } from '../../components/Title';
@@ -59,21 +59,17 @@ export const EventTrigger = () => {
                 control={control}
                 render={({ field, formState }) => (
                     <StyledTextField
-                        {...field}
+                        defaultValue={field.value}
                         InputLabelProps={{ shrink: true }}
                         fullWidth
                         label="Value"
-                        onChange={(e) => {
-                            const val = parseValueAsInt(e.target.value);
+                        onBlur={(e) => {
+                            const val = parseValueAsFloat(e.target.value.replace(',', '.'));
                             field.onChange(val);
                             e.target.value = val.toString();
-                            field.onBlur();
                         }}
                         error={formState.errors.event_condition_value !== undefined}
                         helperText={formState.errors.event_condition_value?.message}
-                        onBlur={() => {
-                            field.onBlur();
-                        }}
                         InputProps={{
                             endAdornment: <InputAdornment position="end">{unit === 'c' ? '°C' : '°F'}</InputAdornment>,
                         }}

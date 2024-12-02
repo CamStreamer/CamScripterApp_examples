@@ -1,4 +1,4 @@
-import { parseValueAsInt } from '../../utils';
+import { parseValueAsInt, parseValueAsFloat } from '../../utils';
 import { Controller, useFormContext } from 'react-hook-form';
 import { StyledTextField, StyledSelect } from '../../components/FormInputs';
 import { Title } from '../../components/Title';
@@ -59,21 +59,17 @@ export const StationEventTrigger = () => {
                 control={control}
                 render={({ field, formState }) => (
                     <StyledTextField
-                        {...field}
+                        defaultValue={field.value}
                         InputLabelProps={{ shrink: true }}
                         fullWidth
                         label="Value"
-                        onChange={(e) => {
-                            const val = parseValueAsInt(e.target.value);
+                        onBlur={(e) => {
+                            const val = parseValueAsFloat(e.target.value.replace(',', '.'));
                             field.onChange(val);
                             e.target.value = val.toString();
-                            field.onBlur();
                         }}
                         error={formState.errors.acs_condition_value !== undefined}
                         helperText={formState.errors.acs_condition_value?.message}
-                        onBlur={() => {
-                            field.onBlur();
-                        }}
                         InputProps={{
                             endAdornment: <InputAdornment position="end">{unit === 'c' ? '°C' : '°F'}</InputAdornment>,
                         }}
@@ -93,14 +89,9 @@ export const StationEventTrigger = () => {
                         onChange={(e) => {
                             const val = parseValueAsInt(e.target.value);
                             field.onChange(val);
-                            e.target.value = val.toString();
-                            field.onBlur();
                         }}
                         error={formState.errors.acs_repeat_after !== undefined}
                         helperText={formState.errors.acs_repeat_after?.message}
-                        onBlur={() => {
-                            field.onBlur();
-                        }}
                         InputProps={{
                             endAdornment: <InputAdornment position="end">s</InputAdornment>,
                         }}

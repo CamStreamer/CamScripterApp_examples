@@ -31,13 +31,12 @@ export const EventsDeviceSettings = () => {
                     <RadioGroup
                         row
                         value={field.value}
-                        onChange={(event) => {
-                            const protocol = event.target.value;
+                        onChange={(e) => {
+                            const protocol = e.target.value;
                             setValue(`event_camera_port`, protocol === 'http' ? 80 : 443, {
                                 shouldTouch: true,
                             });
-
-                            field.onChange(event);
+                            field.onChange(e);
                         }}
                     >
                         {PROTOCOLS.map((value) => (
@@ -77,8 +76,6 @@ export const EventsDeviceSettings = () => {
                         onChange={(e) => {
                             const val = parseValueAsInt(e.target.value);
                             field.onChange(val);
-                            e.target.value = val.toString();
-                            field.onBlur();
                         }}
                         error={formState.errors.event_camera_port !== undefined}
                         helperText={formState.errors.event_camera_port?.message}
@@ -96,9 +93,6 @@ export const EventsDeviceSettings = () => {
                         label="User"
                         error={formState.errors.event_camera_user !== undefined}
                         helperText={formState.errors.event_camera_user?.message}
-                        onBlur={() => {
-                            field.onBlur();
-                        }}
                     />
                 )}
             />

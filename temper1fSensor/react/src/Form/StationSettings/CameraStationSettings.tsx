@@ -29,8 +29,8 @@ export const CameraStationSettings = () => {
                     <RadioGroup
                         row
                         value={field.value}
-                        onChange={(event) => {
-                            field.onChange(event);
+                        onChange={(e) => {
+                            field.onChange(e);
                         }}
                     >
                         {PROTOCOLS.map((value) => (
@@ -55,9 +55,6 @@ export const CameraStationSettings = () => {
                         label="IP address"
                         error={formState.errors.acs_ip !== undefined}
                         helperText={formState.errors.acs_ip?.message}
-                        onBlur={() => {
-                            field.onBlur();
-                        }}
                     />
                 )}
             />
@@ -74,8 +71,6 @@ export const CameraStationSettings = () => {
                         onChange={(e) => {
                             const val = parseValueAsInt(e.target.value);
                             field.onChange(val);
-                            e.target.value = val.toString();
-                            field.onBlur();
                         }}
                         error={formState.errors.acs_port !== undefined}
                         helperText={formState.errors.acs_port?.message}
@@ -94,9 +89,6 @@ export const CameraStationSettings = () => {
                         label="User"
                         error={formState.errors.acs_user !== undefined}
                         helperText={formState.errors.acs_user?.message}
-                        onBlur={() => {
-                            field.onBlur();
-                        }}
                     />
                 )}
             />
@@ -113,9 +105,6 @@ export const CameraStationSettings = () => {
                         label="Source key"
                         error={formState.errors.acs_source_key !== undefined}
                         helperText={formState.errors.acs_source_key?.message}
-                        onBlur={() => {
-                            field.onBlur();
-                        }}
                     />
                 )}
             />
