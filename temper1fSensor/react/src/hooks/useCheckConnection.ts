@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import { useFormContext } from 'react-hook-form';
+import { useFormContext, useWatch } from 'react-hook-form';
+import { TWatches } from '../utils';
 
 type Props = {
     protocol: string;
@@ -10,12 +11,20 @@ type Props = {
 };
 
 export const useCheckConnection = ({ protocol, ipAddress, port, areCredentialsValid, credentials }: Props) => {
-    const { getValues } = useFormContext();
+    const { getValues, control } = useFormContext();
     const fetchIdsInProgress = useRef<number[]>([]);
     const abortControllers = useRef<AbortController | null>(null);
     const [cameraResponse, setCameraResponse] = useState<boolean | null>(null);
     const [status, setStatus] = useState<number | null>(null);
     const [disabled, setDisabled] = useState(false);
+
+    const inputs: TWatches = {
+        protocol: useWatch({ control, name: protocol }),
+        ip: useWatch({ control, name: ipAddress }),
+        port: useWatch({ control, name: port }),
+        user: useWatch({ control, name: credentials[0] }),
+        pass: useWatch({ control, name: credentials[1] }),
+    };
 
     const handleCheck = async () => {
         const fetchId = Math.round(Math.random() * 10000);
@@ -66,18 +75,14 @@ export const useCheckConnection = ({ protocol, ipAddress, port, areCredentialsVa
     };
 
     useEffect(() => {
-        if (
-            getValues(credentials[0]).length === 0 ||
-            getValues(credentials[1]).length === 0 ||
-            getValues(ipAddress).length === 0
-        ) {
+        if (inputs.user.length === 0 || inputs.pass.length === 0 || inputs.ip.length === 0) {
             setStatus(0);
             setDisabled(true);
-        } else if (getValues(credentials[0]) && getValues(credentials[1]) && getValues(ipAddress)) {
+        } else if (inputs.user && inputs.pass && inputs.ip) {
             setStatus(1);
             setDisabled(true);
-            const debounceTimeout = setTimeout(() => {
-                handleCheck();
+            const debounceTimeout = setTimeout(async () => {
+                await handleCheck();
             }, 300);
 
             return () => clearTimeout(debounceTimeout);
@@ -86,7 +91,7 @@ export const useCheckConnection = ({ protocol, ipAddress, port, areCredentialsVa
         } else if (cameraResponse !== null) {
             setStatus(3);
         }
-    }, [areCredentialsValid, cameraResponse, credentials, ipAddress, getValues]);
+    }, [areCredentialsValid, cameraResponse, inputs.protocol, inputs.ip, inputs.port, inputs.user, inputs.pass]);
 
     useEffect(() => {
         setCameraResponse(null);

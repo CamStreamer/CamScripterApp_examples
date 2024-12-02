@@ -2,7 +2,7 @@ import { parseValueAsInt } from '../../utils';
 import { Controller, useFormContext } from 'react-hook-form';
 import { StyledTextField, StyledSelect } from '../../components/FormInputs';
 import { Title } from '../../components/Title';
-import { Stack, MenuItem, FormControlLabel, Switch, InputAdornment } from '@mui/material';
+import { Stack, MenuItem, FormControlLabel, Switch, InputAdornment, FormHelperText } from '@mui/material';
 import { TAppSchema } from '../../models/schema';
 import { EVENT_DELAYS_LABELS, EVENT_DELAYS, WHEN_LABELS, WHEN } from '../constants';
 
@@ -13,7 +13,7 @@ export const StationEventTrigger = () => {
     return (
         <Stack spacing={1.5}>
             <Title text="Event Trigger" />
-            {/*------SWITCH------*/}
+            {/* ------SWITCH------*/}
             <Controller
                 name={`acs_active`}
                 control={control}
@@ -25,7 +25,7 @@ export const StationEventTrigger = () => {
                     />
                 )}
             />
-            {/*------TRIGGERED------*/}
+            {/* ------TRIGGERED------*/}
             <Controller
                 name={`acs_condition_delay`}
                 control={control}
@@ -39,7 +39,7 @@ export const StationEventTrigger = () => {
                     </StyledSelect>
                 )}
             />
-            {/*------WHEN------*/}
+            {/* ------WHEN------*/}
             <Controller
                 name={`acs_condition_operator`}
                 control={control}
@@ -53,7 +53,7 @@ export const StationEventTrigger = () => {
                     </StyledSelect>
                 )}
             />
-            {/*------VALUE------*/}
+            {/* ------VALUE------*/}
             <Controller
                 name={`acs_condition_value`}
                 control={control}
@@ -80,7 +80,7 @@ export const StationEventTrigger = () => {
                     />
                 )}
             />
-            {/*------REPEAT AFTER TIME------*/}
+            {/* ------REPEAT AFTER TIME------*/}
             <Controller
                 name={`acs_repeat_after`}
                 control={control}
@@ -97,11 +97,7 @@ export const StationEventTrigger = () => {
                             field.onBlur();
                         }}
                         error={formState.errors.acs_repeat_after !== undefined}
-                        helperText={
-                            formState.errors.acs_repeat_after?.message
-                                ? formState.errors.acs_repeat_after?.message
-                                : 'Set to zero for non-repetition.'
-                        }
+                        helperText={formState.errors.acs_repeat_after?.message}
                         onBlur={() => {
                             field.onBlur();
                         }}
@@ -111,6 +107,7 @@ export const StationEventTrigger = () => {
                     />
                 )}
             />
+            <FormHelperText>Set to zero for non-repetition.</FormHelperText>
         </Stack>
     );
 };

@@ -11,7 +11,7 @@ export const WidgetSettings = () => {
   return (
     <Stack spacing={1.5}>
       <Title text="Widget settings" />
-      {/*------SERVICE ID------*/}
+      {/* ------SERVICE ID------*/}
       <Controller
         name={`service_id`}
         control={control}
@@ -35,7 +35,7 @@ export const WidgetSettings = () => {
           />
         )}
       />
-      {/*------FIELD NAME------*/}
+      {/* ------FIELD NAME------*/}
       <Controller
         name={`field_name`}
         control={control}

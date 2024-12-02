@@ -1,5 +1,5 @@
 export const appInfo = {
-    //adjust application accodingly
+    // Adjust application accodingly
     name: 'TEMPer1F',
     packageName: 'temper1fSensor',
     headline: 'TEMPer1F Sensor',

@@ -23,7 +23,7 @@ export const EventsDeviceSettings = () => {
     return (
         <Stack spacing={1.5}>
             <Title text="Device Settings" />
-            {/*------PROTOCOL------*/}
+            {/* ------PROTOCOL------*/}
             <Controller
                 name={`event_camera_protocol`}
                 control={control}
@@ -51,7 +51,7 @@ export const EventsDeviceSettings = () => {
                     </RadioGroup>
                 )}
             />
-            {/*------IP ADDRESS------*/}
+            {/* ------IP ADDRESS------*/}
             <Controller
                 name={`event_camera_ip`}
                 control={control}
@@ -59,13 +59,12 @@ export const EventsDeviceSettings = () => {
                     <FormInputWithDialog
                         {...field}
                         value={field.value}
-                        keyName="event_camera_ip"
                         error={!!formState.errors.event_camera_ip}
                         helperText={formState.errors.event_camera_ip?.message}
                     />
                 )}
             />
-            {/*------PORT------*/}
+            {/* ------PORT------*/}
             <Controller
                 name={`event_camera_port`}
                 control={control}
@@ -86,7 +85,7 @@ export const EventsDeviceSettings = () => {
                     />
                 )}
             />
-            {/*------USER------*/}
+            {/* ------USER------*/}
             <Controller
                 name={`event_camera_user`}
                 control={control}
@@ -103,9 +102,9 @@ export const EventsDeviceSettings = () => {
                     />
                 )}
             />
-            {/*------PASSWORD------*/}
+            {/* ------PASSWORD------*/}
             <PasswordInput name="event_camera_pass" areCredentialsValid={areCredentialsValid} control={control} />
-            {/*------CONNECTION CHECK------*/}
+            {/* ------CONNECTION CHECK------*/}
             <ConnectionCheck
                 protocol="event_camera_protocol"
                 ipAddress="event_camera_ip"

@@ -23,7 +23,7 @@ export const IntegrationDeviceSettings = () => {
     return (
         <Stack spacing={1.5}>
             <Title text="Device Settings" />
-            {/*------PROTOCOL------*/}
+            {/* ------PROTOCOL------*/}
             <Controller
                 name={`camera_protocol`}
                 control={control}
@@ -51,7 +51,7 @@ export const IntegrationDeviceSettings = () => {
                     </RadioGroup>
                 )}
             />
-            {/*------IP ADDRESS------*/}
+            {/* ------IP ADDRESS------*/}
             <Controller
                 name={`camera_ip`}
                 control={control}
@@ -59,13 +59,12 @@ export const IntegrationDeviceSettings = () => {
                     <FormInputWithDialog
                         {...field}
                         value={field.value}
-                        keyName="camera_ip"
                         error={!!formState.errors.camera_ip}
                         helperText={formState.errors.camera_ip?.message}
                     />
                 )}
             />
-            {/*------PORT------*/}
+            {/* ------PORT------*/}
             <Controller
                 name={`camera_port`}
                 control={control}
@@ -86,7 +85,7 @@ export const IntegrationDeviceSettings = () => {
                     />
                 )}
             />
-            {/*------USER------*/}
+            {/* ------USER------*/}
             <Controller
                 name={`camera_user`}
                 control={control}
@@ -103,9 +102,9 @@ export const IntegrationDeviceSettings = () => {
                     />
                 )}
             />
-            {/*------PASSWORD------*/}
+            {/* ------PASSWORD------*/}
             <PasswordInput name="camera_pass" areCredentialsValid={areCredentialsValid} control={control} />
-            {/*------CONNECTION CHECK------*/}
+            {/* ------CONNECTION CHECK------*/}
             <ConnectionCheck
                 protocol="camera_protocol"
                 port="camera_port"

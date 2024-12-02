@@ -6,8 +6,6 @@ import styled from '@mui/material/styles/styled';
 import { StyledTextField } from './FormInputs';
 import { Title } from './Title';
 import { ContainerLoader } from '../components/ContainerLoader';
-import { Path } from 'react-hook-form';
-import { TAppSchema } from '../models/schema';
 
 type CameraProps = {
     open: boolean;
@@ -20,7 +18,6 @@ type CameraProps = {
 
 type Props = {
     value: string;
-    keyName: Path<TAppSchema>;
     helperText?: string;
     error?: boolean;
     onBlur?: () => void;
@@ -66,9 +63,13 @@ export const FormInputWithDialog = forwardRef(({ value, onChange }: Props, ref: 
     const [open, setOpen] = useState(false);
     const [list, setList] = useState<TCameraOption[]>([]);
 
-    const handleClickOpen = () => {
+    const handleClickOpen = async () => {
         setOpen(true);
-        fetchCameraOptions();
+        try {
+            await fetchCameraOptions();
+        } catch (err) {
+            console.error(err);
+        }
     };
 
     const handleSelectCamera = (ip: string) => {
@@ -77,7 +78,7 @@ export const FormInputWithDialog = forwardRef(({ value, onChange }: Props, ref: 
     };
 
     useEffect(() => {
-        if (options) {
+        if (options.length > 0) {
             setList(options);
         }
     }, [options]);
@@ -114,6 +115,8 @@ export const FormInputWithDialog = forwardRef(({ value, onChange }: Props, ref: 
         />
     );
 });
+
+FormInputWithDialog.displayName = 'FormInputWithDialog';
 
 const StyledDialog = styled(Dialog)`
     & .MuiDialog-paper {

@@ -2,7 +2,7 @@ import { parseValueAsInt } from '../../utils';
 import { Controller, useFormContext } from 'react-hook-form';
 import { StyledTextField, StyledRadioControlLabel } from '../../components/FormInputs';
 import { Title } from '../../components/Title';
-import { Stack, Radio, RadioGroup } from '@mui/material';
+import { Stack, Radio, RadioGroup, FormHelperText } from '@mui/material';
 import { PasswordInput } from '../../components/PasswordInput';
 import { useCredentialsValidate } from '../../hooks/useCredentialsValidate';
 import { TAppSchema } from '../../models/schema';
@@ -21,7 +21,7 @@ export const CameraStationSettings = () => {
     return (
         <Stack spacing={1.5}>
             <Title text="Camera Station Settings" />
-            {/*------PROTOCOL------*/}
+            {/* ------PROTOCOL------*/}
             <Controller
                 name={`acs_protocol`}
                 control={control}
@@ -44,7 +44,7 @@ export const CameraStationSettings = () => {
                     </RadioGroup>
                 )}
             />
-            {/*------IP ADDRESS------*/}
+            {/* ------IP ADDRESS------*/}
             <Controller
                 name={`acs_ip`}
                 control={control}
@@ -61,7 +61,7 @@ export const CameraStationSettings = () => {
                     />
                 )}
             />
-            {/*------PORT------*/}
+            {/* ------PORT------*/}
             <Controller
                 name={`acs_port`}
                 control={control}
@@ -78,15 +78,12 @@ export const CameraStationSettings = () => {
                             field.onBlur();
                         }}
                         error={formState.errors.acs_port !== undefined}
-                        helperText={
-                            formState.errors.acs_port?.message
-                                ? formState.errors.acs_port?.message
-                                : 'Default ports are 29204 or 55756.'
-                        }
+                        helperText={formState.errors.acs_port?.message}
                     />
                 )}
             />
-            {/*------USER------*/}
+            <FormHelperText>Default ports are 29204 or 55756.</FormHelperText>
+            {/* ------USER------*/}
             <Controller
                 name={`acs_user`}
                 control={control}
@@ -103,9 +100,9 @@ export const CameraStationSettings = () => {
                     />
                 )}
             />
-            {/*------PASSWORD------*/}
+            {/* ------PASSWORD------*/}
             <PasswordInput name="acs_pass" areCredentialsValid={areCredentialsValid} control={control} />
-            {/*------SOURCE KEY------*/}
+            {/* ------SOURCE KEY------*/}
             <Controller
                 name={`acs_source_key`}
                 control={control}

@@ -25,7 +25,7 @@ export const useCameraOptions = () => {
             const resData = await res.json();
             const data: TCameraOptionResponse = JSON.parse(resData.message);
 
-            // this req is not the latest one -> cancel
+            // This req is not the latest one -> cancel
             if (fetchId !== fetchIdsInProgress.current[fetchIdsInProgress.current.length - 1]) {
                 return;
             }

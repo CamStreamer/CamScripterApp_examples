@@ -13,7 +13,7 @@ export const EventTrigger = () => {
     return (
         <Stack spacing={1.5}>
             <Title text="Event Trigger" />
-            {/*------SWITCH------*/}
+            {/* ------SWITCH------*/}
             <Controller
                 name={`event_active`}
                 control={control}
@@ -25,7 +25,7 @@ export const EventTrigger = () => {
                     />
                 )}
             />
-            {/*------TRIGGERED------*/}
+            {/* ------TRIGGERED------*/}
             <Controller
                 name={`event_condition_delay`}
                 control={control}
@@ -39,7 +39,7 @@ export const EventTrigger = () => {
                     </StyledSelect>
                 )}
             />
-            {/*------WHEN------*/}
+            {/* ------WHEN------*/}
             <Controller
                 name={`event_condition_operator`}
                 control={control}
@@ -53,7 +53,7 @@ export const EventTrigger = () => {
                     </StyledSelect>
                 )}
             />
-            {/*------VALUE------*/}
+            {/* ------VALUE------*/}
             <Controller
                 name={`event_condition_value`}
                 control={control}
