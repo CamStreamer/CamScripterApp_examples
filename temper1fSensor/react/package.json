@@ -7,7 +7,8 @@
     "scripts": {
         "dev": "vite",
         "build": "tsc -b && vite build && cp -rT dist ../html",
-        "lint": "eslint .",
+        "lint": "eslint \"src/**/*.{ts,tsx}\"",
+        "lint:fix": "eslint \"src/**/*.{ts,tsx}\" --fix",
         "preview": "vite preview"
     },
     "browserslist": {
@@ -21,6 +22,9 @@
             "last 1 firefox version",
             "last 1 safari version"
         ]
+    },
+    "eslintConfig": {
+        "extends": "./eslintrc.json"
     },
     "dependencies": {
         "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
@@ -38,15 +42,19 @@
         "zod": "^3.22.4"
     },
     "devDependencies": {
+        "@camstreamer/eslint-config": "^1.0.1",
         "@camstreamer/prettier-config": "^2.0.4",
         "@eslint/js": "^9.13.0",
         "@types/node": "^16.18.31",
         "@types/react": "^18.3.12",
         "@types/react-dom": "^18.3.1",
         "@vitejs/plugin-react": "^4.3.3",
-        "eslint": "^9.13.0",
+        "eslint": "8",
+        "eslint-plugin-deprecation": "^3.0.0",
+        "eslint-plugin-react": "^7.37.2",
         "eslint-plugin-react-hooks": "^5.0.0",
         "eslint-plugin-react-refresh": "^0.4.14",
+        "eslint-plugin-unused-imports": "^4.1.4",
         "globals": "^15.11.0",
         "prettier": "^2.7.1",
         "typescript": "~5.6.2",
