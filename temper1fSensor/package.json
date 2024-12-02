@@ -6,10 +6,9 @@
     "main": "main.js",
     "scripts": {
         "clean": "rimraf dist/* html/* *.zip",
-        "build": "npm-run-all tsc",
+        "build": "tsc",
         "build:FE": "cd react && npm run build",
         "build:all": "npm-run-all build build:FE",
-        "tsc": "tsc",
         "try": "npm run build; PERSISTENT_DATA_PATH=\"./localdata/\" node dist/main.js",
         "pretty": "prettier --write \"./src/*.{ts,tsx}\"",
         "pretty:check": "prettier --check \"./src/*.{ts,tsx}\"",
