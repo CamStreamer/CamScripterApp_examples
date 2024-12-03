@@ -43,7 +43,7 @@ export function validateCredentials(proxy: TWatches): [AbortController, Promise<
     });
     const aborter = new AbortController();
     const areValid = fetch(req, { signal: aborter.signal }).then((res) => {
-        return res.status !== 400;
+        return res.status === 200;
     });
     return [aborter, areValid];
 }
