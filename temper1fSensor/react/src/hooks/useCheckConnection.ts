@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { TWatches } from '../utils';
+import { debounce } from '@mui/material/utils';
 
 type Props = {
     protocol: string;
@@ -15,8 +16,6 @@ export const useCheckConnection = ({ protocol, ipAddress, port, areCredentialsVa
     const fetchIdsInProgress = useRef<number[]>([]);
     const abortControllers = useRef<AbortController | null>(null);
     const [cameraResponse, setCameraResponse] = useState<boolean | null>(null);
-    const [status, setStatus] = useState<number | null>(null);
-    const [disabled, setDisabled] = useState(false);
 
     const inputs: TWatches = {
         protocol: useWatch({ control, name: protocol }),
@@ -26,12 +25,21 @@ export const useCheckConnection = ({ protocol, ipAddress, port, areCredentialsVa
         pass: useWatch({ control, name: credentials[1] }),
     };
 
+    const isDisabled = !inputs.user || !inputs.pass || !inputs.ip || !inputs.protocol || !inputs.port;
+
+    const getStatus = (): number => {
+        if (isDisabled) {
+            return 0;
+        }
+        if (cameraResponse === null) {
+            return 1;
+        }
+        return cameraResponse ? 2 : 3;
+    };
+
     const handleCheck = async () => {
         const fetchId = Math.round(Math.random() * 10000);
         fetchIdsInProgress.current.push(fetchId);
-
-        setStatus(1);
-        setDisabled(true);
 
         try {
             const req = new Request(window.location.origin + '/local/camscripter/proxy.cgi', {
@@ -49,56 +57,29 @@ export const useCheckConnection = ({ protocol, ipAddress, port, areCredentialsVa
                 return;
             }
 
-            if (areCredentialsValid) {
-                const res = await fetch(req);
-
-                if (res.ok) {
-                    setCameraResponse(true);
-                    setStatus(2);
-                } else {
-                    setCameraResponse(false);
-                    setStatus(3);
-                }
-            } else {
+            if (!areCredentialsValid) {
                 setCameraResponse(false);
-                setStatus(3);
+                return;
             }
+            const res = await fetch(req);
+            setCameraResponse(res.ok);
         } catch (e) {
             console.error(e);
             setCameraResponse(false);
-            setStatus(3);
         } finally {
             fetchIdsInProgress.current = fetchIdsInProgress.current.filter((id) => fetchId !== id);
             abortControllers.current = null;
-            setDisabled(false);
         }
     };
 
-    useEffect(() => {
-        if (inputs.user.length === 0 || inputs.pass.length === 0 || inputs.ip.length === 0) {
-            setStatus(0);
-            setDisabled(true);
-        } else if (inputs.user && inputs.pass && inputs.ip) {
-            setStatus(1);
-            setDisabled(true);
-            const debounceTimeout = setTimeout(async () => {
-                await handleCheck();
-            }, 300);
-
-            return () => clearTimeout(debounceTimeout);
-        } else if (areCredentialsValid && cameraResponse) {
-            setStatus(2);
-        } else if (cameraResponse !== null) {
-            setStatus(3);
-        }
-    }, [areCredentialsValid, cameraResponse, inputs.protocol, inputs.ip, inputs.port, inputs.user, inputs.pass]);
+    const debouncedHandleCheck = debounce(handleCheck, 500);
 
     useEffect(() => {
-        setCameraResponse(null);
-    }, [credentials]);
+        void debouncedHandleCheck();
+    }, [areCredentialsValid]);
 
     const getLabelText = () => {
-        switch (status) {
+        switch (getStatus()) {
             case 0: {
                 return 'No credentials';
             }
@@ -112,16 +93,15 @@ export const useCheckConnection = ({ protocol, ipAddress, port, areCredentialsVa
                 return 'Failed';
             }
             default: {
-                return 'Check';
+                return 'No credentials';
             }
         }
     };
 
     const getChipClass = () => {
-        switch (status) {
+        switch (getStatus()) {
             case 0:
             case 1:
-            case 4:
                 return 'default';
             case 2:
                 return 'success';
@@ -130,5 +110,5 @@ export const useCheckConnection = ({ protocol, ipAddress, port, areCredentialsVa
         }
     };
 
-    return [handleCheck, disabled, getLabelText, getChipClass] as const;
+    return [handleCheck, isDisabled, getLabelText, getChipClass] as const;
 };

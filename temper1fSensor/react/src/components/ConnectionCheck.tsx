@@ -11,7 +11,7 @@ type Props = {
 };
 
 export const ConnectionCheck = ({ protocol, ipAddress, port, areCredentialsValid, credentials }: Props) => {
-    const [handleCheck, disabled, getLabelText, getChipClass] = useCheckConnection({
+    const [handleCheck, isDisabled, getLabelText, getChipClass] = useCheckConnection({
         protocol,
         ipAddress,
         port,
@@ -23,7 +23,7 @@ export const ConnectionCheck = ({ protocol, ipAddress, port, areCredentialsValid
         <StyledBox>
             <Typography fontWeight={700}>Connection</Typography>
             <StyledConnectionChip color={getChipClass()} label={getLabelText()} />
-            <Button variant="outlined" onClick={handleCheck} disabled={disabled}>
+            <Button variant="outlined" onClick={handleCheck} disabled={isDisabled}>
                 Check
             </Button>
         </StyledBox>
