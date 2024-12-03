@@ -18,7 +18,7 @@ export const mockedSettings: TAppSchema = {
     acs_active: true,
     acs_condition_delay: 0,
     acs_condition_operator: 1,
-    acs_condition_value: 10,
+    acs_condition_value: '10',
     acs_repeat_after: 30,
     event_camera_protocol: 'http',
     event_camera_ip: '',
@@ -27,6 +27,6 @@ export const mockedSettings: TAppSchema = {
     event_camera_pass: '',
     event_condition_delay: 0,
     event_condition_operator: 1,
-    event_condition_value: 10,
+    event_condition_value: '10',
     event_active: true,
 };
