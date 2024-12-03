@@ -1,4 +1,6 @@
 import {
+    Box,
+    Chip,
     FormControl,
     FormControlLabel,
     FormHelperText,
@@ -105,3 +107,15 @@ export const StyledRadioControlLabel = (props: FormControlLabelProps) => {
 
     return <StyledFormControlLabel checked={checked} {...props} />;
 };
+
+export const StyledBox = styled(Box)`
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 10px 0;
+`;
+
+export const StyledConnectionChip = styled(Chip)`
+    cursor: default;
+    margin-right: 10px;
+`;
