@@ -15,6 +15,7 @@ export const useCheckConnection = ({ protocol, ipAddress, port, areCredentialsVa
     const { getValues, control } = useFormContext();
     const fetchIdsInProgress = useRef<number[]>([]);
     const abortControllers = useRef<AbortController | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
     const [cameraResponse, setCameraResponse] = useState<boolean | null>(null);
 
     const inputs: TWatches = {
@@ -28,6 +29,9 @@ export const useCheckConnection = ({ protocol, ipAddress, port, areCredentialsVa
     const isDisabled = !inputs.user || !inputs.pass || !inputs.ip || !inputs.protocol || !inputs.port;
 
     const getStatus = (): number => {
+        if (isLoading) {
+            return 1;
+        }
         if (isDisabled) {
             return 0;
         }
@@ -40,6 +44,8 @@ export const useCheckConnection = ({ protocol, ipAddress, port, areCredentialsVa
     const handleCheck = async () => {
         const fetchId = Math.round(Math.random() * 10000);
         fetchIdsInProgress.current.push(fetchId);
+
+        setIsLoading(true);
 
         try {
             const req = new Request(window.location.origin + '/local/camscripter/proxy.cgi', {
@@ -69,10 +75,11 @@ export const useCheckConnection = ({ protocol, ipAddress, port, areCredentialsVa
         } finally {
             fetchIdsInProgress.current = fetchIdsInProgress.current.filter((id) => fetchId !== id);
             abortControllers.current = null;
+            setIsLoading(false);
         }
     };
 
-    const debouncedHandleCheck = debounce(handleCheck, 500);
+    const debouncedHandleCheck = debounce(handleCheck, 300);
 
     useEffect(() => {
         void debouncedHandleCheck();
