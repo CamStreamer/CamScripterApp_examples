@@ -1,7 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { TWatches } from '../utils';
-import { debounce } from '@mui/material/utils';
 
 type Props = {
     protocol: string;
@@ -26,22 +25,34 @@ export const useCheckConnection = ({ protocol, ipAddress, port, areCredentialsVa
         pass: useWatch({ control, name: credentials[1] }),
     };
 
+    const [prevValid, setPrevValid] = useState<boolean>(areCredentialsValid);
+
+    if (prevValid !== areCredentialsValid) {
+        setPrevValid(areCredentialsValid);
+
+        if (!areCredentialsValid) {
+            setCameraResponse(false);
+        }
+    }
+
     const isDisabled = !inputs.user || !inputs.pass || !inputs.ip || !inputs.protocol || !inputs.port;
 
     const getStatus = (): number => {
-        if (isLoading) {
-            return 1;
-        }
         if (isDisabled) {
             return 0;
         }
-        if (cameraResponse === null) {
+        if (isLoading) {
             return 1;
+        } else {
+            return cameraResponse ? 2 : 3;
         }
-        return cameraResponse ? 2 : 3;
     };
 
     const handleCheck = async () => {
+        if (!areCredentialsValid) {
+            return;
+        }
+
         const fetchId = Math.round(Math.random() * 10000);
         fetchIdsInProgress.current.push(fetchId);
 
@@ -53,8 +64,8 @@ export const useCheckConnection = ({ protocol, ipAddress, port, areCredentialsVa
                     'x-target-camera-protocol': `${getValues(protocol)}`,
                     'x-target-camera-ip': `${getValues(ipAddress)}`,
                     'x-target-camera-port': `${getValues(port)}`,
-                    'x-target-camera-user': `${getValues(credentials[0])}`,
-                    'x-target-camera-pass': `${getValues(credentials[1])}`,
+                    'x-target-camera-user': `${encodeURIComponent(getValues(credentials[0]))}`,
+                    'x-target-camera-pass': `${encodeURIComponent(getValues(credentials[1]))}`,
                     'x-target-camera-path': '/axis-cgi/basicdeviceinfo.cgi',
                 },
             });
@@ -63,10 +74,6 @@ export const useCheckConnection = ({ protocol, ipAddress, port, areCredentialsVa
                 return;
             }
 
-            if (!areCredentialsValid) {
-                setCameraResponse(false);
-                return;
-            }
             const res = await fetch(req);
             setCameraResponse(res.ok);
         } catch (e) {
@@ -79,10 +86,10 @@ export const useCheckConnection = ({ protocol, ipAddress, port, areCredentialsVa
         }
     };
 
-    const debouncedHandleCheck = debounce(handleCheck, 300);
-
     useEffect(() => {
-        void debouncedHandleCheck();
+        if (areCredentialsValid) {
+            void handleCheck();
+        }
     }, [areCredentialsValid]);
 
     const getLabelText = () => {

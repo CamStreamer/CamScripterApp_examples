@@ -1,12 +1,12 @@
 import { parseValueAsInt } from '../../utils';
 import { Controller, useFormContext } from 'react-hook-form';
-import { StyledTextField, StyledRadioControlLabel } from '../../components/FormInputs';
+import { StyledTextField, StyledRadioControlLabel, StyledBox, StyledConnectionChip } from '../../components/FormInputs';
 import { Title } from '../../components/Title';
-import { Stack, Radio, RadioGroup } from '@mui/material';
+import { Button, Typography, Stack, Radio, RadioGroup } from '@mui/material';
 import { FormInputWithDialog } from '../../components/FormInputWithDialog';
 import { PasswordInput } from '../../components/PasswordInput';
-import { ConnectionCheck } from '../../components/ConnectionCheck';
 import { useCredentialsValidate } from '../../hooks/useCredentialsValidate';
+import { useCheckConnection } from '../../hooks/useCheckConnection';
 import { TAppSchema } from '../../models/schema';
 import { PROTOCOLS, PROTOCOL_LABELS } from '../constants';
 
@@ -18,6 +18,14 @@ export const EventsDeviceSettings = () => {
         port: 'event_camera_port',
         user: 'event_camera_user',
         pass: 'event_camera_pass',
+    });
+
+    const [handleCheck, isDisabled, getLabelText, getChipClass] = useCheckConnection({
+        protocol: 'event_camera_protocol',
+        ipAddress: 'event_camera_ip',
+        port: 'event_camera_port',
+        areCredentialsValid: areCredentialsValid,
+        credentials: ['event_camera_user', 'event_camera_pass'],
     });
 
     return (
@@ -99,13 +107,13 @@ export const EventsDeviceSettings = () => {
             {/* ------PASSWORD------*/}
             <PasswordInput name="event_camera_pass" areCredentialsValid={areCredentialsValid} control={control} />
             {/* ------CONNECTION CHECK------*/}
-            <ConnectionCheck
-                protocol="event_camera_protocol"
-                ipAddress="event_camera_ip"
-                port="event_camera_port"
-                areCredentialsValid={areCredentialsValid}
-                credentials={['event_camera_user', 'event_camera_pass']}
-            />
+            <StyledBox>
+                <Typography fontWeight={700}>Connection</Typography>
+                <StyledConnectionChip color={getChipClass()} label={getLabelText()} />
+                <Button variant="outlined" onClick={handleCheck} disabled={isDisabled}>
+                    Check
+                </Button>
+            </StyledBox>
         </Stack>
     );
 };
