@@ -25,16 +25,6 @@ export const useCheckConnection = ({ protocol, ipAddress, port, areCredentialsVa
         pass: useWatch({ control, name: credentials[1] }),
     };
 
-    const [prevValid, setPrevValid] = useState<boolean>(areCredentialsValid);
-
-    if (prevValid !== areCredentialsValid) {
-        setPrevValid(areCredentialsValid);
-
-        if (!areCredentialsValid) {
-            setCameraResponse(false);
-        }
-    }
-
     const isDisabled = !inputs.user || !inputs.pass || !inputs.ip || !inputs.protocol || !inputs.port;
 
     const getStatus = (): number => {
@@ -50,6 +40,7 @@ export const useCheckConnection = ({ protocol, ipAddress, port, areCredentialsVa
 
     const handleCheck = async () => {
         if (!areCredentialsValid) {
+            setCameraResponse(false);
             return;
         }
 
@@ -87,9 +78,7 @@ export const useCheckConnection = ({ protocol, ipAddress, port, areCredentialsVa
     };
 
     useEffect(() => {
-        if (areCredentialsValid) {
-            void handleCheck();
-        }
+        void handleCheck();
     }, [areCredentialsValid]);
 
     const getLabelText = () => {
