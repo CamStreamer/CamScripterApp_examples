@@ -1,6 +1,7 @@
-import { parseValueAsInt, parseValueAsFloat } from '../../utils';
+import { parseValueAsInt } from '../../utils';
 import { Controller, useFormContext } from 'react-hook-form';
 import { StyledTextField, StyledSelect } from '../../components/FormInputs';
+import { FormFloatInput } from '../../components/FormFloatInput';
 import { Title } from '../../components/Title';
 import { Stack, MenuItem, FormControlLabel, Switch, InputAdornment, FormHelperText } from '@mui/material';
 import { TAppSchema } from '../../models/schema';
@@ -54,28 +55,7 @@ export const StationEventTrigger = () => {
                 )}
             />
             {/* ------VALUE------*/}
-            <Controller
-                name={`acs_condition_value`}
-                control={control}
-                render={({ field, formState }) => (
-                    <StyledTextField
-                        defaultValue={field.value}
-                        InputLabelProps={{ shrink: true }}
-                        fullWidth
-                        label="Value"
-                        onBlur={(e) => {
-                            const val = parseValueAsFloat(e.target.value.replace(',', '.'));
-                            field.onChange(val);
-                            e.target.value = val.toString();
-                        }}
-                        error={formState.errors.acs_condition_value !== undefined}
-                        helperText={formState.errors.acs_condition_value?.message}
-                        InputProps={{
-                            endAdornment: <InputAdornment position="end">{unit === 'c' ? '°C' : '°F'}</InputAdornment>,
-                        }}
-                    />
-                )}
-            />
+            <FormFloatInput control={control} name={`acs_condition_value`} unit={unit} />
             {/* ------REPEAT AFTER TIME------*/}
             <Controller
                 name={`acs_repeat_after`}

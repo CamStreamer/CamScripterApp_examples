@@ -1,8 +1,8 @@
-import { parseValueAsFloat } from '../../utils';
 import { Controller, useFormContext } from 'react-hook-form';
-import { StyledTextField, StyledSelect } from '../../components/FormInputs';
+import { StyledSelect } from '../../components/FormInputs';
+import { FormFloatInput } from '../../components/FormFloatInput';
 import { Title } from '../../components/Title';
-import { Stack, MenuItem, FormControlLabel, Switch, InputAdornment } from '@mui/material';
+import { Stack, MenuItem, FormControlLabel, Switch } from '@mui/material';
 import { TAppSchema } from '../../models/schema';
 import { EVENT_DELAYS_LABELS, EVENT_DELAYS, WHEN_LABELS, WHEN } from '../constants';
 
@@ -54,28 +54,7 @@ export const EventTrigger = () => {
                 )}
             />
             {/* ------VALUE------*/}
-            <Controller
-                name={`event_condition_value`}
-                control={control}
-                render={({ field, formState }) => (
-                    <StyledTextField
-                        defaultValue={field.value}
-                        InputLabelProps={{ shrink: true }}
-                        fullWidth
-                        label="Value"
-                        onBlur={(e) => {
-                            const val = parseValueAsFloat(e.target.value.replace(',', '.'));
-                            field.onChange(val);
-                            e.target.value = val.toString();
-                        }}
-                        error={formState.errors.event_condition_value !== undefined}
-                        helperText={formState.errors.event_condition_value?.message}
-                        InputProps={{
-                            endAdornment: <InputAdornment position="end">{unit === 'c' ? '°C' : '°F'}</InputAdornment>,
-                        }}
-                    />
-                )}
-            />
+            <FormFloatInput control={control} name={`event_condition_value`} unit={unit} />
         </Stack>
     );
 };

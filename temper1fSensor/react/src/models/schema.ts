@@ -18,7 +18,7 @@ export const applicationSchema = z.object({
     acs_active: z.boolean(),
     acs_condition_delay: z.number(),
     acs_condition_operator: z.number().int().min(0).max(4),
-    acs_condition_value: z.number(),
+    acs_condition_value: z.coerce.string(),
     acs_repeat_after: z.number(),
     event_camera_protocol: z.union([z.literal('http'), z.literal('https'), z.literal('https_insecure')]),
     event_camera_ip: z.string(),
@@ -27,7 +27,7 @@ export const applicationSchema = z.object({
     event_camera_pass: z.string(),
     event_condition_delay: z.number().int(),
     event_condition_operator: z.number().int().min(0).max(4),
-    event_condition_value: z.number(),
+    event_condition_value: z.coerce.string(),
     event_active: z.boolean(),
 });
 

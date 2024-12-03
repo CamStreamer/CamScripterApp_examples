@@ -44,7 +44,11 @@ export const FormWrapper = ({ defaultValues }: Props) => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(toPost),
+                body: JSON.stringify({
+                    ...toPost,
+                    event_condition_value: parseFloat(toPost.event_condition_value),
+                    acs_condition_value: parseFloat(toPost.acs_condition_value),
+                }),
             });
             if (!res.ok) {
                 throw new Error(`${res.status}: ${res.statusText}`);
