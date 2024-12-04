@@ -11,11 +11,8 @@ import { PROTOCOLS, PROTOCOL_LABELS } from '../constants';
 export const CameraStationSettings = () => {
     const { control } = useFormContext<TAppSchema>();
     const [areCredentialsValid] = useCredentialsValidate({
-        protocol: 'acs_protocol',
-        ipAddress: 'acs_ip',
-        port: 'acs_port',
-        user: 'acs_user',
-        pass: 'acs_pass',
+        name: 'acs',
+        path: '/axis-cgi/param.cgi',
     });
 
     return (

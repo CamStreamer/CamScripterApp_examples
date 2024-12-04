@@ -1,85 +1,39 @@
-import { useState, useRef, useEffect } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { TWatches } from '../utils';
 
 type Props = {
-    protocol: string;
-    ipAddress: string;
-    port: string;
+    isFetchingConnection: boolean;
+    isCameraResponding: boolean;
     areCredentialsValid: boolean;
-    credentials: string[];
+    name: 'camera' | 'acs' | 'event_camera';
 };
 
-export const useCheckConnection = ({ protocol, ipAddress, port, areCredentialsValid, credentials }: Props) => {
-    const { getValues, control } = useFormContext();
-    const fetchIdsInProgress = useRef<number[]>([]);
-    const abortControllers = useRef<AbortController | null>(null);
-    const [isLoading, setIsLoading] = useState(false);
-    const [cameraResponse, setCameraResponse] = useState<boolean | null>(null);
+export const useCheckConnection = ({ isFetchingConnection, isCameraResponding, areCredentialsValid, name }: Props) => {
+    const { control } = useFormContext();
 
-    const inputs: TWatches = {
-        protocol: useWatch({ control, name: protocol }),
-        ip: useWatch({ control, name: ipAddress }),
-        port: useWatch({ control, name: port }),
-        user: useWatch({ control, name: credentials[0] }),
-        pass: useWatch({ control, name: credentials[1] }),
+    const proxy: TWatches = {
+        protocol: useWatch({ control, name: `${name}_protocol` }),
+        ip: useWatch({ control, name: `${name}_ip` }),
+        port: useWatch({ control, name: `${name}_port` }),
+        user: useWatch({ control, name: `${name}_user` }),
+        pass: useWatch({ control, name: `${name}_pass` }),
     };
 
-    const isDisabled = !inputs.user || !inputs.pass || !inputs.ip || !inputs.protocol || !inputs.port;
+    const isDisabled = !proxy.user || !proxy.pass || !proxy.ip || !proxy.protocol || !proxy.port;
 
-    const getStatus = (): number => {
+    const getStatus = () => {
         if (isDisabled) {
             return 0;
         }
-        if (isLoading) {
+        if (isFetchingConnection) {
             return 1;
+        }
+        if (isCameraResponding && areCredentialsValid) {
+            return 2;
         } else {
-            return cameraResponse ? 2 : 3;
+            return 3;
         }
     };
-
-    const handleCheck = async () => {
-        if (!areCredentialsValid) {
-            setCameraResponse(false);
-            return;
-        }
-
-        const fetchId = Math.round(Math.random() * 10000);
-        fetchIdsInProgress.current.push(fetchId);
-
-        setIsLoading(true);
-
-        try {
-            const req = new Request(window.location.origin + '/local/camscripter/proxy.cgi', {
-                headers: {
-                    'x-target-camera-protocol': `${getValues(protocol)}`,
-                    'x-target-camera-ip': `${getValues(ipAddress)}`,
-                    'x-target-camera-port': `${getValues(port)}`,
-                    'x-target-camera-user': `${encodeURIComponent(getValues(credentials[0]))}`,
-                    'x-target-camera-pass': `${encodeURIComponent(getValues(credentials[1]))}`,
-                    'x-target-camera-path': '/axis-cgi/basicdeviceinfo.cgi',
-                },
-            });
-
-            if (fetchId !== fetchIdsInProgress.current[fetchIdsInProgress.current.length - 1]) {
-                return;
-            }
-
-            const res = await fetch(req);
-            setCameraResponse(res.ok);
-        } catch (e) {
-            console.error(e);
-            setCameraResponse(false);
-        } finally {
-            fetchIdsInProgress.current = fetchIdsInProgress.current.filter((id) => fetchId !== id);
-            abortControllers.current = null;
-            setIsLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        void handleCheck();
-    }, [areCredentialsValid]);
 
     const getLabelText = () => {
         switch (getStatus()) {
@@ -113,5 +67,5 @@ export const useCheckConnection = ({ protocol, ipAddress, port, areCredentialsVa
         }
     };
 
-    return [handleCheck, isDisabled, getLabelText, getChipClass] as const;
+    return [isDisabled, getLabelText, getChipClass] as const;
 };

@@ -13,19 +13,20 @@ import { PROTOCOLS, PROTOCOL_LABELS } from '../constants';
 export const EventsDeviceSettings = () => {
     const { control, setValue } = useFormContext<TAppSchema>();
     const [areCredentialsValid] = useCredentialsValidate({
-        protocol: 'event_camera_protocol',
-        ipAddress: 'event_camera_ip',
-        port: 'event_camera_port',
-        user: 'event_camera_user',
-        pass: 'event_camera_pass',
+        name: 'event_camera',
+        path: '/axis-cgi/param.cgi',
     });
 
-    const [handleCheck, isDisabled, getLabelText, getChipClass] = useCheckConnection({
-        protocol: 'event_camera_protocol',
-        ipAddress: 'event_camera_ip',
-        port: 'event_camera_port',
-        areCredentialsValid: areCredentialsValid,
-        credentials: ['event_camera_user', 'event_camera_pass'],
+    const [isCameraResponding, isFetchingConnection, validate] = useCredentialsValidate({
+        name: 'event_camera',
+        path: '/axis-cgi/basicdeviceinfo.cgi',
+    });
+
+    const [isDisabled, getLabelText, getChipClass] = useCheckConnection({
+        isFetchingConnection,
+        isCameraResponding,
+        areCredentialsValid,
+        name: 'event_camera',
     });
 
     return (
@@ -110,7 +111,7 @@ export const EventsDeviceSettings = () => {
             <StyledBox>
                 <Typography fontWeight={700}>Connection</Typography>
                 <StyledConnectionChip color={getChipClass()} label={getLabelText()} />
-                <Button variant="outlined" onClick={handleCheck} disabled={isDisabled}>
+                <Button variant="outlined" onClick={validate} disabled={isDisabled}>
                     Check
                 </Button>
             </StyledBox>

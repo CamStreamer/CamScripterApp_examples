@@ -13,19 +13,20 @@ import { PROTOCOLS, PROTOCOL_LABELS } from '../constants';
 export const IntegrationDeviceSettings = () => {
     const { control, setValue } = useFormContext<TAppSchema>();
     const [areCredentialsValid] = useCredentialsValidate({
-        protocol: 'camera_protocol',
-        ipAddress: 'camera_ip',
-        port: 'camera_port',
-        user: 'camera_user',
-        pass: 'camera_pass',
+        name: 'camera',
+        path: '/axis-cgi/param.cgi',
     });
 
-    const [handleCheck, isDisabled, getLabelText, getChipClass] = useCheckConnection({
-        protocol: 'camera_protocol',
-        ipAddress: 'camera_ip',
-        port: 'camera_port',
-        areCredentialsValid: areCredentialsValid,
-        credentials: ['camera_user', 'camera_pass'],
+    const [isCameraResponding, isFetchingConnection, validate] = useCredentialsValidate({
+        name: 'camera',
+        path: '/axis-cgi/basicdeviceinfo.cgi',
+    });
+
+    const [isDisabled, getLabelText, getChipClass] = useCheckConnection({
+        isFetchingConnection,
+        isCameraResponding,
+        areCredentialsValid,
+        name: 'camera',
     });
 
     return (
@@ -110,7 +111,7 @@ export const IntegrationDeviceSettings = () => {
             <StyledBox>
                 <Typography fontWeight={700}>Connection</Typography>
                 <StyledConnectionChip color={getChipClass()} label={getLabelText()} />
-                <Button variant="outlined" onClick={handleCheck} disabled={isDisabled}>
+                <Button variant="outlined" onClick={validate} disabled={isDisabled}>
                     Check
                 </Button>
             </StyledBox>

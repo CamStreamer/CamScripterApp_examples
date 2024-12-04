@@ -30,11 +30,12 @@ export type TWatches = {
     user: string;
     pass: string;
 };
-export function validateCredentials(proxy: TWatches): [AbortController, Promise<boolean>] {
+
+export function validateCredentials(proxy: TWatches, path: string): [AbortController, Promise<boolean>] {
     const req = new Request(window.location.origin + '/local/camscripter/proxy.cgi', {
         headers: {
             'x-target-camera-protocol': proxy.protocol,
-            'x-target-camera-path': '/axis-cgi/param.cgi',
+            'x-target-camera-path': path,
             'x-target-camera-ip': proxy.ip,
             'x-target-camera-port': proxy.port.toString(),
             'x-target-camera-user': encodeURIComponent(proxy.user),
