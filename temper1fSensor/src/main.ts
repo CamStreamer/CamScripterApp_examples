@@ -176,13 +176,12 @@ async function checkCondtionAndSendCameraEvent(temperature: number) {
             cscEventDeclared = true;
         }
 
-        if (conditionActive && conditionActive !== sentActiveState) {
+        if (conditionActive !== sentActiveState) {
             const timerTime = conditionActive ? settings.event_condition_delay * 1000 : 0;
             clearTimeout(cscEventConditionTimer);
             cscEventConditionTimer = setTimeout(async () => {
                 await sendCameraEventTimerCallback(conditionActive);
                 sentActiveState = conditionActive;
-                cscEventConditionTimer = null;
             }, timerTime);
         }
     } catch (err) {
