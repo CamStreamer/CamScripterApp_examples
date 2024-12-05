@@ -22,11 +22,7 @@ export const FormWrapper = ({ defaultValues }: Props) => {
     });
 
     const onSubmit: SubmitHandler<TAppSchema> = async (toPost) => {
-        if (
-            (toPost.camera_ip !== '' && (toPost.camera_user === '' || toPost.camera_pass === '')) ||
-            (toPost.acs_ip !== '' && (toPost.acs_user === '' || toPost.acs_pass === '')) ||
-            (toPost.event_camera_ip !== '' && (toPost.event_camera_user === '' || toPost.event_camera_pass === ''))
-        ) {
+        if (toPost.camera_ip !== '' && (toPost.camera_user === '' || toPost.camera_pass === '')) {
             displaySnackbar({
                 type: 'error',
                 message: 'Please fill in credentials for the media source.',

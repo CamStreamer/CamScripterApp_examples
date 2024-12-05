@@ -4,16 +4,11 @@ import { StyledTextField, StyledRadioControlLabel } from '../../components/FormI
 import { Title } from '../../components/Title';
 import { Stack, Radio, RadioGroup, FormHelperText } from '@mui/material';
 import { PasswordInput } from '../../components/PasswordInput';
-import { useCredentialsValidate } from '../../hooks/useCredentialsValidate';
 import { TAppSchema } from '../../models/schema';
 import { PROTOCOLS, PROTOCOL_LABELS } from '../constants';
 
 export const CameraStationSettings = () => {
     const { control } = useFormContext<TAppSchema>();
-    const [areCredentialsValid] = useCredentialsValidate({
-        name: 'acs',
-        path: '/axis-cgi/param.cgi',
-    });
 
     return (
         <Stack spacing={1.5}>
@@ -90,7 +85,7 @@ export const CameraStationSettings = () => {
                 )}
             />
             {/* ------PASSWORD------*/}
-            <PasswordInput name="acs_pass" areCredentialsValid={areCredentialsValid} control={control} />
+            <PasswordInput name="acs_pass" areCredentialsValid={true} control={control} />
             {/* ------SOURCE KEY------*/}
             <Controller
                 name={`acs_source_key`}
