@@ -4,15 +4,16 @@
     "camera_port": 80,
     "camera_user": "root",
     "camera_pass": "",
-    "unit": "c",
+    "unit": "f",
     "service_id": 1,
     "field_name": "field1",
-    "acs_protocol": "http",
+    "acs_protocol": "https_insecure",
     "acs_ip": "",
-    "acs_port": 55756,
+    "acs_port": 29204,
     "acs_user": "",
     "acs_pass": "",
     "acs_source_key": "",
+    "acs_active": true,
     "acs_condition_delay": 0,
     "acs_condition_operator": 1,
     "acs_condition_value": 10,
@@ -24,5 +25,6 @@
     "event_camera_pass": "",
     "event_condition_delay": 0,
     "event_condition_operator": 1,
-    "event_condition_value": 10
+    "event_condition_value": 10,
+    "event_active": true
 }
