@@ -1,12 +1,12 @@
-import { TAppSchema } from '../models/schema';
+import { TConnectionParams } from '../models/schema';
 
-export const PROTOCOL_LABELS: Record<TAppSchema['camera_protocol'], string> = {
+export const PROTOCOL_LABELS: Record<TConnectionParams['protocol'], string> = {
     http: 'HTTP',
     https: 'HTTPS',
     https_insecure: 'HTTPS (not trusted cert)',
 };
 
-export const PROTOCOLS = Object.keys(PROTOCOL_LABELS) as TAppSchema['camera_protocol'][];
+export const PROTOCOLS = Object.keys(PROTOCOL_LABELS) as TConnectionParams['protocol'][];
 
 export const EVENT_DELAYS_LABELS: Record<string, string> = {
     0: 'Immediately',

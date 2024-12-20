@@ -22,7 +22,7 @@ export const FormWrapper = ({ defaultValues }: Props) => {
     });
 
     const onSubmit: SubmitHandler<TAppSchema> = async (toPost) => {
-        if (toPost.camera_ip !== '' && (toPost.camera_user === '' || toPost.camera_pass === '')) {
+        if (toPost.camera.ip !== '' && (toPost.camera.user === '' || toPost.camera.pass === '')) {
             displaySnackbar({
                 type: 'error',
                 message: 'Please fill in credentials for the media source.',
@@ -42,8 +42,11 @@ export const FormWrapper = ({ defaultValues }: Props) => {
                 },
                 body: JSON.stringify({
                     ...toPost,
-                    event_condition_value: parseFloat(toPost.event_condition_value),
-                    acs_condition_value: parseFloat(toPost.acs_condition_value),
+                    acs: { ...toPost.acs, condition_value: parseFloat(toPost.acs.condition_value) },
+                    event_camera: {
+                        ...toPost.event_camera,
+                        condition_value: parseFloat(toPost.event_camera.condition_value),
+                    },
                 }),
             });
             if (!res.ok) {
