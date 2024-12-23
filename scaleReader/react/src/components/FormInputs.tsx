@@ -17,7 +17,7 @@ import { styled } from '@mui/material/styles';
 import { ForwardedRef, forwardRef } from 'react';
 
 export const StyledTextField = styled(TextField)`
-    width: clamp(50%, 500px, 100%);
+    width: clamp(50%, 600px, 100%);
 
     & .MuiInputBase-root {
         background-color: white;
@@ -49,7 +49,7 @@ const StyledSelectWithRef = <T,>(
 export const StyledSelect = forwardRef(StyledSelectWithRef);
 
 export const StyledSelectField = styled(FormControl)`
-    width: clamp(50%, 500px, 100%);
+    width: clamp(50%, 600px, 100%);
 
     & .MuiInputBase-root {
         background-color: white;
@@ -118,4 +118,24 @@ export const StyledBox = styled(Box)`
 export const StyledConnectionChip = styled(Chip)`
     cursor: default;
     margin-right: 10px;
+`;
+
+export const StyledForm = styled('div')`
+    width: 100%;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+`;
+
+export const StyledRow = styled('div')`
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    gap: 16px;
+    margin-bottom: 8px;
+
+    @media only screen and (max-width: 700px) {
+        flex-direction: column;
+    }
 `;

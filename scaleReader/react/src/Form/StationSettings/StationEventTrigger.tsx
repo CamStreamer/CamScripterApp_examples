@@ -1,9 +1,9 @@
 import { parseValueAsInt } from '../../utils';
 import { Controller, useFormContext } from 'react-hook-form';
-import { StyledTextField, StyledSelect } from '../../components/FormInputs';
+import { StyledTextField, StyledSelect, StyledForm } from '../../components/FormInputs';
 import { FormFloatInput } from '../../components/FormFloatInput';
 import { Title } from '../../components/Title';
-import { Stack, MenuItem, FormControlLabel, Switch, InputAdornment, FormHelperText } from '@mui/material';
+import { MenuItem, FormControlLabel, Switch, InputAdornment, FormHelperText } from '@mui/material';
 import { TAppSchema } from '../../models/schema';
 import { EVENT_DELAYS_LABELS, EVENT_DELAYS, WHEN_LABELS, WHEN } from '../constants';
 
@@ -11,7 +11,7 @@ export const StationEventTrigger = () => {
     const { control } = useFormContext<TAppSchema>();
 
     return (
-        <Stack spacing={1.5}>
+        <StyledForm>
             <Title text="Event Trigger" />
             {/* ------SWITCH------*/}
             <Controller
@@ -78,6 +78,6 @@ export const StationEventTrigger = () => {
                 )}
             />
             <FormHelperText>Set to zero for non-repetition.</FormHelperText>
-        </Stack>
+        </StyledForm>
     );
 };

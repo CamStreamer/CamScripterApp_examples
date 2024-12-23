@@ -1,16 +1,12 @@
-import { Grid } from '@mui/material';
+import { StyledRow } from '../../components/FormInputs';
 import { EventsDeviceSettings } from './EventsDeviceSettings';
 import { EventTrigger } from './EventTrigger';
 
 export const EventsSettings = () => {
     return (
-        <Grid container>
-            <Grid item md={6} xs={12}>
-                <EventsDeviceSettings />
-            </Grid>
-            <Grid item md={6} xs={12}>
-                <EventTrigger />
-            </Grid>
-        </Grid>
+        <StyledRow>
+            <EventsDeviceSettings />
+            <EventTrigger />
+        </StyledRow>
     );
 };

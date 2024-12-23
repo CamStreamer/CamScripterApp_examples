@@ -1,8 +1,8 @@
 import { Controller, useFormContext } from 'react-hook-form';
-import { StyledSelect } from '../../components/FormInputs';
+import { StyledSelect, StyledForm } from '../../components/FormInputs';
 import { FormFloatInput } from '../../components/FormFloatInput';
 import { Title } from '../../components/Title';
-import { Stack, MenuItem, FormControlLabel, Switch } from '@mui/material';
+import { MenuItem, FormControlLabel, Switch } from '@mui/material';
 import { TAppSchema } from '../../models/schema';
 import { EVENT_DELAYS_LABELS, EVENT_DELAYS, WHEN_LABELS, WHEN } from '../constants';
 
@@ -10,7 +10,7 @@ export const EventTrigger = () => {
     const { control } = useFormContext<TAppSchema>();
 
     return (
-        <Stack spacing={1.5}>
+        <StyledForm>
             <Title text="Event Trigger" />
             {/* ------SWITCH------*/}
             <Controller
@@ -54,6 +54,6 @@ export const EventTrigger = () => {
             />
             {/* ------VALUE------*/}
             <FormFloatInput control={control} name={`event_camera.condition_value`} />
-        </Stack>
+        </StyledForm>
     );
 };

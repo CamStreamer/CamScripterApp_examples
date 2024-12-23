@@ -1,7 +1,6 @@
 import Fade from '@mui/material/Fade';
 import styled from '@mui/material/styles/styled';
 import { CollapsibleFormSection } from '../components/CollapsibleFormSection';
-
 import { LanConverterSettings } from './LanConverterSettings/LanConverterSettings';
 import { IntegrationSettings } from './IntegrationSettings/IntegrationSettings';
 import { StationSettings } from './StationSettings/StationSettings';
@@ -33,6 +32,6 @@ const StyledForm = styled('div')`
     display: flex;
     justify-content: center;
     flex-direction: column;
-    padding: 0 20px;
     margin-top: 20px;
+    gap: 8px;
 `;

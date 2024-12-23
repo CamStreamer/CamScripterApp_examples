@@ -1,8 +1,14 @@
 import { parseValueAsInt } from '../../utils';
 import { Controller, useFormContext } from 'react-hook-form';
-import { StyledTextField, StyledRadioControlLabel, StyledBox, StyledConnectionChip } from '../../components/FormInputs';
+import {
+    StyledTextField,
+    StyledRadioControlLabel,
+    StyledBox,
+    StyledConnectionChip,
+    StyledForm,
+} from '../../components/FormInputs';
 import { Title } from '../../components/Title';
-import { Button, Stack, Radio, RadioGroup, Typography } from '@mui/material';
+import { Button, Radio, RadioGroup, Typography } from '@mui/material';
 import { FormInputWithDialog } from '../../components/FormInputWithDialog';
 import { PasswordInput } from '../../components/PasswordInput';
 import { useCredentialsValidate } from '../../hooks/useCredentialsValidate';
@@ -24,7 +30,7 @@ export const IntegrationDeviceSettings = () => {
     });
 
     return (
-        <Stack spacing={1.5}>
+        <StyledForm>
             <Title text="Device Settings" />
             {/* ------PROTOCOL------*/}
             <Controller
@@ -109,6 +115,6 @@ export const IntegrationDeviceSettings = () => {
                     Check
                 </Button>
             </StyledBox>
-        </Stack>
+        </StyledForm>
     );
 };

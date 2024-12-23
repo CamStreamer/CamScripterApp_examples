@@ -1,15 +1,14 @@
 import { parseValueAsInt } from '../../utils';
 import { Controller, useFormContext } from 'react-hook-form';
-import { StyledTextField } from '../../components/FormInputs';
+import { StyledTextField, StyledForm } from '../../components/FormInputs';
 import { Title } from '../../components/Title';
-import { Stack } from '@mui/material';
 import { TAppSchema } from '../../models/schema';
 
 export const WidgetSettings = () => {
     const { control } = useFormContext<TAppSchema>();
 
     return (
-        <Stack spacing={1.5}>
+        <StyledForm>
             <Title text="Widget settings" />
             {/* ------SERVICE ID------*/}
             <Controller
@@ -59,6 +58,6 @@ export const WidgetSettings = () => {
                     />
                 )}
             />
-        </Stack>
+        </StyledForm>
     );
 };

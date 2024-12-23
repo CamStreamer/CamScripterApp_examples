@@ -1,21 +1,12 @@
-import { Grid } from '@mui/material';
-import styled from '@mui/material/styles/styled';
+import { StyledRow } from './../../components/FormInputs';
 import { IntegrationDeviceSettings } from './IntegrationDeviceSettings';
 import { WidgetSettings } from './WidgetSettings';
 
 export const IntegrationSettings = () => {
     return (
-        <StyledGrid container>
-            <Grid item md={6} xs={12}>
-                <IntegrationDeviceSettings />
-            </Grid>
-            <Grid item md={6} xs={12}>
-                <WidgetSettings />
-            </Grid>
-        </StyledGrid>
+        <StyledRow>
+            <IntegrationDeviceSettings />
+            <WidgetSettings />
+        </StyledRow>
     );
 };
-
-const StyledGrid = styled(Grid)`
-    margin-bottom: 15px;
-`;

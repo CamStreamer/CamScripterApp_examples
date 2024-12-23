@@ -1,8 +1,8 @@
 import { parseValueAsInt } from '../../utils';
 import { Controller, useFormContext } from 'react-hook-form';
-import { StyledTextField, StyledRadioControlLabel } from '../../components/FormInputs';
+import { StyledTextField, StyledRadioControlLabel, StyledForm } from '../../components/FormInputs';
 import { Title } from '../../components/Title';
-import { Stack, Radio, RadioGroup, FormHelperText } from '@mui/material';
+import { Radio, RadioGroup, FormHelperText } from '@mui/material';
 import { PasswordInput } from '../../components/PasswordInput';
 import { TAppSchema } from '../../models/schema';
 import { PROTOCOLS, PROTOCOL_LABELS } from '../constants';
@@ -11,7 +11,7 @@ export const CameraStationSettings = () => {
     const { control } = useFormContext<TAppSchema>();
 
     return (
-        <Stack spacing={1.5}>
+        <StyledForm>
             <Title text="Camera Station Settings" />
             {/* ------PROTOCOL------*/}
             <Controller
@@ -100,6 +100,6 @@ export const CameraStationSettings = () => {
                     />
                 )}
             />
-        </Stack>
+        </StyledForm>
     );
 };
