@@ -1,0 +1,1 @@
+/home/helena/temper1fSensor/CamScripterApp_examples/scaleReader/react/src/models/schema.ts
