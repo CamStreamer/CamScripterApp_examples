@@ -23,7 +23,6 @@ export const WidgetSettings = () => {
                         onChange={(e) => {
                             const val = parseValueAsInt(e.target.value);
                             field.onChange(val);
-                            e.target.value = val.toString();
                         }}
                         error={formState.errors.camera?.service_id !== undefined}
                         helperText={formState.errors.camera?.service_id?.message}

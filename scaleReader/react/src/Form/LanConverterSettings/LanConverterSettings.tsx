@@ -1,6 +1,7 @@
 import { InputAdornment } from '@mui/material';
 import { StyledTextField, StyledRow, StyledForm } from '../../components/FormInputs';
 import { Controller, useFormContext } from 'react-hook-form';
+import { parseValueAsInt } from '../../utils';
 import { TAppSchema } from '../../models/schema';
 
 export const LanConverterSettings = () => {
@@ -32,6 +33,10 @@ export const LanConverterSettings = () => {
                             {...field}
                             fullWidth
                             label="Port"
+                            onChange={(e) => {
+                                const val = parseValueAsInt(e.target.value);
+                                field.onChange(val);
+                            }}
                             error={formState.errors.scale?.port !== undefined}
                             helperText={formState.errors.scale?.port?.message}
                         />
@@ -48,6 +53,10 @@ export const LanConverterSettings = () => {
                             {...field}
                             fullWidth
                             label="Refresh Rate"
+                            onChange={(e) => {
+                                const val = parseValueAsInt(e.target.value);
+                                field.onChange(val);
+                            }}
                             error={formState.errors.scale?.refresh_rate !== undefined}
                             helperText={formState.errors.scale?.refresh_rate?.message}
                             InputProps={{
