@@ -9,9 +9,6 @@ let dataBuffer = '';
 
 let camOverlay = null;
 let csc = null;
-let milestoneClient = null;
-let milestoneConnected = false;
-let milestoneProtectionPeriod = false;
 
 // Read script configuration
 let settings = null;
@@ -24,51 +21,50 @@ try {
 }
 
 // CamOverlay integration
-const coEnabled = settings.camera_ip && settings.service_id;
+const coEnabled = settings.camera.ip && settings.camera.service_id;
 if (coEnabled) {
     camOverlay = new CamOverlayAPI({
-        tls: settings.camera_protocol !== 'http',
-        tlsInsecure: settings.camera_protocol === 'https_insecure',
-        ip: settings.camera_ip,
-        port: settings.camera_port,
-        auth: settings.camera_user + ':' + settings.camera_pass,
+        tls: settings.camera.protocol !== 'http',
+        tlsInsecure: settings.camera.protocol === 'https_insecure',
+        ip: settings.camera.ip,
+        port: settings.camera.port,
+        user: settings.camera.user,
+        pass: settings.camera.pass,
     });
 }
 
 // Camera Events integration
 const eventsConfigured =
-    settings.event_camera_ip.length !== 0 &&
-    settings.event_camera_user.length !== 0 &&
-    settings.event_camera_pass.length !== 0 &&
-    settings.event_condition_delay != null &&
-    settings.event_condition_operator != null &&
-    settings.event_condition_value != null;
+    settings.event_camera.ip.length !== 0 &&
+    settings.event_camera.user.length !== 0 &&
+    settings.event_camera.pass.length !== 0 &&
+    settings.event_camera.condition_delay != null &&
+    settings.event_camera.condition_operator != null &&
+    settings.event_camera.condition_value != null;
 
 if (eventsConfigured) {
     csc = new CamScripterAPICameraEventsGenerator({
-        tls: settings.event_camera_protocol !== 'http',
-        tlsInsecure: settings.event_camera_protocol === 'https_insecure',
-        ip: settings.event_camera_ip,
-        port: settings.event_camera_port,
-        auth: settings.event_camera_user + ':' + settings.event_camera_pass,
+        tls: settings.event_camera.protocol !== 'http',
+        tlsInsecure: settings.event_camera.protocol === 'https_insecure',
+        ip: settings.event_camera.ip,
+        port: settings.event_camera.port,
+        user: settings.event_camera.user,
+        pass: settings.event_camera.pass,
     });
 }
 
 // Axis Camera Station integration
-const acsEnabled = settings.acs_ip.length;
-
-// Milestone integration
-const milestoneEnabled = settings.milestone_ip.length;
+const acsEnabled = settings.acs.ip.length;
 
 // Connect to electronic scale
 let scaleClient = new net.Socket();
-scaleClient.connect(settings.scale_port, settings.scale_ip);
+scaleClient.connect(settings.scale.port, settings.scale.ip);
 
 scaleClient.on('connect', (data) => {
     console.log('Scale connected');
     setInterval(() => {
         scaleClient.write(Buffer.from('1B700D0A', 'hex'));
-    }, settings.refresh_rate);
+    }, settings.scale.refresh_rate);
 });
 
 scaleClient.on('data', async (data) => {
@@ -90,13 +86,13 @@ scaleClient.on('data', async (data) => {
         // Show image in CamOverlay service
         if (coEnabled) {
             try {
-                await camOverlay.updateCGText(settings.service_id, [
+                await camOverlay.updateCGText(settings.camera.service_id, [
                     {
-                        field_name: settings.value_field_name,
+                        field_name: settings.camera.value_field_name,
                         text: weight,
                     },
                     {
-                        field_name: settings.unit_field_name,
+                        field_name: settings.camera.unit_field_name,
                         text: unit,
                     },
                 ]);
@@ -124,7 +120,7 @@ scaleClient.on('data', async (data) => {
             const event = {
                 addExternalDataRequest: {
                     occurenceTime: dateString,
-                    source: settings.acs_source_key,
+                    source: settings.acs.source_key,
                     externalDataType: 'LantronixScale',
                     data: {
                         timestamp: (Date.now() / 1000).toString(),
@@ -136,10 +132,10 @@ scaleClient.on('data', async (data) => {
             const eventData = JSON.stringify(event);
             const req = https.request({
                 method: 'POST',
-                host: settings.acs_ip,
-                port: settings.acs_port,
+                host: settings.acs.ip,
+                port: settings.acs.port,
                 path: '/Acs/Api/ExternalDataFacade/AddExternalData',
-                auth: settings.acs_user + ':' + settings.acs_pass,
+                auth: settings.acs.user + ':' + settings.acs.pass,
                 headers: {
                     'Content-Type': 'application/json',
                     'Content-Length': eventData.length,
@@ -151,21 +147,6 @@ scaleClient.on('data', async (data) => {
             });
             req.write(eventData);
             req.end();
-        }
-
-        // Send to Milestone.
-        if (milestoneEnabled) {
-            connectMilestone();
-
-            // Unit is not empty when the weight is stable.
-            if (milestoneConnected && !milestoneProtectionPeriod && weight != 0 && unit.length) {
-                const sep = Buffer.from(settings.milestone_separator);
-                milestoneClient.write(Buffer.from(settings.milestone_string, 'ascii') + sep);
-                milestoneProtectionPeriod = true;
-                setTimeout(() => {
-                    milestoneProtectionPeriod = false;
-                }, settings.milestone_minimum_span * 1000);
-            }
         }
     }
 });
@@ -291,8 +272,8 @@ async function checkCondtionAndSendCameraEvent(weight) {
     try {
         const conditionActive = isConditionActive(
             Number.parseInt(weight),
-            Number.parseInt(settings.event_condition_operator),
-            Number.parseInt(settings.event_condition_value)
+            Number.parseInt(settings.event_camera._condition_operator),
+            Number.parseInt(settings.event_camera.condition_value)
         );
 
         if (!(await connectCameraEvents())) {
@@ -305,30 +286,13 @@ async function checkCondtionAndSendCameraEvent(weight) {
         }
 
         if (conditionActive != sentActiveState && (!cscEventConditionTimer || !conditionActive)) {
-            const timerTime = conditionActive ? settings.event_condition_delay * 1000 : 0;
+            const timerTime = conditionActive ? settings.event_camera.condition_delay * 1000 : 0;
             clearTimeout(cscEventConditionTimer);
             cscEventConditionTimer = setTimeout(() => sendCameraEventTimerCallback(conditionActive), timerTime);
         }
     } catch (err) {
         console.error('Camera events error:', err);
     }
-}
-
-function connectMilestone() {
-    if (milestoneClient !== null) {
-        return;
-    }
-
-    milestoneClient = new net.Socket();
-    milestoneClient.connect(settings.milestone_port, settings.milestone_ip);
-    milestoneClient.on('connect', () => {
-        milestoneConnected = true;
-    });
-    milestoneClient.on('error', (err) => {
-        console.log('Milestone connection error:', err);
-        milestoneClient = null;
-        milestoneConnected = false;
-    });
 }
 
 function pad(num, size) {

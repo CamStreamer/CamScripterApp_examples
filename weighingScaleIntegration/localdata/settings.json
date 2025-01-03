@@ -1,36 +1,41 @@
 {
-    "scale_ip": "",
-    "scale_port": 10001,
-    "refresh_rate": 500,
-
-    "camera_protocol": "http",
-    "camera_ip": "127.0.0.1",
-    "camera_port": 80,
-    "camera_user": "root",
-    "camera_pass": "",
-    "service_id": 1,
-    "value_field_name": "field1",
-    "unit_field_name": "field2",
-
-    "event_camera_protocol": "http",
-    "event_camera_ip": "127.0.0.1",
-    "event_camera_port": 80,
-    "event_camera_user": "root",
-    "event_camera_pass": "",
-    "event_condition_delay": "",
-    "event_condition_operator": "",
-    "event_condition_value": "",
-
-    "acs_protocol": "https_insecure",
-    "acs_ip": "",
-    "acs_port": 55756,
-    "acs_user": "",
-    "acs_pass": "",
-    "acs_source_key": "",
-
-    "milestone_ip": "",
-    "milestone_port": 1234,
-    "milestone_string": "",
-    "milestone_minimum_span": 5,
-    "milestone_separator": [13,10]
+    "acs": {
+        "protocol": "https_insecure",
+        "ip": "",
+        "port": 29204,
+        "user": "",
+        "pass": "",
+        "source_key": "",
+        "active": false,
+        "condition_delay": 0,
+        "condition_operator": 1,
+        "condition_value": 10,
+        "repeat_after": 30
+    },
+    "camera": {
+        "protocol": "http",
+        "ip": "",
+        "port": 80,
+        "user": "root",
+        "pass": "",
+        "service_id": 1,
+        "value_field_name": "field1",
+        "unit_field_name": "field2"
+    },
+    "event_camera": {
+        "protocol": "http",
+        "ip": "",
+        "port": 80,
+        "user": "root",
+        "pass": "",
+        "active": false,
+        "condition_delay": 0,
+        "condition_operator": 1,
+        "condition_value": "10"
+    },
+    "scale": {
+        "ip": "",
+        "port": 80,
+        "refresh_rate": 500
+    }
 }
