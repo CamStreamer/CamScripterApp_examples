@@ -23,7 +23,7 @@ export class AxisEvents {
         }
 
         return this.csc.sendEvent({
-            declaration_id: 'LantronixScaleReader',
+            declaration_id: 'WeighingScaleIntegration',
             event_data: [
                 {
                     namespace: '',
@@ -61,7 +61,7 @@ export class AxisEvents {
 
     private async declareCameraEvent() {
         await this.csc.declareEvent({
-            declaration_id: 'LantronixScaleReader',
+            declaration_id: 'WeighingScaleIntegration',
             stateless: false,
             declaration: [
                 {
@@ -79,9 +79,9 @@ export class AxisEvents {
                 {
                     namespace: 'tnsaxis',
                     key: 'topic2',
-                    value: 'LantronixScaleReader',
+                    value: 'WeighingScaleIntegration',
                     value_type: 'STRING',
-                    value_nice_name: 'CamScripter: CameraApplicationPlatform',
+                    value_nice_name: 'CamScripter: WeighingScaleIntegration',
                 },
                 {
                     type: 'DATA',

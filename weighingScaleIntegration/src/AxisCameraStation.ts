@@ -21,7 +21,7 @@ export class AxisCameraStation {
                 addExternalDataRequest: {
                     occurrenceTime: dateString,
                     source: this.acsSettings.source_key,
-                    externalDataType: 'LantronixScale',
+                    externalDataType: 'WeighingScaleIntegration',
                     data: {
                         timestamp: (Date.now() / 1000).toString(),
                         weight: weight,
