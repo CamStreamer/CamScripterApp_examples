@@ -207,11 +207,13 @@ function main() {
 
                 // Send Camera Event
                 if (axisEvents !== undefined && unit.length) {
+                    axisEventsSentActiveState = false;
                     checkCondtionAndSendCameraEvent(weight, unit);
                 }
 
                 // Send to Axis Camera Station. Unit is not empty when the weight is stable.
                 if (acs !== undefined && weight !== '0' && unit.length) {
+                    acsEventSentActiveState = false;
                     checkCondtionAndSendAcsEvent(weight, unit);
                 }
             }
