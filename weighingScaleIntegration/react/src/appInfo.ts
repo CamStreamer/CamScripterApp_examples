@@ -2,7 +2,7 @@ export const appInfo = {
     // Adjust application accodingly
     packageName: 'scaleReader',
     headline: 'Weighing Scale Integration',
-    title: 'Scale Reader',
+    title: 'Weighing Scale Integration',
     description:
         'Integration of the G&G E6000YA electronic scale together with the Lantronix UDS2100 RS232/485/422 converter.',
     getGetUrl() {
