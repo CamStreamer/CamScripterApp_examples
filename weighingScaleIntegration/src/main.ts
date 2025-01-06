@@ -155,6 +155,7 @@ function main() {
                 user: settings.camera.user,
                 pass: settings.camera.pass,
             });
+            console.log('CoAPI connected');
         } else {
             console.log('CamOverlay is not configured and thus is disabled.');
         }
@@ -171,7 +172,7 @@ function main() {
         });
 
         scaleClient.on('data', async (data) => {
-            dataBuffer += data.toString('hex');
+            dataBuffer += Buffer.from(data.toString());
             const messageEnd = dataBuffer.indexOf('\r\n');
             if (messageEnd === -1) {
                 return;
