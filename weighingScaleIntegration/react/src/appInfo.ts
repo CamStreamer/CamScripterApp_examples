@@ -1,6 +1,6 @@
 export const appInfo = {
     // Adjust application accodingly
-    packageName: 'scaleReader',
+    packageName: 'weighing_scale',
     headline: 'Weighing Scale Integration',
     title: 'Weighing Scale Integration',
     description:
