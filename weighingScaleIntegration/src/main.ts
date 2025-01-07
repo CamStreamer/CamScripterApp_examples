@@ -50,19 +50,14 @@ function checkCondtionAndSendAcsEvent(weight: string, unit: string) {
             Number.parseInt(settings.event_camera.condition_value)
         );
 
-        if (
-            conditionActive &&
-            conditionActive !== acsEventSentActiveState &&
-            (!acsEventConditionTimer || !conditionActive)
-        ) {
+        if (conditionActive !== acsEventSentActiveState) {
             const timerTime = conditionActive ? settings.event_camera.condition_delay * 1000 : 0;
             if (acsEventConditionTimer !== null) {
                 clearTimeout(acsEventConditionTimer);
             }
-            acsEventConditionTimer = setTimeout(
-                () => sendAcsEventTimerCallback(conditionActive, weight, unit),
-                timerTime
-            );
+            acsEventConditionTimer = setTimeout(() => {
+                sendAcsEventTimerCallback(conditionActive, weight, unit), (acsEventSentActiveState = conditionActive);
+            }, timerTime);
         }
     } catch (err) {
         console.error('ACS event:', err instanceof Error ? err.message : 'unknown');
@@ -90,19 +85,15 @@ function checkCondtionAndSendCameraEvent(weight: string, unit: string) {
             Number.parseInt(settings.event_camera.condition_value)
         );
 
-        if (
-            conditionActive &&
-            conditionActive !== axisEventsSentActiveState &&
-            (!axisEventsConditionTimer || !conditionActive)
-        ) {
+        if (conditionActive !== axisEventsSentActiveState) {
             const timerTime = conditionActive ? settings.event_camera.condition_delay * 1000 : 0;
             if (axisEventsConditionTimer !== null) {
                 clearTimeout(axisEventsConditionTimer);
             }
-            axisEventsConditionTimer = setTimeout(
-                () => sendCameraEventTimerCallback(conditionActive, weight, unit),
-                timerTime
-            );
+            axisEventsConditionTimer = setTimeout(async () => {
+                await sendCameraEventTimerCallback(conditionActive, weight, unit);
+                axisEventsSentActiveState = conditionActive;
+            }, timerTime);
         }
     } catch (err) {
         console.error('Axis event:', err instanceof Error ? err.message : 'unknown');
@@ -207,13 +198,11 @@ function main() {
 
                 // Send Camera Event
                 if (axisEvents !== undefined && unit.length) {
-                    axisEventsSentActiveState = false;
                     checkCondtionAndSendCameraEvent(weight, unit);
                 }
 
                 // Send to Axis Camera Station. Unit is not empty when the weight is stable.
                 if (acs !== undefined && weight !== '0' && unit.length) {
-                    acsEventSentActiveState = false;
                     checkCondtionAndSendAcsEvent(weight, unit);
                 }
             }
