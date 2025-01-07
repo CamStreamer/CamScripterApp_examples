@@ -55,8 +55,9 @@ function checkCondtionAndSendAcsEvent(weight: string, unit: string) {
             if (acsEventConditionTimer !== null) {
                 clearTimeout(acsEventConditionTimer);
             }
-            acsEventConditionTimer = setTimeout(() => {
-                sendAcsEventTimerCallback(conditionActive, weight, unit), (acsEventSentActiveState = conditionActive);
+            acsEventConditionTimer = setTimeout(async () => {
+                await sendAcsEventTimerCallback(conditionActive, weight, unit);
+                acsEventSentActiveState = conditionActive;
             }, timerTime);
         }
     } catch (err) {
