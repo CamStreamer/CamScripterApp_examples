@@ -32,7 +32,9 @@ function readSettings() {
 // Axis Camera Station event - check condition and send event
 async function sendAcsEventTimerCallback(conditionActive: boolean, weight: string, unit: string) {
     try {
-        console.log(`Send ACS event, weight: ${weight} ${unit}`);
+        if (conditionActive) {
+            console.log(`Send ACS event, weight: ${weight} ${unit}`);
+        }
         await acs?.sendEvent(weight, unit);
         acsEventSentActiveState = conditionActive;
         acsEventConditionTimer = null;
@@ -68,7 +70,9 @@ function checkCondtionAndSendAcsEvent(weight: string, unit: string) {
 // Axis Events - check condition and send event
 async function sendCameraEventTimerCallback(conditionActive: boolean, weight: string, unit: string) {
     try {
-        console.log(`Send Axis event, weight: ${weight} ${unit}`);
+        if (conditionActive) {
+            console.log(`Send Axis event, weight: ${weight} ${unit}`);
+        }
         await axisEvents?.sendEvent(conditionActive);
         axisEventsSentActiveState = conditionActive;
         axisEventsConditionTimer = null;
