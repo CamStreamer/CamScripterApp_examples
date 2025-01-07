@@ -4,7 +4,7 @@ export const appInfo = {
     headline: 'Weighing Scale Integration',
     title: 'Weighing Scale Integration',
     description:
-        'Integration of the G&G E6000YA electronic scale together with the Lantronix UDS2100 RS232/485/422 converter.',
+        'Integration of the G&G E6000YA electronic scale together with the Lantronix UDS2100 RS232/485/422 or USR-TCP232-302 converter.',
     getGetUrl() {
         return `/local/camscripter/package/settings.cgi?package_name=${this.packageName}&action=get`;
     },

@@ -35,7 +35,7 @@
     },
     "scale": {
         "ip": "",
-        "port": 80,
+        "port": 10001,
         "refresh_rate": 500
     }
 }
