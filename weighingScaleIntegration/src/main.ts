@@ -12,10 +12,9 @@ let dataBuffer = '';
 
 let co: CamOverlayAPI | undefined;
 let acs: AxisCameraStation | undefined;
-let axisEvents: AxisEvents | undefined;
 let acsEventConditionTimer: NodeJS.Timeout | null = null;
+let axisEvents: AxisEvents | undefined;
 let axisEventsConditionTimer: NodeJS.Timeout | null = null;
-let acsEventSentActiveState = false;
 let axisEventsSentActiveState = false;
 
 // Read script configuration
@@ -30,17 +29,14 @@ function readSettings() {
 }
 
 // Axis Camera Station event - check condition and send event
-async function sendAcsEventTimerCallback(conditionActive: boolean, weight: string, unit: string) {
+async function sendAcsEventTimerCallback(weight: string, unit: string) {
     try {
-        if (conditionActive) {
-            console.log(`Send ACS event, weight: ${weight} ${unit}`);
-        }
+        console.log(`Send ACS event, weight: ${weight} ${unit}`);
         await acs?.sendEvent(weight, unit);
-        acsEventSentActiveState = conditionActive;
         acsEventConditionTimer = null;
     } catch (err) {
         console.error('Camera events error:', err);
-        acsEventConditionTimer = setTimeout(() => sendAcsEventTimerCallback(conditionActive, weight, unit), 5000);
+        acsEventConditionTimer = setTimeout(() => sendAcsEventTimerCallback(weight, unit), 5000);
     }
 }
 
@@ -48,18 +44,17 @@ function checkCondtionAndSendAcsEvent(weight: string, unit: string) {
     try {
         const conditionActive = isConditionActive(
             Number.parseInt(weight),
-            settings.event_camera.condition_operator,
-            Number.parseInt(settings.event_camera.condition_value)
+            settings.acs.condition_operator,
+            Number.parseInt(settings.acs.condition_value)
         );
 
-        if (conditionActive !== acsEventSentActiveState) {
-            const timerTime = conditionActive ? settings.event_camera.condition_delay * 1000 : 0;
+        if (conditionActive) {
+            const timerTime = conditionActive ? settings.acs.condition_delay * 1000 : 0;
             if (acsEventConditionTimer !== null) {
                 clearTimeout(acsEventConditionTimer);
             }
             acsEventConditionTimer = setTimeout(async () => {
-                await sendAcsEventTimerCallback(conditionActive, weight, unit);
-                acsEventSentActiveState = conditionActive;
+                await sendAcsEventTimerCallback(weight, unit);
             }, timerTime);
         }
     } catch (err) {
