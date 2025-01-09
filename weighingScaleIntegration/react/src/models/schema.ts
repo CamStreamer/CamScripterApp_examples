@@ -18,7 +18,7 @@ export const applicationSchema = z.object({
             condition_delay: z.number().int(),
             condition_operator: z.number().int().min(0).max(4),
             condition_value: z.coerce.string(),
-            repeat_after: z.number().positive(),
+            repeat_after: z.number().min(0),
         })
     ),
     camera: connectionParamsSchema.merge(
