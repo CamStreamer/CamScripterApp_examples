@@ -13,6 +13,7 @@ let dataBuffer = '';
 let co: CamOverlayAPI | undefined;
 let acs: AxisCameraStation | undefined;
 let acsEventConditionTimer: NodeJS.Timeout | null = null;
+let acsEventSendTimeStamp: number | null = null;
 let axisEvents: AxisEvents | undefined;
 let axisEventsConditionTimer: NodeJS.Timeout | null = null;
 let axisEventsSentActiveState = false;
@@ -28,14 +29,13 @@ function readSettings() {
     }
 }
 
-// Axis Camera Station event - check condition and send event
 async function sendAcsEventTimerCallback(weight: string, unit: string) {
     try {
         console.log(`Send ACS event, weight: ${weight} ${unit}`);
         await acs?.sendEvent(weight, unit);
-        acsEventConditionTimer = null;
+        acsEventSendTimeStamp = Date.now();
     } catch (err) {
-        console.error('Camera events error:', err);
+        console.error('ACS error:', err);
         acsEventConditionTimer = setTimeout(() => sendAcsEventTimerCallback(weight, unit), 5000);
     }
 }
@@ -49,13 +49,23 @@ function checkCondtionAndSendAcsEvent(weight: string, unit: string) {
         );
 
         if (conditionActive) {
-            const timerTime = conditionActive ? settings.acs.condition_delay * 1000 : 0;
-            if (acsEventConditionTimer !== null) {
-                clearTimeout(acsEventConditionTimer);
+            if (acsEventConditionTimer) {
+                if (
+                    acsEventSendTimeStamp &&
+                    settings.acs.repeat_after !== 0 &&
+                    Date.now() - acsEventSendTimeStamp >= settings.acs.repeat_after * 1000
+                ) {
+                    clearTimeout(acsEventConditionTimer);
+                    sendAcsEventTimerCallback(weight, unit);
+                }
+            } else {
+                const timerTime = settings.acs.condition_delay * 1000;
+                acsEventConditionTimer = setTimeout(() => sendAcsEventTimerCallback(weight, unit), timerTime);
             }
-            acsEventConditionTimer = setTimeout(async () => {
-                await sendAcsEventTimerCallback(weight, unit);
-            }, timerTime);
+        } else if (acsEventConditionTimer) {
+            acsEventSendTimeStamp = null;
+            clearTimeout(acsEventConditionTimer);
+            acsEventConditionTimer = null;
         }
     } catch (err) {
         console.error('ACS event:', err instanceof Error ? err.message : 'unknown');
@@ -203,8 +213,17 @@ function main() {
 
                 // Send to Axis Camera Station. Unit is not empty when the weight is stable.
                 if (acs !== undefined && weight !== '0' && unit.length) {
+                    if (acsEventConditionTimer) {
+                        clearTimeout(acsEventConditionTimer);
+                        acsEventConditionTimer = null;
+                    }
                     checkCondtionAndSendAcsEvent(weight, unit);
                 }
+            } else if (prevWeightData === weightData && acs !== undefined && settings.acs.repeat_after !== 0) {
+                const weight = weightData.substring(0, 9).trim();
+                const unit = weightData.substring(9).trim();
+
+                checkCondtionAndSendAcsEvent(weight, unit);
             }
         });
 
