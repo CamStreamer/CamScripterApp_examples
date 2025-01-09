@@ -51,12 +51,12 @@ function checkCondtionAndSendAcsEvent(weight: string, unit: string) {
         if (conditionActive) {
             if (acsEventConditionTimer) {
                 if (
-                    acsEventSendTimeStamp &&
+                    acsEventSendTimeStamp !== null &&
                     settings.acs.repeat_after !== 0 &&
                     Date.now() - acsEventSendTimeStamp >= settings.acs.repeat_after * 1000
                 ) {
                     clearTimeout(acsEventConditionTimer);
-                    sendAcsEventTimerCallback(weight, unit);
+                    void sendAcsEventTimerCallback(weight, unit);
                 }
             } else {
                 const timerTime = settings.acs.condition_delay * 1000;
