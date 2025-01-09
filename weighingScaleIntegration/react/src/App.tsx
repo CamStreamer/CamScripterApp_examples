@@ -1,6 +1,6 @@
 import { appInfo } from './appInfo';
 import { useState } from 'react';
-import { Box, Typography, Divider } from '@mui/material';
+import { Box, Typography, Divider, Link } from '@mui/material';
 import Container from '@mui/material/Container';
 import styled from '@mui/material/styles/styled';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -59,7 +59,19 @@ export const App = () => {
                 <StyledContentWrapper>
                     <StyledHeader>
                         <Headline text={appInfo.headline} />
-                        <Typography>{appInfo.description}</Typography>
+                        <Typography>
+                            Integration of the G&G E6000YA electronic scale together with the Lantronix UDS2100
+                            RS232/485/422 or USR-TCP232-302 converter. The USR-TCP232-302 converter should be configured
+                            as a TCP server with a baud rate of 9600 and the local port set to 10001 using{' '}
+                            <Link
+                                href="https://drive.google.com/file/d/10qNg4X8wJw_nVKvuYLcnGuRdiBB-M143/view"
+                                target="_blank"
+                                rel="noreferrer"
+                            >
+                                this
+                            </Link>{' '}
+                            app (click the Search Device button, select the found device, and edit its details).
+                        </Typography>
                     </StyledHeader>
                     <Divider />
                     {defaultValues ? (
