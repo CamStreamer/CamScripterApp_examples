@@ -12,7 +12,7 @@ import { useInitializeOnMount } from './hooks/useInitializeOnMount';
 import { ZodError } from 'zod';
 import { useSnackbar } from './hooks/useSnackbar';
 import { Headline } from './components/Title';
-import { FormWrapper } from './FormWrapper';
+import { FormWrapper } from './Form/FormWrapper';
 import { mockedSettings } from './models/mock';
 
 document.title = appInfo.title;
