@@ -14,11 +14,11 @@ export const FormAxisCameraStation = () => {
             <FormHelperText>
                 To run external data on the Axis Camera Station (ACS), you need to edit the registry on the computer
                 where ACS is installed using{' '}
-                <Link href="https://drive.google.com/file/d/176uMtC1goF4kBEFtx0IBMrZ5coo_zPeN/view" target="_blank">
+                <Link href="https://camstreamer.com/acssettings" target="_blank">
                     this
                 </Link>{' '}
                 guide (or use the provided{' '}
-                <Link href="https://drive.google.com/file/d/10Novidd_ZpbYUFQUtcV1RLXKUxyPFg-n/view" target="_blank">
+                <Link href="https://camstreamer.com/acsregistery" target="_blank">
                     file
                 </Link>
                 ). Then, create a new source in Devices &#62; External data sources. Use the generated Source key in the
