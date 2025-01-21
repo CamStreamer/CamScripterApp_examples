@@ -7,7 +7,7 @@ export const mockedSettings: TAppSchema = {
     camera_user: 'root',
     camera_pass: '',
     unit: 'f',
-    service_id: 1,
+    service_id: 2,
     field_name: 'field1',
     acs_protocol: 'https_insecure',
     acs_ip: '',
