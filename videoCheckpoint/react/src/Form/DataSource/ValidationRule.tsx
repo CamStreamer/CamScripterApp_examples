@@ -25,10 +25,7 @@ export const ValidationRule = () => {
                     />
                     <FormHelperText>
                         Use regular expressions - documentation{' '}
-                        <Link
-                            href="https://drive.google.com/file/d/1S3Uy5bvE46NAAGVfsCvA45m14S6DpCMR/view"
-                            target="_blank"
-                        >
+                        <Link href="https://camstreamer.com/regex" target="_blank">
                             here
                         </Link>
                         . Matching data will be processed.
