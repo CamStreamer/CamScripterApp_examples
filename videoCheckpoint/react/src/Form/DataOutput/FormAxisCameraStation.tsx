@@ -4,13 +4,27 @@ import { parseValueAsInt } from '../../utils';
 import { PROTOCOLS, PROTOCOL_LABELS } from '../constants/constants';
 import { StyledTextField, StyledRadioControlLabel, StyledForm, StyledRow } from '../../components/FormInputs';
 import { PasswordInput } from '../../components/PasswordInput';
-import { FormHelperText, Radio, RadioGroup } from '@mui/material';
+import { FormHelperText, Radio, RadioGroup, Link } from '@mui/material';
 
 export const FormAxisCameraStation = () => {
     const { control } = useFormContext<TServerData>();
 
     return (
         <>
+            <FormHelperText>
+                To run external data on the Axis Camera Station (ACS), you need to edit the registry on the computer
+                where ACS is installed using{' '}
+                <Link href="https://drive.google.com/file/d/176uMtC1goF4kBEFtx0IBMrZ5coo_zPeN/view" target="_blank">
+                    this
+                </Link>{' '}
+                guide (or use the provided{' '}
+                <Link href="https://drive.google.com/file/d/10Novidd_ZpbYUFQUtcV1RLXKUxyPFg-n/view" target="_blank">
+                    file
+                </Link>
+                ). Then, create a new source in Devices &#62; External data sources. Use the generated Source key in the
+                settings below. To search for external data in ACS, click the + button, select &#39;Data search&#39;,
+                and set the first filter to the value &#39;Live&#39;.
+            </FormHelperText>
             {/* ------PROTOCOL------*/}
             <Controller
                 name={`acs.protocol`}
