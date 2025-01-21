@@ -37,7 +37,16 @@ export class TempSensorReader {
             const sensorData = await this.readDeviceData(usbDevice);
             return sensorData;
         }
-        throw new Error(`Could not read sensor data, usb devices found: ${this.usbDevices.length}`);
+
+        const usbDeviceList = this.usbDevices.map((device) => {
+            return {
+                vendorId: device.vendorId,
+                productId: device.productId,
+                manufacturer: device.manufacturer,
+            };
+        });
+        const usbDevicesStr = usbDeviceList.length > 0 ? usbDeviceList.toString() : 'none';
+        throw new Error(`Could not read sensor data, usb devices found: ${usbDevicesStr}`);
     }
 
     private async getUsbDevices() {
@@ -66,6 +75,7 @@ export class TempSensorReader {
                 continue;
             }
 
+            console.log('Found USB device:', { vendorId, productId, manufacturer });
             usbDevices.push({ vendorId, productId, manufacturer, product, busnum, devnum, devices });
         }
         return usbDevices;
