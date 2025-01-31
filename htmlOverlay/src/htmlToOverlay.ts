@@ -1,62 +1,26 @@
+import * as fs from 'fs';
 import puppeteer, { Browser, Page } from 'puppeteer-core';
 import { CamOverlayDrawingAPI } from 'camstreamerlib/CamOverlayDrawingAPI';
-
-export type CoordSystem = 'top_left' | 'top_right' | 'bottom_left' | 'bottom_right';
-
-export type ImageSettings = {
-    url: string;
-    renderWidth: number;
-    renderHeight: number;
-    refreshRate: number;
-};
-
-export type CameraSettings = {
-    protocol: string;
-    ip: string;
-    port: number;
-    user: string;
-    pass: string;
-};
-
-export type CamOverlaySettings = {
-    cameraList: number[];
-    coordSystem: CoordSystem;
-    posX: number;
-    posY: number;
-    streamWidth: number;
-    streamHeight: number;
-};
-
-export type HtmlToOverlayOptions = {
-    enabled: boolean;
-    configName: string;
-    imageSettings: ImageSettings;
-    cameraSettings: CameraSettings;
-    coSettings: CamOverlaySettings;
-};
+import { TSettings } from './settingsSchema';
 
 export class HtmlToOverlay {
     private stopped = false;
-    private browser: Browser;
-    private page: Page;
-    private startTimer: NodeJS.Timeout;
-    private screenshotTimer: NodeJS.Timeout;
-    private removeImageTimer: NodeJS.Timeout;
-    private co: CamOverlayDrawingAPI;
+    private browser?: Browser;
+    private page?: Page;
+    private startTimer?: NodeJS.Timeout;
+    private screenshotTimer?: NodeJS.Timeout;
+    private co?: CamOverlayDrawingAPI;
     private coConnected = false;
-    private coDowntimeTimer: NodeJS.Timeout;
-    private takeScreenshotPromise;
+    private takeScreenshotPromise?: Promise<void>;
 
-    constructor(private options: HtmlToOverlayOptions) {}
+    constructor(private options: TSettings[0]) {}
 
     async start() {
         this.stopped = false;
         if (this.options.enabled) {
             console.log('Start overlay: ' + this.options.configName);
+            this.startCamOverlayConnection();
             await this.startBrowser();
-        } else {
-            this.removeImage();
-            this.removeImageTimer = setInterval(() => this.removeImage(), 300_000);
         }
     }
 
@@ -71,14 +35,9 @@ export class HtmlToOverlay {
 
             clearTimeout(this.startTimer);
             clearTimeout(this.screenshotTimer);
-            clearTimeout(this.removeImageTimer);
 
-            if (this.browser) {
-                await this.browser.close();
-            }
-            if (this.coConnected) {
-                await this.removeImage();
-            }
+            await this.browser?.close();
+            await this.removeImage();
         } catch (err) {
             console.log('Stop overlay: ' + this.options.configName, err);
         }
@@ -86,15 +45,17 @@ export class HtmlToOverlay {
 
     private async startBrowser() {
         try {
-            if (this.browser) {
-                this.browser.removeAllListeners();
-                await this.browser.close();
-            }
+            this.browser?.removeAllListeners();
+            await this.browser?.close();
+
+            const executablePath = fs.existsSync('/usr/bin/chromium')
+                ? '/usr/bin/chromium' // Deb version on the newest Ubuntu (remove when the snap is supported)
+                : '/usr/bin/chromium-browser';
 
             this.browser = await puppeteer.launch({
-                executablePath: '/usr/bin/chromium-browser',
+                executablePath,
                 args: ['--no-sandbox', '--disable-setuid-sandbox'],
-                ignoreHTTPSErrors: true,
+                acceptInsecureCerts: true,
                 handleSIGINT: false,
                 handleSIGTERM: false,
             });
@@ -126,41 +87,45 @@ export class HtmlToOverlay {
     }
 
     private restartBrowser() {
-        if (!this.stopped) {
-            clearTimeout(this.startTimer);
-            this.startTimer = setTimeout(() => this.startBrowser(), 5000);
-        }
+        clearTimeout(this.startTimer);
+        this.startTimer = setTimeout(async () => {
+            if (!this.stopped) {
+                await this.startBrowser();
+            }
+        }, 5000);
     }
 
     private async takeScreenshot() {
-        let sleepTime = this.options.imageSettings.refreshRate;
+        let sleepTime = 5000;
         try {
-            if (await this.startCamOverlayConnection()) {
-                const startTime = Date.now();
-
-                const imageData = await this.page.screenshot({ type: 'png', omitBackground: true });
-                const surface = (await this.co.uploadImageData(imageData)).var;
-                const pos = this.computePosition(
-                    this.options.coSettings.coordSystem,
-                    this.options.coSettings.posX,
-                    this.options.coSettings.posY,
-                    this.options.imageSettings.renderWidth,
-                    this.options.imageSettings.renderHeight,
-                    this.options.coSettings.streamWidth,
-                    this.options.coSettings.streamHeight
-                );
-                await this.co.showCairoImageAbsolute(
-                    surface,
-                    pos.x,
-                    pos.y,
-                    this.options.coSettings.streamWidth,
-                    this.options.coSettings.streamHeight
-                );
-                await this.co.cairo('cairo_surface_destroy', surface);
-
-                const endTime = Date.now();
-                sleepTime = Math.max(5, sleepTime - endTime + startTime);
+            if (!this.co || !this.coConnected || !this.page) {
+                return;
             }
+
+            const startTime = Date.now();
+
+            const imageData = await this.page.screenshot({ type: 'png', omitBackground: true });
+            const surface = (await this.co.uploadImageData(Buffer.from(imageData))).var;
+            const pos = this.computePosition(
+                this.options.coSettings.coordSystem,
+                this.options.coSettings.posX,
+                this.options.coSettings.posY,
+                this.options.imageSettings.renderWidth,
+                this.options.imageSettings.renderHeight,
+                this.options.coSettings.streamWidth,
+                this.options.coSettings.streamHeight
+            );
+            await this.co.showCairoImageAbsolute(
+                surface,
+                pos.x,
+                pos.y,
+                this.options.coSettings.streamWidth,
+                this.options.coSettings.streamHeight
+            );
+            await this.co.cairo('cairo_surface_destroy', surface);
+
+            const endTime = Date.now();
+            sleepTime = Math.max(5, this.options.imageSettings.refreshRate - endTime + startTime);
         } catch (err) {
             console.error(this.options.configName, err);
         } finally {
@@ -172,7 +137,7 @@ export class HtmlToOverlay {
 
     private async removeImage() {
         try {
-            if (await this.startCamOverlayConnection()) {
+            if (this.co && this.coConnected) {
                 await this.co.removeImage();
             }
         } catch (err) {
@@ -180,40 +145,39 @@ export class HtmlToOverlay {
         }
     }
 
-    private async startCamOverlayConnection() {
-        if (!this.coConnected && !this.coDowntimeTimer) {
-            this.co = new CamOverlayDrawingAPI({
-                tls: this.options.cameraSettings.protocol !== 'http',
-                tlsInsecure: this.options.cameraSettings.protocol === 'https_insecure',
-                ip: this.options.cameraSettings.ip,
-                port: this.options.cameraSettings.port,
-                auth: this.options.cameraSettings.user + ':' + this.options.cameraSettings.pass,
-                camera: this.options.coSettings.cameraList,
-            });
-
-            this.co.on('open', () => {
-                console.log(`COAPI: ${this.options.configName}: connected`);
-                this.coConnected = true;
-            });
-
-            this.co.on('error', (err) => {
-                console.log(`COAPI-Error: ${this.options.configName}:`, err.message);
-                this.coDowntimeTimer = setTimeout(() => {
-                    this.coDowntimeTimer = undefined;
-                }, 5000);
-            });
-
-            this.co.on('close', () => {
-                console.log(`COAPI-Error: ${this.options.configName}: connection closed`);
-                this.coConnected = false;
-            });
-            await this.co.connect();
+    private startCamOverlayConnection() {
+        if (this.co) {
+            return;
         }
-        return this.coConnected;
+
+        this.co = new CamOverlayDrawingAPI({
+            tls: this.options.cameraSettings.protocol !== 'http',
+            tlsInsecure: this.options.cameraSettings.protocol === 'https_insecure',
+            ip: this.options.cameraSettings.ip,
+            port: this.options.cameraSettings.port,
+            user: this.options.cameraSettings.user,
+            pass: this.options.cameraSettings.pass,
+            camera: this.options.coSettings.cameraList ?? undefined,
+        });
+
+        this.co.on('open', () => {
+            console.log(`COAPI: ${this.options.configName}: connected`);
+            this.coConnected = true;
+        });
+
+        this.co.on('error', (err) => {
+            console.log(`COAPI-Error: ${this.options.configName}:`, err.message);
+        });
+
+        this.co.on('close', () => {
+            console.log(`COAPI-Error: ${this.options.configName}: connection closed`);
+            this.coConnected = false;
+        });
+        this.co.connect();
     }
 
     private computePosition(
-        coordSystem: CoordSystem,
+        coordSystem: TSettings[0]['coSettings']['coordSystem'],
         posX: number,
         posY: number,
         width: number,

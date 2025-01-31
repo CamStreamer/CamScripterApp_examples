@@ -1,22 +1,24 @@
 import * as fs from 'fs';
-import { HtmlToOverlay, HtmlToOverlayOptions } from './htmlToOverlay';
+import { HtmlToOverlay } from './htmlToOverlay';
+import { settingsSchema, TSettings } from './settingsSchema';
 
-let settingsList = [];
+let settingsList: TSettings = [];
 const overlayList: HtmlToOverlay[] = [];
 
 function start() {
     settingsList = readConfiguration();
 
-    settingsList.forEach((settings: HtmlToOverlayOptions) => {
+    settingsList.forEach((settings: TSettings[0]) => {
         if (
             settings.imageSettings.url.length &&
             settings.cameraSettings.ip.length &&
             settings.cameraSettings.user.length &&
             settings.cameraSettings.pass.length &&
+            settings.coSettings.cameraList !== null &&
             settings.coSettings.cameraList?.length
         ) {
             const htmlOvl = new HtmlToOverlay(settings);
-            htmlOvl.start();
+            void htmlOvl.start();
             overlayList.push(htmlOvl);
         }
     });
@@ -27,22 +29,24 @@ function start() {
     }
 }
 
+async function stopAllPackages() {
+    await Promise.all(overlayList.map((overlay) => overlay.stop()));
+}
+
 function readConfiguration() {
     try {
         const data = fs.readFileSync(process.env.PERSISTENT_DATA_PATH + 'settings.json');
-        return JSON.parse(data.toString());
+        const parsedData = JSON.parse(data.toString());
+        const result = settingsSchema.safeParse(parsedData);
+        if (!result.success) {
+            console.error('Invalid configuration:', result.error.errors);
+            return [];
+        }
+        return result.data;
     } catch (err) {
         console.log('No configuration found');
         return [];
     }
-}
-
-async function stopAllPackages() {
-    let promises: Promise<void>[] = [];
-    for (const overlay of overlayList) {
-        promises.push(overlay.stop());
-    }
-    await Promise.all(promises);
 }
 
 process.on('SIGINT', async () => {
