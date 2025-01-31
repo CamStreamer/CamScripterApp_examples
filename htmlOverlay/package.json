@@ -1,31 +1,39 @@
 {
     "name": "@camstreamer/htmloverlay",
-    "version": "1.0.5",
+    "version": "1.1.0",
     "description": "",
     "prettier": "@camstreamer/prettier-config",
     "main": "main.js",
     "scripts": {
         "clean": "rimraf dist/*;",
-        "build": "npm-run-all clean tsc",
+        "build": "tsc",
         "tsc": "tsc",
         "try": "npm run build; PERSISTENT_DATA_PATH=\"./localdata/\" node dist/main.js",
         "pretty": "prettier --write \"./src/*.{ts,tsx}\"",
         "pretty:check": "prettier --check \"./src/*.{ts,tsx}\"",
-        "test": "echo \"Error: no test specified\" && exit 1",
-        "in:prod": "npm install --production",
-        "in:all": "npm install",
+        "lint": "eslint \"./src/**/*.ts\"",
+        "lint:fix": "eslint \"./src/**/*.ts\" --fix",
+        "test": "echo \"Error: no test specified\" && exit 0",
         "zip:package": "node node_modules/camstreamerlib/CreatePackage -i",
-        "zip": "npm-run-all build in:prod zip:package in:all"
+        "zip": "npm-run-all clean build zip:package"
     },
     "author": "CamStreamer s.r.o",
     "license": "ISC",
     "dependencies": {
-        "camstreamerlib": "2.0.2",
-        "puppeteer-core": "^19.7.0"
+        "camstreamerlib": "^3.4.1",
+        "puppeteer-core": "^24.1.1",
+        "zod": "^3.24.1"
     },
     "devDependencies": {
+        "@camstreamer/eslint-config": "^1.0.1",
         "@camstreamer/prettier-config": "^2.0.4",
         "@types/node": "^18.0.6",
+        "@typescript-eslint/eslint-plugin": "^6.3.0",
+        "@typescript-eslint/parser": "^6.3.0",
+        "eslint": "^8.47.0",
+        "eslint-plugin-deprecation": "^3.0.0",
+        "eslint-plugin-react": "^7.33.2",
+        "eslint-plugin-unused-imports": "^3.0.0",
         "npm-run-all": "^4.1.5",
         "prettier": "^2.7.1",
         "rimraf": "^3.0.2",
