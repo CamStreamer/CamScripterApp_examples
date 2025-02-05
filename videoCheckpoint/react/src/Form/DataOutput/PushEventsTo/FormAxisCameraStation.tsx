@@ -1,9 +1,9 @@
 import { Controller, useFormContext } from 'react-hook-form';
-import { TServerData } from '../../models/schema';
-import { parseValueAsInt } from '../../utils';
-import { PROTOCOLS, PROTOCOL_LABELS } from '../constants/constants';
-import { StyledTextField, StyledRadioControlLabel, StyledForm, StyledRow } from '../../components/FormInputs';
-import { PasswordInput } from '../../components/PasswordInput';
+import { TServerData } from '../../../models/schema';
+import { parseValueAsInt } from '../../../utils';
+import { PROTOCOLS, PROTOCOL_LABELS } from '../../constants/constants';
+import { StyledTextField, StyledRadioControlLabel, StyledForm, StyledRow } from '../../../components/FormInputs';
+import { PasswordInput } from '../../../components/PasswordInput';
 import { FormHelperText, Radio, RadioGroup, Link } from '@mui/material';
 
 export const FormAxisCameraStation = () => {

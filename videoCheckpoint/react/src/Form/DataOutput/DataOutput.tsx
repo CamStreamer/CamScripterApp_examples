@@ -7,8 +7,8 @@ import { DevicesForGraphicsOutput } from './DevicesForGraphicsOutput/DevicesForG
 import { LedIndication } from './LedIndication';
 import { UploadImageConfiguration } from './UploadImageConfiguration';
 import { UploadVideoConfiguration } from './UploadVideoConfiguration';
-import { UploadMediaTo } from './UploadMediaTo';
-import { PushEventsTo } from './PushEventsTo';
+import { UploadMediaTo } from './UploadMediaTo/UploadMediaTo';
+import { PushEventsTo } from './PushEventsTo/PushEventsTo';
 import { useInitializeOnMount } from '../../hooks/useInitializeOnMount';
 import { useResolutionList } from '../../hooks/useResolutionList';
 import { useCameraList } from '../../hooks/useCameraList';

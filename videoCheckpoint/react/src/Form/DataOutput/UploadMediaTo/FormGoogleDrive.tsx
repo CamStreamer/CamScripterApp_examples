@@ -1,9 +1,9 @@
 import styled from '@mui/material/styles/styled';
 import { Control, Controller } from 'react-hook-form';
-import { TServerData } from '../../models/schema';
-import { OUTPUT_TYPES, OUTPUT_TYPES_LABELS } from '../constants/constants';
+import { TServerData } from '../../../models/schema';
+import { OUTPUT_TYPES, OUTPUT_TYPES_LABELS } from '../../constants/constants';
 import { FormHelperText, Link, RadioGroup, Radio } from '@mui/material';
-import { StyledRadioControlLabel, StyledTextField, StyledForm, StyledRow } from '../../components/FormInputs';
+import { StyledRadioControlLabel, StyledTextField, StyledForm, StyledRow } from '../../../components/FormInputs';
 
 type Props = {
     control: Control<TServerData>;

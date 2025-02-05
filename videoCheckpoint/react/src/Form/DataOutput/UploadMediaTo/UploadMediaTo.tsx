@@ -1,17 +1,35 @@
-import { StyledSection } from '../../components/FormInputs';
-import { FormControlLabel, Switch } from '@mui/material';
+import { FormControlLabel, FormHelperText, Switch } from '@mui/material';
 import { Controller, useWatch, useFormContext } from 'react-hook-form';
-import { TServerData } from '../../models/schema';
-import { FormAxisCameraStation } from './FormAxisCameraStation';
+import { TServerData } from '../../../models/schema';
+import { StyledTextField, StyledForm, StyledRow, StyledSection } from '../../../components/FormInputs';
+import { FormGoogleDrive } from './FormGoogleDrive';
+import { FormFtp } from './FormFtp';
+import { FormMsSharepoint } from './FormMsSharePoint';
 
-export const PushEventsTo = () => {
+export const UploadMediaTo = () => {
     const { control } = useFormContext<TServerData>();
-    const acsEnabled = useWatch({ control, name: 'acs.enabled' });
+    const googleDriveEnabled = useWatch({ control, name: 'google_drive.enabled' });
+    const msSharepointEnabled = useWatch({ control, name: 'share_point.enabled' });
+    const ftpEnabled = useWatch({ control, name: 'ftp_server.enabled' });
 
     return (
         <StyledSection>
+            <StyledRow>
+                <StyledForm>
+                    <StyledTextField
+                        fullWidth
+                        label="File name"
+                        value="YYYY-MM-DD_HH-MM-SS_code_cameraSerialNumber_channelNumber"
+                        disabled
+                    />
+                    <FormHelperText>
+                        Example of final name of file is 2024-03-18_16-23-45_093155171251_B8A44F73E891_camera1.jpg
+                    </FormHelperText>
+                </StyledForm>
+                <StyledForm />
+            </StyledRow>
             <Controller
-                name="acs.enabled"
+                name="google_drive.enabled"
                 control={control}
                 render={({ field }) => (
                     <FormControlLabel
@@ -24,13 +42,13 @@ export const PushEventsTo = () => {
                                 }}
                             />
                         }
-                        label={'Axis Camera Station'}
+                        label={'Google Drive'}
                     />
                 )}
             />
-            {acsEnabled && <FormAxisCameraStation />}
+            {googleDriveEnabled && <FormGoogleDrive control={control} />}
             <Controller
-                name="axis_events.conn_hub"
+                name="ftp_server.enabled"
                 control={control}
                 render={({ field }) => (
                     <FormControlLabel
@@ -43,17 +61,19 @@ export const PushEventsTo = () => {
                                 }}
                             />
                         }
-                        label={'Source device of Barcode/QR code'}
+                        label={'FTP'}
                     />
                 )}
             />
+            {ftpEnabled && <FormFtp control={control} />}
             <Controller
-                name="axis_events.camera"
+                name="share_point.enabled"
                 control={control}
                 render={({ field }) => (
                     <FormControlLabel
                         control={
                             <Switch
+                                disabled
                                 {...field}
                                 checked={field.value}
                                 onChange={(e, v) => {
@@ -61,18 +81,12 @@ export const PushEventsTo = () => {
                                 }}
                             />
                         }
-                        label={
-                            <>
-                                Source device of Image/Video
-                                <br />
-                                (CamScripter App must be running on this device)
-                            </>
-                        }
+                        label={'MS Sharepoint'}
                     />
                 )}
             />
-            <FormControlLabel control={<Switch disabled />} label={'Genetec'} />
-            <FormControlLabel control={<Switch disabled />} label={'Milestone VMS'} />
+            {msSharepointEnabled && <FormMsSharepoint control={control} />}
+            <FormControlLabel control={<Switch disabled />} label={'Dropbox'} />
             <FormControlLabel control={<Switch disabled />} label={'HTTPS'} />
         </StyledSection>
     );
