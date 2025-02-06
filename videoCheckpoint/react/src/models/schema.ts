@@ -59,6 +59,13 @@ export const serverDataSchema = z.object({
             source_key: z.string(),
         })
     ),
+    genetec: connectionParamsSchema.merge(
+        z.object({
+            enabled: z.boolean(),
+            base_uri: z.string(),
+            app_id: z.string(),
+        })
+    ),
     google_drive: z.object({
         enabled: z.boolean(),
         type: z.string(),
