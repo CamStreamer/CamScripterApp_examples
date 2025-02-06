@@ -1,36 +1,64 @@
 import * as fs from 'fs';
-import { HtmlToOverlay } from './htmlToOverlay';
-import { settingsSchema, TSettings } from './settingsSchema';
+import * as path from 'path';
+import { spawn, ChildProcess } from 'child_process';
+import { settingsSchema, TOverlaySettings } from './settingsSchema';
 
-let settingsList: TSettings = [];
-const overlayList: HtmlToOverlay[] = [];
+const overlayProcesses: ChildProcess[] = [];
 
 function start() {
-    settingsList = readConfiguration();
+    const settings = readConfiguration();
 
-    settingsList.forEach((settings: TSettings[0]) => {
+    if (settings === undefined || settings.linuxUser.length === 0) {
+        console.error('Linux user not set');
+        setTimeout(() => {}, 300_000); // Prevent app from exiting
+        return;
+    }
+
+    settings.overlayList.forEach((overlaySettings: TOverlaySettings) => {
         if (
-            settings.imageSettings.url.length &&
-            settings.cameraSettings.ip.length &&
-            settings.cameraSettings.user.length &&
-            settings.cameraSettings.pass.length &&
-            settings.coSettings.cameraList !== null &&
-            settings.coSettings.cameraList?.length
+            overlaySettings.enabled &&
+            overlaySettings.imageSettings.url.length &&
+            overlaySettings.cameraSettings.ip.length &&
+            overlaySettings.cameraSettings.user.length &&
+            overlaySettings.cameraSettings.pass.length &&
+            overlaySettings.coSettings.cameraList !== null &&
+            overlaySettings.coSettings.cameraList?.length
         ) {
-            const htmlOvl = new HtmlToOverlay(settings);
-            void htmlOvl.start();
-            overlayList.push(htmlOvl);
+            const scriptPath = path.join(__dirname, 'htmlToOverlayProcess.js');
+            const child = spawn('sudo', [
+                '-u',
+                settings.linuxUser,
+                'node',
+                scriptPath,
+                JSON.stringify(overlaySettings),
+            ]);
+
+            child.stdout?.on('data', (data) => {
+                process.stdout.write(data);
+            });
+
+            child.stderr?.on('data', (data) => {
+                process.stderr.write(data);
+            });
+
+            child.on('error', (error) => {
+                console.error(`spawn error: ${error}`);
+            });
+
+            overlayProcesses.push(child);
         }
     });
 
-    if (overlayList.length === 0) {
+    if (overlayProcesses.length === 0) {
         console.log('No configured HTML overlay found');
         setTimeout(() => {}, 300_000); // Prevent app from exiting
     }
 }
 
-async function stopAllPackages() {
-    await Promise.all(overlayList.map((overlay) => overlay.stop()));
+function stopAllPackages() {
+    overlayProcesses.forEach((child) => {
+        child.kill();
+    });
 }
 
 function readConfiguration() {
@@ -40,24 +68,24 @@ function readConfiguration() {
         const result = settingsSchema.safeParse(parsedData);
         if (!result.success) {
             console.error('Invalid configuration:', result.error.errors);
-            return [];
+            return undefined;
         }
         return result.data;
     } catch (err) {
         console.log('No configuration found');
-        return [];
+        return undefined;
     }
 }
 
-process.on('SIGINT', async () => {
+process.on('SIGINT', () => {
     console.log('App exit - configuration changed');
-    await stopAllPackages();
+    stopAllPackages();
     process.exit();
 });
 
-process.on('SIGTERM', async () => {
+process.on('SIGTERM', () => {
     console.log('App exit');
-    await stopAllPackages();
+    stopAllPackages();
     process.exit();
 });
 
