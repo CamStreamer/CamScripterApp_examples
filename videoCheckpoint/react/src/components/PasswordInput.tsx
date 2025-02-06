@@ -11,7 +11,7 @@ import { StyledTextField } from './FormInputs';
 type Props = {
     areCredentialsValid?: boolean;
     control: Control<TServerData>;
-    name: 'camera.pass' | 'conn_hub.pass' | 'acs.pass' | 'ftp_server.pass' | 'output_camera.pass';
+    name: 'camera.pass' | 'conn_hub.pass' | 'acs.pass' | 'ftp_server.pass' | 'output_camera.pass' | 'genetec.pass';
     onBlur?: () => void;
 };
 
