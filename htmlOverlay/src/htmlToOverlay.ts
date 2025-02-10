@@ -1,27 +1,25 @@
 import * as fs from 'fs';
 import puppeteer, { Browser, Page } from 'puppeteer-core';
 import { CamOverlayDrawingAPI } from 'camstreamerlib/CamOverlayDrawingAPI';
-import { TSettings } from './settingsSchema';
+import { TOverlaySettings } from './settingsSchema';
 
 export class HtmlToOverlay {
     private stopped = false;
     private browser?: Browser;
     private page?: Page;
     private startTimer?: NodeJS.Timeout;
-    private screenshotTimer?: NodeJS.Timeout;
     private co?: CamOverlayDrawingAPI;
     private coConnected = false;
+    private screenshotTimer?: NodeJS.Timeout;
     private takeScreenshotPromise?: Promise<void>;
 
-    constructor(private options: TSettings[0]) {}
+    constructor(private options: TOverlaySettings) {}
 
-    async start() {
+    start() {
         this.stopped = false;
-        if (this.options.enabled) {
-            console.log('Start overlay: ' + this.options.configName);
-            this.startCamOverlayConnection();
-            await this.startBrowser();
-        }
+        console.log('Start overlay: ' + this.options.configName);
+        this.startCamOverlayConnection();
+        void this.startBrowser();
     }
 
     async stop() {
@@ -37,7 +35,6 @@ export class HtmlToOverlay {
             clearTimeout(this.screenshotTimer);
 
             await this.browser?.close();
-            await this.removeImage();
         } catch (err) {
             console.log('Stop overlay: ' + this.options.configName, err);
         }
@@ -48,13 +45,23 @@ export class HtmlToOverlay {
             this.browser?.removeAllListeners();
             await this.browser?.close();
 
-            const executablePath = fs.existsSync('/usr/bin/chromium')
-                ? '/usr/bin/chromium' // Deb version on the newest Ubuntu (remove when the snap is supported)
-                : '/usr/bin/chromium-browser';
+            const chromiumNew = fs.existsSync('/usr/bin/chromium-browser');
+            const chromiumDeb = fs.existsSync('/usr/bin/chromium'); // Deb version on the newest Ubuntu
+            const chrome = fs.existsSync('/usr/bin/google-chrome');
+
+            let executablePath = '';
+            if (chromiumNew) {
+                executablePath = '/usr/bin/chromium-browser';
+            } else if (chromiumDeb) {
+                executablePath = '/usr/bin/chromium';
+            } else if (chrome) {
+                executablePath = '/usr/bin/google-chrome';
+            } else {
+                throw new Error('Chromium or Chrome not found');
+            }
 
             this.browser = await puppeteer.launch({
                 executablePath,
-                args: ['--no-sandbox', '--disable-setuid-sandbox'],
                 acceptInsecureCerts: true,
                 handleSIGINT: false,
                 handleSIGTERM: false,
@@ -66,7 +73,7 @@ export class HtmlToOverlay {
 
             this.page = await this.browser.newPage();
             this.page.on('error', (err) => {
-                console.log('Page error', err);
+                console.log('Page:', err);
                 this.restartBrowser();
             });
             this.page.on('close', () => {
@@ -82,6 +89,7 @@ export class HtmlToOverlay {
 
             this.takeScreenshotPromise = this.takeScreenshot();
         } catch (err) {
+            console.error('Browser:', err);
             this.restartBrowser();
         }
     }
@@ -135,16 +143,6 @@ export class HtmlToOverlay {
         }
     }
 
-    private async removeImage() {
-        try {
-            if (this.co && this.coConnected) {
-                await this.co.removeImage();
-            }
-        } catch (err) {
-            console.log('Remove overlay: ' + this.options.configName, err);
-        }
-    }
-
     private startCamOverlayConnection() {
         if (this.co) {
             return;
@@ -177,7 +175,7 @@ export class HtmlToOverlay {
     }
 
     private computePosition(
-        coordSystem: TSettings[0]['coSettings']['coordSystem'],
+        coordSystem: TOverlaySettings['coSettings']['coordSystem'],
         posX: number,
         posY: number,
         width: number,

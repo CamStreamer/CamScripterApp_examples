@@ -1,9 +1,18 @@
 let activeTabNum = 0;
-let configList = [];
+let settings = {};
 
 $(document).ready(function () {
-    $.get('/local/camscripter/package/settings.cgi?package_name=htmlOverlay&action=get', (settings) => {
-        configList = settings;
+    $.get('/local/camscripter/package/settings.cgi?package_name=htmlOverlay&action=get', (newSettings) => {
+        if (Array.isArray(newSettings)) {
+            settings = {
+                linuxUser: '',
+                overlayList: newSettings,
+            };
+        } else {
+            settings = newSettings;
+        }
+
+        $('#linuxUser').val(settings.linuxUser);
         renderTabs();
         renderActiveTabContent();
     });
@@ -11,8 +20,8 @@ $(document).ready(function () {
 
 function renderTabs() {
     let tabsHtml = '';
-    for (let i = 0; i < configList.length; i++) {
-        tabsHtml += getConfigurationTabHtml(i, configList[i].enabled, configList[i].configName);
+    for (let i = 0; i < settings.overlayList.length; i++) {
+        tabsHtml += getConfigurationTabHtml(i, settings.overlayList[i].enabled, settings.overlayList[i].configName);
     }
     tabsHtml +=
         ` <a class="nav-item nav-link"` +
@@ -55,20 +64,24 @@ function tabClicked(event) {
         // Enabled toogle
         const tabId = event.target.closest('a[id^=tab_]').id;
         const tabSequenceNum = parseInt(tabId.substring(4));
-        configList[tabSequenceNum].enabled = !(configList[tabSequenceNum].enabled ?? true);
-        $(`#enabledToogle_${tabSequenceNum}`).bootstrapToggle(configList[tabSequenceNum].enabled ? 'on' : 'off');
+        settings.overlayList[tabSequenceNum].enabled = !(settings.overlayList[tabSequenceNum].enabled ?? true);
+        $(`#enabledToogle_${tabSequenceNum}`).bootstrapToggle(
+            settings.overlayList[tabSequenceNum].enabled ? 'on' : 'off'
+        );
         saveConfiguration();
         return false;
     }
 
     if (event.target.id.indexOf('plus') !== -1) {
         const newConfig = getDefaultConfiguration(findUnusedHtmlOverlayId());
-        $(`#tab_plus`).before(getConfigurationTabHtml(configList.length, newConfig.enabled, newConfig.configName));
+        $(`#tab_plus`).before(
+            getConfigurationTabHtml(settings.overlayList.length, newConfig.enabled, newConfig.configName)
+        );
         $(`#tab_${activeTabNum}`).tab('show');
         $(`#tab_${activeTabNum}`).focus();
         $('#navTab a').unbind().on('click', tabClicked);
         $('[id^="enabledToogle_"]').bootstrapToggle();
-        configList.push(newConfig);
+        settings.overlayList.push(newConfig);
         renderActiveTabContent();
         saveConfiguration();
     } else {
@@ -83,7 +96,7 @@ function tabClicked(event) {
 function removeTab() {
     $(`#tab_${activeTabNum}`).remove();
     $('#navTab a:first').tab('show');
-    configList.splice(activeTabNum, 1);
+    settings.overlayList.splice(activeTabNum, 1);
     resetTabIds();
     activeTabNum = 0;
     renderActiveTabContent();
@@ -101,7 +114,7 @@ function resetTabIds() {
 
 function findUnusedHtmlOverlayId() {
     const configIds = [];
-    configList.forEach((config) => {
+    settings.overlayList.forEach((config) => {
         if (config.configName.indexOf('HtmlOverlay') === 0) {
             const id = parseInt(config.configName.substring(11));
             if (!isNaN(id)) {
@@ -118,11 +131,11 @@ function findUnusedHtmlOverlayId() {
 }
 
 function renderActiveTabContent() {
-    if (activeTabNum >= configList.length) {
+    if (activeTabNum >= settings.overlayList.length) {
         return;
     }
 
-    const config = configList[activeTabNum];
+    const config = settings.overlayList[activeTabNum];
     const imageSettings = config.imageSettings;
     const cameraSettings = config.cameraSettings;
     const coSettings = config.coSettings;
@@ -179,7 +192,7 @@ function getDefaultConfiguration(overlayId) {
 
 async function renderCameraPicker() {
     try {
-        if (activeTabNum >= configList.length) {
+        if (activeTabNum >= settings.overlayList.length) {
             return;
         }
 
@@ -188,7 +201,7 @@ async function renderCameraPicker() {
         cameraSelect.empty();
 
         const activeTabBackup = activeTabNum;
-        const config = configList[activeTabNum];
+        const config = settings.overlayList[activeTabNum];
         const channelList = await getChannelList(config);
         if (activeTabBackup !== activeTabNum) {
             return;
@@ -261,52 +274,55 @@ function inputChanged() {
     saveConfiguration();
     renderCameraPicker();
 
-    if (activeTabNum < configList.length) {
-        $(`#tabText_${activeTabNum}`).text(configList[activeTabNum].configName);
+    if (activeTabNum < settings.overlayList.length) {
+        $(`#tabText_${activeTabNum}`).text(settings.overlayList[activeTabNum].configName);
     }
 }
 
 function cameraPickerChanged() {
-    if (activeTabNum < configList.length) {
+    if (activeTabNum < settings.overlayList.length) {
         const selected = $('#cameraList').val();
         const newCameraList = selected?.map((camera) => parseInt(camera)) || [];
-        if (JSON.stringify(configList[activeTabNum].coSettings.cameraList) !== JSON.stringify(newCameraList)) {
-            configList[activeTabNum].coSettings.cameraList = newCameraList;
+        if (
+            JSON.stringify(settings.overlayList[activeTabNum].coSettings.cameraList) !== JSON.stringify(newCameraList)
+        ) {
+            settings.overlayList[activeTabNum].coSettings.cameraList = newCameraList;
             saveConfiguration();
         }
     }
 }
 
 function saveConfiguration() {
-    if (activeTabNum < configList.length) {
-        configList[activeTabNum] = {
-            enabled: configList[activeTabNum].enabled ?? true,
-            configName: $('#configName').val(),
-            imageSettings: {
-                url: $('#imageUrl').val(),
-                renderWidth: parseInt($('#renderWidth').val()),
-                renderHeight: parseInt($('#renderHeight').val()),
-                refreshRate: parseInt($('#refreshRate').val()),
-            },
-            cameraSettings: {
-                protocol: $('#cameraProtocol').val(),
-                ip: $('#cameraIP').val(),
-                port: parseInt($('#cameraPort').val()),
-                user: $('#cameraUser').val(),
-                pass: $('#cameraPass').val(),
-            },
-            coSettings: {
-                cameraList: configList[activeTabNum].coSettings.cameraList,
-                coordSystem: $('#coordSystem').val(),
-                posX: parseInt($('#posX').val()),
-                posY: parseInt($('#posY').val()),
-                streamWidth: parseInt($('#streamWidth').val()),
-                streamHeight: parseInt($('#streamHeight').val()),
-            },
-        };
+    if (activeTabNum < settings.overlayList.length) {
+        (settings.linuxUser = $('#linuxUser').val()),
+            (settings.overlayList[activeTabNum] = {
+                enabled: settings.overlayList[activeTabNum].enabled ?? true,
+                configName: $('#configName').val(),
+                imageSettings: {
+                    url: $('#imageUrl').val(),
+                    renderWidth: parseInt($('#renderWidth').val()),
+                    renderHeight: parseInt($('#renderHeight').val()),
+                    refreshRate: parseInt($('#refreshRate').val()),
+                },
+                cameraSettings: {
+                    protocol: $('#cameraProtocol').val(),
+                    ip: $('#cameraIP').val(),
+                    port: parseInt($('#cameraPort').val()),
+                    user: $('#cameraUser').val(),
+                    pass: $('#cameraPass').val(),
+                },
+                coSettings: {
+                    cameraList: settings.overlayList[activeTabNum].coSettings.cameraList,
+                    coordSystem: $('#coordSystem').val(),
+                    posX: parseInt($('#posX').val()),
+                    posY: parseInt($('#posY').val()),
+                    streamWidth: parseInt($('#streamWidth').val()),
+                    streamHeight: parseInt($('#streamHeight').val()),
+                },
+            });
 
         $.ajax('/local/camscripter/package/settings.cgi?package_name=htmlOverlay&action=set', {
-            data: JSON.stringify(configList),
+            data: JSON.stringify(settings),
             contentType: 'application/json',
             type: 'POST',
         });
