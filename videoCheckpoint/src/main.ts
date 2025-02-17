@@ -3,6 +3,7 @@ import { TServerData, serverDataSchema } from './schema';
 import { QRCodeReader, TReading } from './input/QrCodeReader';
 import { Widget } from './graphics/Widget';
 import { AxisCameraStation } from './upload/AxisCameraStation';
+import { Genetec } from './upload/Genetec';
 import { LedIndicator } from './vapix/LedIndicator';
 import { GoogleDriveAPI } from './upload/GoogleDriveAPI';
 import { CameraImage } from './vapix/CameraImage';
@@ -22,6 +23,7 @@ let axisEventsCamera: AxisEvents | undefined;
 let ledIndicator: LedIndicator | undefined;
 let widget: Widget | undefined;
 let acs: AxisCameraStation | undefined;
+let genetec: Genetec | undefined;
 let cameraImage: CameraImage | undefined;
 let cameraVideo: CameraVideo | undefined;
 let googleDriveApi: GoogleDriveAPI | undefined;
@@ -89,6 +91,19 @@ async function sendAcsEvent(code: string) {
         return true;
     } catch (err) {
         console.error('ACS event:', err instanceof Error ? err.message : 'unknown');
+        return false;
+    }
+}
+
+async function sendGenetecBookmark(code: string) {
+    try {
+        if (genetec) {
+            console.log(`Send Genetec bookmark, code: "${code}"`);
+            await genetec.sendBookmark(code);
+        }
+        return true;
+    } catch (err) {
+        console.error('Genetec bookmark:', err instanceof Error ? err.message : 'unknown');
         return false;
     }
 }
@@ -202,6 +217,20 @@ function main() {
             }
         }
 
+        if (settings.genetec.enabled) {
+            if (
+                settings.genetec.ip.length !== 0 &&
+                settings.genetec.user.length !== 0 &&
+                settings.genetec.pass.length !== 0 &&
+                settings.genetec.app_id.length !== 0 &&
+                settings.genetec.base_uri.length !== 0
+            ) {
+                genetec = new Genetec(settings.genetec);
+            } else {
+                console.log('Genetec integration is not configured and thus is disabled.');
+            }
+        }
+
         if (settings.google_drive.enabled) {
             if (
                 settings.camera.ip.length !== 0 &&
@@ -272,6 +301,7 @@ function main() {
             await sendAxisEventConnHub(data.code);
             await sendAxisEventCamera(data.code);
             await sendAcsEvent(data.code);
+            await sendGenetecBookmark(data.code);
 
             const promiseArr: Promise<boolean>[] = [];
             let imagesUploadStatus;
