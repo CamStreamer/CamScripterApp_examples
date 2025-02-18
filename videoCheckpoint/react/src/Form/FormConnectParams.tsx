@@ -89,7 +89,6 @@ export const FormConnectParams = ({ name }: Props) => {
                         )}
                     />
                     {/* ------CONNECTION CHECK------*/}
-
                     <ConnectionCheck
                         isFetching={isFetching}
                         isCameraResponding={isCameraResponding}

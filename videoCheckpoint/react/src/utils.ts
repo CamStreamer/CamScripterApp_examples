@@ -16,6 +16,17 @@ export const parseValueAsFloat = (value: string) => {
     }
 };
 
+export const pad = (num: number, size: number) => {
+    const sign = Math.sign(num) === -1 ? '-' : '';
+    return (
+        sign +
+        new Array(size)
+            .concat([Math.abs(num)])
+            .join('0')
+            .slice(-size)
+    );
+};
+
 export type TWatches = {
     protocol: string;
     ip: string;
