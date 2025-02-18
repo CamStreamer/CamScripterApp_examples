@@ -1,21 +1,21 @@
 import styled from '@mui/material/styles/styled';
 import { Checkbox, ListItemText, MenuItem, Select, TextField } from '@mui/material';
 import { StyledSelect } from './FormInputs';
-import { TCameraListOption } from '../hooks/useCameraList';
+import { TCameraListOption } from '../hooks/GenetecAgent';
 import { ForwardedRef, forwardRef, useState } from 'react';
 
 type Props = {
-    viewAreaList?: TCameraListOption[];
-    onChange?: (data: number[]) => void;
-    value: number[];
+    cameraList?: TCameraListOption[];
+    onChange?: (data: string[]) => void;
+    value: string[];
     helperText?: string;
     disabled?: boolean;
     error?: boolean;
 };
 
 export const MultiSelectWithSearch = forwardRef(
-    ({ viewAreaList, disabled, onChange, value }: Props, ref: ForwardedRef<typeof Select>) => {
-        const list = viewAreaList ?? [];
+    ({ cameraList, disabled, onChange, value }: Props, ref: ForwardedRef<typeof Select>) => {
+        const list = cameraList ?? [];
         const [filteredList, setFilteredList] = useState<TCameraListOption[]>(list);
 
         const handleSearch = (value: string) => {
@@ -29,8 +29,8 @@ export const MultiSelectWithSearch = forwardRef(
                 value={value}
                 label={'Bookmark Camera(s)'}
                 renderValue={(selected) => {
-                    return (selected as number[])
-                        .map((v: number) => {
+                    return (selected as string[])
+                        .map((v: string) => {
                             const selectedOptions = list.find((o) => o.value === v);
                             return selectedOptions?.label ?? '';
                         })
@@ -40,7 +40,7 @@ export const MultiSelectWithSearch = forwardRef(
                 onChange={(e) => {
                     const val = e.target.value;
                     const toSave = typeof val === 'string' ? [] : val;
-                    onChange?.(toSave as number[]);
+                    onChange?.(toSave as string[]);
                 }}
                 disabled={disabled ?? list.length === 0}
                 ref={ref}
