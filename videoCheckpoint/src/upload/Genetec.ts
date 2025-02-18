@@ -4,7 +4,6 @@ import { pad } from '../utils';
 const ACTION = 'AddCameraBookmark';
 
 export class Genetec {
-    // 'action?q=AddCameraBookmark'
     private baseUrl: string;
     private credentials: string;
 
@@ -13,7 +12,7 @@ export class Genetec {
         this.credentials = `${genetecSettings.user};${genetecSettings.app_id}:${genetecSettings.pass}`;
     }
 
-    sendBookmark(code: string) {
+    async sendBookmark(code: string) {
         const date = new Date();
         const year = date.getUTCFullYear();
         const month = pad(date.getUTCMonth() + 1, 2);
@@ -32,18 +31,14 @@ export class Genetec {
             cameraEntitiesUrl.push(`${ACTION}(${camera},${timeStamp},${bookmarkText})`);
         }
 
-        console.log('cameraEntitiesUrl', cameraEntitiesUrl);
-
         const requestOptions: RequestInit = {
             method: 'POST',
-            headers: {
+            headers: new Headers({
                 Authorization: `Basic ${encodedCredentials}`,
                 Accept: 'text/json',
-            },
+            }),
             redirect: 'follow' as RequestRedirect,
         };
-
-        console.log(`${this.baseUrl}${cameraEntitiesUrl.join(',')}`);
 
         try {
             fetch(`${this.baseUrl}${cameraEntitiesUrl.join(',')}`, requestOptions).catch((error) =>
