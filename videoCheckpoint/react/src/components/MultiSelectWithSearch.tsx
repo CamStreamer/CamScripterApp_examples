@@ -54,18 +54,25 @@ export const MultiSelectWithSearch = forwardRef(
                     placeholder="Search"
                     onChange={(e) => {
                         handleSearch(e.target.value);
+                        e.stopPropagation();
                     }}
                     onKeyDown={(e) => {
                         e.stopPropagation();
                     }}
                 />
 
-                {filteredList.map((option) => (
-                    <MenuItem key={option.value} value={option.value}>
-                        <Checkbox checked={value.indexOf(option.value) > -1} />
-                        <ListItemText primary={option.label} />
+                {filteredList.length > 1 ? (
+                    filteredList.map((option) => (
+                        <MenuItem key={option.value} value={option.value}>
+                            <Checkbox checked={value.indexOf(option.value) > -1} />
+                            <ListItemText primary={option.label} />
+                        </MenuItem>
+                    ))
+                ) : (
+                    <MenuItem value={''} disabled>
+                        No cameras found
                     </MenuItem>
-                ))}
+                )}
             </StyledSelect>
         );
     }
