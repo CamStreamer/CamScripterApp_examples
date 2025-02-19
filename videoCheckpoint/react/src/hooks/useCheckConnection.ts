@@ -5,7 +5,7 @@ type Props = {
     isFetching: boolean;
     isCameraResponding: boolean;
     areCredentialsValid: boolean;
-    name: 'camera' | 'conn_hub' | 'output_camera';
+    name: 'camera' | 'conn_hub' | 'output_camera' | 'genetec';
 };
 
 export const useCheckConnection = ({ isFetching, isCameraResponding, areCredentialsValid, name }: Props) => {
