@@ -50,6 +50,7 @@ export const StyledSelect = forwardRef(StyledSelectWithRef);
 export const StyledSelectField = styled(FormControl)({
     '& .MuiInputBase-root': { backgroundColor: 'white' },
     'width': 'clamp(50%, 600px, 100%)',
+    'max-width': '548px',
 });
 
 export const StyledTextareaAutosize = styled(TextareaAutosize)`
