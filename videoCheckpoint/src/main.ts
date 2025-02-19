@@ -12,6 +12,7 @@ import { VideoScheduler } from './videoScheduler';
 import { FTPServer } from './upload/ftpServer';
 import { SharePointUploader } from './upload/SharePointUploader';
 import { AxisEvents } from './upload/AxisEvents';
+import { HttpServer } from 'camstreamerlib/HttpServer';
 
 const READ_BARCODE_HIGHLIGHT_DURATION_MS = 250;
 const UPLOADS_HIGHLIGHT_DURATION_MS = 250;
@@ -24,6 +25,7 @@ let ledIndicator: LedIndicator | undefined;
 let widget: Widget | undefined;
 let acs: AxisCameraStation | undefined;
 let genetec: Genetec | undefined;
+let httpServer: HttpServer | undefined;
 let cameraImage: CameraImage | undefined;
 let cameraVideo: CameraVideo | undefined;
 let googleDriveApi: GoogleDriveAPI | undefined;
@@ -226,6 +228,7 @@ function main() {
                 settings.genetec.base_uri.length !== 0
             ) {
                 genetec = new Genetec(settings.genetec);
+                httpServer = new HttpServer();
             } else {
                 console.log('Genetec integration is not configured and thus is disabled.');
             }
@@ -384,6 +387,7 @@ function main() {
         console.log('Application started');
     } catch (err) {
         console.error('Application start:', err);
+        httpServer?.close();
         process.exit(1);
     }
 }
