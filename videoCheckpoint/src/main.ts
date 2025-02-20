@@ -229,6 +229,9 @@ function main() {
             ) {
                 genetec = new Genetec(settings.genetec);
                 httpServer = new HttpServer();
+                httpServer.onRequest('/genetec/checkConnection', genetec.checkConnection.bind(genetec));
+                httpServer.onRequest('/genetec/getCameraList', genetec.getCameraOptions.bind(genetec));
+                httpServer.onRequest('/genetec/sendTestBookmark', genetec.sendTestBookmark.bind(genetec));
             } else {
                 console.log('Genetec integration is not configured and thus is disabled.');
             }
