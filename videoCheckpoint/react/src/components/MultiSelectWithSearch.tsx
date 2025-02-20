@@ -1,8 +1,12 @@
 import styled from '@mui/material/styles/styled';
 import { Checkbox, ListItemText, MenuItem, Select, TextField } from '@mui/material';
 import { StyledSelect } from './FormInputs';
-import { TCameraListOption } from '../hooks/GenetecAgent';
 import { ForwardedRef, forwardRef, useState } from 'react';
+
+export type TCameraListOption = {
+    value: string;
+    label: string;
+};
 
 type Props = {
     cameraList?: TCameraListOption[];
