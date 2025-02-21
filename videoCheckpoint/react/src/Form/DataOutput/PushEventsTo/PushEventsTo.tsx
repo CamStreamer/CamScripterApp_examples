@@ -87,7 +87,7 @@ export const PushEventsTo = () => {
                                 }}
                             />
                         }
-                        label={'Genetec'}
+                        label={'Genetec VMS'}
                     />
                 )}
             />

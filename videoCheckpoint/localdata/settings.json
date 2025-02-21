@@ -67,7 +67,8 @@
         "pass": "",
         "enabled": false,
         "base_uri": "WebSdk",
-        "app_id": ""
+        "app_id": "",
+        "camera_list": [0]
     },
     "google_drive": {
         "enabled": false,
