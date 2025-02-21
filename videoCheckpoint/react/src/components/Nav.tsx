@@ -34,6 +34,7 @@ const StyledLink = styled('a')`
 
 const StyledImage = styled('img')`
     width: 3em;
+    filter: invert(100%) brightness(100) contrast(100%);
 `;
 
 const StyledText = styled(Typography)`
