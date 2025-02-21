@@ -403,4 +403,16 @@ process.on('unhandledRejection', (err: Error) => {
     console.error('Unhandled rejection:', err);
 });
 
+process.on('SIGTERM', () => {
+    console.log('SIGTERM signal received');
+    httpServer?.close();
+    process.exit(0);
+});
+
+process.on('SIGINT', () => {
+    console.log('SIGINT signal received');
+    httpServer?.close();
+    process.exit(0);
+});
+
 main();
