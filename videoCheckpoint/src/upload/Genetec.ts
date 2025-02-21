@@ -6,6 +6,12 @@ const GET_CAMERAS_URL = 'report/EntityConfiguration?q=EntityTypes@Camera';
 const GET_CAMERAS_DETAILS_URL = '/entity?q=';
 const PARAMS = 'Guid,Name,EntityType';
 
+type TCameraOption = {
+    index: number;
+    value: string;
+    label: string;
+};
+
 type TGenetecParams = {
     protocol: string | null;
     ip: string | null;
@@ -63,20 +69,22 @@ export class Genetec {
             base_uri: params.get('base_uri'),
             credentials: params.get('credentials'),
             camera_list: params.get('camera_list'),
+            selected_cameras: params.get('selected_cameras'),
         };
         const baseUrl = `${currentSettings.protocol}://${currentSettings.ip}:${currentSettings.port}/${currentSettings.base_uri}`;
         const credentials = `${currentSettings.credentials}`;
 
         try {
-            if (currentSettings.camera_list !== null) {
+            if (currentSettings.camera_list !== null && currentSettings.selected_cameras !== null) {
                 res.statusCode = 200;
                 res.setHeader('Access-Control-Allow-Origin', '*');
 
                 await this.sendBookmark(
-                    'Testing%bookmark%from%CamStreamer%script',
+                    'Testing bookmark from CamStreamer script',
                     baseUrl,
                     credentials,
-                    currentSettings.camera_list
+                    currentSettings.camera_list,
+                    currentSettings.selected_cameras
                 );
                 res.end('Test bookmark sent');
             }
@@ -110,7 +118,13 @@ export class Genetec {
         }
     }
 
-    async sendBookmark(code: string, baseUrl?: string, credentials?: string, currentCameraList?: string) {
+    async sendBookmark(
+        code: string,
+        baseUrl?: string,
+        credentials?: string,
+        currentCameraList?: string,
+        currentSelectedCameras?: string
+    ) {
         console.log('Sending bookmark... ', code);
 
         const date = new Date();
@@ -124,10 +138,21 @@ export class Genetec {
 
         const timeStamp = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${miliSeconds}Z`;
         const bookmarkText = code;
-        const cameraList = currentCameraList !== undefined ? JSON.parse(currentCameraList) : this.fetchedCameraList;
+        const cameraList: TCameraOption[] =
+            currentCameraList !== undefined ? JSON.parse(currentCameraList) : this.fetchedCameraList;
+
+        const selectedCameras: number[] =
+            currentSelectedCameras !== undefined
+                ? JSON.parse(currentSelectedCameras)
+                : cameraList.map((camera: TCameraOption) => camera.index);
+
+        const selectedCamerasToSend = cameraList.filter((camera: TCameraOption) =>
+            selectedCameras.includes(camera.index)
+        );
+
         const cameraEntitiesUrl: string[] = [];
 
-        for (const camera of cameraList) {
+        for (const camera of selectedCamerasToSend) {
             cameraEntitiesUrl.push(`${ACTION}(${camera.value},${timeStamp},${bookmarkText})`);
         }
 

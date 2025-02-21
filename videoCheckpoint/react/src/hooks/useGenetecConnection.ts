@@ -19,7 +19,7 @@ type TGenetec = {
 };
 
 export const useGenetecConnection = () => {
-    const { control } = useFormContext();
+    const { control, watch } = useFormContext();
     const [isConnected, setIsConnected] = useState(false);
     const [isFetching, setIsFetching] = useState(true);
     const [cameraList, setCameraList] = useState<TCameraListOption[]>();
@@ -33,6 +33,8 @@ export const useGenetecConnection = () => {
         user: useWatch({ control, name: `genetec.user` }),
         pass: useWatch({ control, name: `genetec.pass` }),
     };
+
+    const selectedCameras = watch(`genetec.camera_list`);
 
     const handleCheckConnection = async () => {
         setIsFetching(true);
@@ -55,7 +57,7 @@ export const useGenetecConnection = () => {
         await fetch(
             `/local/camscripter/package/proxy/video_checkpoint/genetec/sendTestBookmark?${generateParams(
                 proxy
-            )}&camera_list=${JSON.stringify(cameraList)}`,
+            )}&camera_list=${JSON.stringify(cameraList)}&selected_cameras=${JSON.stringify(selectedCameras)}`,
             {
                 method: 'POST',
             }
