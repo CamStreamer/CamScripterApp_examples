@@ -6,16 +6,6 @@ const GET_CAMERAS_URL = 'report/EntityConfiguration?q=EntityTypes@Camera';
 const GET_CAMERAS_DETAILS_URL = '/entity?q=';
 const PARAMS = 'Guid,Name,EntityType';
 
-type TGenetec = {
-    protocol: string;
-    ip: string;
-    port: string;
-    base_uri: string;
-    user: string;
-    pass: string;
-    app_id: string;
-};
-
 type TGenetecParams = {
     protocol: string | null;
     ip: string | null;
@@ -27,10 +17,12 @@ type TGenetecParams = {
 export class Genetec {
     private baseUrl: string;
     private credentials: string;
+    private fetchedCameraList: { index: number; value: string; label: string }[];
 
     constructor(private genetecSettings: TServerData['genetec']) {
         this.baseUrl = `${genetecSettings.protocol}://${genetecSettings.ip}:${genetecSettings.port}/${genetecSettings.base_uri}`;
         this.credentials = btoa(`${genetecSettings.user};${genetecSettings.app_id}:${genetecSettings.pass}`);
+        this.fetchedCameraList = [];
     }
 
     async checkConnection(req: any, res: any) {
@@ -132,12 +124,11 @@ export class Genetec {
 
         const timeStamp = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${miliSeconds}Z`;
         const bookmarkText = code;
-        const cameraList =
-            currentCameraList !== undefined ? JSON.parse(currentCameraList) : this.genetecSettings.camera_list;
-        const cameraEntitiesUrl = [];
+        const cameraList = currentCameraList !== undefined ? JSON.parse(currentCameraList) : this.fetchedCameraList;
+        const cameraEntitiesUrl: string[] = [];
 
         for (const camera of cameraList) {
-            cameraEntitiesUrl.push(`${ACTION}(${camera},${timeStamp},${bookmarkText})`);
+            cameraEntitiesUrl.push(`${ACTION}(${camera.value},${timeStamp},${bookmarkText})`);
         }
 
         const requestOptions = this.requestOptionsCreator(
@@ -200,7 +191,7 @@ export class Genetec {
                         });
                     }
                 }
-                console.log('Camera list:', cameraList);
+                this.fetchedCameraList = cameraList;
                 return cameraList;
             } catch (e) {
                 console.error(e);

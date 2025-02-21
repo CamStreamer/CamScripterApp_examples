@@ -11,7 +11,7 @@ import { FormHelperText, Radio, RadioGroup, Link, Button, Box, Typography } from
 import styled from '@mui/material/styles/styled';
 
 export const Genetec = () => {
-    const { control, watch } = useFormContext<TServerData>();
+    const { control } = useFormContext<TServerData>();
     const [isConnected, setIsConnected] = useState(false);
     const [isFetching, setIsFetching] = useState(false);
     const [cameraList, setCameraList] = useState<TCameraListOption[]>();
@@ -26,13 +26,12 @@ export const Genetec = () => {
         pass: useWatch({ control, name: `genetec.pass` }),
     };
 
-    const currentCameraList = watch('genetec.camera_list');
-
     const handleCheckConnection = async () => {
         setIsFetching(true);
         const isConnectedResponse = await fetch(
             `/local/camscripter/package/proxy/video_checkpoint/genetec/checkConnection?${generateParams(genetec)}`
         );
+        void handleFetchCameraList();
         setIsConnected(isConnectedResponse.status === 200);
         setIsFetching(false);
     };
@@ -45,10 +44,11 @@ export const Genetec = () => {
     };
 
     const handleSendTestBookmark = async () => {
+        console.log(JSON.stringify(cameraList));
         await fetch(
             `/local/camscripter/package/proxy/video_checkpoint/genetec/sendTestBookmark?${generateParams(
                 genetec
-            )}&camera_list=${JSON.stringify(currentCameraList)}`,
+            )}&camera_list=${JSON.stringify(cameraList)}`,
             {
                 method: 'POST',
             }
