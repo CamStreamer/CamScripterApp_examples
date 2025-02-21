@@ -4,14 +4,15 @@ import { StyledSelect } from './FormInputs';
 import { ForwardedRef, forwardRef, useState } from 'react';
 
 export type TCameraListOption = {
+    index: number;
     value: string;
     label: string;
 };
 
 type Props = {
     cameraList?: TCameraListOption[];
-    onChange?: (data: string[]) => void;
-    value: string[];
+    onChange?: (data: number[]) => void;
+    value: number[];
     helperText?: string;
     disabled?: boolean;
     error?: boolean;
@@ -20,6 +21,7 @@ type Props = {
 export const MultiSelectWithSearch = forwardRef(
     ({ cameraList, disabled, onChange, value }: Props, ref: ForwardedRef<typeof Select>) => {
         const list = cameraList ?? [];
+
         const [filteredList, setFilteredList] = useState<TCameraListOption[]>(list);
 
         const handleSearch = (value: string) => {
@@ -33,9 +35,9 @@ export const MultiSelectWithSearch = forwardRef(
                 value={value}
                 label={'Bookmark Camera(s)'}
                 renderValue={(selected) => {
-                    return (selected as string[])
-                        .map((v: string) => {
-                            const selectedOptions = list.find((o) => o.value === v);
+                    return (selected as number[])
+                        .map((v: number) => {
+                            const selectedOptions = list.find((o) => o.index === v);
                             return selectedOptions?.label ?? '';
                         })
                         .filter((v: string) => !!v)
@@ -44,7 +46,7 @@ export const MultiSelectWithSearch = forwardRef(
                 onChange={(e) => {
                     const val = e.target.value;
                     const toSave = typeof val === 'string' ? [] : val;
-                    onChange?.(toSave as string[]);
+                    onChange?.(toSave as number[]);
                 }}
                 disabled={disabled ?? list.length === 0}
                 ref={ref}
@@ -65,10 +67,10 @@ export const MultiSelectWithSearch = forwardRef(
                     }}
                 />
 
-                {filteredList.length > 1 ? (
+                {filteredList.length > 0 ? (
                     filteredList.map((option) => (
-                        <MenuItem key={option.value} value={option.value}>
-                            <Checkbox checked={value.indexOf(option.value) > -1} />
+                        <MenuItem key={option.value} value={option.index}>
+                            <Checkbox checked={value.indexOf(option.index) > -1} />
                             <ListItemText primary={option.label} />
                         </MenuItem>
                     ))
@@ -86,7 +88,7 @@ MultiSelectWithSearch.displayName = 'MultiSelectWithSearch';
 
 const StyledSearchbar = styled(TextField)`
     position: sticky;
-    top: 0;
+    top: 10px;
     z-index: 1;
     background-color: white;
     margin: 2px 0px 10px 11px;
