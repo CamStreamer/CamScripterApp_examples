@@ -1,14 +1,64 @@
-import { Controller, useFormContext } from 'react-hook-form';
+import { useEffect, useState } from 'react';
+import { Controller, useFormContext, useWatch } from 'react-hook-form';
 import { TServerData } from '../../../models/schema';
-import { parseValueAsInt } from '../../../utils';
+import { parseValueAsInt, generateParams } from '../../../utils';
 import { PROTOCOLS, PROTOCOL_LABELS } from '../../constants/constants';
 import { StyledTextField, StyledRadioControlLabel, StyledForm, StyledRow } from '../../../components/FormInputs';
 import { PasswordInput } from '../../../components/PasswordInput';
+import { ConnectionCheck } from '../../../components/ConnectionCheck';
+import { MultiSelectWithSearch, TCameraListOption } from '../../../components/MultiSelectWithSearch';
 import { FormHelperText, Radio, RadioGroup, Link, Button, Box, Typography } from '@mui/material';
 import styled from '@mui/material/styles/styled';
 
 export const Genetec = () => {
-    const { control } = useFormContext<TServerData>();
+    const { control, watch } = useFormContext<TServerData>();
+    const [isConnected, setIsConnected] = useState(false);
+    const [isFetching, setIsFetching] = useState(false);
+    const [cameraList, setCameraList] = useState<TCameraListOption[]>();
+
+    const genetec = {
+        protocol: useWatch({ control, name: `genetec.protocol` }),
+        ip: useWatch({ control, name: `genetec.ip` }),
+        port: useWatch({ control, name: `genetec.port` }),
+        base_uri: useWatch({ control, name: `genetec.base_uri` }),
+        app_id: useWatch({ control, name: `genetec.app_id` }),
+        user: useWatch({ control, name: `genetec.user` }),
+        pass: useWatch({ control, name: `genetec.pass` }),
+    };
+
+    const currentCameraList = watch('genetec.camera_list');
+
+    const handleCheckConnection = async () => {
+        setIsFetching(true);
+        const isConnectedResponse = await fetch(
+            `/local/camscripter/package/proxy/video_checkpoint/genetec/checkConnection?${generateParams(genetec)}`
+        );
+        setIsConnected(isConnectedResponse.status === 200);
+        setIsFetching(false);
+    };
+
+    const handleFetchCameraList = async () => {
+        const cameraListResponse = await fetch(
+            `/local/camscripter/package/proxy/video_checkpoint/genetec/getCameraList?${generateParams(genetec)}`
+        ).then((res) => res.json());
+        setCameraList(cameraListResponse);
+    };
+
+    const handleSendTestBookmark = async () => {
+        await fetch(
+            `/local/camscripter/package/proxy/video_checkpoint/genetec/sendTestBookmark?${generateParams(
+                genetec
+            )}&camera_list=${JSON.stringify(currentCameraList)}`,
+            {
+                method: 'POST',
+            }
+        );
+    };
+
+    useEffect(() => {
+        void handleCheckConnection();
+        void handleFetchCameraList();
+    }, [genetec.protocol, genetec.ip, genetec.port, genetec.base_uri, genetec.user, genetec.pass, genetec.app_id]);
 
     return (
         <>
@@ -87,6 +137,20 @@ export const Genetec = () => {
                         control={control}
                         render={({ field }) => <StyledTextField {...field} fullWidth label="Base Uri" />}
                     />
+                    {/* ------BOOKMARK CAMERA(S)------*/}
+                    <Controller
+                        name={`genetec.camera_list`}
+                        control={control}
+                        render={({ field, formState }) => (
+                            <MultiSelectWithSearch
+                                {...field}
+                                cameraList={cameraList}
+                                onChange={(data) => field.onChange(data)}
+                                error={!!formState.errors.genetec?.camera_list}
+                                helperText={formState.errors.genetec?.camera_list?.message}
+                            />
+                        )}
+                    />
                 </StyledForm>
                 <StyledForm>
                     {/* ------USER------*/}
@@ -114,12 +178,22 @@ export const Genetec = () => {
                 </StyledForm>
             </StyledRow>
             {/* ------CONNECTION CHECK------*/}
-
+            <ConnectionCheck
+                isFetching={isFetching}
+                isCameraResponding={isConnected}
+                areCredentialsValid={true}
+                name={'genetec'}
+                check={handleCheckConnection}
+            />
             {/* ------SEND TEST MESSAGE------*/}
             <StyledForm>
                 <StyledBox>
                     <Typography fontWeight={700}>Test message</Typography>
-                    <Button variant="outlined" onClick={() => console.log('clicked')} disabled={false}>
+                    <Button
+                        variant="outlined"
+                        onClick={handleSendTestBookmark}
+                        disabled={!isConnected || cameraList?.length === 0}
+                    >
                         Send
                     </Button>
                 </StyledBox>

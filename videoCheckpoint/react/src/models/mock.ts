@@ -62,14 +62,15 @@ export const mockedSettings: TServerData = {
         source_key: '',
     },
     genetec: {
+        enabled: false,
         protocol: 'http',
         ip: '',
         port: 4590,
         user: '',
         pass: '',
-        enabled: false,
         base_uri: 'WebSdk',
         app_id: '',
+        camera_list: [0],
     },
     google_drive: {
         email: '',

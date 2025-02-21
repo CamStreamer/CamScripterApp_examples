@@ -87,3 +87,19 @@ export const checkConnection = (proxy: TWatches): [AbortController, Promise<{ re
 
     return [aborter, cameraResponse];
 };
+
+type TGenetec = {
+    protocol: string;
+    ip: string;
+    port: number;
+    base_uri: string;
+    user: string;
+    pass: string;
+    app_id: string;
+};
+
+export const generateParams = (genetec: TGenetec) => {
+    return `protocol=${genetec.protocol}&ip=${genetec.ip}&port=${genetec.port}&base_uri=${
+        genetec.base_uri
+    }&credentials=${btoa(`${genetec.user};${genetec.app_id}:${genetec.pass}`)}`;
+};
