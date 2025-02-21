@@ -12,9 +12,11 @@ import { FormHelperText, Radio, RadioGroup, Link, Button, Box, Typography } from
 import styled from '@mui/material/styles/styled';
 
 export const Genetec = () => {
-    const { control } = useFormContext<TServerData>();
+    const { control, watch } = useFormContext<TServerData>();
     const [handleCheckConnection, handleFetchCameraList, handleSendTestBookmark, isConnected, isFetching, cameraList] =
         useGenetecConnection();
+
+    const selectedCameraList = watch('genetec.camera_list');
 
     useEffect(() => {
         const timeout = setTimeout(() => {
@@ -156,7 +158,7 @@ export const Genetec = () => {
                     <Button
                         variant="outlined"
                         onClick={handleSendTestBookmark}
-                        disabled={!isConnected || cameraList?.length === 0}
+                        disabled={!isConnected || cameraList?.length === 0 || selectedCameraList.length === 0}
                     >
                         Send
                     </Button>
