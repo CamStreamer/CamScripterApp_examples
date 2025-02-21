@@ -45,10 +45,11 @@ export class Genetec {
                 base_uri: params.get('base_uri'),
                 credentials: params.get('credentials'),
             };
+            const baseUrl = `${currentSettings.protocol}://${currentSettings.ip}:${currentSettings.port}/${currentSettings.base_uri}`;
+            const credentials = `${currentSettings.credentials}`;
 
-            console.log('Current settings:', currentSettings);
+            const isConnected = await this.checkConnectionToGenetec(baseUrl, credentials).then((res) => res.Rsp.Status);
 
-            const isConnected = await this.checkConnectionToGenetec().then((res) => res.Rsp.Status);
             console.log('Connection status:', isConnected);
             res.statusCode = 200;
             res.setHeader('Access-Control-Allow-Origin', '*');
@@ -61,12 +62,32 @@ export class Genetec {
     }
 
     async sendTestBookmark(req: any, res: any) {
+        const queryString = req.url.split('?')[1];
+        const params = new URLSearchParams(queryString);
+        const currentSettings = {
+            protocol: params.get('protocol'),
+            ip: params.get('ip'),
+            port: params.get('port'),
+            base_uri: params.get('base_uri'),
+            credentials: params.get('credentials'),
+            camera_list: params.get('camera_list'),
+        };
+        const baseUrl = `${currentSettings.protocol}://${currentSettings.ip}:${currentSettings.port}/${currentSettings.base_uri}`;
+        const credentials = `${currentSettings.credentials}`;
+
         try {
-            res.statusCode = 200;
-            res.setHeader('Access-Control-Allow-Origin', '*');
-            const currentSettings = req.body;
-            const result = await this.sendBookmark('Testing%bookmark%from%CamStreamer%script', currentSettings);
-            res.end('Test bookmark sent');
+            if (currentSettings.camera_list !== null) {
+                res.statusCode = 200;
+                res.setHeader('Access-Control-Allow-Origin', '*');
+
+                await this.sendBookmark(
+                    'Testing%bookmark%from%CamStreamer%script',
+                    baseUrl,
+                    credentials,
+                    currentSettings.camera_list
+                );
+                res.end('Test bookmark sent');
+            }
         } catch (err) {
             console.error('Cannot send test bookmark, error:', err);
             res.statusCode = 500;
@@ -92,17 +113,12 @@ export class Genetec {
             res.setHeader('Access-Control-Allow-Origin', '*');
             res.end(JSON.stringify(cameraList));
         } catch (err) {
-            console.error('Cannot connect to Genetec, error:', err);
+            console.error('Cannot get camera options, error: ', err);
             res.statusCode = 500;
         }
     }
 
-    async sendBookmark(code: string, currentSettings?: TGenetec) {
-        if (currentSettings !== undefined) {
-            this.baseUrl = `${currentSettings.protocol}://${currentSettings.ip}:${currentSettings.port}/${currentSettings.base_uri}`;
-            this.credentials = btoa(`${currentSettings.user};${currentSettings.app_id}:${currentSettings.pass}`);
-        }
-
+    async sendBookmark(code: string, baseUrl?: string, credentials?: string, currentCameraList?: string) {
         console.log('Sending bookmark... ', code);
 
         const date = new Date();
@@ -116,17 +132,23 @@ export class Genetec {
 
         const timeStamp = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${miliSeconds}Z`;
         const bookmarkText = code;
+        const cameraList =
+            currentCameraList !== undefined ? JSON.parse(currentCameraList) : this.genetecSettings.camera_list;
         const cameraEntitiesUrl = [];
 
-        for (const camera of this.genetecSettings.camera_list) {
+        for (const camera of cameraList) {
             cameraEntitiesUrl.push(`${ACTION}(${camera},${timeStamp},${bookmarkText})`);
         }
 
-        const requestOptions = this.requestOptionsCreator('POST');
+        const requestOptions = this.requestOptionsCreator(
+            'POST',
+            credentials !== undefined ? credentials : this.credentials
+        );
 
         try {
-            fetch(`${this.baseUrl}/action?q=${cameraEntitiesUrl.join(',')}`, requestOptions).catch((error) =>
-                console.error(error)
+            await fetch(
+                `${baseUrl !== undefined ? baseUrl : this.baseUrl}/action?q=${cameraEntitiesUrl.join(',')}`,
+                requestOptions
             );
             console.log('Bookmark sent: ', code);
         } catch (err) {
@@ -164,12 +186,15 @@ export class Genetec {
 
                 if (!Array.isArray(camerasDetails)) {
                     cameraList.push({
+                        index: 0,
                         value: camerasDetails.Guid,
                         label: camerasDetails.Name,
                     });
                 } else {
-                    for (const camera of camerasDetails) {
+                    for (let i = 0; i < camerasDetails.length; i++) {
+                        const camera = camerasDetails[i];
                         cameraList.push({
+                            index: i,
                             value: camera.Guid,
                             label: camera.Name,
                         });
@@ -191,16 +216,16 @@ export class Genetec {
         return await fetch(`${this.baseUrl}/${GET_CAMERAS_URL}`, requestOptions).then((res) => res.json());
     }
 
-    private async checkConnectionToGenetec() {
-        const requestOptions = this.requestOptionsCreator('GET');
-        return fetch(`${this.baseUrl}/`, requestOptions).then((res) => res.json());
+    private async checkConnectionToGenetec(baseUrl: string, credentials: string) {
+        const requestOptions = this.requestOptionsCreator('GET', credentials);
+        return fetch(`${baseUrl}/`, requestOptions).then((res) => res.json());
     }
 
-    private requestOptionsCreator(method: string): RequestInit {
+    private requestOptionsCreator(method: string, credentials?: string): RequestInit {
         return {
             method: method,
             headers: new Headers({
-                Authorization: `Basic ${this.credentials}`,
+                Authorization: `Basic ${credentials !== undefined ? credentials : this.credentials}`,
                 Accept: 'text/json',
             }),
             redirect: 'follow' as RequestRedirect,
