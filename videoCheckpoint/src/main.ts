@@ -237,10 +237,10 @@ function main() {
                     try {
                         res.statusCode = 200;
                         res.setHeader('Access-Control-Allow-Origin', '*');
-                        res.end('true');
+                        res.end('{"message": "Server running"}');
                     } catch (err) {
                         res.statusCode = 500;
-                        res.end('false');
+                        res.end('{"message": "Server is not running"}');
                     }
                 });
             } else {
