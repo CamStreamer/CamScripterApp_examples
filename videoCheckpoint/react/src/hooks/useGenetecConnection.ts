@@ -23,10 +23,11 @@ type Props = {
 };
 
 export const useGenetecConnection = ({ displaySnackbar }: Props) => {
-    const { control, watch } = useFormContext();
+    const { control, watch, formState } = useFormContext();
     const [isConnected, setIsConnected] = useState(false);
     const [isFetching, setIsFetching] = useState(false);
     const [cameraList, setCameraList] = useState<TCameraListOption[]>();
+    const [serverRunning, setServerRunning] = useState(false);
 
     const proxy: TGenetec = {
         protocol: useWatch({ control, name: `genetec.protocol` }),
@@ -39,6 +40,8 @@ export const useGenetecConnection = ({ displaySnackbar }: Props) => {
     };
 
     const selectedCameras = watch(`genetec.camera_list`);
+
+    const isDisabled = !proxy.ip || !proxy.port || !proxy.base_uri || !proxy.app_id || !proxy.user || !proxy.pass;
 
     const handleCheckConnection = async () => {
         setIsFetching(true);
@@ -77,12 +80,11 @@ export const useGenetecConnection = ({ displaySnackbar }: Props) => {
     };
 
     const checkServerRunning = async () => {
-        setIsFetching(true);
         const response = await fetch(`/local/camscripter/package/proxy/video_checkpoint/genetec/serverRunCheck`);
+
         if (response.status === 200) {
-            void handleCheckConnection();
-            void handleFetchCameraList();
             setIsFetching(false);
+            setServerRunning(true);
         } else {
             const timeoutId = setTimeout(() => {
                 void checkServerRunning();
@@ -92,8 +94,18 @@ export const useGenetecConnection = ({ displaySnackbar }: Props) => {
     };
 
     useEffect(() => {
-        void checkServerRunning();
-    }, [proxy.protocol, proxy.ip, proxy.port, proxy.base_uri, proxy.user, proxy.pass, proxy.app_id]);
+        if (!isDisabled) {
+            setIsFetching(true);
+            setServerRunning(false);
+            void checkServerRunning();
+        }
+    }, [formState.submitCount, isDisabled]);
 
-    return [handleCheckConnection, handleSendTestBookmark, isConnected, isFetching, cameraList] as const;
+    useEffect(() => {
+        if (serverRunning && !isDisabled) {
+            void handleCheckConnection();
+        }
+    }, [proxy.protocol, proxy.ip, proxy.port, proxy.base_uri, proxy.user, proxy.pass, proxy.app_id, serverRunning]);
+
+    return [handleCheckConnection, handleSendTestBookmark, isConnected, isFetching, cameraList, serverRunning] as const;
 };

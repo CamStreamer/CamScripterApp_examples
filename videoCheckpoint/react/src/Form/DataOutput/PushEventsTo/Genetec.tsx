@@ -15,11 +15,13 @@ import styled from '@mui/material/styles/styled';
 export const Genetec = () => {
     const { control, watch } = useFormContext<TServerData>();
     const { snackbarData, displaySnackbar, closeSnackbar } = useSnackbar();
-    const [handleCheckConnection, handleSendTestBookmark, isConnected, isFetching, cameraList] = useGenetecConnection({
-        displaySnackbar,
-    });
+    const [handleCheckConnection, handleSendTestBookmark, isConnected, isFetching, cameraList, serverRunning] =
+        useGenetecConnection({
+            displaySnackbar,
+        });
 
     const selectedCameraList = watch('genetec.camera_list');
+    const isDisabled = !isConnected || cameraList?.length === 0 || selectedCameraList.length === 0 || !serverRunning;
 
     return (
         <>
@@ -151,11 +153,7 @@ export const Genetec = () => {
             <StyledForm>
                 <StyledBox>
                     <Typography fontWeight={700}>Test message</Typography>
-                    <Button
-                        variant="outlined"
-                        onClick={handleSendTestBookmark}
-                        disabled={!isConnected || cameraList?.length === 0 || selectedCameraList.length === 0}
-                    >
+                    <Button variant="outlined" onClick={handleSendTestBookmark} disabled={isDisabled}>
                         Send
                     </Button>
                 </StyledBox>

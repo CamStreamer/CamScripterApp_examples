@@ -88,7 +88,7 @@ export const checkConnection = (proxy: TWatches): [AbortController, Promise<{ re
     return [aborter, cameraResponse];
 };
 
-type TGenetec = {
+export type TGenetec = {
     protocol: string;
     ip: string;
     port: number;
