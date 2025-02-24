@@ -8,13 +8,16 @@ import { StyledTextField, StyledRadioControlLabel, StyledForm, StyledRow } from 
 import { PasswordInput } from '../../../components/PasswordInput';
 import { ConnectionCheck } from '../../../components/ConnectionCheck';
 import { MultiSelectWithSearch } from '../../../components/MultiSelectWithSearch';
+import { InfoSnackbar } from '../../../components/Snackbar';
+import { useSnackbar } from '../../../hooks/useSnackbar';
 import { FormHelperText, Radio, RadioGroup, Link, Button, Box, Typography } from '@mui/material';
 import styled from '@mui/material/styles/styled';
 
 export const Genetec = () => {
     const { control, watch } = useFormContext<TServerData>();
+    const { snackbarData, displaySnackbar, closeSnackbar } = useSnackbar();
     const [handleCheckConnection, handleFetchCameraList, handleSendTestBookmark, isConnected, isFetching, cameraList] =
-        useGenetecConnection();
+        useGenetecConnection({ displaySnackbar });
 
     const selectedCameraList = watch('genetec.camera_list');
 
@@ -28,6 +31,7 @@ export const Genetec = () => {
 
     return (
         <>
+            <InfoSnackbar snackbarData={snackbarData} closeSnackbar={closeSnackbar} />
             <FormHelperText>
                 For this integration, you need to obtain an SDK certificate application ID to send events via the WebSDK
                 API. Please contact your Genetec vendor to acquire an ID. Use the Bookmarks module to view the created

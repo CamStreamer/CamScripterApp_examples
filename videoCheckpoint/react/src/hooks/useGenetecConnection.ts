@@ -18,7 +18,11 @@ type TGenetec = {
     pass: string;
 };
 
-export const useGenetecConnection = () => {
+type Props = {
+    displaySnackbar: (data: { type: 'error' | 'success'; message: string }) => void;
+};
+
+export const useGenetecConnection = ({ displaySnackbar }: Props) => {
     const { control, watch } = useFormContext();
     const [isConnected, setIsConnected] = useState(false);
     const [isFetching, setIsFetching] = useState(true);
@@ -54,7 +58,7 @@ export const useGenetecConnection = () => {
     };
 
     const handleSendTestBookmark = async () => {
-        await fetch(
+        const isSent = await fetch(
             `/local/camscripter/package/proxy/video_checkpoint/genetec/sendTestBookmark?${generateParams(
                 proxy
             )}&camera_list=${JSON.stringify(cameraList)}&selected_cameras=${JSON.stringify(selectedCameras)}`,
@@ -62,6 +66,12 @@ export const useGenetecConnection = () => {
                 method: 'POST',
             }
         );
+        if (isSent.status === 200) {
+            displaySnackbar({
+                type: 'success',
+                message: 'Test message sent.',
+            });
+        }
     };
 
     useEffect(() => {
