@@ -25,7 +25,7 @@ type Props = {
 export const useGenetecConnection = ({ displaySnackbar }: Props) => {
     const { control, watch } = useFormContext();
     const [isConnected, setIsConnected] = useState(false);
-    const [isFetching, setIsFetching] = useState(true);
+    const [isFetching, setIsFetching] = useState(false);
     const [cameraList, setCameraList] = useState<TCameraListOption[]>();
 
     const proxy: TGenetec = {
@@ -45,6 +45,8 @@ export const useGenetecConnection = ({ displaySnackbar }: Props) => {
         const isConnectedResponse = await fetch(
             `/local/camscripter/package/proxy/video_checkpoint/genetec/checkConnection?${generateParams(proxy)}`
         );
+
+        void handleFetchCameraList();
 
         setIsConnected(isConnectedResponse.status === 200);
         setIsFetching(false);
@@ -74,17 +76,24 @@ export const useGenetecConnection = ({ displaySnackbar }: Props) => {
         }
     };
 
+    const checkServerRunning = async () => {
+        setIsFetching(true);
+        const response = await fetch(`/local/camscripter/package/proxy/video_checkpoint/genetec/serverRunCheck`);
+        if (response.status === 200) {
+            void handleCheckConnection();
+            void handleFetchCameraList();
+            setIsFetching(false);
+        } else {
+            const timeoutId = setTimeout(() => {
+                void checkServerRunning();
+            }, 3000);
+            return () => clearTimeout(timeoutId);
+        }
+    };
+
     useEffect(() => {
-        void handleCheckConnection();
-        void handleFetchCameraList();
+        void checkServerRunning();
     }, [proxy.protocol, proxy.ip, proxy.port, proxy.base_uri, proxy.user, proxy.pass, proxy.app_id]);
 
-    return [
-        handleCheckConnection,
-        handleFetchCameraList,
-        handleSendTestBookmark,
-        isConnected,
-        isFetching,
-        cameraList,
-    ] as const;
+    return [handleCheckConnection, handleSendTestBookmark, isConnected, isFetching, cameraList] as const;
 };

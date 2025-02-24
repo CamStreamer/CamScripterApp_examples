@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { TServerData } from '../../../models/schema';
 import { parseValueAsInt } from '../../../utils';
@@ -16,18 +15,11 @@ import styled from '@mui/material/styles/styled';
 export const Genetec = () => {
     const { control, watch } = useFormContext<TServerData>();
     const { snackbarData, displaySnackbar, closeSnackbar } = useSnackbar();
-    const [handleCheckConnection, handleFetchCameraList, handleSendTestBookmark, isConnected, isFetching, cameraList] =
-        useGenetecConnection({ displaySnackbar });
+    const [handleCheckConnection, handleSendTestBookmark, isConnected, isFetching, cameraList] = useGenetecConnection({
+        displaySnackbar,
+    });
 
     const selectedCameraList = watch('genetec.camera_list');
-
-    useEffect(() => {
-        const timeout = setTimeout(() => {
-            void handleCheckConnection();
-            void handleFetchCameraList();
-        }, 8000);
-        return () => clearTimeout(timeout);
-    }, []);
 
     return (
         <>

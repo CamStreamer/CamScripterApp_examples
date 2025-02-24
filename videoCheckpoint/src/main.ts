@@ -232,6 +232,17 @@ function main() {
                 httpServer.onRequest('/genetec/checkConnection', genetec.checkConnection.bind(genetec));
                 httpServer.onRequest('/genetec/getCameraList', genetec.getCameraOptions.bind(genetec));
                 httpServer.onRequest('/genetec/sendTestBookmark', genetec.sendTestBookmark.bind(genetec));
+
+                httpServer.onRequest('/genetec/serverRunCheck', function (req, res) {
+                    try {
+                        res.statusCode = 200;
+                        res.setHeader('Access-Control-Allow-Origin', '*');
+                        res.end('true');
+                    } catch (err) {
+                        res.statusCode = 500;
+                        res.end('false');
+                    }
+                });
             } else {
                 console.log('Genetec integration is not configured and thus is disabled.');
             }
