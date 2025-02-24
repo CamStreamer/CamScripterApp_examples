@@ -1,5 +1,5 @@
 import { TServerData } from '../schema';
-import { pad } from '../utils';
+import { pad, generateUrl, TProxy } from '../utils';
 
 const ACTION = 'AddCameraBookmark';
 const GET_CAMERAS_URL = 'report/EntityConfiguration?q=EntityTypes@Camera';
@@ -12,40 +12,30 @@ type TCameraOption = {
     label: string;
 };
 
-type TGenetecParams = {
-    protocol: string | null;
-    ip: string | null;
-    port: string | null;
-    base_uri: string | null;
-    credentials: string | null;
-};
-
 export class Genetec {
     private baseUrl: string;
     private credentials: string;
-    private fetchedCameraList: { index: number; value: string; label: string }[];
 
     constructor(private genetecSettings: TServerData['genetec']) {
-        this.baseUrl = `${genetecSettings.protocol}://${genetecSettings.ip}:${genetecSettings.port}/${genetecSettings.base_uri}`;
+        this.baseUrl = generateUrl(genetecSettings);
         this.credentials = btoa(`${genetecSettings.user};${genetecSettings.app_id}:${genetecSettings.pass}`);
-        this.fetchedCameraList = [];
     }
 
     async checkConnection(req: any, res: any) {
         console.log('Checking connection to Genetec...');
-        try {
-            const queryString = req.url.split('?')[1];
-            const params = new URLSearchParams(queryString);
-            const currentSettings = {
-                protocol: params.get('protocol'),
-                ip: params.get('ip'),
-                port: params.get('port'),
-                base_uri: params.get('base_uri'),
-                credentials: params.get('credentials'),
-            };
-            const baseUrl = `${currentSettings.protocol}://${currentSettings.ip}:${currentSettings.port}/${currentSettings.base_uri}`;
-            const credentials = `${currentSettings.credentials}`;
+        const queryString = req.url.split('?')[1];
+        const params = new URLSearchParams(queryString);
+        const currentSettings = {
+            protocol: params.get('protocol'),
+            ip: params.get('ip'),
+            port: params.get('port'),
+            base_uri: params.get('base_uri'),
+            credentials: params.get('credentials'),
+        };
+        const baseUrl = generateUrl(currentSettings);
+        const credentials = `${currentSettings.credentials}`;
 
+        try {
             const isConnected = await this.checkConnectionToGenetec(baseUrl, credentials).then((res) => res.Rsp.Status);
 
             console.log('Connection status:', isConnected);
@@ -71,7 +61,7 @@ export class Genetec {
             camera_list: params.get('camera_list'),
             selected_cameras: params.get('selected_cameras'),
         };
-        const baseUrl = `${currentSettings.protocol}://${currentSettings.ip}:${currentSettings.port}/${currentSettings.base_uri}`;
+        const baseUrl = generateUrl(currentSettings);
         const credentials = `${currentSettings.credentials}`;
 
         try {
@@ -83,8 +73,8 @@ export class Genetec {
                     'Testing bookmark from CamStreamer script',
                     baseUrl,
                     credentials,
-                    currentSettings.camera_list,
-                    currentSettings.selected_cameras
+                    JSON.parse(currentSettings.camera_list),
+                    JSON.parse(currentSettings.selected_cameras)
                 );
                 res.end('Test bookmark sent');
             }
@@ -97,18 +87,20 @@ export class Genetec {
 
     async getCameraOptions(req: any, res: any) {
         console.log('Fetching camera list...');
-        try {
-            const queryString = req.url.split('?')[1];
-            const params = new URLSearchParams(queryString);
-            const currentSettings = {
-                protocol: params.get('protocol'),
-                ip: params.get('ip'),
-                port: params.get('port'),
-                base_uri: params.get('base_uri'),
-                credentials: params.get('credentials'),
-            };
+        const queryString = req.url.split('?')[1];
+        const params = new URLSearchParams(queryString);
+        const currentSettings = {
+            protocol: params.get('protocol'),
+            ip: params.get('ip'),
+            port: params.get('port'),
+            base_uri: params.get('base_uri'),
+            credentials: params.get('credentials'),
+        };
+        const baseUrl = generateUrl(currentSettings);
+        const credentials = `${currentSettings.credentials}`;
 
-            const cameraList = await this.getCameraList(currentSettings);
+        try {
+            const cameraList = await this.getCameraList(baseUrl, credentials);
             res.statusCode = 200;
             res.setHeader('Access-Control-Allow-Origin', '*');
             res.end(JSON.stringify(cameraList));
@@ -122,10 +114,23 @@ export class Genetec {
         code: string,
         baseUrl?: string,
         credentials?: string,
-        currentCameraList?: string,
-        currentSelectedCameras?: string
+        currentCameraList?: TCameraOption[],
+        currentSelectedCameras?: number[]
     ) {
         console.log('Sending bookmark... ', code);
+
+        if (baseUrl === undefined) {
+            baseUrl = this.baseUrl;
+        }
+        if (credentials === undefined) {
+            credentials = this.credentials;
+        }
+        if (currentCameraList === undefined) {
+            currentCameraList = await this.getCameraList(baseUrl, credentials);
+        }
+        if (currentSelectedCameras === undefined) {
+            currentSelectedCameras = this.genetecSettings.camera_list;
+        }
 
         const date = new Date();
         const year = date.getUTCFullYear();
@@ -138,16 +143,9 @@ export class Genetec {
 
         const timeStamp = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${miliSeconds}Z`;
         const bookmarkText = code;
-        const cameraList: TCameraOption[] =
-            currentCameraList !== undefined ? JSON.parse(currentCameraList) : this.fetchedCameraList;
 
-        const selectedCameras: number[] =
-            currentSelectedCameras !== undefined
-                ? JSON.parse(currentSelectedCameras)
-                : cameraList.map((camera: TCameraOption) => camera.index);
-
-        const selectedCamerasToSend = cameraList.filter((camera: TCameraOption) =>
-            selectedCameras.includes(camera.index)
+        const selectedCamerasToSend = currentCameraList.filter((camera: TCameraOption) =>
+            currentSelectedCameras?.includes(camera.index)
         );
 
         const cameraEntitiesUrl: string[] = [];
@@ -172,64 +170,56 @@ export class Genetec {
         }
     }
 
-    private async getCameraList(currentSettings?: TGenetecParams) {
-        if (currentSettings !== undefined && currentSettings.credentials !== null) {
-            this.baseUrl = `${currentSettings.protocol}://${currentSettings.ip}:${currentSettings.port}/${currentSettings.base_uri}`;
-            this.credentials = currentSettings.credentials;
+    private async getCameraList(baseUrl: string, credentials: string) {
+        try {
+            const guidsArray = await this.getAllCamerasGuids(baseUrl, credentials).then((res) => res.Rsp.Result);
+            const camerasGuids = guidsArray.map((guid: { Guid: string }) => guid.Guid);
+            const camerasDetailsUrl = [];
 
-            try {
-                const guidsArray = await this.getAllCamerasGuids().then((res) => res.Rsp.Result);
-                const camerasGuids = guidsArray.map((guid: { Guid: string }) => guid.Guid);
-                const camerasDetailsUrl = [];
-
-                for (const guid of camerasGuids) {
-                    camerasDetailsUrl.push(`entity=${guid},${PARAMS}`);
-                }
-
-                const requestOptions = this.requestOptionsCreator('GET');
-
-                const camerasDetails = await fetch(
-                    `${this.baseUrl}/${GET_CAMERAS_DETAILS_URL}${camerasDetailsUrl.join(',')}`,
-                    requestOptions
-                )
-                    .then((res) => res.json())
-                    .then((response) => response.Rsp.Result)
-                    .catch((error) => {
-                        console.error(error);
-                    });
-
-                const cameraList = [];
-
-                if (!Array.isArray(camerasDetails)) {
-                    cameraList.push({
-                        index: 0,
-                        value: camerasDetails.Guid,
-                        label: camerasDetails.Name,
-                    });
-                } else {
-                    for (let i = 0; i < camerasDetails.length; i++) {
-                        const camera = camerasDetails[i];
-                        cameraList.push({
-                            index: i,
-                            value: camera.Guid,
-                            label: camera.Name,
-                        });
-                    }
-                }
-                this.fetchedCameraList = cameraList;
-                return cameraList;
-            } catch (e) {
-                console.error(e);
-                return [];
+            for (const guid of camerasGuids) {
+                camerasDetailsUrl.push(`entity=${guid},${PARAMS}`);
             }
-        } else {
+
+            const requestOptions = this.requestOptionsCreator('GET', credentials);
+
+            const camerasDetails = await fetch(
+                `${baseUrl}/${GET_CAMERAS_DETAILS_URL}${camerasDetailsUrl.join(',')}`,
+                requestOptions
+            )
+                .then((res) => res.json())
+                .then((response) => response.Rsp.Result)
+                .catch((error) => {
+                    console.error(error);
+                });
+
+            const cameraList = [];
+
+            if (!Array.isArray(camerasDetails)) {
+                cameraList.push({
+                    index: 0,
+                    value: camerasDetails.Guid,
+                    label: camerasDetails.Name,
+                });
+            } else {
+                for (let i = 0; i < camerasDetails.length; i++) {
+                    const camera = camerasDetails[i];
+                    cameraList.push({
+                        index: i,
+                        value: camera.Guid,
+                        label: camera.Name,
+                    });
+                }
+            }
+            return cameraList;
+        } catch (e) {
+            console.error(e);
             return [];
         }
     }
 
-    private async getAllCamerasGuids() {
-        const requestOptions = this.requestOptionsCreator('GET');
-        return await fetch(`${this.baseUrl}/${GET_CAMERAS_URL}`, requestOptions).then((res) => res.json());
+    private async getAllCamerasGuids(baseUrl: string, credentials: string) {
+        const requestOptions = this.requestOptionsCreator('GET', credentials);
+        return await fetch(`${baseUrl}/${GET_CAMERAS_URL}`, requestOptions).then((res) => res.json());
     }
 
     private async checkConnectionToGenetec(baseUrl: string, credentials: string) {
@@ -237,11 +227,11 @@ export class Genetec {
         return fetch(`${baseUrl}/`, requestOptions).then((res) => res.json());
     }
 
-    private requestOptionsCreator(method: string, credentials?: string): RequestInit {
+    private requestOptionsCreator(method: string, credentials: string): RequestInit {
         return {
             method: method,
             headers: new Headers({
-                Authorization: `Basic ${credentials !== undefined ? credentials : this.credentials}`,
+                Authorization: `Basic ${credentials}`,
                 Accept: 'text/json',
             }),
             redirect: 'follow' as RequestRedirect,
