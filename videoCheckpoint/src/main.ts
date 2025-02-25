@@ -220,37 +220,24 @@ function main() {
         }
 
         if (settings.genetec.enabled) {
-            if (
-                settings.genetec.ip.length !== 0 &&
-                settings.genetec.user.length !== 0 &&
-                settings.genetec.pass.length !== 0 &&
-                settings.genetec.app_id.length !== 0 &&
-                settings.genetec.base_uri.length !== 0
-            ) {
-                genetec = new Genetec(settings.genetec);
-            } else {
-                console.log('Genetec integration is not configured and thus is disabled.');
-            }
-        }
+            genetec = new Genetec(settings.genetec);
+            httpServer = new HttpServer();
 
-        httpServer = new HttpServer();
-
-        if (genetec !== undefined) {
             httpServer.onRequest('/genetec/checkConnection', genetec.checkConnection.bind(genetec));
             httpServer.onRequest('/genetec/getCameraList', genetec.getCameraOptions.bind(genetec));
             httpServer.onRequest('/genetec/sendTestBookmark', genetec.sendTestBookmark.bind(genetec));
-        }
 
-        httpServer.onRequest('/genetec/serverRunCheck', function (req, res) {
-            try {
-                res.statusCode = 200;
-                res.setHeader('Access-Control-Allow-Origin', '*');
-                res.end('{"message": "Server running"}');
-            } catch (err) {
-                res.statusCode = 500;
-                res.end('{"message": "Server is not running"}');
-            }
-        });
+            httpServer.onRequest('/genetec/serverRunCheck', function (req, res) {
+                try {
+                    res.statusCode = 200;
+                    res.setHeader('Access-Control-Allow-Origin', '*');
+                    res.end('{"message": "Server running"}');
+                } catch (err) {
+                    res.statusCode = 500;
+                    res.end('{"message": "Server is not running"}');
+                }
+            });
+        }
 
         if (settings.google_drive.enabled) {
             if (

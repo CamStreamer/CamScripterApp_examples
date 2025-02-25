@@ -84,7 +84,7 @@ export const useGenetecConnection = ({ displaySnackbar }: Props) => {
 
         if (response.status === 200) {
             setIsFetching(false);
-            setServerRunning(true);
+            void handleCheckConnection();
         } else {
             const timeoutId = setTimeout(() => {
                 void checkServerRunning();
@@ -99,13 +99,17 @@ export const useGenetecConnection = ({ displaySnackbar }: Props) => {
             setServerRunning(false);
             void checkServerRunning();
         }
-    }, [formState.submitCount, isDisabled]);
-
-    useEffect(() => {
-        if (serverRunning && !isDisabled) {
-            void handleCheckConnection();
-        }
-    }, [proxy.protocol, proxy.ip, proxy.port, proxy.base_uri, proxy.user, proxy.pass, proxy.app_id, serverRunning]);
+    }, [
+        formState.submitCount,
+        isDisabled,
+        proxy.protocol,
+        proxy.ip,
+        proxy.port,
+        proxy.base_uri,
+        proxy.user,
+        proxy.pass,
+        proxy.app_id,
+    ]);
 
     return [handleCheckConnection, handleSendTestBookmark, isConnected, isFetching, cameraList, serverRunning] as const;
 };
