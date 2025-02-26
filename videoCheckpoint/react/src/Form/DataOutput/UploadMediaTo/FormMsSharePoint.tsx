@@ -1,8 +1,8 @@
 import { Control, Controller } from 'react-hook-form';
-import { TServerData } from '../../models/schema';
-import { StyledTextField } from '../../components/FormInputs';
+import { TServerData } from '../../../models/schema';
+import { StyledTextField } from '../../../components/FormInputs';
 import { InputAdornment } from '@mui/material';
-import { parseValueAsInt } from '../../utils';
+import { parseValueAsInt } from '../../../utils';
 
 type Props = {
     control: Control<TServerData>;

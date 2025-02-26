@@ -1,10 +1,10 @@
 import { Control, Controller } from 'react-hook-form';
-import { TServerData } from '../../models/schema';
-import { parseValueAsInt } from '../../utils';
-import { OUTPUT_TYPES, OUTPUT_TYPES_LABELS } from '../constants/constants';
+import { TServerData } from '../../../models/schema';
+import { parseValueAsInt } from '../../../utils';
+import { OUTPUT_TYPES, OUTPUT_TYPES_LABELS } from '../../constants/constants';
 import { FormHelperText, RadioGroup, Radio } from '@mui/material';
-import { StyledTextField, StyledRadioControlLabel, StyledForm, StyledRow } from '../../components/FormInputs';
-import { PasswordInput } from '../../components/PasswordInput';
+import { StyledTextField, StyledRadioControlLabel, StyledForm, StyledRow } from '../../../components/FormInputs';
+import { PasswordInput } from '../../../components/PasswordInput';
 
 type Props = {
     control: Control<TServerData>;

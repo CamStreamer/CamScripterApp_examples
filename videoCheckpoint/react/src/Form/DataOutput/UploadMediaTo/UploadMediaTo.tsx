@@ -1,7 +1,7 @@
 import { FormControlLabel, FormHelperText, Switch } from '@mui/material';
 import { Controller, useWatch, useFormContext } from 'react-hook-form';
-import { TServerData } from '../../models/schema';
-import { StyledTextField, StyledForm, StyledRow, StyledSection } from '../../components/FormInputs';
+import { TServerData } from '../../../models/schema';
+import { StyledTextField, StyledForm, StyledRow, StyledSection } from '../../../components/FormInputs';
 import { FormGoogleDrive } from './FormGoogleDrive';
 import { FormFtp } from './FormFtp';
 import { FormMsSharepoint } from './FormMsSharePoint';

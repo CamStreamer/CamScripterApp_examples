@@ -3,6 +3,7 @@ import { TServerData, serverDataSchema } from './schema';
 import { QRCodeReader, TReading } from './input/QrCodeReader';
 import { Widget } from './graphics/Widget';
 import { AxisCameraStation } from './upload/AxisCameraStation';
+import { Genetec } from './upload/Genetec';
 import { LedIndicator } from './vapix/LedIndicator';
 import { GoogleDriveAPI } from './upload/GoogleDriveAPI';
 import { CameraImage } from './vapix/CameraImage';
@@ -11,6 +12,7 @@ import { VideoScheduler } from './videoScheduler';
 import { FTPServer } from './upload/ftpServer';
 import { SharePointUploader } from './upload/SharePointUploader';
 import { AxisEvents } from './upload/AxisEvents';
+import { HttpServer } from 'camstreamerlib/HttpServer';
 
 const READ_BARCODE_HIGHLIGHT_DURATION_MS = 250;
 const UPLOADS_HIGHLIGHT_DURATION_MS = 250;
@@ -22,6 +24,8 @@ let axisEventsCamera: AxisEvents | undefined;
 let ledIndicator: LedIndicator | undefined;
 let widget: Widget | undefined;
 let acs: AxisCameraStation | undefined;
+let genetec: Genetec | undefined;
+let httpServer: HttpServer | undefined;
 let cameraImage: CameraImage | undefined;
 let cameraVideo: CameraVideo | undefined;
 let googleDriveApi: GoogleDriveAPI | undefined;
@@ -89,6 +93,19 @@ async function sendAcsEvent(code: string) {
         return true;
     } catch (err) {
         console.error('ACS event:', err instanceof Error ? err.message : 'unknown');
+        return false;
+    }
+}
+
+async function sendGenetecBookmark(code: string) {
+    try {
+        if (genetec) {
+            console.log(`Send Genetec bookmark, code: "${code}"`);
+            await genetec.sendBookmark(code);
+        }
+        return true;
+    } catch (err) {
+        console.error('Genetec bookmark:', err instanceof Error ? err.message : 'unknown');
         return false;
     }
 }
@@ -202,6 +219,26 @@ function main() {
             }
         }
 
+        if (settings.genetec.enabled) {
+            genetec = new Genetec(settings.genetec);
+            httpServer = new HttpServer();
+
+            httpServer.onRequest('/genetec/checkConnection', genetec.checkConnection.bind(genetec));
+            httpServer.onRequest('/genetec/getCameraList', genetec.getCameraOptions.bind(genetec));
+            httpServer.onRequest('/genetec/sendTestBookmark', genetec.sendTestBookmark.bind(genetec));
+
+            httpServer.onRequest('/genetec/serverRunCheck', function (req, res) {
+                try {
+                    res.statusCode = 200;
+                    res.setHeader('Access-Control-Allow-Origin', '*');
+                    res.end('{"message": "Server running"}');
+                } catch (err) {
+                    res.statusCode = 500;
+                    res.end('{"message": "Server is not running"}');
+                }
+            });
+        }
+
         if (settings.google_drive.enabled) {
             if (
                 settings.camera.ip.length !== 0 &&
@@ -272,6 +309,7 @@ function main() {
             await sendAxisEventConnHub(data.code);
             await sendAxisEventCamera(data.code);
             await sendAcsEvent(data.code);
+            await sendGenetecBookmark(data.code);
 
             const promiseArr: Promise<boolean>[] = [];
             let imagesUploadStatus;
@@ -354,6 +392,7 @@ function main() {
         console.log('Application started');
     } catch (err) {
         console.error('Application start:', err);
+        httpServer?.close();
         process.exit(1);
     }
 }
@@ -364,6 +403,18 @@ process.on('uncaughtException', (err: Error) => {
 
 process.on('unhandledRejection', (err: Error) => {
     console.error('Unhandled rejection:', err);
+});
+
+process.on('SIGTERM', () => {
+    console.log('SIGTERM signal received');
+    httpServer?.close();
+    process.exit(0);
+});
+
+process.on('SIGINT', () => {
+    console.log('SIGINT signal received');
+    httpServer?.close();
+    process.exit(0);
 });
 
 main();

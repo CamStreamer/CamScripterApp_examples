@@ -49,6 +49,7 @@ export const StyledSelect = forwardRef(StyledSelectWithRef);
 
 export const StyledSelectField = styled(FormControl)({
     '& .MuiInputBase-root': { backgroundColor: 'white' },
+    '& .MuiSelect-select': { whiteSpace: 'wrap' },
     'width': 'clamp(50%, 600px, 100%)',
 });
 

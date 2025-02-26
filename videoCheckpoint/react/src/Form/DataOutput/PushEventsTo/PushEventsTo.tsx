@@ -1,12 +1,14 @@
-import { StyledSection } from '../../components/FormInputs';
+import { StyledSection } from '../../../components/FormInputs';
 import { FormControlLabel, Switch } from '@mui/material';
 import { Controller, useWatch, useFormContext } from 'react-hook-form';
-import { TServerData } from '../../models/schema';
+import { TServerData } from '../../../models/schema';
 import { FormAxisCameraStation } from './FormAxisCameraStation';
+import { Genetec } from './Genetec';
 
 export const PushEventsTo = () => {
     const { control } = useFormContext<TServerData>();
     const acsEnabled = useWatch({ control, name: 'acs.enabled' });
+    const genetecEnabled = useWatch({ control, name: 'genetec.enabled' });
 
     return (
         <StyledSection>
@@ -71,7 +73,25 @@ export const PushEventsTo = () => {
                     />
                 )}
             />
-            <FormControlLabel control={<Switch disabled />} label={'Genetec'} />
+            <Controller
+                name="genetec.enabled"
+                control={control}
+                render={({ field }) => (
+                    <FormControlLabel
+                        control={
+                            <Switch
+                                {...field}
+                                checked={field.value}
+                                onChange={(e, v) => {
+                                    field.onChange(v);
+                                }}
+                            />
+                        }
+                        label={'Genetec VMS'}
+                    />
+                )}
+            />
+            {genetecEnabled && <Genetec />}
             <FormControlLabel control={<Switch disabled />} label={'Milestone VMS'} />
             <FormControlLabel control={<Switch disabled />} label={'HTTPS'} />
         </StyledSection>

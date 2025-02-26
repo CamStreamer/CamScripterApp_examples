@@ -16,6 +16,17 @@ export const parseValueAsFloat = (value: string) => {
     }
 };
 
+export const pad = (num: number, size: number) => {
+    const sign = Math.sign(num) === -1 ? '-' : '';
+    return (
+        sign +
+        new Array(size)
+            .concat([Math.abs(num)])
+            .join('0')
+            .slice(-size)
+    );
+};
+
 export type TWatches = {
     protocol: string;
     ip: string;
@@ -31,8 +42,8 @@ export function validateCredentials(proxy: TWatches): [AbortController, Promise<
             'x-target-camera-path': '/axis-cgi/param.cgi',
             'x-target-camera-ip': proxy.ip,
             'x-target-camera-port': proxy.port.toString(),
-            'x-target-camera-user': encodeURIComponent(proxy.user),
-            'x-target-camera-pass': encodeURIComponent(proxy.pass),
+            'x-target-camera-user': proxy.user,
+            'x-target-camera-pass': proxy.pass,
         },
     });
     const aborter = new AbortController();
@@ -50,8 +61,8 @@ export const checkConnection = (proxy: TWatches): [AbortController, Promise<{ re
             'x-target-camera-path': '/axis-cgi/basicdeviceinfo.cgi',
             'x-target-camera-ip': proxy.ip,
             'x-target-camera-port': proxy.port.toString(),
-            'x-target-camera-user': encodeURIComponent(proxy.user),
-            'x-target-camera-pass': encodeURIComponent(proxy.pass),
+            'x-target-camera-user': proxy.user,
+            'x-target-camera-pass': proxy.pass,
         },
         body: JSON.stringify({
             apiVersion: '1.0',
@@ -75,4 +86,20 @@ export const checkConnection = (proxy: TWatches): [AbortController, Promise<{ re
     });
 
     return [aborter, cameraResponse];
+};
+
+export type TGenetec = {
+    protocol: string;
+    ip: string;
+    port: number;
+    base_uri: string;
+    user: string;
+    pass: string;
+    app_id: string;
+};
+
+export const generateParams = (genetec: TGenetec) => {
+    return `protocol=${genetec.protocol}&ip=${genetec.ip}&port=${genetec.port}&base_uri=${
+        genetec.base_uri
+    }&credentials=${btoa(`${genetec.user};${genetec.app_id}:${genetec.pass}`)}`;
 };

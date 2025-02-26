@@ -59,6 +59,17 @@
         "pass": "",
         "source_key": ""
     },
+    "genetec": {
+        "protocol": "http",
+        "ip": "",
+        "port": 4590,
+        "user": "",
+        "pass": "",
+        "enabled": false,
+        "base_uri": "WebSdk",
+        "app_id": "",
+        "camera_list": [0]
+    },
     "google_drive": {
         "enabled": false,
         "type": "image",

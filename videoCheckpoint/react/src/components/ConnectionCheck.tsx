@@ -6,7 +6,7 @@ type Props = {
     isFetching: boolean;
     isCameraResponding: boolean;
     areCredentialsValid: boolean;
-    name: 'camera' | 'conn_hub' | 'output_camera';
+    name: 'camera' | 'conn_hub' | 'output_camera' | 'genetec';
     check: () => void;
 };
 
