@@ -46,7 +46,7 @@ export const useGenetecConnection = ({ displaySnackbar }: Props) => {
     const handleCheckConnection = async () => {
         setIsFetching(true);
         const isConnectedResponse = await fetch(
-            `/local/camscripter/package/proxy/video_checkpoint/genetec/checkConnection?${generateParams(proxy)}`
+            `/local/camscripter/proxy/video_checkpoint/genetec/checkConnection?${generateParams(proxy)}`
         );
 
         void handleFetchCameraList();
@@ -57,14 +57,14 @@ export const useGenetecConnection = ({ displaySnackbar }: Props) => {
 
     const handleFetchCameraList = async () => {
         const cameraListResponse = await fetch(
-            `/local/camscripter/package/proxy/video_checkpoint/genetec/getCameraList?${generateParams(proxy)}`
+            `/local/camscripter/proxy/video_checkpoint/genetec/getCameraList?${generateParams(proxy)}`
         ).then((res) => res.json());
         setCameraList(cameraListResponse);
     };
 
     const handleSendTestBookmark = async () => {
         const isSent = await fetch(
-            `/local/camscripter/package/proxy/video_checkpoint/genetec/sendTestBookmark?${generateParams(
+            `/local/camscripter/proxy/video_checkpoint/genetec/sendTestBookmark?${generateParams(
                 proxy
             )}&camera_list=${JSON.stringify(cameraList)}&selected_cameras=${JSON.stringify(selectedCameras)}`,
             {
@@ -80,10 +80,11 @@ export const useGenetecConnection = ({ displaySnackbar }: Props) => {
     };
 
     const checkServerRunning = async () => {
-        const response = await fetch(`/local/camscripter/package/proxy/video_checkpoint/genetec/serverRunCheck`);
+        const response = await fetch(`/local/camscripter/proxy/video_checkpoint/genetec/serverRunCheck`);
 
         if (response.status === 200) {
             setIsFetching(false);
+            setServerRunning(true);
             void handleCheckConnection();
         } else {
             const timeoutId = setTimeout(() => {
@@ -111,5 +112,13 @@ export const useGenetecConnection = ({ displaySnackbar }: Props) => {
         proxy.app_id,
     ]);
 
-    return [handleCheckConnection, handleSendTestBookmark, isConnected, isFetching, cameraList, serverRunning] as const;
+    return [
+        handleCheckConnection,
+        handleSendTestBookmark,
+        isConnected,
+        isFetching,
+        cameraList,
+        serverRunning,
+        isDisabled,
+    ] as const;
 };
