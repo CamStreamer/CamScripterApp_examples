@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
-import { TWatches, validateCredentials } from '../utils';
+import { TWatches, validateCredentials, checkConnection } from '../utils';
 import { TSettings } from '../models/schema';
 
 type Props = {
@@ -10,6 +10,8 @@ type Props = {
 export const useCredentialsValidate = ({ name }: Props) => {
     const { control } = useFormContext<TSettings>();
     const [areCredentialsValid, setAreCredentialsValid] = useState<boolean>(true);
+    const [isFetching, setIsFetching] = useState<boolean>(false);
+    const [isCameraResponding, setIsCameraResponding] = useState<boolean>(false);
     const [lastRequestAborter, setLastRequestAborter] = useState<AbortController | null>(null);
 
     const proxy: TWatches = {
@@ -20,18 +22,63 @@ export const useCredentialsValidate = ({ name }: Props) => {
         pass: useWatch({ control, name: `${name}.pass` }),
     };
 
-    useEffect(() => {
-        lastRequestAborter?.abort();
-        const [aborter, areValidPromise] = validateCredentials(proxy);
-        setLastRequestAborter(aborter);
+    const validate = async () => {
+        if (!proxy.ip || !proxy.port || !proxy.user || !proxy.pass) {
+            return;
+        }
 
-        areValidPromise
-            .then((areValid) => {
-                setAreCredentialsValid(areValid);
-                setLastRequestAborter(null);
-            })
-            .catch(console.error);
+        try {
+            lastRequestAborter?.abort();
+            const [aborter, areValidPromise] = validateCredentials(proxy);
+            setLastRequestAborter(aborter);
+
+            await areValidPromise
+                .then((areValid) => {
+                    setAreCredentialsValid(areValid);
+                    setLastRequestAborter(null);
+                })
+                .catch(console.error);
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const check = async () => {
+        if (!proxy.ip || !proxy.port || !proxy.user || !proxy.pass) {
+            return;
+        }
+
+        if (!areCredentialsValid) {
+            return;
+        }
+
+        setIsFetching(true);
+
+        try {
+            lastRequestAborter?.abort();
+            const [aborter, cameraResponsePromise] = checkConnection(proxy);
+            setLastRequestAborter(aborter);
+
+            await cameraResponsePromise
+                .then((res) => {
+                    setIsCameraResponding(res.response);
+                    setLastRequestAborter(null);
+                })
+                .catch(console.error);
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setIsFetching(false);
+        }
+    };
+
+    useEffect(() => {
+        void validate();
     }, [proxy.protocol, proxy.ip, proxy.port, proxy.user, proxy.pass]);
 
-    return [areCredentialsValid] as const;
+    useEffect(() => {
+        void check();
+    }, [areCredentialsValid]);
+
+    return [areCredentialsValid, isFetching, isCameraResponding, check] as const;
 };
