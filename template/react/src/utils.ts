@@ -37,8 +37,8 @@ export function validateCredentials(proxy: TWatches): [AbortController, Promise<
             'x-target-camera-path': '/axis-cgi/param.cgi',
             'x-target-camera-ip': proxy.ip,
             'x-target-camera-port': proxy.port.toString(),
-            'x-target-camera-user': encodeURIComponent(proxy.user),
-            'x-target-camera-pass': encodeURIComponent(proxy.pass),
+            'x-target-camera-user': proxy.user,
+            'x-target-camera-pass': proxy.pass,
         },
     });
     const aborter = new AbortController();

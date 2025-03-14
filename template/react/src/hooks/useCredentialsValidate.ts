@@ -4,7 +4,7 @@ import { TWatches, validateCredentials } from '../utils';
 import { TSettings } from '../models/schema';
 
 type Props = {
-    name: 'camera';
+    name: 'camera' | 'output_camera';
 };
 
 export const useCredentialsValidate = ({ name }: Props) => {

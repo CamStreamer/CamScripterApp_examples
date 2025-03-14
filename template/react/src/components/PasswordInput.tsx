@@ -10,12 +10,10 @@ import { StyledTextField } from './FormInputs';
 type Props = {
     areCredentialsValid?: boolean;
     control: Control<TSettings>;
-    name: `camera`;
-    onBlur?: () => void;
-    onChange?: () => void;
+    name: 'camera' | 'output_camera';
 };
 
-export const PasswordInput = ({ control, name, onBlur, onChange, areCredentialsValid = true }: Props) => {
+export const PasswordInput = ({ control, name, areCredentialsValid = true }: Props) => {
     const [showPassword, setShowPassword] = useState(false);
     const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -48,11 +46,9 @@ export const PasswordInput = ({ control, name, onBlur, onChange, areCredentialsV
                     helperText={areCredentialsValid ? formState.errors?.[name]?.pass?.message : 'Wrong credentials'}
                     onBlur={() => {
                         field.onBlur();
-                        onBlur?.();
                     }}
                     onChange={(event) => {
                         field.onChange(event);
-                        onChange?.();
                     }}
                 />
             )}
