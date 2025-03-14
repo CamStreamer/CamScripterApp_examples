@@ -13,7 +13,7 @@ export const Nav = () => {
 };
 
 const StyledNav = styled('nav')`
-    background-color: #15273d;
+    background-color: #00aea4;
     padding: 0.5rem 1rem;
     display: flex;
     align-items: center;
@@ -26,13 +26,15 @@ const StyledNav = styled('nav')`
 const StyledLink = styled('a')`
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 2rem;
+    margin-left: 1rem;
     text-decoration: none;
     color: inherit;
 `;
 
 const StyledImage = styled('img')`
     width: 3em;
+    filter: invert(100%) brightness(100) contrast(100%);
 `;
 
 const StyledText = styled(Typography)`
