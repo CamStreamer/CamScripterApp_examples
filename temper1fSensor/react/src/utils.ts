@@ -38,8 +38,8 @@ export function validateCredentials(proxy: TWatches, path: string): [AbortContro
             'x-target-camera-path': path,
             'x-target-camera-ip': proxy.ip,
             'x-target-camera-port': proxy.port.toString(),
-            'x-target-camera-user': encodeURIComponent(proxy.user),
-            'x-target-camera-pass': encodeURIComponent(proxy.pass),
+            'x-target-camera-user': proxy.user,
+            'x-target-camera-pass': proxy.pass,
         },
     });
     const aborter = new AbortController();
