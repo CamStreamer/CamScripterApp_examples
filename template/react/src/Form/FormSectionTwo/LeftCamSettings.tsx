@@ -1,26 +1,22 @@
 import { Controller, useFormContext } from 'react-hook-form';
-import { TSettings, TCamera } from '../../models/schema';
+import { PROTOCOLS, PROTOCOL_LABELS } from '../constants';
+import { TSettings } from '../../models/schema';
 import { useCredentialsValidate } from '../../hooks/useCredentialsValidate';
-import { Radio, RadioGroup, Stack } from '@mui/material';
-import { StyledTextField, StyledRadioControlLabel } from '../../components/FormInputs';
+import { Radio, RadioGroup } from '@mui/material';
+import { StyledTextField, StyledRadioControlLabel, StyledForm } from '../../components/FormInputs';
 import { PasswordInput } from '../../components/PasswordInput';
 import { parseValueAsInt } from '../../utils';
 import { Title } from '../../components/Title';
 
-type Props = {
-    name: 'camera';
-    onBlur?: () => void;
-};
-
-export const LeftCamSettings = ({ onBlur, name }: Props) => {
+export const LeftCamSettings = () => {
     const { control, setValue } = useFormContext<TSettings>();
-    const [areCredentialsValid] = useCredentialsValidate({ name });
+    const [areCredentialsValid] = useCredentialsValidate({ name: 'output_camera' });
 
     return (
-        <Stack spacing={1.5}>
+        <StyledForm>
             <Title text="Camera Connection Settings" />
             <Controller
-                name={`${name}.protocol`}
+                name={`output_camera.protocol`}
                 control={control}
                 render={({ field }) => (
                     <RadioGroup
@@ -28,12 +24,11 @@ export const LeftCamSettings = ({ onBlur, name }: Props) => {
                         value={field.value}
                         onChange={(event) => {
                             const protocol = event.target.value;
-                            setValue(`${name}.port`, protocol === 'http' ? 80 : 443, {
+                            setValue(`output_camera.port`, protocol === 'http' ? 80 : 443, {
                                 shouldTouch: true,
                             });
 
                             field.onChange(event);
-                            onBlur?.();
                         }}
                     >
                         {PROTOCOLS.map((value) => (
@@ -48,7 +43,7 @@ export const LeftCamSettings = ({ onBlur, name }: Props) => {
                 )}
             />
             <Controller
-                name={`${name}.ip`}
+                name={`output_camera.ip`}
                 control={control}
                 render={({ field, formState }) => (
                     <StyledTextField
@@ -56,17 +51,16 @@ export const LeftCamSettings = ({ onBlur, name }: Props) => {
                         InputLabelProps={{ shrink: true }}
                         fullWidth
                         label="IP address"
-                        error={formState.errors[name]?.ip !== undefined}
-                        helperText={formState.errors[name]?.ip?.message}
+                        error={formState.errors.output_camera?.ip !== undefined}
+                        helperText={formState.errors.output_camera?.ip?.message}
                         onBlur={() => {
                             field.onBlur();
-                            onBlur?.();
                         }}
                     />
                 )}
             />
             <Controller
-                name={`${name}.port`}
+                name={`output_camera.port`}
                 control={control}
                 render={({ field, formState }) => (
                     <StyledTextField
@@ -78,17 +72,16 @@ export const LeftCamSettings = ({ onBlur, name }: Props) => {
                             field.onChange(val);
                             e.target.value = val.toString();
                             field.onBlur();
-                            onBlur?.();
                         }}
                         fullWidth
                         label="Port"
-                        error={formState.errors[name]?.port !== undefined}
-                        helperText={formState.errors[name]?.port?.message}
+                        error={formState.errors.output_camera?.port !== undefined}
+                        helperText={formState.errors.output_camera?.port?.message}
                     />
                 )}
             />
             <Controller
-                name={`${name}.user`}
+                name={`output_camera.user`}
                 control={control}
                 render={({ field, formState }) => (
                     <StyledTextField
@@ -96,23 +89,15 @@ export const LeftCamSettings = ({ onBlur, name }: Props) => {
                         InputLabelProps={{ shrink: true }}
                         fullWidth
                         label="User"
-                        error={formState.errors[name]?.user !== undefined}
-                        helperText={formState.errors[name]?.user?.message}
+                        error={formState.errors.output_camera?.user !== undefined}
+                        helperText={formState.errors.output_camera?.user?.message}
                         onBlur={() => {
                             field.onBlur();
-                            onBlur?.();
                         }}
                     />
                 )}
             />
-            <PasswordInput areCredentialsValid={areCredentialsValid} control={control} name={name} onBlur={onBlur} />
-        </Stack>
+            <PasswordInput areCredentialsValid={areCredentialsValid} control={control} name={'output_camera'} />
+        </StyledForm>
     );
 };
-
-const PROTOCOL_LABELS: Record<TCamera['protocol'], string> = {
-    http: 'HTTP',
-    https: 'HTTPS',
-    https_insecure: 'HTTPS (not trusted cert)',
-};
-const PROTOCOLS = Object.keys(PROTOCOL_LABELS) as TCamera['protocol'][];
