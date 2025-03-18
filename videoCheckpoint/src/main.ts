@@ -4,6 +4,7 @@ import { QRCodeReader, TReading } from './input/QrCodeReader';
 import { Widget } from './graphics/Widget';
 import { AxisCameraStation } from './upload/AxisCameraStation';
 import { Genetec } from './upload/Genetec';
+import { Milestone } from './upload/Milestone';
 import { LedIndicator } from './vapix/LedIndicator';
 import { GoogleDriveAPI } from './upload/GoogleDriveAPI';
 import { CameraImage } from './vapix/CameraImage';
@@ -25,6 +26,7 @@ let ledIndicator: LedIndicator | undefined;
 let widget: Widget | undefined;
 let acs: AxisCameraStation | undefined;
 let genetec: Genetec | undefined;
+let milestone: Milestone | undefined;
 let httpServer: HttpServer | undefined;
 let cameraImage: CameraImage | undefined;
 let cameraVideo: CameraVideo | undefined;
@@ -106,6 +108,18 @@ async function sendGenetecBookmark(code: string) {
         return true;
     } catch (err) {
         console.error('Genetec bookmark:', err instanceof Error ? err.message : 'unknown');
+        return false;
+    }
+}
+
+function sendMilestoneEvent(code: string) {
+    try {
+        if (milestone) {
+            milestone.sendEvent(code);
+        }
+        return true;
+    } catch (err) {
+        console.error('Milestone event:', err instanceof Error ? err.message : 'unknown');
         return false;
     }
 }
@@ -239,6 +253,10 @@ function main() {
             });
         }
 
+        if (settings.milestone.enabled) {
+            milestone = new Milestone(settings.milestone);
+        }
+
         if (settings.google_drive.enabled) {
             if (
                 settings.camera.ip.length !== 0 &&
@@ -310,6 +328,7 @@ function main() {
             await sendAxisEventCamera(data.code);
             await sendAcsEvent(data.code);
             await sendGenetecBookmark(data.code);
+            sendMilestoneEvent(data.code);
 
             const promiseArr: Promise<boolean>[] = [];
             let imagesUploadStatus;
