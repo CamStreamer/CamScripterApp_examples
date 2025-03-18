@@ -74,7 +74,7 @@ export const mockedSettings: TServerData = {
     },
     milestone: {
         enabled: false,
-        transaction_source: '',
+        transaction_source: 'Videocheckpoint',
         port: 8081,
     },
     google_drive: {
