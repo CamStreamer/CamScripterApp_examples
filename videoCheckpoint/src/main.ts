@@ -115,6 +115,7 @@ async function sendGenetecBookmark(code: string) {
 function sendMilestoneEvent(code: string) {
     try {
         if (milestone) {
+            console.log(`Send Milestone event, code: "${code}"`);
             milestone.sendEvent(code);
         }
         return true;

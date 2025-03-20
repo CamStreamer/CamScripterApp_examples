@@ -3,6 +3,7 @@ import { TServerData } from '../schema';
 
 export class Milestone {
     private milestoneClient: net.Socket | null = null;
+    private codeBuffer: string | null = null;
 
     constructor(private milestoneSettings: TServerData['milestone']) {
         this.serverConnect();
@@ -36,16 +37,17 @@ export class Milestone {
     sendEvent(code: string) {
         const validatedCode = code.trim().split(' ').join('');
         const message = `${this.milestoneSettings.transaction_source} ${validatedCode}\n`;
+        this.codeBuffer = message;
         if (this.milestoneClient) {
-            this.milestoneClient.write(message, (err) => {
+            this.milestoneClient.write(this.codeBuffer, (err) => {
                 if (err) {
                     console.error('Error sending data to client:', err);
                 } else {
-                    console.log('Data sent to client:', message);
+                    console.log('Data sent to client:', `${this.milestoneSettings.transaction_source} ${code}`);
                 }
             });
         } else {
-            console.log('No client connected to send data.');
+            console.log('No client connected.');
         }
     }
 }
