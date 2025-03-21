@@ -3,7 +3,6 @@ import { TServerData } from '../schema';
 
 export class Milestone {
     private milestoneClient: net.Socket | null = null;
-    private codeBuffer: string | null = null;
 
     constructor(private milestoneSettings: TServerData['milestone']) {
         this.serverConnect();
@@ -11,19 +10,24 @@ export class Milestone {
 
     serverConnect() {
         const server = net.createServer((client) => {
-            this.milestoneClient = client;
+            if (this.milestoneClient) {
+                console.log('Closing connection to the previous Milestone client.');
+                this.milestoneClient.end();
+                this.milestoneClient.destroy();
+            }
 
+            this.milestoneClient = client;
             console.log('Milestone client connected');
 
             client.on('end', () => {
-                console.log('Client disconnected.');
+                console.log('Milestone client disconnected.');
                 this.milestoneClient = null;
             });
         });
 
         server.listen(this.milestoneSettings.port, () => {
             server.on('close', () => {
-                console.log('TCP server socket is closed.');
+                console.log('Milestone: TCP server socket is closed.');
                 process.exit(1);
             });
 
@@ -37,17 +41,16 @@ export class Milestone {
     sendEvent(code: string) {
         const validatedCode = code.trim().split(' ').join('');
         const message = `${this.milestoneSettings.transaction_source} ${validatedCode}\n`;
-        this.codeBuffer = message;
         if (this.milestoneClient) {
-            this.milestoneClient.write(this.codeBuffer, (err) => {
+            this.milestoneClient.write(message, (err) => {
                 if (err) {
-                    console.error('Error sending data to client:', err);
+                    console.error('Error sending data to Milestone:', err);
                 } else {
-                    console.log('Data sent to client:', `${this.milestoneSettings.transaction_source} ${code}`);
+                    console.log('Data sent to Milestone:', `${this.milestoneSettings.transaction_source} ${code}`);
                 }
             });
         } else {
-            console.log('No client connected.');
+            console.log('No Milestone client connected.');
         }
     }
 }
