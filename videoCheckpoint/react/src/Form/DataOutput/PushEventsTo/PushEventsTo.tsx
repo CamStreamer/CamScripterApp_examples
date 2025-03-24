@@ -4,11 +4,13 @@ import { Controller, useWatch, useFormContext } from 'react-hook-form';
 import { TServerData } from '../../../models/schema';
 import { FormAxisCameraStation } from './FormAxisCameraStation';
 import { Genetec } from './Genetec';
+import { Milestone } from './Milestone';
 
 export const PushEventsTo = () => {
     const { control } = useFormContext<TServerData>();
     const acsEnabled = useWatch({ control, name: 'acs.enabled' });
     const genetecEnabled = useWatch({ control, name: 'genetec.enabled' });
+    const milestoneEnabled = useWatch({ control, name: 'milestone.enabled' });
 
     return (
         <StyledSection>
@@ -92,7 +94,25 @@ export const PushEventsTo = () => {
                 )}
             />
             {genetecEnabled && <Genetec />}
-            <FormControlLabel control={<Switch disabled />} label={'Milestone VMS'} />
+            <Controller
+                name="milestone.enabled"
+                control={control}
+                render={({ field }) => (
+                    <FormControlLabel
+                        control={
+                            <Switch
+                                {...field}
+                                checked={field.value}
+                                onChange={(e, v) => {
+                                    field.onChange(v);
+                                }}
+                            />
+                        }
+                        label={'Milestone VMS'}
+                    />
+                )}
+            />
+            {milestoneEnabled && <Milestone />}
             <FormControlLabel control={<Switch disabled />} label={'HTTPS'} />
         </StyledSection>
     );

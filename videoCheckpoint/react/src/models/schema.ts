@@ -67,6 +67,11 @@ export const serverDataSchema = z.object({
             camera_list: z.number().array().nonempty(),
         })
     ),
+    milestone: z.object({
+        enabled: z.boolean(),
+        transaction_source: z.string(),
+        port: z.number().positive().lt(65535),
+    }),
     google_drive: z.object({
         enabled: z.boolean(),
         type: z.string(),
