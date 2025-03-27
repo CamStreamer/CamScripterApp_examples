@@ -1,30 +1,26 @@
 import { z } from 'zod';
 
-const connectionParams = {
+export const connectionParamsSchema = z.object({
     protocol: z.union([z.literal('http'), z.literal('https'), z.literal('https_insecure')]),
-    ip: z.string(),
-    port: z.number(),
+    ip: z.union([z.string().ip(), z.literal('')]),
+    port: z.number().positive().lt(65535),
     user: z.string(),
     pass: z.string(),
-    camera_list: z.array(z.number()),
-};
-export const cameraSchema = z.object({
-    ...connectionParams,
-    serviceID: z.number(),
-    fieldName: z.string(),
 });
-export const applicationSchema = z.object({
-    protocol: z.union([z.literal('http'), z.literal('https'), z.literal('https_insecure')]),
-    ip: z.string(),
-    port: z.number(),
-    portID: z.string(),
-    updateFrequency: z.number(),
-});
-export const settingsSchema = z.object({
-    camera: cameraSchema,
-    application: applicationSchema,
-});
+export type TConnectionParams = z.infer<typeof connectionParamsSchema>;
 
-export type TCamera = z.infer<typeof cameraSchema>;
-export type TPapago = z.infer<typeof applicationSchema>;
+export const settingsSchema = z.object({
+    camera: connectionParamsSchema.merge(
+        z.object({
+            update_frequency: z.number(),
+            port_id: z.string(),
+        })
+    ),
+    output_camera: connectionParamsSchema.merge(
+        z.object({
+            field_name: z.string(),
+            service_id: z.string(),
+        })
+    ),
+});
 export type TSettings = z.infer<typeof settingsSchema>;

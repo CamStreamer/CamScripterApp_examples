@@ -1,22 +1,17 @@
 import { Controller, useFormContext } from 'react-hook-form';
 import { TSettings } from '../../models/schema';
-import { StyledTextField } from '../../components/FormInputs';
+import { StyledTextField, StyledForm } from '../../components/FormInputs';
 import { parseValueAsInt } from '../../utils';
 import { Title } from '../../components/Title';
-import { Stack } from '@mui/material';
 
-type Props = {
-    name: 'camera';
-    onBlur?: () => void;
-};
-export const RightCamSettings = ({ onBlur, name }: Props) => {
+export const RightCamSettings = () => {
     const { control } = useFormContext<TSettings>();
 
     return (
-        <Stack spacing={1.5}>
+        <StyledForm>
             <Title text="Custom Graphics Widget settings" />
             <Controller
-                name={`${name}.serviceID`}
+                name={`output_camera.service_id`}
                 control={control}
                 render={({ field, formState }) => (
                     <StyledTextField
@@ -28,17 +23,16 @@ export const RightCamSettings = ({ onBlur, name }: Props) => {
                             field.onChange(val);
                             e.target.value = val.toString();
                             field.onBlur();
-                            onBlur?.();
                         }}
                         fullWidth
                         label="Service ID"
-                        error={formState.errors[name]?.serviceID !== undefined}
-                        helperText={formState.errors[name]?.serviceID?.message}
+                        error={formState.errors.output_camera?.service_id !== undefined}
+                        helperText={formState.errors.output_camera?.service_id?.message}
                     />
                 )}
             />
             <Controller
-                name={`${name}.fieldName`}
+                name={`output_camera.field_name`}
                 control={control}
                 render={({ field, formState }) => (
                     <StyledTextField
@@ -46,15 +40,14 @@ export const RightCamSettings = ({ onBlur, name }: Props) => {
                         InputLabelProps={{ shrink: true }}
                         fullWidth
                         label="Field Name"
-                        error={formState.errors[name]?.fieldName !== undefined}
-                        helperText={formState.errors[name]?.fieldName?.message}
+                        error={formState.errors.output_camera?.field_name !== undefined}
+                        helperText={formState.errors.output_camera?.field_name?.message}
                         onBlur={() => {
                             field.onBlur();
-                            onBlur?.();
                         }}
                     />
                 )}
             />
-        </Stack>
+        </StyledForm>
     );
 };

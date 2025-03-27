@@ -2,8 +2,8 @@ import { Fade } from '@mui/material';
 import styled from '@mui/material/styles/styled';
 import { CollapsibleFormSection } from '../components/CollapsibleFormSection';
 
-import { FormSectionTwo } from './FormSectionTwo/FormSectionTwo';
 import { FormSectionOne } from './FormSectionOne/FormSectionOne';
+import { FormSectionTwo } from './FormSectionTwo/FormSectionTwo';
 
 export function Form() {
     return (
@@ -25,6 +25,6 @@ const StyledForm = styled('div')`
     display: flex;
     justify-content: center;
     flex-direction: column;
-    padding: 0 20px;
     margin-top: 20px;
+    gap: 8px;
 `;
