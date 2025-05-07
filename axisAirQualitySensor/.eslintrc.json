@@ -1,0 +1,19 @@
+{
+    "env": {
+        "es2021": true,
+        "browser": true,
+        "node": true
+    },
+    "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended", "@camstreamer/eslint-config"],
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+        "project": "tsconfig.json",
+        "tsconfigRootDir": ".",
+        "ecmaVersion": "latest",
+        "sourceType": "module"
+    },
+    "plugins": ["@typescript-eslint"],
+    "rules": {
+        "@typescript-eslint/no-explicit-any": "off"
+    }
+}
