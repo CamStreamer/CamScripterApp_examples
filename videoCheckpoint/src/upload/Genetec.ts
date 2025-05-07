@@ -1,13 +1,15 @@
 import { TServerData } from '../schema';
 import { GenetecAgent, GenetecAgentOptions } from 'camstreamerlib/events/GenetecAgent';
 
-const PARAMS = ['Guid', 'Name', 'EntityType'];
+type TParams = Array<'Guid' | 'Name' | 'EntityType'>;
 
 type TCameraOption = {
     index: number;
     value: string;
     label: string;
 };
+
+const PARAMS: TParams = ['Guid', 'Name', 'EntityType'];
 
 export class Genetec {
     private agent: GenetecAgent;
@@ -165,8 +167,8 @@ export class Genetec {
             const camera = camerasDetails[i];
             cameraList.push({
                 index: i,
-                value: camera.Guid,
-                label: camera.Name,
+                value: camera.Guid ?? '',
+                label: camera.Name ?? '',
             });
         }
 
