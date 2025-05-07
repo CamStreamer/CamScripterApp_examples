@@ -99,13 +99,11 @@ export type TGenetec = {
 };
 
 export const generateParams = (genetec: TGenetec) => {
-    return `
-        protocol=${encodeURIComponent(genetec.protocol)}
-        &ip=${encodeURIComponent(genetec.ip)}
-        &port=${encodeURIComponent(genetec.port)}
-        &base_uri=${encodeURIComponent(genetec.base_uri)}
-        &user=${encodeURIComponent(genetec.user)}
-        &pass=${encodeURIComponent(genetec.pass)}
-        &app_id=${encodeURIComponent(genetec.app_id)}
-    `;
+    return `protocol=${encodeURIComponent(genetec.protocol)}&ip=${encodeURIComponent(
+        genetec.ip
+    )}&port=${encodeURIComponent(genetec.port)}&base_uri=${encodeURIComponent(
+        genetec.base_uri
+    )}&user=${encodeURIComponent(genetec.user)}&pass=${encodeURIComponent(genetec.pass)}&app_id=${encodeURIComponent(
+        genetec.app_id
+    )}`;
 };
