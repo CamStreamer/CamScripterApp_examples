@@ -1,5 +1,4 @@
 import * as Stream from 'stream';
-import { TServerData } from './schema';
 
 export function pad(num: number, size: number) {
     const sign = Math.sign(num) === -1 ? '-' : '';
@@ -90,16 +89,4 @@ export async function convertWebStreamToNodeReadable(webStream: ReadableStream):
 
     await pushChunks();
     return Promise.resolve(nodeReadable);
-}
-
-export type TProxy = {
-    protocol: string | null;
-    ip: string | null;
-    port: string | null;
-    base_uri: string | null;
-    credentials: string | null;
-};
-
-export function generateUrl(proxy: TProxy | TServerData['genetec']) {
-    return `${proxy.protocol}://${proxy.ip}:${proxy.port}/${proxy.base_uri}`;
 }

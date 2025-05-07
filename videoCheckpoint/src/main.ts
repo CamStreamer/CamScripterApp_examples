@@ -238,9 +238,9 @@ function main() {
             genetec = new Genetec(settings.genetec);
             httpServer = new HttpServer();
 
-            httpServer.onRequest('/genetec/checkConnection', genetec.checkConnection.bind(genetec));
-            httpServer.onRequest('/genetec/getCameraList', genetec.getCameraOptions.bind(genetec));
-            httpServer.onRequest('/genetec/sendTestBookmark', genetec.sendTestBookmark.bind(genetec));
+            httpServer.onRequest('/genetec/checkConnection', (req, res) => genetec?.checkConnection(req, res));
+            httpServer.onRequest('/genetec/getCameraList', (req, res) => genetec?.getCameraOptions(req, res));
+            httpServer.onRequest('/genetec/sendTestBookmark', (req, res) => genetec?.sendTestBookmark(req, res));
 
             httpServer.onRequest('/genetec/serverRunCheck', function (req, res) {
                 try {

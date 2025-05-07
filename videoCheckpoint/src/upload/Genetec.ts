@@ -1,10 +1,7 @@
 import { TServerData } from '../schema';
-import { pad, generateUrl, TProxy } from '../utils';
+import { GenetecAgent, GenetecAgentOptions } from 'camstreamerlib/events/GenetecAgent';
 
-const ACTION = 'AddCameraBookmark';
-const GET_CAMERAS_URL = 'report/EntityConfiguration?q=EntityTypes@Camera';
-const GET_CAMERAS_DETAILS_URL = '/entity?q=';
-const PARAMS = 'Guid,Name,EntityType';
+type TParams = Array<'Guid' | 'Name' | 'EntityType'>;
 
 type TCameraOption = {
     index: number;
@@ -12,30 +9,44 @@ type TCameraOption = {
     label: string;
 };
 
+const PARAMS: TParams = ['Guid', 'Name', 'EntityType'];
+
 export class Genetec {
-    private baseUrl: string;
-    private credentials: string;
+    private agent: GenetecAgent;
+    private settings: GenetecAgentOptions;
 
     constructor(private genetecSettings: TServerData['genetec']) {
-        this.baseUrl = generateUrl(genetecSettings);
-        this.credentials = btoa(`${genetecSettings.user};${genetecSettings.app_id}:${genetecSettings.pass}`);
+        this.settings = {
+            protocol: genetecSettings.protocol,
+            ip: genetecSettings.ip,
+            port: genetecSettings.port,
+            base_uri: genetecSettings.base_uri,
+            user: genetecSettings.user,
+            pass: genetecSettings.pass,
+            app_id: genetecSettings.app_id,
+        };
+
+        this.agent = new GenetecAgent(this.settings);
     }
 
     async checkConnection(req: any, res: any) {
         const queryString = req.url.split('?')[1];
         const params = new URLSearchParams(queryString);
         const currentSettings = {
-            protocol: params.get('protocol'),
-            ip: params.get('ip'),
-            port: params.get('port'),
-            base_uri: params.get('base_uri'),
-            credentials: params.get('credentials'),
+            protocol: params.get('protocol') ?? 'http',
+            ip: params.get('ip') ?? '127.0.0.1',
+            port: params.get('port') ?? 80,
+            base_uri: params.get('base_uri') ?? 'WebSdk',
+            user: params.get('user') ?? 'root',
+            pass: params.get('pass') ?? '',
+            app_id: params.get('app_id') ?? '',
         };
-        const baseUrl = generateUrl(currentSettings);
-        const credentials = `${currentSettings.credentials}`;
+
+        console.log('currentSettings:', currentSettings);
 
         try {
-            const isConnected = await this.checkConnectionToGenetec(baseUrl, credentials).then((res) => res.Rsp.Status);
+            const newAgent = new GenetecAgent(currentSettings as GenetecAgentOptions);
+            const isConnected = await newAgent.checkConnection().then((res) => res.Rsp.Status);
 
             console.log('Connection to Genetec successful');
             res.statusCode = 200;
@@ -56,25 +67,28 @@ export class Genetec {
         const queryString = req.url.split('?')[1];
         const params = new URLSearchParams(queryString);
         const currentSettings = {
-            protocol: params.get('protocol'),
-            ip: params.get('ip'),
-            port: params.get('port'),
-            base_uri: params.get('base_uri'),
-            credentials: params.get('credentials'),
+            protocol: params.get('protocol') ?? 'http',
+            ip: params.get('ip') ?? '127.0.0.1',
+            port: params.get('port') ?? 80,
+            base_uri: params.get('base_uri') ?? 'WebSdk',
+            user: params.get('user') ?? 'root',
+            pass: params.get('pass') ?? '',
+            app_id: params.get('app_id') ?? '',
+        };
+        const currentCameraOptions = {
             camera_list: params.get('camera_list'),
             selected_cameras: params.get('selected_cameras'),
         };
-        const baseUrl = generateUrl(currentSettings);
-        const credentials = `${currentSettings.credentials}`;
 
         try {
-            if (currentSettings.camera_list !== null && currentSettings.selected_cameras !== null) {
+            if (currentCameraOptions.camera_list !== null && currentCameraOptions.selected_cameras !== null) {
+                const newAgent = new GenetecAgent(currentSettings as GenetecAgentOptions);
+
                 await this.sendBookmark(
                     'Testing bookmark from CamStreamer script',
-                    baseUrl,
-                    credentials,
-                    JSON.parse(currentSettings.camera_list),
-                    JSON.parse(currentSettings.selected_cameras)
+                    newAgent,
+                    JSON.parse(currentCameraOptions.camera_list),
+                    JSON.parse(currentCameraOptions.selected_cameras)
                 );
 
                 res.statusCode = 200;
@@ -92,17 +106,18 @@ export class Genetec {
         const queryString = req.url.split('?')[1];
         const params = new URLSearchParams(queryString);
         const currentSettings = {
-            protocol: params.get('protocol'),
-            ip: params.get('ip'),
-            port: params.get('port'),
-            base_uri: params.get('base_uri'),
-            credentials: params.get('credentials'),
+            protocol: params.get('protocol') ?? 'http',
+            ip: params.get('ip') ?? '127.0.0.1',
+            port: params.get('port') ?? 80,
+            base_uri: params.get('base_uri') ?? 'WebSdk',
+            user: params.get('user') ?? 'root',
+            pass: params.get('pass') ?? '',
+            app_id: params.get('app_id') ?? '',
         };
-        const baseUrl = generateUrl(currentSettings);
-        const credentials = `${currentSettings.credentials}`;
 
         try {
-            const cameraList = await this.getCameraList(baseUrl, credentials);
+            const newAgent = new GenetecAgent(currentSettings as GenetecAgentOptions);
+            const cameraList = await this.getCameraList(newAgent);
 
             res.statusCode = 200;
             res.setHeader('Access-Control-Allow-Origin', '*');
@@ -115,120 +130,48 @@ export class Genetec {
 
     async sendBookmark(
         code: string,
-        baseUrl?: string,
-        credentials?: string,
+        newAgent?: GenetecAgent,
         currentCameraList?: TCameraOption[],
         currentSelectedCameras?: number[]
     ) {
+        const genetecAgent = newAgent ?? this.agent;
         console.log('Sending bookmark... ', code);
         try {
-            if (baseUrl === undefined) {
-                baseUrl = this.baseUrl;
-            }
-            if (credentials === undefined) {
-                credentials = this.credentials;
-            }
             if (currentCameraList === undefined) {
-                currentCameraList = await this.getCameraList(baseUrl, credentials);
+                currentCameraList = await this.getCameraList();
             }
             if (currentSelectedCameras === undefined) {
                 currentSelectedCameras = this.genetecSettings.camera_list;
             }
 
-            const date = new Date();
-            const year = date.getUTCFullYear();
-            const month = pad(date.getUTCMonth() + 1, 2);
-            const day = pad(date.getUTCDate(), 2);
-            const hours = pad(date.getUTCHours(), 2);
-            const minutes = pad(date.getUTCMinutes(), 2);
-            const seconds = pad(date.getUTCSeconds(), 2);
-            const miliSeconds = pad(date.getUTCMilliseconds(), 2);
+            const selectedCamerasToSend = currentCameraList
+                .filter((camera: TCameraOption) => currentSelectedCameras?.includes(camera.index))
+                .map((camera) => camera.value);
 
-            const timeStamp = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${miliSeconds}Z`;
-            const bookmarkText = code;
-
-            const selectedCamerasToSend = currentCameraList.filter((camera: TCameraOption) =>
-                currentSelectedCameras?.includes(camera.index)
-            );
-
-            const cameraEntitiesUrl: string[] = [];
-
-            for (const camera of selectedCamerasToSend) {
-                cameraEntitiesUrl.push(`${ACTION}(${camera.value},${timeStamp},${bookmarkText})`);
-            }
-
-            const requestOptions = this.requestOptionsCreator(
-                'POST',
-                credentials !== undefined ? credentials : this.credentials
-            );
-
-            await fetch(
-                `${baseUrl !== undefined ? baseUrl : this.baseUrl}/action?q=${cameraEntitiesUrl.join(',')}`,
-                requestOptions
-            );
+            await genetecAgent.sendBookmark(selectedCamerasToSend, code);
             console.log('Bookmark sent: ', code);
         } catch (err) {
             console.error('Cannot send bookmark, error: ', err);
         }
     }
 
-    private async getCameraList(baseUrl: string, credentials: string) {
-        const guidsArray = await this.getAllCamerasGuids(baseUrl, credentials).then((res) => res.Rsp.Result);
-        const camerasGuids = guidsArray.map((guid: { Guid: string }) => guid.Guid);
-        const camerasDetailsUrl = [];
+    private async getCameraList(newAgent?: GenetecAgent) {
+        const genetecAgent = newAgent ?? this.agent;
 
-        for (const guid of camerasGuids) {
-            camerasDetailsUrl.push(`entity=${guid},${PARAMS}`);
-        }
-
-        const requestOptions = this.requestOptionsCreator('GET', credentials);
-
-        const camerasDetails = await fetch(
-            `${baseUrl}/${GET_CAMERAS_DETAILS_URL}${camerasDetailsUrl.join(',')}`,
-            requestOptions
-        )
-            .then((res) => res.json())
-            .then((response) => response.Rsp.Result);
+        const guidsArray = await genetecAgent.getAllCameraGuids().then((res) => res.Rsp.Result);
+        const camerasDetails = await genetecAgent.getCameraDetails(guidsArray, PARAMS).then((res) => res.Rsp.Result);
 
         const cameraList = [];
 
-        if (!Array.isArray(camerasDetails)) {
+        for (let i = 0; i < camerasDetails.length; i++) {
+            const camera = camerasDetails[i];
             cameraList.push({
-                index: 0,
-                value: camerasDetails.Guid,
-                label: camerasDetails.Name,
+                index: i,
+                value: camera.Guid ?? '',
+                label: camera.Name ?? '',
             });
-        } else {
-            for (let i = 0; i < camerasDetails.length; i++) {
-                const camera = camerasDetails[i];
-                cameraList.push({
-                    index: i,
-                    value: camera.Guid,
-                    label: camera.Name,
-                });
-            }
         }
+
         return cameraList;
-    }
-
-    private async getAllCamerasGuids(baseUrl: string, credentials: string) {
-        const requestOptions = this.requestOptionsCreator('GET', credentials);
-        return await fetch(`${baseUrl}/${GET_CAMERAS_URL}`, requestOptions).then((res) => res.json());
-    }
-
-    private async checkConnectionToGenetec(baseUrl: string, credentials: string) {
-        const requestOptions = this.requestOptionsCreator('GET', credentials);
-        return fetch(`${baseUrl}/`, requestOptions).then((res) => res.json());
-    }
-
-    private requestOptionsCreator(method: string, credentials: string): RequestInit {
-        return {
-            method: method,
-            headers: new Headers({
-                Authorization: `Basic ${credentials}`,
-                Accept: 'text/json',
-            }),
-            redirect: 'follow' as RequestRedirect,
-        };
     }
 }
