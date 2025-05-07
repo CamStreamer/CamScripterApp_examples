@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Box, Container, CssBaseline, Typography } from '@mui/material';
+import { Box, Container, CssBaseline, Typography, Divider } from '@mui/material';
 import styled from '@mui/material/styles/styled';
 
 import { Nav } from './components/Nav';
@@ -68,6 +68,7 @@ export const App = () => {
                             send an event to Axis Camera Station.
                         </Typography>
                     </StyledHeader>
+                    <Divider />
                     {defaultValues ? (
                         <FormWrapper defaultValues={defaultValues} />
                     ) : (
@@ -85,25 +86,33 @@ const StyledContainer = styled(Container)`
     flex-direction: column;
     flex: 1;
     align-items: center;
+    background-color: white;
 
     & > div {
         flex: 1;
     }
 `;
 
-const StyledContentWrapper = styled(Box)({
-    width: '100%',
-    display: 'flex',
-    flexDirection: 'column',
-    position: 'relative',
-});
+const StyledContentWrapper = styled(Box)`
+    width: 100%;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    position: relative;
+
+    & hr {
+        width: calc(100% + 48px);
+
+        @media (max-width: 600px) {
+            width: calc(100% + 32px);
+        }
+    }
+`;
 
 const StyledHeader = styled(Box)`
     display: flex;
     flex-direction: column;
     width: 100%;
-    background-color: white;
-    padding: 16px;
-    padding-bottom: 30px;
+    padding: 20px 0;
     gap: 8px;
 `;
