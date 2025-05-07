@@ -1,19 +1,10 @@
 {
-    "barcode_validation_rule": "",
-    "conn_hub": {
+    "source_camera": {
         "protocol": "http",
         "ip": "",
         "port": 80,
         "user": "root",
         "pass": ""
-    },
-    "camera": {
-        "protocol": "http",
-        "ip": "",
-        "port": 80,
-        "user": "root",
-        "pass": "",
-        "serial_number": ""
     },
     "output_camera": {
         "protocol": "http",
@@ -22,90 +13,13 @@
         "user": "root",
         "pass": ""
     },
-    "image_upload": {
-        "camera_list": [0],
-        "resolution": "1920x1080"
-    },
-    "video_upload": {
-        "prebuffer_sec": 10,
-        "postbuffer_sec": 10,
-        "timeout_enabled": true,
-        "timeout_sec": 300,
-        "closing_barcode_enabled": false,
-        "closing_barcode": "",
-        "starting_barcode_enabled": false,
-        "starting_barcode": "",
-        "camera_list": [0]
-    },
     "widget": {
-        "coord_system": "top_right",
-        "pos_x": 10,
-        "pos_y": 10,
-        "stream_resolution": "1920x1080",
         "camera_list": [0],
+        "coord_system": "top_left",
+        "pos_x": 0,
+        "pos_y": 0,
         "scale": 100,
-        "visibility_time_sec": 5
-    },
-    "axis_events": {
-        "conn_hub": false,
-        "camera": false
-    },
-    "acs": {
-        "enabled": false,
-        "protocol": "https_insecure",
-        "ip": "",
-        "port": 29204,
-        "user": "",
-        "pass": "",
-        "source_key": ""
-    },
-    "genetec": {
-        "enabled": false,
-        "protocol": "http",
-        "ip": "",
-        "port": 4590,
-        "user": "",
-        "pass": "",
-        "base_uri": "WebSdk",
-        "app_id": "",
-        "camera_list": [0]
-    },
-    "milestone": {
-        "enabled": false,
-        "transaction_source": "Videocheckpoint",
-        "port": 8081
-    },
-    "google_drive": {
-        "enabled": false,
-        "type": "image",
-        "email": "",
-        "private_key": "",
-        "folder_id": ""
-    },
-    "ftp_server": {
-        "type": "image",
-        "protocol": "ftp",
-        "ip": "",
-        "port": 21,
-        "user": "",
-        "pass": "",
-        "enabled": false,
-        "upload_path": ""
-    },
-    "share_point": {
-        "enabled": false,
-        "url": "",
-        "output_dir": "",
-        "client_secret": "",
-        "client_id": "",
-        "tenant_id": "",
-        "connection_timeout_s": 30,
-        "upload_timeout_s": 60,
-        "number_of_retries": 3
-    },
-    "led": {
-        "enabled": true,
-        "led_green_port": 2,
-        "led_red_port": 3
+        "stream_resolution": "1920x1080",
+        "units": "M"
     }
 }

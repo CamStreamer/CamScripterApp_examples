@@ -21,16 +21,16 @@ export const FormWrapper = ({ defaultValues }: Props) => {
     });
 
     const onSubmit: SubmitHandler<TServerData> = async (toPost) => {
-        if (toPost.camera.user === '' || toPost.camera.pass === '') {
+        if (toPost.source_camera.user === '' || toPost.source_camera.pass === '') {
             displaySnackbar({
                 type: 'error',
-                message: 'Please fill in credentials for the media source.',
+                message: 'Please fill in credentials for the data source.',
             });
             return;
         }
 
         try {
-            let url = '/local/camscripter/package/settings.cgi?package_name=video_checkpoint&action=set';
+            let url = '/local/camscripter/package/settings.cgi?package_name=axis_air_quality_sensor&action=set';
             if (process.env!.NODE_ENV === 'development') {
                 url = 'http://localhost:52520' + url;
             }

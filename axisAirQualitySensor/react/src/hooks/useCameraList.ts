@@ -9,7 +9,7 @@ export type TCameraListOption = {
 };
 
 type Props = {
-    name: 'camera' | 'output_camera';
+    name: 'source_camera' | 'output_camera';
 };
 
 export const useCameraList = ({ name }: Props) => {
@@ -85,8 +85,6 @@ export const useCameraList = ({ name }: Props) => {
         } catch (e) {
             if ((e as Error).name !== 'AbortError') {
                 setValue('widget.camera_list', [0]);
-                setValue('image_upload.camera_list', [0]);
-                setValue('video_upload.camera_list', [0]);
                 setOptions([]);
                 setIsFetching(false);
             }

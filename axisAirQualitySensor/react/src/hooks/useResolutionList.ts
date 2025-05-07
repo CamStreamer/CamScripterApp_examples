@@ -4,7 +4,7 @@ import { useFormContext } from 'react-hook-form';
 import { TServerData } from '../models/schema';
 
 type Props = {
-    name: 'camera' | 'output_camera';
+    name: 'source_camera' | 'output_camera';
 };
 
 export const useResolutionList = ({ name }: Props) => {
