@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import { TServerData } from '../schema';
+import { TServerData } from './schema';
 import {
     CamOverlayDrawingAPI,
     TCairoCreateResponse,
