@@ -16,12 +16,12 @@ export const mockedSettings: TServerData = {
         pass: '',
     },
     widget: {
-        scale: 100,
+        camera_list: [0],
         coord_system: 'top_left',
         pos_x: 0,
         pos_y: 0,
+        scale: 100,
         stream_resolution: '1920x1080',
-        camera_list: [0],
-        units: 'metric',
+        units: 'M',
     },
 };

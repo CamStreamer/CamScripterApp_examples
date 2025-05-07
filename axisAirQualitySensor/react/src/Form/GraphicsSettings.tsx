@@ -1,9 +1,9 @@
 import { Controller, useFormContext } from 'react-hook-form';
 import { TServerData } from '../models/schema';
-import { InputAdornment, MenuItem, FormHelperText } from '@mui/material';
+import { InputAdornment, MenuItem } from '@mui/material';
 import { StyledTextField, StyledSelect, StyledForm } from '../components/FormInputs';
 import { parseValueAsInt, parseValueAsFloat } from '../utils';
-import { COORD_LIST, COORD_LIST_LABELS } from './constants/constants';
+import { COORD_LIST, COORD_LIST_LABELS, UNITS, UNITS_LABELS } from './constants/constants';
 import { Title } from '../components/Title';
 
 type Props = {
@@ -130,59 +130,18 @@ export const GraphicsSettings = ({ resolutionOptions }: Props) => {
                     />
                 )}
             />
-            {/* ------DISPLAY TIME------*/}
-            <Controller
-                name={'widget.visibility_time_sec'}
-                control={control}
-                render={({ field, formState }) => (
-                    <StyledTextField
-                        defaultValue={field.value}
-                        fullWidth
-                        label="Display time"
-                        InputLabelProps={{ shrink: true }}
-                        onBlur={(e) => {
-                            const val = parseValueAsFloat(e.target.value);
-                            field.onChange(val);
-                            e.target.value = val.toString();
-                        }}
-                        error={!!formState.errors.widget?.scale}
-                        helperText={formState.errors.widget?.scale?.message}
-                        InputProps={{
-                            endAdornment: (
-                                <InputAdornment position="end" disableTypography>
-                                    s
-                                </InputAdornment>
-                            ),
-                        }}
-                    />
-                )}
-            />
-            <FormHelperText>Displaying widget for selected time, seconds.</FormHelperText>
             {/* ------UNITS------*/}
             <Controller
-                name={'widget.visibility_time_sec'}
+                name={'widget.units'}
                 control={control}
-                render={({ field, formState }) => (
-                    <StyledTextField
-                        defaultValue={field.value}
-                        fullWidth
-                        label="Display time"
-                        InputLabelProps={{ shrink: true }}
-                        onBlur={(e) => {
-                            const val = parseValueAsFloat(e.target.value);
-                            field.onChange(val);
-                            e.target.value = val.toString();
-                        }}
-                        error={!!formState.errors.widget?.scale}
-                        helperText={formState.errors.widget?.scale?.message}
-                        InputProps={{
-                            endAdornment: (
-                                <InputAdornment position="end" disableTypography>
-                                    s
-                                </InputAdornment>
-                            ),
-                        }}
-                    />
+                render={({ field }) => (
+                    <StyledSelect {...field} label="Units">
+                        {UNITS.map((value) => (
+                            <MenuItem key={value} value={value}>
+                                {UNITS_LABELS[value]}
+                            </MenuItem>
+                        ))}
+                    </StyledSelect>
                 )}
             />
         </StyledForm>
