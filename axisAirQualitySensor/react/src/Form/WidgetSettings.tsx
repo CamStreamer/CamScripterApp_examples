@@ -10,12 +10,13 @@ type Props = {
     resolutionOptions: string[];
 };
 
-export const GraphicsSettings = ({ resolutionOptions }: Props) => {
+export const WidgetSettings = ({ resolutionOptions }: Props) => {
     const { control } = useFormContext<TServerData>();
 
     return (
         <StyledForm>
             <Title text="Graphics settings" />
+
             {/* ------RESOLUTION------*/}
             <Controller
                 name={'widget.stream_resolution'}
@@ -35,6 +36,7 @@ export const GraphicsSettings = ({ resolutionOptions }: Props) => {
                     </StyledSelect>
                 )}
             />
+
             {/* ------POSITION------*/}
             <Controller
                 name={'widget.coord_system'}
@@ -49,6 +51,7 @@ export const GraphicsSettings = ({ resolutionOptions }: Props) => {
                     </StyledSelect>
                 )}
             />
+
             {/* ------OFFSET X------*/}
             <Controller
                 name={'widget.pos_x'}
@@ -76,6 +79,7 @@ export const GraphicsSettings = ({ resolutionOptions }: Props) => {
                     />
                 )}
             />
+
             {/* ------OFFSET Y------*/}
             <Controller
                 name={'widget.pos_y'}
@@ -103,6 +107,7 @@ export const GraphicsSettings = ({ resolutionOptions }: Props) => {
                     />
                 )}
             />
+
             {/* ------SCALE------*/}
             <Controller
                 name={'widget.scale'}
@@ -130,6 +135,7 @@ export const GraphicsSettings = ({ resolutionOptions }: Props) => {
                     />
                 )}
             />
+
             {/* ------UNITS------*/}
             <Controller
                 name={'widget.units'}

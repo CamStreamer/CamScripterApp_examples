@@ -4,7 +4,7 @@ import { TWatches, validateCredentials, checkConnection } from '../utils';
 import { TServerData } from '../models/schema';
 
 type Props = {
-    name: 'camera' | 'conn_hub' | 'output_camera';
+    name: 'source_camera' | 'output_camera';
 };
 
 export const useCredentialsValidate = ({ name }: Props) => {
@@ -63,10 +63,9 @@ export const useCredentialsValidate = ({ name }: Props) => {
             await cameraResponsePromise
                 .then((res) => {
                     setIsCameraResponding(res.response);
-                    if (name === 'camera') {
-                        const data = res.data as { data: { propertyList: { SerialNumber: string } } };
-                        setCameraSerialNumber(data.data.propertyList.SerialNumber);
-                    }
+                    const data = res.data as { data: { propertyList: { SerialNumber: string } } };
+                    setCameraSerialNumber(data.data.propertyList.SerialNumber);
+
                     setLastRequestAborter(null);
                 })
                 .catch(console.error);

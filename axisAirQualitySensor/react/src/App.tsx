@@ -29,12 +29,6 @@ export const App = () => {
             response = await fetch(url);
             data = await response.json();
             const parsedData = serverDataSchema.parse(data);
-            if (!parsedData.axis_events) {
-                parsedData.axis_events = {
-                    conn_hub: true,
-                    camera: false,
-                };
-            }
             setDefaultValues(parsedData);
         } catch (e) {
             if (e instanceof ZodError) {
@@ -62,11 +56,7 @@ export const App = () => {
                 <StyledContentWrapper>
                     <StyledHeader>
                         <Headline text={'Axis Air Quality Sensor'} />
-                        <Typography>
-                            A solution for retail, warehousing and manufacturing clients to retrieve barcode scanner
-                            data, overlay data on a video stream and upload media content to&nbsp;FTP or Google Drive or
-                            send an event to Axis Camera Station.
-                        </Typography>
+                        <Typography>Some text</Typography>
                     </StyledHeader>
                     <Divider />
                     {defaultValues ? (

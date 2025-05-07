@@ -16,7 +16,7 @@ type Props = {
     viewAreaList: TCameraListOption[];
 };
 
-export const ConnectionSettings = ({ viewAreaList }: Props) => {
+export const OutputCameraSettings = ({ viewAreaList }: Props) => {
     const { control, setValue } = useFormContext<TServerData>();
     const [areCredentialsValid, isFetching, isCameraResponding, check] = useCredentialsValidate({
         name: 'output_camera',
@@ -25,6 +25,7 @@ export const ConnectionSettings = ({ viewAreaList }: Props) => {
     return (
         <StyledForm>
             <Title text="Connection settings" />
+
             {/* ------PROTOCOL------*/}
             <Controller
                 name={`output_camera.protocol`}
@@ -67,6 +68,7 @@ export const ConnectionSettings = ({ viewAreaList }: Props) => {
                     />
                 )}
             />
+
             {/* ------PORT------*/}
             <Controller
                 name={`output_camera.port`}
@@ -102,6 +104,7 @@ export const ConnectionSettings = ({ viewAreaList }: Props) => {
                     />
                 )}
             />
+
             {/* ------PASSWORD------*/}
             <PasswordInput control={control} name={`output_camera.pass`} areCredentialsValid={areCredentialsValid} />
 

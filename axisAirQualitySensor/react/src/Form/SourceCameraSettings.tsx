@@ -9,25 +9,17 @@ import { useCredentialsValidate } from '../hooks/useCredentialsValidate';
 import { parseValueAsInt } from '../utils';
 import { PROTOCOLS, PROTOCOL_LABELS } from './constants/constants';
 
-type Props = {
-    name: 'camera' | 'conn_hub';
-};
-
-export const FormConnectParams = ({ name }: Props) => {
+export const SourceCameraSettings = () => {
     const { control, setValue } = useFormContext<TServerData>();
-    const [areCredentialsValid, isFetching, isCameraResponding, check, cameraSerialNumber] = useCredentialsValidate({
-        name: name,
+    const [areCredentialsValid, isFetching, isCameraResponding, check, _] = useCredentialsValidate({
+        name: 'source_camera',
     });
-
-    if (cameraSerialNumber !== null) {
-        setValue('camera.serial_number', cameraSerialNumber as string);
-    }
 
     return (
         <>
             {/* ------PROTOCOL------*/}
             <Controller
-                name={`${name}.protocol`}
+                name={`source_camera.protocol`}
                 control={control}
                 render={({ field }) => (
                     <RadioGroup
@@ -36,7 +28,7 @@ export const FormConnectParams = ({ name }: Props) => {
                         value={field.value}
                         onChange={(e) => {
                             const protocol = e.target.value;
-                            setValue(`${name}.port`, protocol === 'http' ? 80 : 443, {
+                            setValue(`source_camera.port`, protocol === 'http' ? 80 : 443, {
                                 shouldTouch: true,
                             });
                             field.onChange(e);
@@ -57,20 +49,20 @@ export const FormConnectParams = ({ name }: Props) => {
                 <StyledForm>
                     {/* ------IP ADDRESS------*/}
                     <Controller
-                        name={`${name}.ip`}
+                        name={`source_camera.ip`}
                         control={control}
                         render={({ field, formState }) => (
                             <FormInputWithDialog
                                 {...field}
                                 value={field.value}
-                                error={!!formState.errors[name]?.ip}
-                                helperText={formState.errors[name]?.ip?.message}
+                                error={!!formState.errors.source_camera?.ip}
+                                helperText={formState.errors.source_camera?.ip?.message}
                             />
                         )}
                     />
                     {/* ------PORT------*/}
                     <Controller
-                        name={`${name}.port`}
+                        name={`source_camera.port`}
                         control={control}
                         render={({ field, formState }) => (
                             <StyledTextField
@@ -83,8 +75,8 @@ export const FormConnectParams = ({ name }: Props) => {
                                 }}
                                 fullWidth
                                 label="Port"
-                                error={!!formState.errors[name]?.port}
-                                helperText={formState.errors[name]?.port?.message}
+                                error={!!formState.errors.source_camera?.port}
+                                helperText={formState.errors.source_camera?.port?.message}
                             />
                         )}
                     />
@@ -93,27 +85,32 @@ export const FormConnectParams = ({ name }: Props) => {
                         isFetching={isFetching}
                         isCameraResponding={isCameraResponding}
                         areCredentialsValid={areCredentialsValid}
-                        name={name}
+                        name={'source_camera'}
                         check={check}
                     />
                 </StyledForm>
                 <StyledForm>
                     {/* ------USER------*/}
                     <Controller
-                        name={`${name}.user`}
+                        name={`source_camera.user`}
                         control={control}
                         render={({ field, formState }) => (
                             <StyledTextField
                                 {...field}
                                 fullWidth
                                 label="User"
-                                error={!!formState.errors[name]?.user}
-                                helperText={formState.errors[name]?.user?.message}
+                                error={!!formState.errors.source_camera?.user}
+                                helperText={formState.errors.source_camera?.user?.message}
                             />
                         )}
                     />
+
                     {/* ------PASSWORD------*/}
-                    <PasswordInput control={control} name={`${name}.pass`} areCredentialsValid={areCredentialsValid} />
+                    <PasswordInput
+                        control={control}
+                        name={`source_camera.pass`}
+                        areCredentialsValid={areCredentialsValid}
+                    />
                 </StyledForm>
             </StyledRow>
         </>

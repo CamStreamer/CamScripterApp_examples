@@ -4,11 +4,11 @@ import { useCameraList } from '../hooks/useCameraList';
 import { useInitializeOnMount } from '../hooks/useInitializeOnMount';
 import { useResolutionList } from '../hooks/useResolutionList';
 import { StyledRow } from '../components/FormInputs';
-import { ConnectionSettings } from './ConnectionSettings';
-import { GraphicsSettings } from './GraphicsSettings';
+import { OutputCameraSettings } from './OutputCameraSettings';
+import { WidgetSettings } from './WidgetSettings';
 import { useEffect } from 'react';
 
-export const DevicesForGraphicsOutput = () => {
+export const GraphicsOutputSettings = () => {
     const { watch } = useFormContext<TServerData>();
     const [viewAreaList, fetchCameraList] = useCameraList({
         name: 'output_camera',
@@ -41,8 +41,8 @@ export const DevicesForGraphicsOutput = () => {
 
     return (
         <StyledRow>
-            <ConnectionSettings viewAreaList={viewAreaList} />
-            <GraphicsSettings resolutionOptions={resolutionOptions} />
+            <OutputCameraSettings viewAreaList={viewAreaList} />
+            <WidgetSettings resolutionOptions={resolutionOptions} />
         </StyledRow>
     );
 };

@@ -1,18 +1,18 @@
 import Fade from '@mui/material/Fade';
 import styled from '@mui/material/styles/styled';
 import { CollapsibleFormSection } from '../components/CollapsibleFormSection';
-import { DevicesForGraphicsOutput } from './DevicesForGraphicsOutput';
-import { FormConnectParams } from './FormConnectParams';
+import { GraphicsOutputSettings } from './GraphicsOutputSettings';
+import { SourceCameraSettings } from './SourceCameraSettings';
 
 export function Form() {
     return (
         <Fade in={true} timeout={1000}>
             <StyledForm>
                 <CollapsibleFormSection label="Source of Air Quality data" defaultExpanded={true}>
-                    <FormConnectParams name={'conn_hub'} />
+                    <SourceCameraSettings />
                 </CollapsibleFormSection>
-                <CollapsibleFormSection label="Devices for graphics output" defaultExpanded={true}>
-                    <DevicesForGraphicsOutput />
+                <CollapsibleFormSection label="Device for graphics output" defaultExpanded={true}>
+                    <GraphicsOutputSettings />
                 </CollapsibleFormSection>
             </StyledForm>
         </Fade>

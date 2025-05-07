@@ -11,7 +11,7 @@ import { StyledTextField } from './FormInputs';
 type Props = {
     areCredentialsValid?: boolean;
     control: Control<TServerData>;
-    name: 'camera.pass' | 'conn_hub.pass' | 'acs.pass' | 'ftp_server.pass' | 'output_camera.pass' | 'genetec.pass';
+    name: 'source_camera.pass' | 'output_camera.pass';
     onBlur?: () => void;
 };
 
@@ -19,7 +19,7 @@ export function PasswordInput({ control, name, onBlur, areCredentialsValid }: Pr
     const [showPassword, setShowPassword] = useState(false);
     const handleClickShowPassword = () => setShowPassword((show) => !show);
 
-    const [name1, name2] = name.split('.') as ['camera', 'pass']; // Hack
+    const [name1, name2] = name.split('.') as ['source_camera' | 'output_camera', 'pass'];
 
     return (
         <Controller

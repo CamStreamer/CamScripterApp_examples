@@ -1,42 +1,24 @@
 import { useFormContext, useWatch } from 'react-hook-form';
-import { TWatches, TGenetec } from '../utils';
+import { TWatches } from '../utils';
 
 type Props = {
     isFetching: boolean;
     isCameraResponding: boolean;
     areCredentialsValid: boolean;
-    name: 'camera' | 'conn_hub' | 'output_camera' | 'genetec';
+    name: 'source_camera' | 'output_camera';
 };
 
 export const useCheckConnection = ({ isFetching, isCameraResponding, areCredentialsValid, name }: Props) => {
     const { control } = useFormContext();
-    const baseProxy: TWatches = {
+    const proxy: TWatches = {
         protocol: useWatch({ control, name: `${name}.protocol` }),
         ip: useWatch({ control, name: `${name}.ip` }),
         port: useWatch({ control, name: `${name}.port` }),
         user: useWatch({ control, name: `${name}.user` }),
         pass: useWatch({ control, name: `${name}.pass` }),
     };
-    let proxy: TWatches | TGenetec = baseProxy;
-    let isDisabled: boolean;
 
-    if (name === 'genetec') {
-        proxy = {
-            ...baseProxy,
-            base_uri: useWatch({ control, name: `${name}.base_uri` }),
-            app_id: useWatch({ control, name: `${name}.app_id` }),
-        };
-        isDisabled =
-            !proxy.protocol ||
-            !proxy.ip ||
-            !proxy.port ||
-            !proxy.user ||
-            !proxy.pass ||
-            !proxy.base_uri ||
-            !proxy.app_id;
-    } else {
-        isDisabled = !proxy.protocol || !proxy.ip || !proxy.port || !proxy.user || !proxy.pass;
-    }
+    const isDisabled = !proxy.protocol || !proxy.ip || !proxy.port || !proxy.user || !proxy.pass;
 
     const getStatus = () => {
         if (isDisabled) {
