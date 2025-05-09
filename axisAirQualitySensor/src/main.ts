@@ -1,41 +1,16 @@
 import * as fs from 'fs';
 import { TServerData, serverDataSchema } from './schema';
-import { Widget } from './Widget';
-import { getTemperature } from './utils';
-
-export type TData = {
-    'PM1.0': number;
-    'PM2.5': number;
-    'PM4.0': number;
-    'PM10.0': number;
-    'Temperature': number;
-    'Humidity': number;
-    'VOC': number;
-    'NOx': number;
-    'CO2': number;
-    'AQI': number;
-    'Vaping': number;
-};
+import { Widget } from './graphics/Widget';
+import { getTemperature, getSeverity } from './utils';
+import { TData, TInfo, DEFAULT_DATA } from './constants';
 
 let settings: TServerData;
 let widget: Widget | undefined;
 let airQualityReader: boolean = false;
 
 let dataBuffer = '';
-let prevData: TData | null = null;
-let data: TData = {
-    'PM1.0': 0,
-    'PM2.5': 0,
-    'PM4.0': 0,
-    'PM10.0': 0,
-    'Temperature': 0,
-    'Humidity': 0,
-    'VOC': 0,
-    'NOx': 0,
-    'CO2': 0,
-    'AQI': 0,
-    'Vaping': 0,
-};
+let prevData: Record<keyof TData, TInfo> | null = null;
+let data: Record<keyof TData, TInfo> = DEFAULT_DATA;
 
 function readSettings() {
     try {
@@ -81,14 +56,23 @@ async function watchAirQualityData() {
             const [key, value] = v;
 
             if (key === 'Temperature') {
-                data.Temperature = getTemperature(value, unit);
+                data.Temperature = {
+                    value: getTemperature(value, unit),
+                    severity: getSeverity(key, parseFloat(value)),
+                };
             } else {
-                data[key as keyof TData] = parseFloat(value);
+                const typedKey = key as keyof TData;
+                data[typedKey] = {
+                    value: parseFloat(value),
+                    severity: getSeverity(typedKey, parseFloat(value)),
+                };
             }
         }
+
         const shouldUpdate = shouldUpdateWidget();
         if (shouldUpdate) {
             console.log('Receiving new data, updating widget...');
+            console.log('Data:', data);
             widget?.displayWidget(data, unit);
         }
     }

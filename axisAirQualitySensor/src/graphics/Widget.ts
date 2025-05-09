@@ -1,10 +1,12 @@
-import { TServerData } from './schema';
-import { TData } from './main';
+import { TServerData } from '../schema';
+import { TData, TInfo, SEVERITY } from '../constants';
 import {
     CamOverlayDrawingAPI,
     TCairoCreateResponse,
     CamOverlayDrawingOptions,
 } from 'camstreamerlib/CamOverlayDrawingAPI';
+
+// import { PainterOptions, Painter, Frame, CamOverlayDrawingOptions } from 'camstreamerlib/CamOverlayPainter/Painter';
 
 export class Widget {
     private cod: CamOverlayDrawingAPI;
@@ -24,13 +26,12 @@ export class Widget {
         this.coConnect();
     }
 
-    async displayWidget(data: TData, unit: 'M' | 'I') {
+    async displayWidget(data: Record<keyof TData, TInfo>, unit: 'F' | 'C') {
         try {
             if (!this.coReady) {
                 return;
             }
-            const temperatureUnit = unit === 'I' ? '°F' : '°C';
-            await this.renderWidget(data, temperatureUnit, this.cod);
+            await this.renderWidget(data, `°${unit}`, this.cod);
         } catch (err) {
             console.error(err);
         }
@@ -56,14 +57,15 @@ export class Widget {
         this.cod.connect();
     }
 
-    async renderWidget(data: TData, temperatureUnit: string, cod: CamOverlayDrawingAPI) {
+    async renderWidget(data: Record<keyof TData, TInfo>, unit: string, cod: CamOverlayDrawingAPI) {
         console.log('Rendering widget:', data);
 
-        const temperature = `${data.Temperature} ${temperatureUnit}`;
+        const temperature = `${data.Temperature} ${unit}`;
         const scaleFactor = this.widgetSettings.scale / 100;
         const resolution = this.widgetSettings.stream_resolution.split('x').map(Number);
         const widgetWidth = Math.round(600 * scaleFactor);
         const widgetHeight = Math.round(130 * scaleFactor);
+
         const surfaceResponse = (await cod.cairo(
             'cairo_image_surface_create',
             'CAIRO_FORMAT_ARGB32',
@@ -73,6 +75,8 @@ export class Widget {
         const surface = surfaceResponse.var;
         const cairoResponse = (await cod.cairo('cairo_create', surface)) as TCairoCreateResponse;
         const cairo = cairoResponse.var;
+
+        void cod.cairo('cairo_image_surface_create', 'CAIRO_FORMAT_ARGB32', 200, 200);
 
         void cod.cairo('cairo_surface_destroy', surface);
         void cod.cairo('cairo_destroy', cairo);
