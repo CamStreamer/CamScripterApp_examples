@@ -27,8 +27,8 @@ export const COORD_LIST_LABELS: Record<TServerData['widget']['coord_system'], st
 export const COORD_LIST = Object.keys(COORD_LIST_LABELS) as TServerData['widget']['coord_system'][];
 
 export const UNITS_LABELS: Record<TServerData['widget']['units'], string> = {
-    M: 'Metric',
-    I: 'Imperial',
+    C: 'Metric',
+    F: 'Imperial',
 };
 
 export const UNITS = Object.keys(UNITS_LABELS) as Array<keyof typeof UNITS_LABELS>;

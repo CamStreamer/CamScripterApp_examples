@@ -24,7 +24,7 @@ export const serverDataSchema = z.object({
         stream_resolution: z.string(),
         camera_list: z.number().array().nonempty(),
         scale: z.number().positive(),
-        units: z.union([z.literal('M'), z.literal('I')]),
+        units: z.union([z.literal('C'), z.literal('F')]),
     }),
 });
 export type TServerData = z.infer<typeof serverDataSchema>;

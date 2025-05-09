@@ -22,6 +22,6 @@ export const mockedSettings: TServerData = {
         pos_y: 0,
         scale: 100,
         stream_resolution: '1920x1080',
-        units: 'M',
+        units: 'C',
     },
 };
