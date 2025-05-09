@@ -8,7 +8,7 @@ export function Form() {
     return (
         <Fade in={true} timeout={1000}>
             <StyledForm>
-                <CollapsibleFormSection label="Source of Air Quality data" defaultExpanded={true}>
+                <CollapsibleFormSection label="Air Quality Monitor" defaultExpanded={true}>
                     <SourceCameraSettings />
                 </CollapsibleFormSection>
                 <CollapsibleFormSection label="Device for graphics output" defaultExpanded={true}>

@@ -1,4 +1,3 @@
-import * as fs from 'fs';
 import { TServerData } from './schema';
 import {
     CamOverlayDrawingAPI,
@@ -9,8 +8,6 @@ import {
 export class Widget {
     private cod: CamOverlayDrawingAPI;
     private coReady = false;
-    private barcodeFont?: string;
-    private visibilityTimer?: NodeJS.Timeout;
 
     constructor(cameraSettings: TServerData['output_camera'], private widgetSettings: TServerData['widget']) {
         const options: CamOverlayDrawingOptions = {
@@ -26,24 +23,14 @@ export class Widget {
         this.coConnect();
     }
 
-    async showBarCode(text: string, visibilityTimeSec: number) {
+    async displayWidget(text: string) {
+        console.log('Showing barcode: ' + text);
         try {
+            console.log('co ready: ' + this.coReady);
             if (!this.coReady) {
                 return;
             }
-            if (this.barcodeFont === undefined) {
-                this.barcodeFont = await this.uploadFont();
-            }
             await this.renderWidget(text, this.cod);
-
-            clearTimeout(this.visibilityTimer);
-            if (visibilityTimeSec !== 0) {
-                this.visibilityTimer = setTimeout(() => {
-                    if (this.coReady) {
-                        void this.cod.removeImage();
-                    }
-                }, visibilityTimeSec * 1000);
-            }
         } catch (err) {
             console.error(err);
         }
@@ -64,13 +51,13 @@ export class Widget {
         this.cod.on('close', () => {
             console.log('COAPI-Error: connection closed');
             this.coReady = false;
-            this.barcodeFont = undefined;
         });
 
         this.cod.connect();
     }
 
     async renderWidget(text: string, cod: CamOverlayDrawingAPI) {
+        console.log('Rendering widget');
         const scaleFactor = this.widgetSettings.scale / 100;
         const resolution = this.widgetSettings.stream_resolution.split('x').map(Number);
         const widgetWidth = Math.round(600 * scaleFactor);
@@ -85,35 +72,25 @@ export class Widget {
         const cairoResponse = (await cod.cairo('cairo_create', surface)) as TCairoCreateResponse;
         const cairo = cairoResponse.var;
 
-        // Measure the size of the barcode
-        void cod.cairo('cairo_set_font_face', cairo, this.barcodeFont);
-        void cod.cairo('cairo_set_font_size', cairo, 70);
-        const textExtents = ((await cod.cairo('cairo_text_extents', cairo, `*${text}*`)) as any).var;
-        const margin = 60;
-        const barcodeWidth = Math.min(600 - margin, textExtents.width);
-
-        // Fill the background
-        void cod.cairo('cairo_scale', cairo, scaleFactor, scaleFactor);
-        void cod.cairo('cairo_rectangle', cairo, 0, 0, barcodeWidth + margin, 320);
-        void cod.cairo('cairo_set_source_rgb', cairo, 1.0, 1.0, 1.0);
+        // Fill the background with a white rectangle
+        void cod.cairo('cairo_set_source_rgb', cairo, 1.0, 1.0, 1.0); // White color
+        void cod.cairo('cairo_rectangle', cairo, 0, 0, widgetWidth, widgetHeight);
         void cod.cairo('cairo_fill', cairo);
-        void cod.cairo('cairo_stroke', cairo);
 
-        // Write the barcode and the text below it
-        const textPos = margin / 2;
-        void cod.cairo('cairo_set_font_face', cairo, this.barcodeFont);
-        void cod.cairo('cairo_set_font_size', cairo, 70);
-        void cod.cairo('cairo_set_source_rgb', cairo, 0.0, 0.0, 0.0);
-        void cod.writeText(cairo, `*${text}*`, textPos, 5, barcodeWidth, 70, 'A_CENTER', 'TFM_SCALE');
-
-        void cod.cairo('cairo_set_font_face', cairo, 'NULL');
-        void cod.writeText(cairo, text, textPos, 80, barcodeWidth, 30, 'A_CENTER', 'TFM_SCALE');
+        // Write the black text on top
+        void cod.cairo('cairo_set_source_rgb', cairo, 0.0, 0.0, 0.0); // Black color
+        void cod.cairo('cairo_set_font_size', cairo, 50); // Set font size
+        const textExtents = ((await cod.cairo('cairo_text_extents', cairo, text)) as any).var;
+        const textX = (widgetWidth - textExtents.width) / 2; // Center the text horizontally
+        const textY = (widgetHeight + textExtents.height) / 2; // Center the text vertically
+        void cod.cairo('cairo_move_to', cairo, textX, textY);
+        void cod.cairo('cairo_show_text', cairo, text);
 
         const pos = this.computePosition(
             this.widgetSettings.coord_system,
             this.widgetSettings.pos_x,
             this.widgetSettings.pos_y,
-            (barcodeWidth + margin) * scaleFactor,
+            widgetWidth,
             widgetHeight,
             resolution[0],
             resolution[1]
@@ -122,12 +99,6 @@ export class Widget {
 
         void cod.cairo('cairo_surface_destroy', surface);
         void cod.cairo('cairo_destroy', cairo);
-    }
-
-    private async uploadFont() {
-        const imgData = fs.readFileSync('fonts/fre3of9x.ttf');
-        const fontRes = await this.cod.uploadFontData(imgData);
-        return fontRes.var;
     }
 
     private computePosition(

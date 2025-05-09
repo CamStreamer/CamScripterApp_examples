@@ -1,11 +1,40 @@
 import * as fs from 'fs';
 import { TServerData, serverDataSchema } from './schema';
 import { Widget } from './Widget';
-import { HttpServer } from 'camstreamerlib/HttpServer';
+
+type TData = {
+    'PM1.0': number;
+    'PM2.5': number;
+    'PM4.0': number;
+    'PM10.0': number;
+    'Temperature': number;
+    'Humidity': number;
+    'VOC': number;
+    'NOx': number;
+    'CO2': number;
+    'AQI': number;
+    'Vaping': number;
+};
 
 let settings: TServerData;
 let widget: Widget | undefined;
-let httpServer: HttpServer | undefined;
+let airQualityReader: boolean = false;
+
+let dataBuffer = '';
+let prevData: TData | null = null;
+let data: TData = {
+    'PM1.0': 0,
+    'PM2.5': 0,
+    'PM4.0': 0,
+    'PM10.0': 0,
+    'Temperature': 0,
+    'Humidity': 0,
+    'VOC': 0,
+    'NOx': 0,
+    'CO2': 0,
+    'AQI': 0,
+    'Vaping': 0,
+};
 
 function readSettings() {
     try {
@@ -17,23 +46,80 @@ function readSettings() {
     }
 }
 
-async function showWidget(code: string, visibilityTimeSec: number, shouldShowWidget: boolean) {
-    try {
-        if (widget && shouldShowWidget) {
-            console.log(`Display widget, code: "${code}"`);
-            await widget.showBarCode(code, visibilityTimeSec);
+async function watchAirQualityData() {
+    console.log('Watching air quality data...');
+
+    const response = await fetch(
+        `${settings.source_camera.protocol}://${settings.source_camera.ip}/axis-cgi/airquality/metadata.cgi`,
+        {
+            headers: { Accept: 'text/event-stream' },
+        }
+    );
+
+    if (response.body === null) {
+        console.error('No data:', response.statusText);
+        return;
+    }
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder('utf-8');
+
+    while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        dataBuffer += decoder.decode(value, { stream: true });
+
+        const lines = dataBuffer.split('\n');
+        dataBuffer = lines.pop() || '';
+
+        const values = lines[0].split(', ').map((value) => value.split(' = '));
+
+        for (const v of values) {
+            const [key, value] = v;
+
+            if (key in data) {
+                data[key as keyof TData] = parseFloat(value);
+            }
+        }
+        const shouldUpdate = shouldUpdateWidget();
+        if (shouldUpdate) {
+            console.log('Receiving new data, updating widget...');
+            widget?.displayWidget('Hello World');
+        }
+    }
+}
+
+function shouldUpdateWidget() {
+    if (prevData === null) {
+        prevData = { ...data };
+        return true;
+    }
+
+    for (const key in data) {
+        if (data[key as keyof TData] !== prevData[key as keyof TData]) {
+            prevData = { ...data };
             return true;
         }
-        return false;
-    } catch (err) {
-        console.error('Show widget:', err instanceof Error ? err.message : 'unknown');
-        return false;
     }
+
+    return false;
 }
 
 function main() {
     try {
         settings = readSettings();
+
+        if (
+            settings.source_camera.ip.length !== 0 &&
+            settings.source_camera.user.length !== 0 &&
+            settings.source_camera.pass.length !== 0
+        ) {
+            airQualityReader = true;
+        } else {
+            console.log('The Axis Air Quality Sensor is not configured and thus is disabled.');
+        }
+
         if (
             settings.output_camera.ip.length !== 0 &&
             settings.output_camera.user.length !== 0 &&
@@ -44,10 +130,13 @@ function main() {
             console.log('The CamOverlay widget is not configured and thus is disabled.');
         }
 
+        if (airQualityReader && widget) {
+            watchAirQualityData();
+        }
+
         console.log('Application started');
     } catch (err) {
         console.error('Application start:', err);
-        httpServer?.close();
         process.exit(1);
     }
 }
@@ -62,13 +151,11 @@ process.on('unhandledRejection', (err: Error) => {
 
 process.on('SIGTERM', () => {
     console.log('SIGTERM signal received');
-    httpServer?.close();
     process.exit(0);
 });
 
 process.on('SIGINT', () => {
     console.log('SIGINT signal received');
-    httpServer?.close();
     process.exit(0);
 });
 
