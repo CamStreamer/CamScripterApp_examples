@@ -1,4 +1,5 @@
 import { TServerData } from './schema';
+import { TData } from './main';
 import {
     CamOverlayDrawingAPI,
     TCairoCreateResponse,
@@ -23,14 +24,13 @@ export class Widget {
         this.coConnect();
     }
 
-    async displayWidget(text: string) {
-        console.log('Showing barcode: ' + text);
+    async displayWidget(data: TData, unit: 'M' | 'I') {
         try {
-            console.log('co ready: ' + this.coReady);
             if (!this.coReady) {
                 return;
             }
-            await this.renderWidget(text, this.cod);
+            const temperatureUnit = unit === 'I' ? '°F' : '°C';
+            await this.renderWidget(data, temperatureUnit, this.cod);
         } catch (err) {
             console.error(err);
         }
@@ -56,8 +56,10 @@ export class Widget {
         this.cod.connect();
     }
 
-    async renderWidget(text: string, cod: CamOverlayDrawingAPI) {
-        console.log('Rendering widget');
+    async renderWidget(data: TData, temperatureUnit: string, cod: CamOverlayDrawingAPI) {
+        console.log('Rendering widget:', data);
+
+        const temperature = `${data.Temperature} ${temperatureUnit}`;
         const scaleFactor = this.widgetSettings.scale / 100;
         const resolution = this.widgetSettings.stream_resolution.split('x').map(Number);
         const widgetWidth = Math.round(600 * scaleFactor);
@@ -71,31 +73,6 @@ export class Widget {
         const surface = surfaceResponse.var;
         const cairoResponse = (await cod.cairo('cairo_create', surface)) as TCairoCreateResponse;
         const cairo = cairoResponse.var;
-
-        // Fill the background with a white rectangle
-        void cod.cairo('cairo_set_source_rgb', cairo, 1.0, 1.0, 1.0); // White color
-        void cod.cairo('cairo_rectangle', cairo, 0, 0, widgetWidth, widgetHeight);
-        void cod.cairo('cairo_fill', cairo);
-
-        // Write the black text on top
-        void cod.cairo('cairo_set_source_rgb', cairo, 0.0, 0.0, 0.0); // Black color
-        void cod.cairo('cairo_set_font_size', cairo, 50); // Set font size
-        const textExtents = ((await cod.cairo('cairo_text_extents', cairo, text)) as any).var;
-        const textX = (widgetWidth - textExtents.width) / 2; // Center the text horizontally
-        const textY = (widgetHeight + textExtents.height) / 2; // Center the text vertically
-        void cod.cairo('cairo_move_to', cairo, textX, textY);
-        void cod.cairo('cairo_show_text', cairo, text);
-
-        const pos = this.computePosition(
-            this.widgetSettings.coord_system,
-            this.widgetSettings.pos_x,
-            this.widgetSettings.pos_y,
-            widgetWidth,
-            widgetHeight,
-            resolution[0],
-            resolution[1]
-        );
-        await cod.showCairoImageAbsolute(surface, pos.x, pos.y, resolution[0], resolution[1]);
 
         void cod.cairo('cairo_surface_destroy', surface);
         void cod.cairo('cairo_destroy', cairo);

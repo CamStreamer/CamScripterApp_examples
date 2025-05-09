@@ -1,8 +1,9 @@
 import * as fs from 'fs';
 import { TServerData, serverDataSchema } from './schema';
 import { Widget } from './Widget';
+import { getTemperature } from './utils';
 
-type TData = {
+export type TData = {
     'PM1.0': number;
     'PM2.5': number;
     'PM4.0': number;
@@ -74,18 +75,21 @@ async function watchAirQualityData() {
         dataBuffer = lines.pop() || '';
 
         const values = lines[0].split(', ').map((value) => value.split(' = '));
+        const unit = settings.widget.units;
 
         for (const v of values) {
             const [key, value] = v;
 
-            if (key in data) {
+            if (key === 'Temperature') {
+                data.Temperature = getTemperature(value, unit);
+            } else {
                 data[key as keyof TData] = parseFloat(value);
             }
         }
         const shouldUpdate = shouldUpdateWidget();
         if (shouldUpdate) {
             console.log('Receiving new data, updating widget...');
-            widget?.displayWidget('Hello World');
+            widget?.displayWidget(data, unit);
         }
     }
 }
