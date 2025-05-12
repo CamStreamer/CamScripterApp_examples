@@ -1,13 +1,13 @@
 export type TUnit = 'C' | 'F';
 
-export type TColor = [number, number, number];
+export type TColor = string;
 
 export type TData = {
     'PM1.0': number;
     'PM2.5': number;
     'PM4.0': number;
     'PM10.0': number;
-    'Temperature': number;
+    'Temperature': string;
     'Humidity': number;
     'VOC': number;
     'NOx': number;
@@ -17,8 +17,8 @@ export type TData = {
 };
 
 export type TInfo = {
-    value: number;
-    severity: keyof typeof SEVERITY | 'undetected' | 'detected';
+    value: number | string;
+    severity: keyof typeof SEVERITY;
 };
 
 export const DEFAULT_DATA: Record<keyof TData, TInfo> = {
@@ -39,7 +39,7 @@ export const DEFAULT_DATA: Record<keyof TData, TInfo> = {
         severity: 'good',
     },
     'Temperature': {
-        value: 0,
+        value: '0',
         severity: 'good',
     },
     'Humidity': {
@@ -64,7 +64,7 @@ export const DEFAULT_DATA: Record<keyof TData, TInfo> = {
     },
     'Vaping': {
         value: 0,
-        severity: 'undetected',
+        severity: 'good',
     },
 };
 
@@ -119,11 +119,29 @@ export const QUALITY_TIERS: Record<keyof TData, Record<string, [number, number]>
 };
 
 export const SEVERITY = {
-    good: [0, 153 / 255, 76 / 255],
-    moderate: [1.0, 1.0, 51 / 255],
-    sensitive: [1.0, 128 / 255, 0],
-    unhealthy: [1.0, 51 / 255, 51 / 255],
-    very_unhealthy: [102 / 255, 0, 204 / 255],
-    hazardous: [153 / 255, 0, 0],
-    error: [0, 0, 0],
+    good: [0, 255, 0], // '#00ff00'
+    moderate: [255, 238, 0], // '#ffee00'
+    sensitive: [255, 153, 0], // '#ff9900'
+    unhealthy: [255, 0, 0], // '#ff0000'
+    very_unhealthy: [187, 0, 255], // '#bb00ff'
+    hazardous: [112, 0, 0], // '#700000'
+    error: [0, 0, 0], // '#000000'
+};
+
+export const FONT = {
+    family: 'OpenSans',
+    big: 48,
+    small: 28,
+    color: '#ffffff',
+};
+
+export const POS = {
+    leftColumn: 150,
+    centerLeftColumn: 450,
+    centerRightColumn: 700,
+    rightColumn: 1200,
+    firstRow: 50,
+    secondRow: 160,
+    thirdRow: 280,
+    fourthRow: 400,
 };

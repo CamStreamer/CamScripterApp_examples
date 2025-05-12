@@ -1,16 +1,16 @@
 import { TUnit, TData, QUALITY_TIERS, SEVERITY } from './constants';
 
-export const getTemperature = (temperature: string, unit: TUnit): number => {
+export const getTemperature = (temperature: string, unit: TUnit): string => {
     if (unit === 'F') {
-        return (parseFloat(temperature) * 9) / 5 + 32;
+        return ((parseFloat(temperature) * 9) / 5 + 32).toFixed(1);
     }
-    return parseFloat(temperature);
+    return parseFloat(temperature).toFixed(1);
 };
 
 // returns key of the severity
-export const getSeverity = (param: keyof TData, value: number): keyof typeof SEVERITY | 'undetected' | 'detected' => {
+export const getSeverity = (param: keyof TData, value: number): keyof typeof SEVERITY => {
     if (param === 'Vaping') {
-        return value > 0 ? 'detected' : 'undetected';
+        return value > 0 ? 'unhealthy' : 'good';
     }
 
     const tiers = QUALITY_TIERS[param];

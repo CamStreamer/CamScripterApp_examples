@@ -63,16 +63,14 @@ async function watchAirQualityData() {
             } else {
                 const typedKey = key as keyof TData;
                 data[typedKey] = {
-                    value: parseFloat(value),
-                    severity: getSeverity(typedKey, parseFloat(value)),
+                    value: Number(value) % 1 === 0 ? Number(value) : Number(value).toFixed(1),
+                    severity: getSeverity(typedKey, Number(value)),
                 };
             }
         }
 
         const shouldUpdate = shouldUpdateWidget();
         if (shouldUpdate) {
-            console.log('Receiving new data, updating widget...');
-            console.log('Data:', data);
             widget?.displayWidget(data, unit);
         }
     }
@@ -85,7 +83,7 @@ function shouldUpdateWidget() {
     }
 
     for (const key in data) {
-        if (data[key as keyof TData] !== prevData[key as keyof TData]) {
+        if (data[key as keyof TData].value !== prevData[key as keyof TData].value) {
             prevData = { ...data };
             return true;
         }
