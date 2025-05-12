@@ -11,7 +11,7 @@ export function Form() {
                 <CollapsibleFormSection label="Air Quality Monitor" defaultExpanded={true}>
                     <SourceCameraSettings />
                 </CollapsibleFormSection>
-                <CollapsibleFormSection label="Device for graphics output" defaultExpanded={true}>
+                <CollapsibleFormSection label="Camoverlay app integration" defaultExpanded={true}>
                     <GraphicsOutputSettings />
                 </CollapsibleFormSection>
             </StyledForm>

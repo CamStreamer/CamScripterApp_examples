@@ -56,7 +56,10 @@ export const App = () => {
                 <StyledContentWrapper>
                     <StyledHeader>
                         <Headline text={'Axis Air Quality Sensor'} />
-                        <Typography>Some text</Typography>
+                        <Typography>
+                            The script integrates data from the AXIS D6210 Air Quality Sensor and displays it in the
+                            camera image via the CamOverlay App.
+                        </Typography>
                     </StyledHeader>
                     <Divider />
                     {defaultValues ? (

@@ -1,7 +1,8 @@
 import { Controller, useFormContext } from 'react-hook-form';
 import { TServerData } from '../models/schema';
-import { InputAdornment, MenuItem } from '@mui/material';
-import { StyledTextField, StyledSelect, StyledForm } from '../components/FormInputs';
+import { styled } from '@mui/material/styles';
+import { InputAdornment, MenuItem, Radio, RadioGroup, Typography, Box } from '@mui/material';
+import { StyledTextField, StyledSelect, StyledForm, StyledRadioControlLabel } from '../components/FormInputs';
 import { parseValueAsInt, parseValueAsFloat } from '../utils';
 import { COORD_LIST, COORD_LIST_LABELS, UNITS, UNITS_LABELS } from './constants/constants';
 import { Title } from '../components/Title';
@@ -137,19 +138,39 @@ export const WidgetSettings = ({ resolutionOptions }: Props) => {
             />
 
             {/* ------UNITS------*/}
-            <Controller
-                name={'widget.units'}
-                control={control}
-                render={({ field }) => (
-                    <StyledSelect {...field} label="Units">
-                        {UNITS.map((value) => (
-                            <MenuItem key={value} value={value}>
-                                {UNITS_LABELS[value]}
-                            </MenuItem>
-                        ))}
-                    </StyledSelect>
-                )}
-            />
+            <StyledBox>
+                <Typography fontWeight={700}>Temperature Units</Typography>
+                <Controller
+                    name={'widget.units'}
+                    control={control}
+                    render={({ field }) => (
+                        <RadioGroup
+                            row
+                            style={{ gridColumn: '2 span' }}
+                            value={field.value}
+                            onChange={(e) => {
+                                field.onChange(e);
+                            }}
+                        >
+                            {UNITS.map((unit) => (
+                                <StyledRadioControlLabel
+                                    key={unit}
+                                    value={unit}
+                                    control={<Radio color="info" />}
+                                    label={UNITS_LABELS[unit]}
+                                />
+                            ))}
+                        </RadioGroup>
+                    )}
+                />
+            </StyledBox>
         </StyledForm>
     );
 };
+
+const StyledBox = styled(Box)`
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 4px 0;
+`;
