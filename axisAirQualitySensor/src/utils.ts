@@ -27,5 +27,5 @@ export const getSeverity = (param: keyof TData, value: number): keyof typeof SEV
         }
     }
 
-    return 'error';
+    return 'hazardous';
 };

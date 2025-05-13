@@ -163,7 +163,7 @@ export class Widget {
             'small'
         );
         this.writeText(cod, cairo, unit, POS.leftColumn + 100, 170, 'small');
-        this.writeText(cod, cairo, 'ppm', POS.rightColumn + 100, POS.thirdRow + 10, 'small');
+        this.writeText(cod, cairo, 'ppm', POS.rightColumn + 105, POS.thirdRow + 10, 'small');
 
         const pos = this.computePosition(
             this.widgetSettings.coord_system,
@@ -200,7 +200,15 @@ export class Widget {
         posY: number,
         color: number[]
     ) {
+        const radius = 8 / 2;
         void cod.cairo('cairo_set_source_rgb', cairo, color[0], color[1], color[2]);
+
+        void cod.cairo('cairo_arc', cairo, startPosX, posY, radius, 0, 2 * Math.PI);
+        void cod.cairo('cairo_fill', cairo);
+
+        void cod.cairo('cairo_arc', cairo, endPosX, posY, radius, 0, 2 * Math.PI);
+        void cod.cairo('cairo_fill', cairo);
+
         void cod.cairo('cairo_set_line_width', cairo, 8);
         void cod.cairo('cairo_move_to', cairo, startPosX, posY);
         void cod.cairo('cairo_line_to', cairo, endPosX, posY);

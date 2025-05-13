@@ -119,12 +119,12 @@ export const QUALITY_TIERS: Record<keyof TData, Record<string, [number, number]>
 };
 
 export const SEVERITY = {
-    good: [0, 255, 0], // '#00ff00'
-    moderate: [255, 238, 0], // '#ffee00'
-    sensitive: [255, 153, 0], // '#ff9900'
-    unhealthy: [255, 0, 0], // '#ff0000'
-    very_unhealthy: [187, 0, 255], // '#bb00ff'
-    hazardous: [112, 0, 0], // '#700000'
+    good: [0, 1, 0], // '#00ff00'
+    moderate: [1, 238 / 255, 0], // '#ffee00'
+    sensitive: [1, 153 / 255, 0], // '#ff9900'
+    unhealthy: [1, 0, 0], // '#ff0000'
+    very_unhealthy: [187 / 255, 0, 1], // '#bb00ff'
+    hazardous: [112 / 255, 0, 0], // '#700000'
     error: [0, 0, 0], // '#000000'
 };
 
