@@ -1,6 +1,6 @@
 import { Controller, useFormContext } from 'react-hook-form';
 import { TServerData } from '../models/schema';
-import { Radio, RadioGroup } from '@mui/material';
+import { FormHelperText, Radio, RadioGroup } from '@mui/material';
 import { StyledTextField, StyledRadioControlLabel, StyledForm, StyledRow } from '../components/FormInputs';
 import { FormInputWithDialog } from '../components/FormInputWithDialog';
 import { PasswordInput } from '../components/PasswordInput';
@@ -17,6 +17,10 @@ export const SourceCameraSettings = () => {
 
     return (
         <>
+            <FormHelperText>
+                Use the same login credentials as the camera paired with the sensor, where you can also see it in the
+                user interface.
+            </FormHelperText>
             {/* ------PROTOCOL------*/}
             <Controller
                 name={`source_camera.protocol`}

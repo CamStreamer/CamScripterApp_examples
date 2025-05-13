@@ -32,7 +32,7 @@ export const CollapsibleFormSection = ({ label, defaultExpanded, children }: Pro
                 </StyledExpandMore>
                 <StyledDivider orientation="horizontal" />
             </StyledTextWrapper>
-            <Collapse in={expanded}>{children}</Collapse>
+            <StyledCollapse in={expanded}>{children}</StyledCollapse>
         </Stack>
     );
 };
@@ -62,4 +62,8 @@ const StyledLabelText = styled(Typography)`
 
 const StyledDivider = styled(Divider)`
     flex: 1;
+`;
+
+const StyledCollapse = styled(Collapse)`
+    margin-top: 4px;
 `;
