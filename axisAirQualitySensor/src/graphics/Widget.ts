@@ -11,8 +11,10 @@ import {
 export class Widget {
     private cod: CamOverlayDrawingAPI;
     private coReady = false;
-    private font: string | undefined;
+    private fontRegular: string | undefined;
+    private fontBold: string | undefined;
     private background: string | undefined;
+    private gif: string | undefined;
 
     constructor(cameraSettings: TServerData['output_camera'], private widgetSettings: TServerData['widget']) {
         const options: CamOverlayDrawingOptions = {
@@ -33,11 +35,17 @@ export class Widget {
             if (!this.coReady) {
                 return;
             }
-            if (this.font === undefined) {
-                this.font = await this.uploadFont();
+            if (this.fontRegular === undefined) {
+                this.fontRegular = await this.uploadFont('OpenSans-Regular.ttf');
+            }
+            if (this.fontBold === undefined) {
+                this.fontBold = await this.uploadFont('OpenSans-Bold.ttf');
             }
             if (this.background === undefined) {
-                this.background = await this.uploadImage();
+                this.background = await this.uploadImage('background/axis-air-quality-widget.png');
+            }
+            if (this.gif === undefined) {
+                this.gif = await this.uploadImage('background/dust.gif');
             }
             await this.renderWidget(data, `°${unit}`, this.cod);
         } catch (err) {
@@ -50,6 +58,12 @@ export class Widget {
 
         this.cod.on('open', () => {
             console.log('COAPI connected');
+
+            this.fontRegular = undefined;
+            this.fontBold = undefined;
+            this.background = undefined;
+            this.gif = undefined;
+
             this.coReady = true;
         });
 
@@ -81,19 +95,27 @@ export class Widget {
         const cairoResponse = (await cod.cairo('cairo_create', surface)) as TCairoCreateResponse;
         const cairo = cairoResponse.var;
 
+        // Set scale factor
+        void cod.cairo('cairo_scale', cairo, scaleFactor, scaleFactor);
+
         // Draw the background
         if (this.background) {
-            await cod.cairo('cairo_set_source_surface', cairo, this.background, 0, 0);
-            await cod.cairo('cairo_paint', cairo);
+            void cod.cairo('cairo_set_source_surface', cairo, this.background, 0, 0);
+            void cod.cairo('cairo_paint', cairo);
         }
 
-        void cod.cairo('cairo_set_font_face', cairo, this.font);
-        void cod.cairo('cairo_set_font_size', cairo, 48);
+        // Draw the gif
+        if (this.gif) {
+            void cod.cairo('cairo_set_source_surface', cairo, this.gif, POS.centerLeftColumn - 30, POS.firstRow - 10);
+            void cod.cairo('cairo_paint', cairo);
+        }
+
+        void cod.cairo('cairo_set_font_face', cairo, this.fontBold);
 
         // Draw severity lines
-        this.drawLine(cod, cairo, 40, 550, 120, SEVERITY[data.Humidity.severity]);
-        this.drawLine(cod, cairo, 40, 550, 250, SEVERITY[data.Temperature.severity]);
-        this.drawLine(cod, cairo, 40, 550, 370, SEVERITY[data.Vaping.severity]);
+        this.drawLine(cod, cairo, 40, 540, 120, SEVERITY[data.Humidity.severity]);
+        this.drawLine(cod, cairo, 40, 540, 250, SEVERITY[data.Temperature.severity]);
+        this.drawLine(cod, cairo, 40, 540, 370, SEVERITY[data.Vaping.severity]);
 
         this.drawLine(cod, cairo, 620, 800, 250, SEVERITY[data['PM1.0'].severity]);
         this.drawLine(cod, cairo, 620, 800, 370, SEVERITY[data['PM2.5'].severity]);
@@ -107,19 +129,9 @@ export class Widget {
         this.drawLine(cod, cairo, 40, 800, 540, SEVERITY[data.AQI.severity]);
 
         // Write texts
+        void cod.cairo('cairo_set_font_face', cairo, this.fontBold);
         this.writeText(cod, cairo, data.Humidity.value, POS.leftColumn, POS.firstRow);
-        this.writeText(cod, cairo, '%RH', POS.leftColumn + 100, 50, 'small');
-        this.writeText(cod, cairo, GRAM_UNIT, POS.centerRightColumn, 50, 'small');
         this.writeText(cod, cairo, data.Temperature.value, POS.leftColumn, POS.secondRow);
-        this.writeText(
-            cod,
-            cairo,
-            data.Vaping.value === 0 ? 'UNDETECTED' : 'DETECTED',
-            POS.leftColumn + 10,
-            POS.thirdRow + 15,
-            'small'
-        );
-        this.writeText(cod, cairo, unit, POS.leftColumn + 100, 170, 'small');
 
         this.writeText(cod, cairo, data['PM1.0'].value, POS.centerLeftColumn, POS.secondRow);
         this.writeText(cod, cairo, data['PM2.5'].value, POS.centerLeftColumn, POS.thirdRow);
@@ -129,7 +141,6 @@ export class Widget {
         this.writeText(cod, cairo, data.VOC.value, POS.rightColumn, POS.firstRow);
         this.writeText(cod, cairo, data.NOx.value, POS.rightColumn, POS.secondRow);
         this.writeText(cod, cairo, data.CO2.value, POS.rightColumn, POS.thirdRow);
-        this.writeText(cod, cairo, 'ppm', POS.rightColumn + 100, POS.thirdRow + 10, 'small');
 
         this.writeText(
             cod,
@@ -138,6 +149,21 @@ export class Widget {
             POS.leftColumn + 50,
             POS.fourthRow
         );
+
+        void cod.cairo('cairo_set_font_face', cairo, this.fontRegular);
+
+        this.writeText(cod, cairo, '%RH', POS.leftColumn + 100, 50, 'small');
+        this.writeText(cod, cairo, GRAM_UNIT, POS.centerRightColumn, 50, 'small');
+        this.writeText(
+            cod,
+            cairo,
+            data.Vaping.value === 0 ? 'UNDETECTED' : 'DETECTED',
+            POS.leftColumn + 10,
+            POS.thirdRow + 15,
+            'small'
+        );
+        this.writeText(cod, cairo, unit, POS.leftColumn + 100, 170, 'small');
+        this.writeText(cod, cairo, 'ppm', POS.rightColumn + 100, POS.thirdRow + 10, 'small');
 
         const pos = this.computePosition(
             this.widgetSettings.coord_system,
@@ -154,14 +180,14 @@ export class Widget {
         void cod.cairo('cairo_destroy', cairo);
     }
 
-    private async uploadFont() {
-        const imgData = fs.readFileSync('fonts/OpenSans-Regular.ttf');
+    private async uploadFont(fontName: string) {
+        const imgData = fs.readFileSync(`fonts/${fontName}`);
         const fontRes = await this.cod.uploadFontData(imgData);
         return fontRes.var;
     }
 
-    private async uploadImage() {
-        const imgData = fs.readFileSync('background/axis-air-quality-widget.png');
+    private async uploadImage(fileName: string) {
+        const imgData = fs.readFileSync(fileName);
         const imgResponse = await this.cod.uploadImageData(imgData);
         return imgResponse.var;
     }
