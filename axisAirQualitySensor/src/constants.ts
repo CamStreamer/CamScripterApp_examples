@@ -136,12 +136,14 @@ export const FONT = {
 };
 
 export const POS = {
-    leftColumn: 150,
-    centerLeftColumn: 450,
-    centerRightColumn: 700,
-    rightColumn: 1200,
-    firstRow: 50,
-    secondRow: 160,
-    thirdRow: 280,
-    fourthRow: 400,
+    leftColumn: 300,
+    centerLeftColumn: 650,
+    centerRightColumn: 880,
+    rightColumn: 1400,
+    firstRow: 40,
+    secondRow: 165,
+    thirdRow: 290,
+    fourthRow: 450,
 };
+
+export const GRAM_UNIT = '\u00B5g/m\u00B3';
