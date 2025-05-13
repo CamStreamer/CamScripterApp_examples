@@ -8,6 +8,7 @@ let settings: TServerData;
 let widget: Widget | undefined;
 let airQualityReader: boolean = false;
 
+let retryTimeout: NodeJS.Timeout | null = null;
 let dataBuffer = '';
 let prevData: Record<keyof TData, TInfo> | null = null;
 let data: Record<keyof TData, TInfo> = DEFAULT_DATA;
@@ -24,55 +25,75 @@ function readSettings() {
 
 async function watchAirQualityData() {
     console.log('Watching air quality data...');
-
-    const response = await fetch(
-        `${settings.source_camera.protocol}://${settings.source_camera.ip}/axis-cgi/airquality/metadata.cgi`,
-        {
-            headers: { Accept: 'text/event-stream' },
-        }
-    );
-
-    if (response.body === null) {
-        console.error('No data:', response.statusText);
-        return;
+    if (retryTimeout) {
+        clearTimeout(retryTimeout);
+        retryTimeout = null;
     }
 
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder('utf-8');
+    try {
+        const response = await fetch(
+            `${settings.source_camera.protocol}://${settings.source_camera.ip}/axis-cgi/airquality/metadata.cgi`,
+            {
+                headers: { Accept: 'text/event-stream' },
+            }
+        );
 
-    while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
+        if (response.body === null) {
+            console.error('No data:', response.statusText);
+            return;
+        }
 
-        dataBuffer += decoder.decode(value, { stream: true });
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder('utf-8');
 
-        const lines = dataBuffer.split('\n');
-        dataBuffer = lines.pop() || '';
+        while (true) {
+            try {
+                const { done, value } = await reader.read();
+                if (done) {
+                    console.warn('Stream ended unexpectedly.');
+                    break;
+                }
 
-        const values = lines[0].split(', ').map((value) => value.split(' = '));
-        const unit = settings.widget.units;
+                dataBuffer += decoder.decode(value, { stream: true });
 
-        for (const v of values) {
-            const [key, value] = v;
+                const lines = dataBuffer.split('\n');
+                dataBuffer = lines.pop() || '';
 
-            if (key === 'Temperature') {
-                data.Temperature = {
-                    value: getTemperature(value, unit),
-                    severity: getSeverity(key, parseFloat(value)),
-                };
-            } else {
-                const typedKey = key as keyof TData;
-                data[typedKey] = {
-                    value: Number(value) % 1 === 0 ? Number(value) : Number(value).toFixed(1),
-                    severity: getSeverity(typedKey, Number(value)),
-                };
+                const values = lines[0].split(', ').map((value) => value.split(' = '));
+                const unit = settings.widget.units;
+
+                for (const v of values) {
+                    const [key, value] = v;
+
+                    if (key === 'Temperature') {
+                        data.Temperature = {
+                            value: getTemperature(value, unit),
+                            severity: getSeverity(key, parseFloat(value)),
+                        };
+                    } else {
+                        const typedKey = key as keyof TData;
+                        data[typedKey] = {
+                            value: Number(value) % 1 === 0 ? Number(value) : Number(value).toFixed(1),
+                            severity: getSeverity(typedKey, Number(value)),
+                        };
+                    }
+                }
+
+                const shouldUpdate = shouldUpdateWidget();
+                if (shouldUpdate) {
+                    console.log('update');
+                    widget?.displayWidget(data, unit);
+                }
+            } catch (err) {
+                console.error('Error processing stream data:', err);
+                break;
             }
         }
-
-        const shouldUpdate = shouldUpdateWidget();
-        if (shouldUpdate) {
-            widget?.displayWidget(data, unit);
-        }
+    } catch (err) {
+        console.error('Error fetching air quality data:', err);
+    } finally {
+        console.log('Restarting air quality data watcher...');
+        retryTimeout = setTimeout(watchAirQualityData, 5000);
     }
 }
 
