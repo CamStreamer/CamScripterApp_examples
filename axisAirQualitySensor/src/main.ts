@@ -81,7 +81,6 @@ async function watchAirQualityData() {
 
                 const shouldUpdate = shouldUpdateWidget();
                 if (shouldUpdate) {
-                    console.log('update');
                     widget?.displayWidget(data, unit);
                 }
             } catch (err) {

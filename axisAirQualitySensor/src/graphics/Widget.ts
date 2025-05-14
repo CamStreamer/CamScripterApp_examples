@@ -44,9 +44,6 @@ export class Widget {
             if (this.background === undefined) {
                 this.background = await this.uploadImage('background/axis-air-quality-widget.png');
             }
-            if (this.gif === undefined) {
-                this.gif = await this.uploadImage('background/dust.gif');
-            }
             await this.renderWidget(data, `°${unit}`, this.cod);
         } catch (err) {
             console.error(err);
@@ -104,66 +101,60 @@ export class Widget {
             void cod.cairo('cairo_paint', cairo);
         }
 
-        // Draw the gif
-        if (this.gif) {
-            void cod.cairo('cairo_set_source_surface', cairo, this.gif, POS.centerLeftColumn - 30, POS.firstRow - 10);
-            void cod.cairo('cairo_paint', cairo);
-        }
-
         void cod.cairo('cairo_set_font_face', cairo, this.fontBold);
 
         // Draw severity lines
-        this.drawLine(cod, cairo, 40, 540, 120, SEVERITY[data.Humidity.severity]);
-        this.drawLine(cod, cairo, 40, 540, 250, SEVERITY[data.Temperature.severity]);
-        this.drawLine(cod, cairo, 40, 540, 370, SEVERITY[data.Vaping.severity]);
+        this.drawLine(cod, cairo, 43, 533, 121, SEVERITY[data.Humidity.severity]);
+        this.drawLine(cod, cairo, 43, 533, 247, SEVERITY[data.Temperature.severity]);
+        this.drawLine(cod, cairo, 43, 533, 373, SEVERITY[data.Vaping.severity]);
 
-        this.drawLine(cod, cairo, 620, 800, 250, SEVERITY[data['PM1.0'].severity]);
-        this.drawLine(cod, cairo, 620, 800, 370, SEVERITY[data['PM2.5'].severity]);
-        this.drawLine(cod, cairo, 850, 1030, 250, SEVERITY[data['PM4.0'].severity]);
-        this.drawLine(cod, cairo, 850, 1030, 370, SEVERITY[data['PM10.0'].severity]);
+        this.drawLine(cod, cairo, 620, 800, 247, SEVERITY[data['PM1.0'].severity]);
+        this.drawLine(cod, cairo, 620, 800, 373, SEVERITY[data['PM2.5'].severity]);
+        this.drawLine(cod, cairo, 850, 1030, 247, SEVERITY[data['PM4.0'].severity]);
+        this.drawLine(cod, cairo, 850, 1030, 373, SEVERITY[data['PM10.0'].severity]);
 
-        this.drawLine(cod, cairo, 1100, 1650, 120, SEVERITY[data.VOC.severity]);
-        this.drawLine(cod, cairo, 1100, 1650, 250, SEVERITY[data.NOx.severity]);
-        this.drawLine(cod, cairo, 1100, 1650, 370, SEVERITY[data.CO2.severity]);
+        this.drawLine(cod, cairo, 1109, 1650, 120, SEVERITY[data.VOC.severity]);
+        this.drawLine(cod, cairo, 1109, 1650, 247, SEVERITY[data.NOx.severity]);
+        this.drawLine(cod, cairo, 1109, 1650, 373, SEVERITY[data.CO2.severity]);
 
         this.drawLine(cod, cairo, 40, 800, 540, SEVERITY[data.AQI.severity]);
 
         // Write texts
         void cod.cairo('cairo_set_font_face', cairo, this.fontBold);
-        this.writeText(cod, cairo, data.Humidity.value, POS.leftColumn, POS.firstRow);
-        this.writeText(cod, cairo, data.Temperature.value, POS.leftColumn, POS.secondRow);
+        this.writeText(cod, cairo, data.Humidity.value, 260, POS.firstRow);
+        this.writeText(cod, cairo, data.Temperature.value, 260, POS.secondRow);
 
-        this.writeText(cod, cairo, data['PM1.0'].value, POS.centerLeftColumn, POS.secondRow);
-        this.writeText(cod, cairo, data['PM2.5'].value, POS.centerLeftColumn, POS.thirdRow);
-        this.writeText(cod, cairo, data['PM4.0'].value, POS.centerRightColumn, POS.secondRow);
-        this.writeText(cod, cairo, data['PM10.0'].value, POS.centerRightColumn, POS.thirdRow);
+        this.writeText(cod, cairo, data['PM1.0'].value, 600, POS.secondRow);
+        this.writeText(cod, cairo, data['PM2.5'].value, 600, POS.thirdRow);
+        this.writeText(cod, cairo, data['PM4.0'].value, 830, POS.secondRow);
+        this.writeText(cod, cairo, data['PM10.0'].value, 830, POS.thirdRow);
 
-        this.writeText(cod, cairo, data.VOC.value, POS.rightColumn, POS.firstRow);
-        this.writeText(cod, cairo, data.NOx.value, POS.rightColumn, POS.secondRow);
-        this.writeText(cod, cairo, data.CO2.value, POS.rightColumn, POS.thirdRow);
+        this.writeText(cod, cairo, data.VOC.value, 1380, POS.firstRow);
+        this.writeText(cod, cairo, data.NOx.value, 1380, POS.secondRow);
+        this.writeText(cod, cairo, data.CO2.value, 1380, POS.thirdRow);
 
         this.writeText(
             cod,
             cairo,
             data.AQI.value === 0 ? 'Calculating' : data.AQI.value.toString(),
-            POS.leftColumn + 50,
+            350,
             POS.fourthRow
         );
 
         void cod.cairo('cairo_set_font_face', cairo, this.fontRegular);
 
-        this.writeText(cod, cairo, '%RH', POS.leftColumn + 100, 50, 'small');
-        this.writeText(cod, cairo, GRAM_UNIT, POS.centerRightColumn, 50, 'small');
+        this.writeText(cod, cairo, '%RH', 470, 50, 'small');
+        this.writeText(cod, cairo, GRAM_UNIT, 940, 50, 'small');
         this.writeText(
             cod,
             cairo,
             data.Vaping.value === 0 ? 'UNDETECTED' : 'DETECTED',
-            POS.leftColumn + 10,
+            330,
             POS.thirdRow + 15,
             'small'
         );
-        this.writeText(cod, cairo, unit, POS.leftColumn + 100, 170, 'small');
-        this.writeText(cod, cairo, 'ppm', POS.rightColumn + 105, POS.thirdRow + 10, 'small');
+        this.writeText(cod, cairo, unit, 470, 170, 'small');
+        this.writeText(cod, cairo, 'ppm', 1450, POS.thirdRow + 10, 'small', true);
 
         const pos = this.computePosition(
             this.widgetSettings.coord_system,
@@ -223,16 +214,17 @@ export class Widget {
         value: number | string,
         posX: number,
         posY: number,
-        fontSize?: string
+        fontSize?: string,
+        ppm?: boolean
     ) {
         void cod.writeText(
             cairo,
             value.toString(),
             posX,
             posY,
-            200, // width of the text box?
+            200,
             fontSize === 'small' ? FONT.small : FONT.big,
-            'A_CENTER',
+            fontSize === 'small' ? (ppm ? 'A_RIGHT' : 'A_LEFT') : 'A_RIGHT',
             'TFM_SCALE'
         );
     }

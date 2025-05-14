@@ -136,10 +136,6 @@ export const FONT = {
 };
 
 export const POS = {
-    leftColumn: 300,
-    centerLeftColumn: 650,
-    centerRightColumn: 880,
-    rightColumn: 1400,
     firstRow: 40,
     secondRow: 165,
     thirdRow: 290,
