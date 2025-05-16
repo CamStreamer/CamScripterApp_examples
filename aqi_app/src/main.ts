@@ -46,6 +46,8 @@ let text: Frame;
 let upperText: Frame;
 let lowerText: Frame;
 
+const fontColor: [number, number, number] = [1.0, 1.0, 1.0];
+
 const codes: Record<string, ImageCode> = {
     good: {
         text: ['GOOD'],
@@ -205,7 +207,7 @@ function mapData(data: AqiResponseType) {
 
     value.setText(displayedValue?.toString() ?? '', 'A_CENTER', 'TFM_SCALE');
     label.setText(settings.display_location, 'A_CENTER', 'TFM_SCALE');
-    background.setBgImage(code.img_file, 'fit');
+    background.setBgImage(code.img_file, 'none');
 }
 
 function genLayout(background: Painter) {
@@ -215,7 +217,7 @@ function genLayout(background: Painter) {
         height: 30,
         width: 273,
         text: '',
-        fontColor: [1.0, 1.0, 1.0],
+        fontColor: fontColor,
     });
     value = new Frame({
         x: 0,
@@ -223,7 +225,7 @@ function genLayout(background: Painter) {
         height: 90,
         width: 273,
         text: '0',
-        fontColor: [1.0, 1.0, 1.0],
+        fontColor: fontColor,
     });
     text = new Frame({
         x: 3,
@@ -231,7 +233,7 @@ function genLayout(background: Painter) {
         height: 30,
         width: 273,
         text: '',
-        fontColor: [1.0, 1.0, 1.0],
+        fontColor: fontColor,
     });
     upperText = new Frame({
         x: 3,
@@ -239,7 +241,7 @@ function genLayout(background: Painter) {
         height: 25,
         width: 273,
         text: '',
-        fontColor: [1.0, 1.0, 1.0],
+        fontColor: fontColor,
         enabled: false,
     });
     lowerText = new Frame({
@@ -248,7 +250,7 @@ function genLayout(background: Painter) {
         height: 25,
         width: 273,
         text: '',
-        fontColor: [1.0, 1.0, 1.0],
+        fontColor: fontColor,
         enabled: false,
     });
 
@@ -303,8 +305,8 @@ async function main() {
     const options: PainterOptions = {
         x: settings.pos_x,
         y: settings.pos_y,
-        width: 279,
-        height: 253,
+        width: 556,
+        height: 700,
         screenWidth: cam_width,
         screenHeight: cam_height,
         coAlignment: settings.coordinates,
