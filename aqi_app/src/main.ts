@@ -207,7 +207,7 @@ function mapData(data: AqiResponseType) {
 
     value.setText(displayedValue?.toString() ?? '', 'A_CENTER', 'TFM_SCALE');
     label.setText(settings.display_location, 'A_CENTER', 'TFM_SCALE');
-    background.setBgImage(code.img_file, 'none');
+    background.setBgImage(code.img_file, 'fit');
 }
 
 function genLayout(background: Painter) {
@@ -215,7 +215,7 @@ function genLayout(background: Painter) {
         x: 0,
         y: 10,
         height: 30,
-        width: 273,
+        width: 272,
         text: '',
         fontColor: fontColor,
     });
@@ -223,7 +223,7 @@ function genLayout(background: Painter) {
         x: 0,
         y: 35,
         height: 90,
-        width: 273,
+        width: 272,
         text: '0',
         fontColor: fontColor,
     });
@@ -231,7 +231,7 @@ function genLayout(background: Painter) {
         x: 3,
         y: 140,
         height: 30,
-        width: 273,
+        width: 272,
         text: '',
         fontColor: fontColor,
     });
@@ -239,7 +239,7 @@ function genLayout(background: Painter) {
         x: 3,
         y: 130,
         height: 25,
-        width: 273,
+        width: 272,
         text: '',
         fontColor: fontColor,
         enabled: false,
@@ -248,7 +248,7 @@ function genLayout(background: Painter) {
         x: 3,
         y: 160,
         height: 25,
-        width: 273,
+        width: 272,
         text: '',
         fontColor: fontColor,
         enabled: false,
@@ -305,8 +305,8 @@ async function main() {
     const options: PainterOptions = {
         x: settings.pos_x,
         y: settings.pos_y,
-        width: 556,
-        height: 700,
+        width: 280,
+        height: 278,
         screenWidth: cam_width,
         screenHeight: cam_height,
         coAlignment: settings.coordinates,
