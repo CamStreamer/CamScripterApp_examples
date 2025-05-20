@@ -46,6 +46,8 @@ let text: Frame;
 let upperText: Frame;
 let lowerText: Frame;
 
+const fontColor: [number, number, number] = [1.0, 1.0, 1.0];
+
 const codes: Record<string, ImageCode> = {
     good: {
         text: ['GOOD'],
@@ -213,42 +215,42 @@ function genLayout(background: Painter) {
         x: 0,
         y: 10,
         height: 30,
-        width: 273,
+        width: 272,
         text: '',
-        fontColor: [1.0, 1.0, 1.0],
+        fontColor: fontColor,
     });
     value = new Frame({
         x: 0,
         y: 35,
         height: 90,
-        width: 273,
+        width: 272,
         text: '0',
-        fontColor: [1.0, 1.0, 1.0],
+        fontColor: fontColor,
     });
     text = new Frame({
         x: 3,
         y: 140,
         height: 30,
-        width: 273,
+        width: 272,
         text: '',
-        fontColor: [1.0, 1.0, 1.0],
+        fontColor: fontColor,
     });
     upperText = new Frame({
         x: 3,
         y: 130,
         height: 25,
-        width: 273,
+        width: 272,
         text: '',
-        fontColor: [1.0, 1.0, 1.0],
+        fontColor: fontColor,
         enabled: false,
     });
     lowerText = new Frame({
         x: 3,
         y: 160,
         height: 25,
-        width: 273,
+        width: 272,
         text: '',
-        fontColor: [1.0, 1.0, 1.0],
+        fontColor: fontColor,
         enabled: false,
     });
 
@@ -303,8 +305,8 @@ async function main() {
     const options: PainterOptions = {
         x: settings.pos_x,
         y: settings.pos_y,
-        width: 279,
-        height: 253,
+        width: 280,
+        height: 278,
         screenWidth: cam_width,
         screenHeight: cam_height,
         coAlignment: settings.coordinates,
