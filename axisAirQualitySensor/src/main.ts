@@ -54,12 +54,19 @@ async function watchAirQualityData() {
                     break;
                 }
 
+                //PM1.0 = 64, PM2.5 = 25, PM4.0 = 91, PM10.0 = 90, Temperature = 53, Humidity = 19, VOC = 85, NOx = 43, CO2 = 81, AQI = 100}
+
                 dataBuffer += decoder.decode(value, { stream: true });
 
                 const lines = dataBuffer.split('\n');
-                dataBuffer = lines.pop() || '';
+                if (lines.length < 2) {
+                    continue;
+                }
 
-                const values = lines[0].split(', ').map((value) => value.split(' = '));
+                const lineIndex = lines.length - 2;
+                const values = lines[lineIndex].split(', ').map((value) => value.split(' = '));
+                dataBuffer = lines[lines.length - 1];
+
                 const unit = settings.widget.units;
 
                 for (const v of values) {

@@ -221,15 +221,15 @@ function genLayout(background: Painter) {
     });
     value = new Frame({
         x: 0,
-        y: 35,
+        y: 38,
         height: 90,
         width: 272,
-        text: '0',
+        text: '',
         fontColor: fontColor,
     });
     text = new Frame({
         x: 3,
-        y: 140,
+        y: 142,
         height: 30,
         width: 272,
         text: '',
