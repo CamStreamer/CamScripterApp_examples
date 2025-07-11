@@ -1,19 +1,12 @@
 import { TServerData } from '../schema';
-import { GenetecAgent, GenetecAgentOptions } from 'camstreamerlib/events/GenetecAgent';
-
-type TParams = Array<'Guid' | 'Name' | 'EntityType'>;
-
-type TCameraOption = {
-    index: number;
-    value: string;
-    label: string;
-};
+import { GenetecAgent, GenetecAgentOptions, TParams } from 'camstreamerlib/events/GenetecAgent';
 
 const PARAMS: TParams = ['Guid', 'Name', 'EntityType'];
 
 export class Genetec {
     private agent: GenetecAgent;
     private settings: GenetecAgentOptions;
+    private cameraList: string[] = [];
 
     constructor(private genetecSettings: TServerData['genetec']) {
         this.settings = {
@@ -27,6 +20,7 @@ export class Genetec {
         };
 
         this.agent = new GenetecAgent(this.settings);
+        this.cameraList = genetecSettings.camera_list;
     }
 
     async checkConnection(req: any, res: any) {
@@ -41,8 +35,6 @@ export class Genetec {
             pass: params.get('pass') ?? '',
             app_id: params.get('app_id') ?? '',
         };
-
-        console.log('currentSettings:', currentSettings);
 
         try {
             const newAgent = new GenetecAgent(currentSettings as GenetecAgentOptions);
@@ -75,20 +67,16 @@ export class Genetec {
             pass: params.get('pass') ?? '',
             app_id: params.get('app_id') ?? '',
         };
-        const currentCameraOptions = {
-            camera_list: params.get('camera_list'),
-            selected_cameras: params.get('selected_cameras'),
-        };
+        const selectedCameras = params.get('selected_cameras');
 
         try {
-            if (currentCameraOptions.camera_list !== null && currentCameraOptions.selected_cameras !== null) {
+            if (selectedCameras !== null) {
                 const newAgent = new GenetecAgent(currentSettings as GenetecAgentOptions);
 
                 await this.sendBookmark(
                     'Testing bookmark from CamStreamer script',
                     newAgent,
-                    JSON.parse(currentCameraOptions.camera_list),
-                    JSON.parse(currentCameraOptions.selected_cameras)
+                    JSON.parse(selectedCameras)
                 );
 
                 res.statusCode = 200;
@@ -128,27 +116,16 @@ export class Genetec {
         }
     }
 
-    async sendBookmark(
-        code: string,
-        newAgent?: GenetecAgent,
-        currentCameraList?: TCameraOption[],
-        currentSelectedCameras?: number[]
-    ) {
+    async sendBookmark(code: string, newAgent?: GenetecAgent, currentSelectedCameras?: string[]) {
         const genetecAgent = newAgent ?? this.agent;
         console.log('Sending bookmark... ', code);
         try {
-            if (currentCameraList === undefined) {
-                currentCameraList = await this.getCameraList();
-            }
-            if (currentSelectedCameras === undefined) {
-                currentSelectedCameras = this.genetecSettings.camera_list;
+            let selectedCameras = this.cameraList;
+            if (currentSelectedCameras !== undefined) {
+                selectedCameras = currentSelectedCameras;
             }
 
-            const selectedCamerasToSend = currentCameraList
-                .filter((camera: TCameraOption) => currentSelectedCameras?.includes(camera.index))
-                .map((camera) => camera.value);
-
-            await genetecAgent.sendBookmark(selectedCamerasToSend, code);
+            await genetecAgent.sendBookmark(selectedCameras, code);
             console.log('Bookmark sent: ', code);
         } catch (err) {
             console.error('Cannot send bookmark, error: ', err);
@@ -159,7 +136,7 @@ export class Genetec {
         const genetecAgent = newAgent ?? this.agent;
 
         const guidsArray = await genetecAgent.getAllCameraGuids().then((res) => res.Rsp.Result);
-        const camerasDetails = await genetecAgent.getCameraDetails(guidsArray, PARAMS).then((res) => res.Rsp.Result);
+        const camerasDetails = await genetecAgent.getCameraDetails(guidsArray, PARAMS);
 
         const cameraList = [];
 

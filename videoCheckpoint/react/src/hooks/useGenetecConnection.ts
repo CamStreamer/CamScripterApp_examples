@@ -66,7 +66,7 @@ export const useGenetecConnection = ({ displaySnackbar }: Props) => {
         const isSent = await fetch(
             `/local/camscripter/proxy/video_checkpoint/genetec/sendTestBookmark?${generateParams(
                 proxy
-            )}&camera_list=${JSON.stringify(cameraList)}&selected_cameras=${JSON.stringify(selectedCameras)}`,
+            )}&selected_cameras=${JSON.stringify(selectedCameras)}`,
             {
                 method: 'POST',
             }
