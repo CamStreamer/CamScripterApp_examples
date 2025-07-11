@@ -1,6 +1,6 @@
 {
     "name": "video_checkpoint",
-    "version": "1.2.6",
+    "version": "1.2.7",
     "description": "",
     "prettier": "@camstreamer/prettier-config",
     "main": "main.js",
