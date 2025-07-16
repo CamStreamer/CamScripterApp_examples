@@ -28,7 +28,22 @@ export const App = () => {
 
             response = await fetch(url);
             data = await response.json();
-            const parsedData = serverDataSchema.parse(data);
+
+            const cameraList = data.genetec?.camera_list ?? [];
+            let defaultData = {} as TServerData;
+            if (cameraList.some((item) => typeof item === 'number')) {
+                defaultData = {
+                    ...data,
+                    genetec: {
+                        ...data.genetec,
+                        camera_list: [],
+                    },
+                };
+            } else {
+                defaultData = data;
+            }
+
+            const parsedData = serverDataSchema.parse(defaultData);
             if (!parsedData.axis_events) {
                 parsedData.axis_events = {
                     conn_hub: true,
