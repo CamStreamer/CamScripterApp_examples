@@ -2,7 +2,7 @@ import { Controller, useFormContext } from 'react-hook-form';
 import { TSettingsSchema } from '../../models/schema';
 import { InputAdornment, Radio, RadioGroup } from '@mui/material';
 import { StyledTextField, StyledRadioControlLabel, StyledForm as FormSection } from '../../components/FormInputs';
-import { parseValueAsInt } from '../../utils';
+import { parseValueAsFloat } from '../../utils';
 import { OVERLAY_TYPES, OVERLAY_TYPES_LABELS } from '../constants/constants';
 import { Title } from '../../components/Title';
 import { styled } from '@mui/material/styles';
@@ -45,15 +45,15 @@ export const OverlaySettings = () => {
                 control={control}
                 render={({ field, formState }) => (
                     <StyledTextField
-                        defaultValue={field.value}
+                        {...field}
+                        fullWidth
+                        label="Glass size"
                         InputLabelProps={{ shrink: true }}
                         onBlur={(e) => {
-                            const val = parseValueAsInt(e.target.value);
+                            const val = parseValueAsFloat(e.target.value);
                             field.onChange(val);
                             e.target.value = val.toString();
                         }}
-                        fullWidth
-                        label="Glass size"
                         error={!!formState.errors.widget?.glass_size}
                         helperText={formState.errors.widget?.glass_size?.message}
                         InputProps={{

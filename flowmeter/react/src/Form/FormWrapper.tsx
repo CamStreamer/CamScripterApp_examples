@@ -53,7 +53,7 @@ export const FormWrapper = ({ defaultValues }: Props) => {
             console.error('Error while submitting data: ', e);
             displaySnackbar({
                 type: 'error',
-                message: 'Error saving settings.',
+                message: 'Unable to save settings.',
             });
         }
     };
