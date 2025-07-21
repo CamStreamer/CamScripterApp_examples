@@ -1,8 +1,9 @@
 {
-  "package_name": "flowmeter",
-  "package_menu_name": "Flow Meter",
-  "package_version": "1.1.3",
-  "vendor": "Camstreamer s.r.o.",
-  "required_camscripter_rbi_version": "1.0.0",
-  "ui_link": "/local/camscripter/package/flowmeter/index.html"
+    "package_name": "flowmeter",
+    "package_menu_name": "Flow Meter",
+    "package_version": "1.1.3",
+    "vendor": "Camstreamer s.r.o.",
+    "required_camscripter_version": "1.5.3",
+    "required_camscripter_rbi_version": "1.4.0",
+    "ui_link": "/local/camscripter/package/flowmeter/index.html"
 }
