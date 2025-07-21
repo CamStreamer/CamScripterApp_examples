@@ -70,6 +70,18 @@ httpServer.onRequest('/calibration_calibrate.cgi', async (req, res) => {
     }
 });
 
+httpServer.onRequest('/serverRunCheck.cgi', (req, res) => {
+    try {
+        console.log('access: server run check');
+        res.statusCode = 200;
+    } catch (err) {
+        console.error('Cannot finish server run check, error:', err);
+        res.statusCode = 500;
+    } finally {
+        res.end();
+    }
+});
+
 const spinelController = new SpinelController();
 spinelController.on('volume', async (volume: number) => {
     if (widget) {
