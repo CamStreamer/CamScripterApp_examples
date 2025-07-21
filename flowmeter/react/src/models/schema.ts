@@ -10,6 +10,7 @@ export const connectionParamsSchema = z.object({
 export type TConnectionParams = z.infer<typeof connectionParamsSchema>;
 
 export const settingsSchema = z.object({
+    started: z.boolean().default(false),
     camera: connectionParamsSchema,
     widget: z.object({
         coord_system: z.union([

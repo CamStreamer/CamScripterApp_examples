@@ -1,6 +1,7 @@
 import { TSettingsSchema } from './schema';
 
 export const mockedSettings: TSettingsSchema = {
+    started: false,
     camera: {
         protocol: 'http',
         ip: '',
