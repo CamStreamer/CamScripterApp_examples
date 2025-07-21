@@ -22,11 +22,14 @@ export class Widget {
     private layout?: TLayout;
     private layoutReady = false;
 
-    constructor(private settings: TSettingsSchema) {
+    constructor(
+        private cameraSettings: TSettingsSchema['camera'],
+        private widgetSettings: TSettingsSchema['widget']
+    ) {
         const options = {
-            ip: this.settings.camera_ip,
-            port: this.settings.camera_port,
-            auth: `${this.settings.camera_user}:${this.settings.camera_pass}`,
+            ip: this.cameraSettings.ip,
+            port: this.cameraSettings.port,
+            auth: `${this.cameraSettings.user}:${this.cameraSettings.pass}`,
             tls: false,
         };
         this.cod = new CamOverlayDrawingAPI(options);
@@ -57,7 +60,7 @@ export class Widget {
             this.layout.volume.setText(volume.toFixed(2) + ' l', 'A_CENTER');
             this.layout.beerCount.setText(Math.floor(volume * 2).toString(), 'A_RIGHT');
 
-            await this.layout.background.generate(this.cod, this.settings.scale / 100);
+            await this.layout.background.generate(this.cod, this.widgetSettings.scale / 100);
         } catch (err) {
             console.error('Generate widget error: ', err);
         }
@@ -100,14 +103,15 @@ export class Widget {
     }
 
     private async createLayout(mm: MemoryManager) {
+        const resolution = this.widgetSettings.stream_resolution.split('x').map(Number);
         const background = new CairoPainter({
-            x: this.settings.pos_x,
-            y: this.settings.pos_y,
+            x: this.widgetSettings.pos_x,
+            y: this.widgetSettings.pos_y,
             width: 500,
             height: 760,
-            screenWidth: this.settings.res_w,
-            screenHeight: this.settings.res_h,
-            coAlignment: this.settings.coord,
+            screenWidth: resolution[0],
+            screenHeight: resolution[1],
+            coAlignment: this.widgetSettings.coord_system,
         });
         background.setBgImage(await mm.image('bg'), 'fit');
 
@@ -117,7 +121,7 @@ export class Widget {
             width: 180,
             height: 48,
         });
-        startTime.setText(this.settings.start_time, 'A_CENTER');
+        startTime.setText(this.widgetSettings.start_time, 'A_CENTER');
 
         const currentTime = new CairoFrame({
             x: 260,
@@ -165,7 +169,7 @@ export class Widget {
             width: 400,
             height: 40,
         });
-        groupName.setText(this.settings.group_name, 'A_CENTER');
+        groupName.setText(this.widgetSettings.group_name, 'A_CENTER');
 
         background.insert(startTime, currentTime, beerBackground, currentBeer, beerCount, volume, groupName);
         return {

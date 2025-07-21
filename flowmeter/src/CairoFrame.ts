@@ -1,4 +1,4 @@
-import { CamOverlayDrawingAPI, UploadImageResponse, Align } from 'camstreamerlib/CamOverlayDrawingAPI';
+import { CamOverlayDrawingAPI, TUploadImageResponse, TAlign } from 'camstreamerlib/CamOverlayDrawingAPI';
 
 type RGB = [number, number, number];
 type RGBA = [number, number, number, number];
@@ -29,7 +29,7 @@ export default class CairoFrame {
     private bgImage?: string;
     private bgType: 'fit' | 'stretch' | 'plain';
     private textType: TMF;
-    private align: Align;
+    private align: TAlign;
     private bgWidth?: number;
     private bgHeight?: number;
 
@@ -52,7 +52,7 @@ export default class CairoFrame {
         this.align = 'A_LEFT';
     }
 
-    setText(text: string, align: Align, textType: TMF = 'TFM_OVERFLOW', color = white): void {
+    setText(text: string, align: TAlign, textType: TMF = 'TFM_OVERFLOW', color = white): void {
         this.text = text;
         this.fontColor = color;
         this.align = align;
@@ -168,7 +168,7 @@ export default class CairoFrame {
         this.font = fontdata;
     }
 
-    setBgImage(imageData: UploadImageResponse, type: 'fit' | 'stretch' | 'plain'): void {
+    setBgImage(imageData: TUploadImageResponse, type: 'fit' | 'stretch' | 'plain'): void {
         this.bgImage = imageData.var;
         this.bgWidth = imageData.width;
         this.bgHeight = imageData.height;

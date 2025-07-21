@@ -81,15 +81,25 @@ async function start() {
     try {
         let oldSettings = '';
         if (settings) {
-            const { started: tmp1, ...restOfSettingsOld } = settings;
+            const {
+                widget: { start_time: tmp1, ...restWidget },
+                ...restSettings
+            } = settings;
             void tmp1;
+            const restOfSettingsOld = { ...restWidget, ...restSettings };
+
             oldSettings = JSON.stringify(restOfSettingsOld);
         }
 
         settings = readConfiguration();
 
-        const { started: tmp2, ...restOfSettings } = settings;
+        const {
+            widget: { start_time: tmp2, ...restWidget },
+            ...restSettings
+        } = settings;
         void tmp2;
+        const restOfSettings = { ...restWidget, ...restSettings };
+
         const newSettings = JSON.stringify(restOfSettings);
 
         if (widget && oldSettings !== newSettings) {
@@ -97,9 +107,9 @@ async function start() {
             widget = undefined;
         }
         if (!widget) {
-            widget = new Widget(settings);
+            widget = new Widget(settings.camera, settings.widget);
         }
-        if (settings.started) {
+        if (settings.widget.start_time) {
             await spinelController.start();
         }
     } catch (err) {

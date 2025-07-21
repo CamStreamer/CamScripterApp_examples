@@ -1,4 +1,4 @@
-import { CamOverlayDrawingAPI, CairoCreateResponse } from 'camstreamerlib/CamOverlayDrawingAPI';
+import { CamOverlayDrawingAPI, TCairoCreateResponse } from 'camstreamerlib/CamOverlayDrawingAPI';
 
 import CairoFrame from './CairoFrame';
 
@@ -71,8 +71,8 @@ export default class CairoPainter extends CairoFrame {
             'CAIRO_FORMAT_ARGB32',
             Math.floor(this.width * scale),
             Math.floor(this.height * scale)
-        )) as CairoCreateResponse;
-        const cairo = (await cod.cairo('cairo_create', surface.var)) as CairoCreateResponse;
+        )) as TCairoCreateResponse;
+        const cairo = (await cod.cairo('cairo_create', surface.var)) as TCairoCreateResponse;
 
         return [surface.var, cairo.var];
     }

@@ -1,10 +1,10 @@
-import { CamOverlayDrawingAPI, UploadImageResponse } from 'camstreamerlib/CamOverlayDrawingAPI';
+import { CamOverlayDrawingAPI, TUploadImageResponse } from 'camstreamerlib/CamOverlayDrawingAPI';
 import * as fs from 'fs';
 
 export class MemoryManager {
     private imgFiles: Record<string, string> = {};
     private fontFiles: Record<string, string> = {};
-    private images: Record<string, UploadImageResponse> = {};
+    private images: Record<string, TUploadImageResponse> = {};
     private fonts: Record<string, string> = {};
 
     constructor(private co: CamOverlayDrawingAPI) {}
