@@ -21,6 +21,8 @@ export class Widget {
     private mm?: MemoryManager;
     private layout?: TLayout;
     private layoutReady = false;
+    private widgetBg: string;
+    private widgetBeerType: string;
 
     constructor(
         private cameraSettings: TSettingsSchema['camera'],
@@ -33,6 +35,9 @@ export class Widget {
             tls: false,
         };
         this.cod = new CamOverlayDrawingAPI(options);
+        this.widgetBeerType = this.widgetSettings.overlay_type === 'birel' ? 'birel' : 'beer';
+        this.widgetBg =
+            this.widgetBeerType === 'birel' ? 'bg-birel' : this.widgetBeerType === 'beer' ? 'bg-beer' : 'bg';
     }
 
     stop() {
@@ -95,11 +100,19 @@ export class Widget {
     }
 
     private prepareImages(mm: MemoryManager) {
-        mm.registerImage('1', '1-empty.png');
-        mm.registerImage('2', '2-almost-empty.png');
-        mm.registerImage('3', '3-almost-full.png');
-        mm.registerImage('4', '4-full.png');
+        mm.registerImage('bg-birel', 'birel_bg.png');
+        mm.registerImage('bg-beer', 'beer_bg.png');
         mm.registerImage('bg', 'axis_bg.png');
+
+        mm.registerImage('beer-1', 'beer-empty.png');
+        mm.registerImage('beer-2', 'beer-almost-empty.png');
+        mm.registerImage('beer-3', 'beer-almost-full.png');
+        mm.registerImage('beer-4', 'beer-full.png');
+
+        mm.registerImage('birel-1', 'birel-empty.png');
+        mm.registerImage('birel-2', 'birel-almost-empty.png');
+        mm.registerImage('birel-3', 'birel-almost-full.png');
+        mm.registerImage('birel-4', 'birel-full.png');
     }
 
     private async createLayout(mm: MemoryManager) {
@@ -113,7 +126,7 @@ export class Widget {
             screenHeight: resolution[1],
             coAlignment: this.widgetSettings.coord_system,
         });
-        background.setBgImage(await mm.image('bg'), 'fit');
+        background.setBgImage(await mm.image(this.widgetBg), 'fit');
 
         const startTime = new CairoFrame({
             x: 35,
@@ -137,7 +150,7 @@ export class Widget {
             width: 110,
             height: 128,
         });
-        beerBackground.setBgImage(await mm.image('4'), 'fit');
+        beerBackground.setBgImage(await mm.image(`${this.widgetBeerType}-4`), 'fit');
 
         const currentBeer = new CairoFrame({
             x: 310,
@@ -145,7 +158,7 @@ export class Widget {
             width: 110,
             height: 128,
         });
-        currentBeer.setBgImage(await mm.image('1'), 'fit');
+        currentBeer.setBgImage(await mm.image(`${this.widgetBeerType}-1`), 'fit');
 
         const beerCount = new CairoFrame({
             x: 45,
@@ -187,13 +200,13 @@ export class Widget {
     private getBeerIndex(volumeLiters: number) {
         const ml = (volumeLiters % 0.5) * 1000;
         if (ml < 125) {
-            return '1';
+            return `${this.widgetBeerType}-1`;
         } else if (ml < 250) {
-            return '2';
+            return `${this.widgetBeerType}-2`;
         } else if (ml < 375) {
-            return '3';
+            return `${this.widgetBeerType}-3`;
         } else {
-            return '4';
+            return `${this.widgetBeerType}-4`;
         }
     }
 }
