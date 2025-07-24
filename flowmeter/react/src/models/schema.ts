@@ -15,6 +15,8 @@ export const settingsSchema = z.object({
     group_name: z.string(),
     start_time: z.string(),
     scale: z.number(),
+    calibration_volume: z.number(),
+    overlay_type: z.union([z.literal('axis_beer'), z.literal('beer'), z.literal('birel')]),
 });
 
 export type TSettings = z.infer<typeof settingsSchema>;

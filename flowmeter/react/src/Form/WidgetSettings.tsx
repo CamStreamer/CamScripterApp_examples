@@ -1,10 +1,10 @@
 import { Controller, useFormContext } from 'react-hook-form';
 import { TSettings } from '../models/schema';
-import { InputAdornment, MenuItem } from '@mui/material';
-import { StyledTextField, StyledSelect, StyledForm } from '../components/FormInputs';
+import { FormHelperText, InputAdornment, MenuItem, Radio, RadioGroup } from '@mui/material';
+import { StyledTextField, StyledSelect, StyledForm, StyledRadioControlLabel } from '../components/FormInputs';
 import { parseValueAsInt, parseValueAsFloat } from '../utils';
 import { Title } from '../components/Title';
-import { COORD_LIST, COORD_LIST_LABELS } from '../constants';
+import { COORD_LIST, COORD_LIST_LABELS, OVERLAY_TYPES, OVERLAY_TYPES_LABELS } from '../constants';
 
 type Props = {
     resolutionOptions: string[];
@@ -135,6 +135,85 @@ export const WidgetSettings = ({ resolutionOptions }: Props) => {
                     />
                 )}
             />
+
+            {/* ------START TIME------*/}
+            <Controller
+                name={'start_time'}
+                control={control}
+                render={({ field, formState }) => (
+                    <StyledTextField
+                        {...field}
+                        fullWidth
+                        label="Start time"
+                        error={!!formState.errors.start_time}
+                        helperText={formState.errors.start_time?.message}
+                    />
+                )}
+            />
+
+            {/* ------GROUP NAME------*/}
+            <Controller
+                name={'group_name'}
+                control={control}
+                render={({ field, formState }) => (
+                    <StyledTextField
+                        {...field}
+                        fullWidth
+                        label="Group name"
+                        error={!!formState.errors.group_name}
+                        helperText={formState.errors.group_name?.message}
+                    />
+                )}
+            />
+
+            <Title text="Choose overlay" />
+
+            {/* ------OVERLAY TYPE------*/}
+            <Controller
+                name={'overlay_type'}
+                control={control}
+                render={({ field }) => (
+                    <RadioGroup
+                        row
+                        style={{ gridColumn: '2 span' }}
+                        value={field.value}
+                        onChange={(e) => {
+                            field.onChange(e);
+                        }}
+                    >
+                        {OVERLAY_TYPES.map((unit) => (
+                            <StyledRadioControlLabel
+                                key={unit}
+                                value={unit}
+                                control={<Radio color="info" />}
+                                label={OVERLAY_TYPES_LABELS[unit]}
+                            />
+                        ))}
+                    </RadioGroup>
+                )}
+            />
+
+            {/* ------CALIBRATION VOLUME------*/}
+            <Controller
+                name={'calibration_volume'}
+                control={control}
+                render={({ field }) => (
+                    <StyledTextField
+                        {...field}
+                        fullWidth
+                        label="Glass size"
+                        disabled
+                        InputProps={{
+                            endAdornment: (
+                                <InputAdornment position="end" disableTypography>
+                                    liters
+                                </InputAdornment>
+                            ),
+                        }}
+                    />
+                )}
+            />
+            <FormHelperText>To set the glass size, please calibrate the Flow Meter.</FormHelperText>
         </StyledForm>
     );
 };

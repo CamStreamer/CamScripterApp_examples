@@ -15,4 +15,6 @@ export const mockedSettings: TSettings = {
     group_name: 'default',
     start_time: 'now',
     scale: 100,
+    calibration_volume: 0.5,
+    overlay_type: 'axis_beer',
 };
