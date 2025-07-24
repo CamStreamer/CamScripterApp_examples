@@ -1,5 +1,5 @@
 import { CamOverlayDrawingAPI } from 'camstreamerlib/CamOverlayDrawingAPI';
-import { TSettingsSchema } from './schema';
+import { TSettings } from './schema';
 import { MemoryManager } from './MemoryManager';
 import CairoPainter from './CairoPainter';
 import CairoFrame from './CairoFrame';
@@ -22,7 +22,7 @@ export class Widget {
     private layout?: TLayout;
     private layoutReady = false;
 
-    constructor(private settings: TSettingsSchema) {
+    constructor(private settings: TSettings) {
         const options = {
             ip: this.settings.camera_ip,
             port: this.settings.camera_port,
@@ -100,13 +100,14 @@ export class Widget {
     }
 
     private async createLayout(mm: MemoryManager) {
+        const resolution = this.settings.resolution.split('x').map(Number);
         const background = new CairoPainter({
             x: this.settings.pos_x,
             y: this.settings.pos_y,
             width: 500,
             height: 760,
-            screenWidth: this.settings.res_w,
-            screenHeight: this.settings.res_h,
+            screenWidth: resolution[0],
+            screenHeight: resolution[1],
             coAlignment: this.settings.coord,
         });
         background.setBgImage(await mm.image('bg'), 'fit');

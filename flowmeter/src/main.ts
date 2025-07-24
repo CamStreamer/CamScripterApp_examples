@@ -1,12 +1,12 @@
 import * as fs from 'fs';
 import { HttpServer } from 'camstreamerlib/HttpServer';
-import { settingsSchema, TSettingsSchema } from './schema';
+import { settingsSchema, TSettings } from './schema';
 import { SpinelController } from './SpinelController';
 import { Widget } from './Widget';
 
 console.log('Starting Flowmeter Package...');
 
-let settings: TSettingsSchema | undefined;
+let settings: TSettings | undefined;
 let widget: Widget | undefined;
 
 const httpServer = new HttpServer();
