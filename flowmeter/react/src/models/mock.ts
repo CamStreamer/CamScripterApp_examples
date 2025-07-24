@@ -1,0 +1,16 @@
+import { TSettings } from './schema';
+
+export const mockedSettings: TSettings = {
+    started: false,
+    camera_ip: '',
+    camera_port: 80,
+    camera_user: 'root',
+    camera_pass: '',
+    coord: 'top_left',
+    pos_x: 0,
+    pos_y: 0,
+    resolution: '1920x1080',
+    group_name: 'default',
+    start_time: 'now',
+    scale: 100,
+};

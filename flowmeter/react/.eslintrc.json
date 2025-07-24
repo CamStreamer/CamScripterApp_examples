@@ -1,0 +1,17 @@
+{
+    "root": true,
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+        "project": "**/tsconfig.json",
+        "sourceType": "module"
+    },
+    "extends": ["@camstreamer/eslint-config/react.json"],
+    "ignorePatterns": [".eslintrc.json", "src/react-utils"],
+    "rules": {
+        "react/react-in-jsx-scope": "off",
+        "@typescript-eslint/strict-boolean-expressions": [
+            "error",
+            { "allowNullableObject": true, "allowNullableBoolean": true }
+        ]
+    }
+}
