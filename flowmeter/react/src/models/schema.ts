@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 export const settingsSchema = z.object({
     started: z.boolean(),
+    camera_protocol: z.union([z.literal('http'), z.literal('https'), z.literal('https_insecure')]),
     camera_ip: z.string(),
     camera_port: z.number(),
     camera_user: z.string(),
@@ -10,6 +11,7 @@ export const settingsSchema = z.object({
     pos_x: z.number(),
     pos_y: z.number(),
     resolution: z.string(),
+    camera_list: z.array(z.number()),
     group_name: z.string(),
     start_time: z.string(),
     scale: z.number(),
