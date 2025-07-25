@@ -1,4 +1,6 @@
 import {
+    Box,
+    Chip,
     FormControl,
     FormControlLabel,
     FormHelperText,
@@ -107,4 +109,16 @@ export const StyledSection = styled('div')`
     display: flex;
     flex-direction: column;
     gap: 16px;
+`;
+
+export const StyledBox = styled(Box)`
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 10px 0;
+`;
+
+export const StyledChip = styled(Chip)`
+    cursor: default;
+    margin-right: 10px;
 `;

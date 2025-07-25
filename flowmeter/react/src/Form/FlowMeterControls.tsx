@@ -1,11 +1,11 @@
 import { Modal } from '../components/Modal';
 import Button from '@mui/material/Button/Button';
 import styled from '@mui/material/styles/styled';
-import { Box, Chip, InputAdornment, Typography } from '@mui/material';
+import { InputAdornment, Typography } from '@mui/material';
 import { useGetFlowMeterStatus } from '../hooks/useGetFlowMeterStatus';
 import { useState } from 'react';
 import { Controller, useFormContext, useWatch } from 'react-hook-form';
-import { StyledTextField } from '../components/FormInputs';
+import { StyledBox, StyledChip, StyledTextField } from '../components/FormInputs';
 import { TSettings } from '../models/schema';
 import { parseValueAsFloat } from '../utils';
 import { useSnackbar } from '../hooks/useSnackbar';
@@ -47,7 +47,7 @@ export const FlowMeterControls = () => {
             <InfoSnackbar snackbarData={snackbarData} closeSnackbar={closeSnackbar} />
             <StyledBox>
                 <Typography fontWeight={700}>State</Typography>
-                <StyledConnectionChip color={getChipClass()} label={getLabelText()} />
+                <StyledChip color={getChipClass()} label={getLabelText()} />
                 {isStarting || isStopping ? null : (
                     <Button
                         variant="outlined"
@@ -115,18 +115,6 @@ export const FlowMeterControls = () => {
         </>
     );
 };
-
-const StyledBox = styled(Box)`
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 10px 0;
-`;
-
-const StyledConnectionChip = styled(Chip)`
-    cursor: default;
-    margin-right: 10px;
-`;
 
 const StyledButtonRow = styled('div')`
     display: flex;
