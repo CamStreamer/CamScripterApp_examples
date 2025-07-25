@@ -14,7 +14,7 @@ import { useFlowMeterControl } from '../hooks/useFlowMeterControls';
 
 export const FlowMeterControls = () => {
     const { control } = useFormContext<TSettings>();
-    const { snackbarData, closeSnackbar } = useSnackbar();
+    const { snackbarData, displaySnackbar, closeSnackbar } = useSnackbar();
     const {
         handleStart,
         handleStop,
@@ -23,10 +23,10 @@ export const FlowMeterControls = () => {
         handleCalibrationCalibrate,
         isStarting,
         isStopping,
-    } = useFlowMeterControl();
+        started,
+    } = useFlowMeterControl({ displaySnackbar });
 
     const glassSize = useWatch({ name: 'calibration_volume', control });
-    const flowMeterStarted = useWatch({ name: 'started', control });
 
     const [openResetModal, setOpenResetModal] = useState(false);
     const [openCalibrateModal, setOpenCalibrateModal] = useState(false);
@@ -37,7 +37,7 @@ export const FlowMeterControls = () => {
     };
 
     const { getLabelText, getChipClass, getButtonText } = useGetFlowMeterStatus({
-        started: flowMeterStarted,
+        started,
         isStarting,
         isStopping,
     });
@@ -48,15 +48,17 @@ export const FlowMeterControls = () => {
             <StyledBox>
                 <Typography fontWeight={700}>State</Typography>
                 <StyledConnectionChip color={getChipClass()} label={getLabelText()} />
-                <Button
-                    variant="outlined"
-                    color={flowMeterStarted ? 'error' : 'success'}
-                    onClick={async () => {
-                        await (flowMeterStarted ? handleStop() : handleStart());
-                    }}
-                >
-                    {getButtonText()}
-                </Button>
+                {isStarting || isStopping ? null : (
+                    <Button
+                        variant="outlined"
+                        color={started ? 'error' : 'success'}
+                        onClick={async () => {
+                            await (started ? handleStop() : handleStart());
+                        }}
+                    >
+                        {getButtonText()}
+                    </Button>
+                )}
             </StyledBox>
             <StyledButtonRow>
                 <Button variant="outlined" onClick={() => setOpenResetModal(true)}>

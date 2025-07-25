@@ -1,22 +1,27 @@
 import { SubmitHandler, useFormContext } from 'react-hook-form';
 import { TSettings } from '../models/schema';
-import { useSnackbar } from './useSnackbar';
 import { useState } from 'react';
 
-export const useFlowMeterControl = () => {
-    const { getValues } = useFormContext();
-    const { displaySnackbar } = useSnackbar();
+type Props = {
+    displaySnackbar: (data: { type: 'error' | 'success'; message: string }) => void;
+};
 
+export const useFlowMeterControl = ({ displaySnackbar }: Props) => {
+    const { getValues } = useFormContext();
+
+    const [started, setStarted] = useState(false);
     const [isStopping, setIsStopping] = useState(false);
     const [isStarting, setIsStarting] = useState(false);
 
     const handleStart = async () => {
+        setIsStarting(true);
+
         const formValues = getValues() as TSettings;
         const updatedData = { ...formValues, started: true };
 
         try {
             await saveAppSettings(updatedData);
-            setIsStarting(true);
+            setStarted(true);
 
             displaySnackbar({
                 type: 'success',
@@ -28,18 +33,21 @@ export const useFlowMeterControl = () => {
                 type: 'error',
                 message: 'Unable to start flow meter.',
             });
+            setStarted(false);
         } finally {
             setIsStarting(false);
         }
     };
 
     const handleStop = async () => {
+        setIsStopping(true);
+
         const formValues = getValues() as TSettings;
         const updatedData = { ...formValues, started: false };
 
         try {
             await saveAppSettings(updatedData);
-            setIsStopping(true);
+            setStarted(false);
 
             displaySnackbar({
                 type: 'success',
@@ -51,6 +59,7 @@ export const useFlowMeterControl = () => {
                 type: 'error',
                 message: 'Unable to stop flow meter.',
             });
+            setStarted(true);
         } finally {
             setIsStopping(false);
         }
@@ -66,15 +75,41 @@ export const useFlowMeterControl = () => {
 
     const handleCalibrationCalibrate = async (volume: number) => {
         try {
-            await fetch(`/local/camscripter/proxy/flowmeter/calibration_calibrate.cgi?volume=${volume}`);
+            const res = await fetch(`/local/camscripter/proxy/flowmeter/calibration_calibrate.cgi?volume=${volume}`);
+            console.log('Calibration response:', res);
+
+            if (!res.ok) {
+                displaySnackbar({
+                    type: 'error',
+                    message: 'Unable to calibrate.',
+                });
+                return;
+            }
+
+            displaySnackbar({
+                type: 'success',
+                message: 'Successfully calibrated.',
+            });
         } catch (error) {
             console.error('Error during calibration:', error);
+            displaySnackbar({
+                type: 'error',
+                message: 'Unable to calibrate.',
+            });
         }
     };
 
     const handleResetCounter = async () => {
         try {
-            await fetch('/local/camscripter/proxy/flowmeter/reset_counter.cgi');
+            const res = await fetch('/local/camscripter/proxy/flowmeter/reset_counter.cgi');
+
+            if (res.status !== 200) {
+                displaySnackbar({
+                    type: 'error',
+                    message: 'Unable to reset counter.',
+                });
+                return;
+            }
 
             displaySnackbar({
                 type: 'success',
@@ -115,5 +150,6 @@ export const useFlowMeterControl = () => {
         handleCalibrationCalibrate,
         isStarting,
         isStopping,
+        started,
     } as const;
 };
