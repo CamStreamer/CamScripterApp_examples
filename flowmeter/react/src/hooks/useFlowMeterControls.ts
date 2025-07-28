@@ -104,10 +104,10 @@ export const useFlowMeterControl = ({ displaySnackbar }: Props) => {
         try {
             const res = await fetch('/local/camscripter/proxy/flowmeter/reset_counter.cgi');
 
-            if (res.status !== 200) {
+            if (res.status === 400) {
                 displaySnackbar({
                     type: 'error',
-                    message: 'Unable to reset counter.',
+                    message: 'Unable to reset counter when the counting is running.',
                 });
                 return;
             }
