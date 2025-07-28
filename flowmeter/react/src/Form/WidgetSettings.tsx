@@ -1,6 +1,6 @@
 import { Controller, useFormContext } from 'react-hook-form';
 import { TSettings } from '../models/schema';
-import { FormHelperText, InputAdornment, MenuItem, Radio, RadioGroup } from '@mui/material';
+import { InputAdornment, MenuItem, Radio, RadioGroup } from '@mui/material';
 import { StyledTextField, StyledSelect, StyledForm, StyledRadioControlLabel } from '../components/FormInputs';
 import { parseValueAsInt, parseValueAsFloat } from '../utils';
 import { Title } from '../components/Title';
@@ -193,16 +193,22 @@ export const WidgetSettings = ({ resolutionOptions }: Props) => {
                 )}
             />
 
-            {/* ------CALIBRATION VOLUME------*/}
+            {/* ------GLASS SIZE------*/}
             <Controller
-                name={'calibration_volume'}
+                name={'glass_size'}
                 control={control}
-                render={({ field }) => (
+                render={({ field, formState }) => (
                     <StyledTextField
                         {...field}
                         fullWidth
                         label="Glass size"
-                        disabled
+                        onBlur={(e) => {
+                            const val = parseValueAsFloat(e.target.value);
+                            field.onChange(val);
+                            e.target.value = val.toString();
+                        }}
+                        error={!!formState.errors.glass_size}
+                        helperText={formState.errors.glass_size?.message}
                         InputProps={{
                             endAdornment: (
                                 <InputAdornment position="end" disableTypography>
@@ -213,7 +219,6 @@ export const WidgetSettings = ({ resolutionOptions }: Props) => {
                     />
                 )}
             />
-            <FormHelperText>To set the glass size, please calibrate the Flow Meter.</FormHelperText>
         </StyledForm>
     );
 };

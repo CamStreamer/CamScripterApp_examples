@@ -62,7 +62,7 @@ export class Widget {
             this.layout.currentBeer.setBgImage(await this.mm.image(this.getBeerIndex(volume)), 'fit');
 
             this.layout.volume.setText(volume.toFixed(2) + ' l', 'A_CENTER');
-            this.layout.beerCount.setText(Math.floor(volume * 2).toString(), 'A_RIGHT');
+            this.layout.beerCount.setText(Math.floor(volume / this.settings.glass_size).toString(), 'A_RIGHT');
 
             await this.layout.background.generate(this.cod, this.settings.scale / 100);
         } catch (err) {
@@ -208,12 +208,13 @@ export class Widget {
     }
 
     private getBeerIndex(volumeLiters: number) {
-        const ml = (volumeLiters % 0.5) * 1000;
-        if (ml < 125) {
+        const ml = (volumeLiters % this.settings.glass_size) * 1000;
+        const quarter = (this.settings.glass_size / 4) * 1000;
+        if (ml < quarter) {
             return `${this.widgetBeerType}-1`;
-        } else if (ml < 250) {
+        } else if (ml < quarter * 2) {
             return `${this.widgetBeerType}-2`;
-        } else if (ml < 375) {
+        } else if (ml < quarter * 3) {
             return `${this.widgetBeerType}-3`;
         } else {
             return `${this.widgetBeerType}-4`;

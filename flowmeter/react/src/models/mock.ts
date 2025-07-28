@@ -15,6 +15,6 @@ export const mockedSettings: TSettings = {
     group_name: 'Group 1',
     start_time: '12:00',
     scale: 100,
-    calibration_volume: 0.5,
+    glass_size: 0.3,
     overlay_type: 'axis_beer',
 };
