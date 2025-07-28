@@ -79,6 +79,7 @@ export class Widget {
                 console.log('COAPI connected');
                 this.mm = new MemoryManager(this.cod);
                 this.prepareImages(this.mm);
+                this.prepareFonts(this.mm);
                 this.layout = await this.createLayout(this.mm);
                 this.layoutReady = true;
             });
@@ -114,6 +115,11 @@ export class Widget {
         mm.registerImage('birel-4', 'birel-full.png');
     }
 
+    private prepareFonts(mm: MemoryManager) {
+        mm.registerFont('OpenSansBold', 'OpenSans-Bold.ttf');
+        mm.registerFont('OpenSans', 'OpenSans-Regular.ttf');
+    }
+
     private async createLayout(mm: MemoryManager) {
         const resolution = this.settings.resolution.split('x').map(Number);
         const background = new CairoPainter({
@@ -134,6 +140,7 @@ export class Widget {
             height: 48,
         });
         startTime.setText(this.settings.start_time, 'A_CENTER');
+        startTime.setFont(await mm.font('OpenSans'));
 
         const currentTime = new CairoFrame({
             x: 260,
@@ -142,6 +149,7 @@ export class Widget {
             height: 48,
         });
         currentTime.setText('12:20', 'A_CENTER');
+        currentTime.setFont(await mm.font('OpenSans'));
 
         const beerBackground = new CairoFrame({
             x: 90,
@@ -163,9 +171,10 @@ export class Widget {
             x: 45,
             y: 275,
             width: 100,
-            height: 48,
+            height: 54,
         });
         beerCount.setText('24', 'A_RIGHT');
+        beerCount.setFont(await mm.font('OpenSansBold'));
 
         const volume = new CairoFrame({
             x: 50,
@@ -174,6 +183,7 @@ export class Widget {
             height: 80,
         });
         volume.setText('62.00 l', 'A_CENTER');
+        volume.setFont(await mm.font('OpenSans'));
 
         const groupName = new CairoFrame({
             x: 50,
@@ -182,6 +192,7 @@ export class Widget {
             height: 40,
         });
         groupName.setText(this.settings.group_name, 'A_CENTER');
+        groupName.setFont(await mm.font('OpenSans'));
 
         background.insert(startTime, currentTime, beerBackground, currentBeer, beerCount, volume, groupName);
         return {
