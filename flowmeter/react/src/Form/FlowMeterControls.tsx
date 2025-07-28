@@ -4,16 +4,13 @@ import styled from '@mui/material/styles/styled';
 import { InputAdornment, Typography } from '@mui/material';
 import { useGetFlowMeterStatus } from '../hooks/useGetFlowMeterStatus';
 import { useState } from 'react';
-import { Controller, useFormContext, useWatch } from 'react-hook-form';
 import { StyledBox, StyledChip, StyledTextField } from '../components/FormInputs';
-import { TSettings } from '../models/schema';
 import { parseValueAsFloat } from '../utils';
 import { useSnackbar } from '../hooks/useSnackbar';
 import { InfoSnackbar } from '../components/Snackbar';
 import { useFlowMeterControl } from '../hooks/useFlowMeterControls';
 
 export const FlowMeterControls = () => {
-    const { control } = useFormContext<TSettings>();
     const { snackbarData, displaySnackbar, closeSnackbar } = useSnackbar();
     const {
         handleStart,
@@ -26,8 +23,7 @@ export const FlowMeterControls = () => {
         started,
     } = useFlowMeterControl({ displaySnackbar });
 
-    const glassSize = useWatch({ name: 'calibration_volume', control });
-
+    const [volume, setVolume] = useState<number | string>(0);
     const [openResetModal, setOpenResetModal] = useState(false);
     const [openCalibrateModal, setOpenCalibrateModal] = useState(false);
 
@@ -82,33 +78,27 @@ export const FlowMeterControls = () => {
                     confirmText="CALIBRATE"
                     open={openCalibrateModal}
                     onClose={() => setOpenCalibrateModal(false)}
-                    onConfirm={() => handleCalibrationCalibrate(glassSize)}
+                    onConfirm={() => handleCalibrationCalibrate(Number(volume))}
+                    disabledConfirmBtn={isNaN(Number(volume))}
                 >
-                    <Controller
-                        name={'calibration_volume'}
-                        control={control}
-                        render={({ field, formState }) => (
-                            <StyledTextField
-                                {...field}
-                                fullWidth
-                                label="Glass size"
-                                InputLabelProps={{ shrink: true }}
-                                onBlur={(e) => {
-                                    const val = parseValueAsFloat(e.target.value);
-                                    field.onChange(val);
-                                    e.target.value = val.toString();
-                                }}
-                                error={!!formState.errors.calibration_volume}
-                                helperText={formState.errors.calibration_volume?.message}
-                                InputProps={{
-                                    endAdornment: (
-                                        <InputAdornment position="end" disableTypography>
-                                            liters
-                                        </InputAdornment>
-                                    ),
-                                }}
-                            />
-                        )}
+                    <StyledTextField
+                        fullWidth
+                        label="Volume"
+                        InputLabelProps={{ shrink: true }}
+                        onBlur={(e) => {
+                            const val = parseValueAsFloat(e.target.value);
+                            setVolume(val);
+                            e.target.value = val.toString();
+                        }}
+                        error={isNaN(Number(volume))}
+                        helperText={isNaN(Number(volume)) ? 'Please enter a valid number' : ''}
+                        InputProps={{
+                            endAdornment: (
+                                <InputAdornment position="end" disableTypography>
+                                    liters
+                                </InputAdornment>
+                            ),
+                        }}
                     />
                 </Modal>
             </StyledButtonRow>

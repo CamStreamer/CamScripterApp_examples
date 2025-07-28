@@ -10,9 +10,19 @@ type Props = {
     children?: React.ReactNode;
     onClose: () => void;
     onConfirm: (volume?: number) => void;
+    disabledConfirmBtn?: boolean;
 };
 
-export const Modal = ({ open, title, description, confirmText, onClose, children, onConfirm }: Props) => {
+export const Modal = ({
+    open,
+    title,
+    description,
+    confirmText,
+    onClose,
+    children,
+    onConfirm,
+    disabledConfirmBtn = false,
+}: Props) => {
     return (
         <StyledDialog fullWidth maxWidth="md" onClose={onClose} open={open}>
             <Stack spacing={2}>
@@ -30,6 +40,7 @@ export const Modal = ({ open, title, description, confirmText, onClose, children
                             onConfirm();
                             onClose();
                         }}
+                        disabled={disabledConfirmBtn}
                     >
                         {confirmText}
                     </Button>
