@@ -1,4 +1,4 @@
-import { SubmitHandler, useFormContext } from 'react-hook-form';
+import { SubmitHandler, useFormContext, useWatch } from 'react-hook-form';
 import { TSettings } from '../models/schema';
 import { useState } from 'react';
 
@@ -7,9 +7,10 @@ type Props = {
 };
 
 export const useFlowMeterControl = ({ displaySnackbar }: Props) => {
-    const { getValues } = useFormContext();
+    const { control, getValues } = useFormContext<TSettings>();
+    const isFlowMeterStarted = useWatch({ name: 'started', control });
 
-    const [started, setStarted] = useState(false);
+    const [started, setStarted] = useState(isFlowMeterStarted);
     const [isStopping, setIsStopping] = useState(false);
     const [isStarting, setIsStarting] = useState(false);
 
