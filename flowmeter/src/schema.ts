@@ -1,1 +1,1 @@
-/home/helena/temper1fSensor/CamScripterApp_examples/flowmeter/react/src/models/schema.ts
+../react/src/models/schema.ts
