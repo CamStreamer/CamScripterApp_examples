@@ -26,10 +26,12 @@ export class Widget {
 
     constructor(private settings: TSettings) {
         const options = {
+            tls: this.settings.camera_protocol !== 'http',
+            tlsInsecure: this.settings.camera_protocol === 'https_insecure',
             ip: this.settings.camera_ip,
             port: this.settings.camera_port,
             auth: `${this.settings.camera_user}:${this.settings.camera_pass}`,
-            tls: false,
+            camera: this.settings.camera_list,
         };
         this.widgetBeerType = this.settings.overlay_type === 'birel' ? 'birel' : 'beer';
         this.widgetBg = this.settings.overlay_type === 'axis_beer' ? 'bg' : `bg-${this.widgetBeerType}`;
