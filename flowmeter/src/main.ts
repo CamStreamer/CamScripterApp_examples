@@ -1,12 +1,10 @@
 import * as fs from 'fs';
 import { HttpServer } from 'camstreamerlib/HttpServer';
-import { settingsSchema, TSettingsSchema } from './schema';
+import { settingsSchema, TSettings } from './schema';
 import { SpinelController } from './SpinelController';
 import { Widget } from './Widget';
 
-console.log('Starting Flowmeter Package...');
-
-let settings: TSettingsSchema | undefined;
+let settings: TSettings | undefined;
 let widget: Widget | undefined;
 
 const httpServer = new HttpServer();
@@ -77,44 +75,6 @@ spinelController.on('volume', async (volume: number) => {
     }
 });
 
-async function start() {
-    try {
-        let oldSettings = '';
-        if (settings) {
-            const { started: tmp1, ...restOfSettingsOld } = settings;
-            void tmp1;
-            oldSettings = JSON.stringify(restOfSettingsOld);
-        }
-
-        settings = readConfiguration();
-
-        const { started: tmp2, ...restOfSettings } = settings;
-        void tmp2;
-        const newSettings = JSON.stringify(restOfSettings);
-
-        if (widget && oldSettings !== newSettings) {
-            await widget.stop();
-            widget = undefined;
-        }
-        if (!widget) {
-            widget = new Widget(settings);
-        }
-        if (settings.started) {
-            await spinelController.start();
-        }
-    } catch (err) {
-        console.log(err);
-    }
-}
-
-async function stop() {
-    try {
-        await spinelController.stop();
-    } catch (err) {
-        console.log(err);
-    }
-}
-
 function readConfiguration() {
     try {
         const data = fs.readFileSync(process.env.PERSISTENT_DATA_PATH + 'settings.json');
@@ -125,13 +85,53 @@ function readConfiguration() {
     }
 }
 
+async function start() {
+    try {
+        console.log('Starting application...');
+        settings = readConfiguration();
+
+        if (widget) {
+            widget.stop();
+            widget = undefined;
+        }
+        widget = new Widget(settings);
+
+        if (settings.started) {
+            await spinelController.start();
+        }
+        console.log('Application started');
+    } catch (err) {
+        console.log('Application start:', err);
+    }
+}
+
+async function stop() {
+    try {
+        await spinelController.stop();
+    } catch (err) {
+        console.log('Application stop:', err);
+    }
+}
+
+process.on('uncaughtException', (err: Error) => {
+    console.error('Uncaught exception:', err);
+    process.exit(1);
+});
+
+process.on('unhandledRejection', (err: Error) => {
+    console.error('Unhandled rejection:', err);
+    process.exit(1);
+});
+
 process.on('SIGINT', async () => {
+    console.log('SIGINT signal received');
     await stop();
     await start();
 });
 
 process.on('SIGTERM', async () => {
-    await httpServer.close();
+    console.log('SIGTERM signal received');
+    httpServer.close();
     await stop();
     process.exit(0);
 });

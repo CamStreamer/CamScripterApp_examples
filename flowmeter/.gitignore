@@ -1,6 +1,7 @@
 node_modules/
 production_modules/
 dist/
+html/
 .vs/
 *.zip
 
