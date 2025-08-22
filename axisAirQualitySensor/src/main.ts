@@ -1,4 +1,6 @@
 import * as fs from 'fs';
+import * as https from 'https';
+import fetch from 'node-fetch';
 import { TServerData, serverDataSchema } from './schema';
 import { Widget } from './graphics/Widget';
 import { getTemperature, getSeverity } from './utils';
@@ -30,33 +32,37 @@ async function watchAirQualityData() {
         retryTimeout = null;
     }
 
+    const isTlsInsecure = settings.source_camera.protocol === 'https_insecure';
+    const protocol = isTlsInsecure ? 'https' : settings.source_camera.protocol;
+    const url = `${protocol}://${settings.source_camera.ip}/axis-cgi/airquality/metadata.cgi`;
+
+    const agent = new https.Agent({
+        rejectUnauthorized: !isTlsInsecure,
+    });
+
     try {
-        const response = await fetch(
-            `${settings.source_camera.protocol}://${settings.source_camera.ip}/axis-cgi/airquality/metadata.cgi`,
-            {
-                headers: { Accept: 'text/event-stream' },
-            }
-        );
+        const response = await fetch(url, {
+            headers: { Accept: 'text/event-stream' },
+            agent: isTlsInsecure ? agent : undefined,
+        });
 
         if (response.body === null) {
             console.error('No data:', response.statusText);
             return;
         }
 
-        const reader = response.body.getReader();
         const decoder = new TextDecoder('utf-8');
+        const stream = response.body;
 
-        while (true) {
+        //PM1.0 = 64, PM2.5 = 25, PM4.0 = 91, PM10.0 = 90, Temperature = 53, Humidity = 19, VOC = 85, NOx = 43, CO2 = 81, AQI = 100
+        for await (const chunk of stream) {
             try {
-                const { done, value } = await reader.read();
-                if (done) {
-                    console.warn('Stream ended unexpectedly.');
-                    break;
+                if (typeof chunk === 'string') {
+                    dataBuffer += chunk;
+                    continue;
+                } else {
+                    dataBuffer += decoder.decode(chunk, { stream: true });
                 }
-
-                //PM1.0 = 64, PM2.5 = 25, PM4.0 = 91, PM10.0 = 90, Temperature = 53, Humidity = 19, VOC = 85, NOx = 43, CO2 = 81, AQI = 100}
-
-                dataBuffer += decoder.decode(value, { stream: true });
 
                 const lines = dataBuffer.split('\n');
                 if (lines.length < 2) {
