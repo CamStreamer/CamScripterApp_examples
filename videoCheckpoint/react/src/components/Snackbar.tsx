@@ -7,13 +7,10 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import CloseIcon from '@mui/icons-material/Close';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import { TSnackData } from '../hooks/useSnackbar';
 
-type SnackData = {
-    type: 'error' | 'success';
-    message: string;
-};
 type Props = {
-    snackbarData: SnackData | null;
+    snackbarData: TSnackData | null;
     closeSnackbar: () => void;
 };
 
@@ -46,7 +43,7 @@ export const InfoSnackbar = ({ snackbarData, closeSnackbar }: Props) => {
     );
 };
 
-const StyledCont = styled('div')<{ $severity: 'error' | 'success' }>`
+const StyledCont = styled('div')<{ $severity: TSnackData['type'] }>`
     display: flex;
     flex-direction: row;
     align-items: center;
