@@ -1,34 +1,33 @@
 import { promisify } from 'util';
-import { CameraVapix } from 'camstreamerlib/CameraVapix';
+import { VapixAPI } from 'camstreamerlib/cjs';
+import { DefaultClient } from 'camstreamerlib/cjs/node';
 import { TServerData } from '../schema';
+import { getCameraOptions } from '../utils';
 
 const setTimeoutPromise = promisify(setTimeout);
 
 const FLASH_INTERVAL_MS = 500;
 
 export class LedIndicator {
-    private cameraVapix: CameraVapix;
+    private vapix: VapixAPI;
     private startFlashesCount = 0;
     private greenLedIndicationTimeoutId: NodeJS.Timeout | null = null;
     private redLedIndicationTimeoutId: NodeJS.Timeout | null = null;
 
     constructor(connHubSettings: TServerData['conn_hub'], private ledSettings: TServerData['led']) {
-        const options = {
-            tls: connHubSettings.protocol !== 'http',
-            tlsInsecure: connHubSettings.protocol === 'https_insecure',
-            ip: connHubSettings.ip,
-            port: connHubSettings.port,
-            user: connHubSettings.user,
-            pass: connHubSettings.pass,
-        };
-        this.cameraVapix = new CameraVapix(options);
+        const options = getCameraOptions(connHubSettings);
+        const httpClient = new DefaultClient(options);
+        this.vapix = new VapixAPI(httpClient);
     }
 
     private async setGreenLedState(active: boolean) {
         try {
-            if (this.ledSettings.led_green_port !== undefined) {
-                await this.cameraVapix.setOutputState(this.ledSettings.led_green_port, active);
-            }
+            await this.vapix.setPorts([
+                {
+                    port: this.ledSettings.led_green_port.toString(),
+                    state: active ? 'closed' : 'open',
+                },
+            ]);
         } catch (e) {
             console.warn('Green led error: If the problem persists, check your led configuration', e);
         }
@@ -36,16 +35,32 @@ export class LedIndicator {
 
     private async setRedLedState(active: boolean) {
         try {
-            if (this.ledSettings.led_red_port !== undefined) {
-                await this.cameraVapix.setOutputState(this.ledSettings.led_red_port, active);
-            }
+            await this.vapix.setPorts([
+                {
+                    port: this.ledSettings.led_red_port.toString(),
+                    state: active ? 'closed' : 'open',
+                },
+            ]);
         } catch (e) {
             console.warn('Red led error: If the problem persists, check your led configuration', e);
         }
     }
 
     private async setBothLEDs(bothActive: boolean) {
-        await Promise.all([this.setGreenLedState(bothActive), this.setRedLedState(bothActive)]);
+        try {
+            await this.vapix.setPorts([
+                {
+                    port: this.ledSettings.led_green_port.toString(),
+                    state: bothActive ? 'closed' : 'open',
+                },
+                {
+                    port: this.ledSettings.led_red_port.toString(),
+                    state: bothActive ? 'closed' : 'open',
+                },
+            ]);
+        } catch (e) {
+            console.warn('Red led error: Please check your led configuration', e);
+        }
     }
 
     private async greenFlash() {
@@ -109,14 +124,18 @@ export class LedIndicator {
     }
 
     async destructor() {
-        if (this.greenLedIndicationTimeoutId) {
-            clearTimeout(this.greenLedIndicationTimeoutId);
-            this.greenLedIndicationTimeoutId = null;
+        try {
+            if (this.greenLedIndicationTimeoutId) {
+                clearTimeout(this.greenLedIndicationTimeoutId);
+                this.greenLedIndicationTimeoutId = null;
+            }
+            if (this.redLedIndicationTimeoutId) {
+                clearTimeout(this.redLedIndicationTimeoutId);
+                this.redLedIndicationTimeoutId = null;
+            }
+            await this.setBothLEDs(false);
+        } catch (e) {
+            console.error('Led destructor error: ', e);
         }
-        if (this.redLedIndicationTimeoutId) {
-            clearTimeout(this.redLedIndicationTimeoutId);
-            this.redLedIndicationTimeoutId = null;
-        }
-        await this.setBothLEDs(false);
     }
 }

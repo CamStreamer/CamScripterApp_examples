@@ -1,10 +1,6 @@
 import * as fs from 'fs';
 import { TServerData } from '../schema';
-import {
-    CamOverlayDrawingAPI,
-    TCairoCreateResponse,
-    CamOverlayDrawingOptions,
-} from 'camstreamerlib/CamOverlayDrawingAPI';
+import { CamOverlayDrawingAPI, TCairoCreateResponse, CamOverlayDrawingOptions } from 'camstreamerlib/cjs';
 
 export class Widget {
     private cod: CamOverlayDrawingAPI;

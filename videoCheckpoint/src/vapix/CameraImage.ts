@@ -1,6 +1,8 @@
 import { Writable } from 'stream';
 import { TServerData } from '../schema';
-import { CameraVapix } from 'camstreamerlib/CameraVapix';
+import { VapixAPI } from 'camstreamerlib/cjs';
+import { DefaultClient } from 'camstreamerlib/cjs/node';
+import { getCameraOptions } from '../utils';
 
 const TIMEOUT_MS = 10_000;
 
@@ -10,18 +12,12 @@ export type TImageData = {
 };
 
 export class CameraImage {
-    private cameraVapix: CameraVapix;
+    private vapix: VapixAPI;
 
     constructor(cameraSettings: TServerData['camera'], private imageUpload: TServerData['image_upload']) {
-        const options = {
-            tls: cameraSettings.protocol !== 'http',
-            tlsInsecure: cameraSettings.protocol === 'https_insecure',
-            ip: cameraSettings.ip,
-            port: cameraSettings.port,
-            user: cameraSettings.user,
-            pass: cameraSettings.pass,
-        };
-        this.cameraVapix = new CameraVapix(options);
+        const options = getCameraOptions(cameraSettings);
+        const httpClient = new DefaultClient(options);
+        this.vapix = new VapixAPI(httpClient);
     }
 
     async getImageDataFromCamera(): Promise<TImageData[]> {
@@ -61,9 +57,15 @@ export class CameraImage {
             };
 
             const resolution = this.imageUpload.resolution;
-            this.cameraVapix.getCameraImage(camera, '10', resolution, Writable.toWeb(imageStream)).catch((err) => {
-                reject(new Error(`GetCameraImage: ${err.message}`));
-            });
+            this.vapix
+                .getCameraImage({
+                    resolution: resolution,
+                    compression: 10,
+                    camera: camera,
+                })
+                .catch((err) => {
+                    reject(new Error(`GetCameraImage: ${err.message}`));
+                });
         });
     }
 }

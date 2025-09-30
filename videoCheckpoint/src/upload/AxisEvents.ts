@@ -1,5 +1,5 @@
 import { TConnectionParams } from '../schema';
-import { CamScripterAPICameraEventsGenerator } from 'camstreamerlib/CamScripterAPICameraEventsGenerator';
+import { CamScripterAPICameraEventsGenerator } from 'camstreamerlib/cjs/CamScripterAPICameraEventsGenerator';
 
 export class AxisEvents {
     private csc: CamScripterAPICameraEventsGenerator;
