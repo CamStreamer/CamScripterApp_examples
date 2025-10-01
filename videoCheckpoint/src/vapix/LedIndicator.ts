@@ -13,18 +13,22 @@ export class LedIndicator {
     private startFlashesCount = 0;
     private greenLedIndicationTimeoutId: NodeJS.Timeout | null = null;
     private redLedIndicationTimeoutId: NodeJS.Timeout | null = null;
+    private greenLedPort: number;
+    private redLedPort: number;
 
     constructor(connHubSettings: TServerData['conn_hub'], private ledSettings: TServerData['led']) {
         const options = getCameraOptions(connHubSettings);
         const httpClient = new DefaultClient(options);
         this.vapix = new VapixAPI(httpClient);
+        this.greenLedPort = ledSettings.led_green_port - 1; // Vapix API uses 0-based port numbering
+        this.redLedPort = ledSettings.led_red_port - 1;
     }
 
     private async setGreenLedState(active: boolean) {
         try {
             await this.vapix.setPorts([
                 {
-                    port: this.ledSettings.led_green_port.toString(),
+                    port: this.greenLedPort.toString(),
                     state: active ? 'closed' : 'open',
                 },
             ]);
@@ -37,7 +41,7 @@ export class LedIndicator {
         try {
             await this.vapix.setPorts([
                 {
-                    port: this.ledSettings.led_red_port.toString(),
+                    port: this.redLedPort.toString(),
                     state: active ? 'closed' : 'open',
                 },
             ]);
@@ -50,11 +54,11 @@ export class LedIndicator {
         try {
             await this.vapix.setPorts([
                 {
-                    port: this.ledSettings.led_green_port.toString(),
+                    port: this.greenLedPort.toString(),
                     state: bothActive ? 'closed' : 'open',
                 },
                 {
-                    port: this.ledSettings.led_red_port.toString(),
+                    port: this.redLedPort.toString(),
                     state: bothActive ? 'closed' : 'open',
                 },
             ]);

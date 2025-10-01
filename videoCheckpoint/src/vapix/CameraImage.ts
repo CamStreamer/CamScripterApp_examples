@@ -1,4 +1,3 @@
-import { Writable } from 'stream';
 import { TServerData } from '../schema';
 import { VapixAPI } from 'camstreamerlib/cjs';
 import { DefaultClient } from 'camstreamerlib/cjs/node';
@@ -34,38 +33,26 @@ export class CameraImage {
     }
 
     private getCameraImage(camera: string) {
-        return new Promise<Buffer>((resolve, reject) => {
-            const imageStream = new Writable();
-
-            const timeout = setTimeout(() => {
-                imageStream.destroy();
-                reject(new Error('CameraImage - get image timed out for view area ' + camera));
-            }, TIMEOUT_MS);
-
-            const bufs: Buffer[] = [];
-            imageStream._write = (chunk, encoding, next) => {
-                if (imageStream.destroyed) {
-                    return;
-                }
-                bufs.push(chunk);
-                next();
-            };
-
-            imageStream._final = () => {
-                clearTimeout(timeout);
-                resolve(Buffer.concat(bufs));
-            };
-
+        return new Promise<Buffer>(async (resolve, reject) => {
             const resolution = this.imageUpload.resolution;
-            this.vapix
-                .getCameraImage({
+
+            try {
+                const res = await this.vapix.getCameraImage({
                     resolution: resolution,
                     compression: 10,
                     camera: camera,
-                })
-                .catch((err) => {
-                    reject(new Error(`GetCameraImage: ${err.message}`));
                 });
+
+                if (res.ok === false) {
+                    throw new Error(`GetCameraImage: ${res.status} ${res.statusText}`);
+                }
+
+                const imageData = await res.arrayBuffer();
+                resolve(Buffer.from(imageData));
+            } catch (err) {
+                const error = err instanceof Error ? err.message : JSON.stringify(err);
+                reject(new Error(`GetCameraImage: ${error}`));
+            }
         });
     }
 }
