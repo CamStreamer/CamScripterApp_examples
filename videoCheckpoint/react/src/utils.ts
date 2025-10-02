@@ -1,3 +1,5 @@
+import { TCameraListOption } from './hooks/useGenetecConnection';
+
 export const parseValueAsInt = (value: string) => {
     const parsedValue = parseInt(value);
     if (isNaN(parsedValue)) {
@@ -101,9 +103,14 @@ export type TGenetec = {
 export const generateParams = (genetec: TGenetec) => {
     return `protocol=${encodeURIComponent(genetec.protocol)}&ip=${encodeURIComponent(
         genetec.ip
-    )}&port=${encodeURIComponent(genetec.port)}&base_uri=${encodeURIComponent(
+    )}&port=${encodeURIComponent(genetec.port)}&baseUri=${encodeURIComponent(
         genetec.base_uri
-    )}&user=${encodeURIComponent(genetec.user)}&pass=${encodeURIComponent(genetec.pass)}&app_id=${encodeURIComponent(
+    )}&user=${encodeURIComponent(genetec.user)}&pass=${encodeURIComponent(genetec.pass)}&appId=${encodeURIComponent(
         genetec.app_id
     )}`;
+};
+
+export const areValuesInList = (oldList: string[], newList: TCameraListOption[]): boolean => {
+    const newValuesSet = new Set(newList.map((item) => item.value));
+    return oldList.every((val) => newValuesSet.has(val));
 };

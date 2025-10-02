@@ -23,6 +23,7 @@ type TCameraListOption = {
 type Props = {
     cameraList?: TCameraListOption[];
     onChange?: (data: string[]) => void;
+    reloadCameras: () => void;
     value: string[];
     helperText?: string;
     disabled?: boolean;
@@ -30,7 +31,7 @@ type Props = {
 };
 
 export const MultiSelectWithSearch = forwardRef(
-    ({ cameraList, disabled, onChange, value }: Props, ref: ForwardedRef<typeof Select>) => {
+    ({ cameraList, disabled, onChange, reloadCameras, value }: Props, ref: ForwardedRef<typeof Select>) => {
         const list = cameraList ?? [];
 
         const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -88,6 +89,7 @@ export const MultiSelectWithSearch = forwardRef(
                     onFocus={() => {
                         setFilteredList(list);
                     }}
+                    onOpen={() => reloadCameras()}
                     disabled={disabled ?? list.length === 0}
                     ref={ref}
                     fullWidth

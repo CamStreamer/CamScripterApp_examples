@@ -1,6 +1,7 @@
-import { Writable } from 'stream';
 import { TServerData } from '../schema';
-import { CameraVapix } from 'camstreamerlib/CameraVapix';
+import { VapixAPI } from 'camstreamerlib/cjs';
+import { DefaultClient } from 'camstreamerlib/cjs/node';
+import { getCameraOptions } from '../utils';
 
 const TIMEOUT_MS = 10_000;
 
@@ -10,18 +11,12 @@ export type TImageData = {
 };
 
 export class CameraImage {
-    private cameraVapix: CameraVapix;
+    private vapix: VapixAPI;
 
     constructor(cameraSettings: TServerData['camera'], private imageUpload: TServerData['image_upload']) {
-        const options = {
-            tls: cameraSettings.protocol !== 'http',
-            tlsInsecure: cameraSettings.protocol === 'https_insecure',
-            ip: cameraSettings.ip,
-            port: cameraSettings.port,
-            user: cameraSettings.user,
-            pass: cameraSettings.pass,
-        };
-        this.cameraVapix = new CameraVapix(options);
+        const options = getCameraOptions(cameraSettings);
+        const httpClient = new DefaultClient(options);
+        this.vapix = new VapixAPI(httpClient);
     }
 
     async getImageDataFromCamera(): Promise<TImageData[]> {
@@ -38,32 +33,26 @@ export class CameraImage {
     }
 
     private getCameraImage(camera: string) {
-        return new Promise<Buffer>((resolve, reject) => {
-            const imageStream = new Writable();
-
-            const timeout = setTimeout(() => {
-                imageStream.destroy();
-                reject(new Error('CameraImage - get image timed out for view area ' + camera));
-            }, TIMEOUT_MS);
-
-            const bufs: Buffer[] = [];
-            imageStream._write = (chunk, encoding, next) => {
-                if (imageStream.destroyed) {
-                    return;
-                }
-                bufs.push(chunk);
-                next();
-            };
-
-            imageStream._final = () => {
-                clearTimeout(timeout);
-                resolve(Buffer.concat(bufs));
-            };
-
+        return new Promise<Buffer>(async (resolve, reject) => {
             const resolution = this.imageUpload.resolution;
-            this.cameraVapix.getCameraImage(camera, '10', resolution, Writable.toWeb(imageStream)).catch((err) => {
-                reject(new Error(`GetCameraImage: ${err.message}`));
-            });
+
+            try {
+                const res = await this.vapix.getCameraImage({
+                    resolution: resolution,
+                    compression: 10,
+                    camera: camera,
+                });
+
+                if (res.ok === false) {
+                    throw new Error(`GetCameraImage: ${res.status} ${res.statusText}`);
+                }
+
+                const imageData = await res.arrayBuffer();
+                resolve(Buffer.from(imageData));
+            } catch (err) {
+                const error = err instanceof Error ? err.message : JSON.stringify(err);
+                reject(new Error(`GetCameraImage: ${error}`));
+            }
         });
     }
 }

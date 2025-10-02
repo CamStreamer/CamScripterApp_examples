@@ -1,6 +1,7 @@
 import { useFormContext, useWatch } from 'react-hook-form';
 import { useState, useEffect } from 'react';
-import { generateParams } from '../utils';
+import { areValuesInList, generateParams } from '../utils';
+import { TSnackData } from './useSnackbar';
 
 export type TCameraListOption = {
     index: number;
@@ -19,11 +20,11 @@ type TGenetec = {
 };
 
 type Props = {
-    displaySnackbar: (data: { type: 'error' | 'success'; message: string }) => void;
+    displaySnackbar: (data: TSnackData) => void;
 };
 
 export const useGenetecConnection = ({ displaySnackbar }: Props) => {
-    const { control, watch, formState } = useFormContext();
+    const { control, formState, setValue } = useFormContext();
     const [isConnected, setIsConnected] = useState(false);
     const [isFetching, setIsFetching] = useState(false);
     const [cameraList, setCameraList] = useState<TCameraListOption[]>();
@@ -39,7 +40,7 @@ export const useGenetecConnection = ({ displaySnackbar }: Props) => {
         pass: useWatch({ control, name: `genetec.pass` }),
     };
 
-    const selectedCameras = watch(`genetec.camera_list`);
+    const selectedCameras = useWatch({ control, name: 'genetec.camera_list' });
 
     const isDisabled = !proxy.ip || !proxy.port || !proxy.base_uri || !proxy.app_id || !proxy.user || !proxy.pass;
 
@@ -56,9 +57,15 @@ export const useGenetecConnection = ({ displaySnackbar }: Props) => {
     };
 
     const handleFetchCameraList = async () => {
-        const cameraListResponse = await fetch(
+        const cameraListResponse: TCameraListOption[] = await fetch(
             `/local/camscripter/proxy/video_checkpoint/genetec/getCameraList?${generateParams(proxy)}`
         ).then((res) => res.json());
+
+        if (!areValuesInList(selectedCameras, cameraListResponse)) {
+            const filtered = selectedCameras.filter((v: string) => cameraListResponse.find((o) => o.value === v));
+            setValue('genetec.camera_list', filtered);
+        }
+
         setCameraList(cameraListResponse);
     };
 
@@ -66,7 +73,7 @@ export const useGenetecConnection = ({ displaySnackbar }: Props) => {
         const isSent = await fetch(
             `/local/camscripter/proxy/video_checkpoint/genetec/sendTestBookmark?${generateParams(
                 proxy
-            )}&selected_cameras=${JSON.stringify(selectedCameras)}`,
+            )}&camera_list=${JSON.stringify(selectedCameras)}`,
             {
                 method: 'POST',
             }
@@ -115,6 +122,7 @@ export const useGenetecConnection = ({ displaySnackbar }: Props) => {
     return [
         handleCheckConnection,
         handleSendTestBookmark,
+        handleFetchCameraList,
         isConnected,
         isFetching,
         cameraList,

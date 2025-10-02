@@ -1,5 +1,6 @@
+import { IncomingMessage, ServerResponse } from 'http';
 import { TServerData } from '../schema';
-import { GenetecAgent, GenetecAgentOptions, TParams } from 'camstreamerlib/events/GenetecAgent';
+import { GenetecAgent, GenetecAgentOptions, TParams } from 'camstreamerlib/cjs/node';
 
 const PARAMS: TParams = ['Guid', 'Name', 'EntityType'];
 
@@ -13,41 +14,28 @@ export class Genetec {
             protocol: genetecSettings.protocol,
             ip: genetecSettings.ip,
             port: genetecSettings.port,
-            base_uri: genetecSettings.base_uri,
+            baseUri: genetecSettings.base_uri,
             user: genetecSettings.user,
             pass: genetecSettings.pass,
-            app_id: genetecSettings.app_id,
+            appId: genetecSettings.app_id,
         };
 
         this.agent = new GenetecAgent(this.settings);
         this.cameraList = genetecSettings.camera_list;
     }
 
-    async checkConnection(req: any, res: any) {
-        const queryString = req.url.split('?')[1];
-        const params = new URLSearchParams(queryString);
-        const currentSettings = {
-            protocol: params.get('protocol') ?? 'http',
-            ip: params.get('ip') ?? '127.0.0.1',
-            port: params.get('port') ?? 80,
-            base_uri: params.get('base_uri') ?? 'WebSdk',
-            user: params.get('user') ?? 'root',
-            pass: params.get('pass') ?? '',
-            app_id: params.get('app_id') ?? '',
-        };
+    async checkConnection(req: IncomingMessage, res: ServerResponse<IncomingMessage>) {
+        const queryString = req.url?.split('?')[1];
+        const currentSettings = this.getGenetecSettings(queryString);
 
         try {
-            const newAgent = new GenetecAgent(currentSettings as GenetecAgentOptions);
-            const isConnected = await newAgent.checkConnection().then((res) => res.Rsp.Status);
+            const newAgent = new GenetecAgent(currentSettings);
+            await newAgent.checkConnection();
 
             console.log('Connection to Genetec successful');
             res.statusCode = 200;
             res.setHeader('Access-Control-Allow-Origin', '*');
-            res.end(
-                isConnected === 'Ok'
-                    ? '{"message": "Genetec connection success"}'
-                    : '{"message": "Genetec connection unsuccessful"}'
-            );
+            res.end('{"message": "Genetec connection success"}');
         } catch (err) {
             console.error('Cannot connect to Genetec, error:', err);
             res.statusCode = 500;
@@ -55,29 +43,17 @@ export class Genetec {
         }
     }
 
-    async sendTestBookmark(req: any, res: any) {
-        const queryString = req.url.split('?')[1];
+    async sendTestBookmark(req: IncomingMessage, res: ServerResponse<IncomingMessage>) {
+        const queryString = req.url?.split('?')[1];
         const params = new URLSearchParams(queryString);
-        const currentSettings = {
-            protocol: params.get('protocol') ?? 'http',
-            ip: params.get('ip') ?? '127.0.0.1',
-            port: params.get('port') ?? 80,
-            base_uri: params.get('base_uri') ?? 'WebSdk',
-            user: params.get('user') ?? 'root',
-            pass: params.get('pass') ?? '',
-            app_id: params.get('app_id') ?? '',
-        };
-        const selectedCameras = params.get('selected_cameras');
+        const currentSettings = this.getGenetecSettings(queryString);
+
+        const selectedCameras = params.get('camera_list');
 
         try {
             if (selectedCameras !== null) {
-                const newAgent = new GenetecAgent(currentSettings as GenetecAgentOptions);
-
-                await this.sendBookmark(
-                    'Testing bookmark from CamStreamer script',
-                    newAgent,
-                    JSON.parse(selectedCameras)
-                );
+                const newAgent = new GenetecAgent(currentSettings);
+                await newAgent.sendBookmark(selectedCameras.split(','), 'Testing bookmark from CamStreamer script');
 
                 res.statusCode = 200;
                 res.setHeader('Access-Control-Allow-Origin', '*');
@@ -90,21 +66,12 @@ export class Genetec {
         }
     }
 
-    async getCameraOptions(req: any, res: any) {
-        const queryString = req.url.split('?')[1];
-        const params = new URLSearchParams(queryString);
-        const currentSettings = {
-            protocol: params.get('protocol') ?? 'http',
-            ip: params.get('ip') ?? '127.0.0.1',
-            port: params.get('port') ?? 80,
-            base_uri: params.get('base_uri') ?? 'WebSdk',
-            user: params.get('user') ?? 'root',
-            pass: params.get('pass') ?? '',
-            app_id: params.get('app_id') ?? '',
-        };
+    async getCameraOptions(req: IncomingMessage, res: ServerResponse<IncomingMessage>) {
+        const queryString = req.url?.split('?')[1];
+        const currentSettings = this.getGenetecSettings(queryString);
 
         try {
-            const newAgent = new GenetecAgent(currentSettings as GenetecAgentOptions);
+            const newAgent = new GenetecAgent(currentSettings);
             const cameraList = await this.getCameraList(newAgent);
 
             res.statusCode = 200;
@@ -150,5 +117,34 @@ export class Genetec {
         }
 
         return cameraList;
+    }
+
+    private getGenetecSettings(queryString: string | undefined): GenetecAgentOptions {
+        const params = new URLSearchParams(queryString);
+
+        const protocolParam = params.get('protocol');
+        let protocol: GenetecAgentOptions['protocol'];
+
+        if (!this.isValidProtocol(protocolParam)) {
+            throw new Error('Invalid protocol specified.');
+        } else if (this.isValidProtocol(protocolParam)) {
+            protocol = protocolParam;
+        }
+
+        const currentSettings: GenetecAgentOptions = {
+            protocol: protocol ?? 'http',
+            ip: params.get('ip') ?? '127.0.0.1',
+            port: parseInt(params.get('port') ?? '80'),
+            baseUri: params.get('baseUri') ?? 'WebSdk',
+            user: params.get('user') ?? 'root',
+            pass: params.get('pass') ?? '',
+            appId: params.get('appId') ?? '',
+        };
+
+        return currentSettings;
+    }
+
+    private isValidProtocol(protocol: string | null): protocol is 'http' | 'https' | 'https_insecure' {
+        return protocol === 'http' || protocol === 'https' || protocol === 'https_insecure';
     }
 }

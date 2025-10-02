@@ -1,4 +1,4 @@
-import { Controller, useFormContext } from 'react-hook-form';
+import { Controller, useFormContext, useWatch } from 'react-hook-form';
 import { TServerData } from '../../../models/schema';
 import { parseValueAsInt } from '../../../utils';
 import { useGenetecConnection } from '../../../hooks/useGenetecConnection';
@@ -13,11 +13,12 @@ import { FormHelperText, Radio, RadioGroup, Link, Button, Box, Typography } from
 import styled from '@mui/material/styles/styled';
 
 export const Genetec = () => {
-    const { control, watch } = useFormContext<TServerData>();
+    const { control } = useFormContext<TServerData>();
     const { snackbarData, displaySnackbar, closeSnackbar } = useSnackbar();
     const [
         handleCheckConnection,
         handleSendTestBookmark,
+        handleFetchCameraList,
         isConnected,
         isFetching,
         cameraList,
@@ -27,7 +28,7 @@ export const Genetec = () => {
         displaySnackbar,
     });
 
-    const selectedCameraList = watch('genetec.camera_list');
+    const selectedCameraList = useWatch({ control, name: 'genetec.camera_list' });
     const isSendDisabled =
         !isConnected || cameraList?.length === 0 || selectedCameraList.length === 0 || !serverRunning || isDisabled;
 
@@ -118,6 +119,7 @@ export const Genetec = () => {
                                 {...field}
                                 cameraList={cameraList}
                                 onChange={(data) => field.onChange(data)}
+                                reloadCameras={handleFetchCameraList}
                                 error={!!formState.errors.genetec?.camera_list}
                                 helperText={formState.errors.genetec?.camera_list?.message}
                             />

@@ -13,7 +13,7 @@ import { VideoScheduler } from './videoScheduler';
 import { FTPServer } from './upload/ftpServer';
 import { SharePointUploader } from './upload/SharePointUploader';
 import { AxisEvents } from './upload/AxisEvents';
-import { HttpServer } from 'camstreamerlib/HttpServer';
+import { HttpServer } from 'camstreamerlib/cjs/node';
 
 const READ_BARCODE_HIGHLIGHT_DURATION_MS = 250;
 const UPLOADS_HIGHLIGHT_DURATION_MS = 250;

@@ -1,4 +1,6 @@
 import * as Stream from 'stream';
+import { TServerData } from './schema';
+import { HttpOptions } from 'camstreamerlib/cjs';
 
 export function pad(num: number, size: number) {
     const sign = Math.sign(num) === -1 ? '-' : '';
@@ -89,4 +91,16 @@ export async function convertWebStreamToNodeReadable(webStream: ReadableStream):
 
     await pushChunks();
     return Promise.resolve(nodeReadable);
+}
+
+export function getCameraOptions(camera: TServerData['camera' | 'conn_hub']): HttpOptions {
+    return {
+        tls: camera.protocol !== 'http',
+        tlsInsecure: camera.protocol === 'https_insecure',
+        ip: camera.ip,
+        port: camera.port,
+        user: camera.user,
+        pass: camera.pass,
+        keepAlive: true,
+    };
 }

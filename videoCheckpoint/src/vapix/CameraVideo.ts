@@ -1,30 +1,27 @@
 import { JSDOM } from 'jsdom';
 import { TServerData } from '../schema';
-import { CameraVapix } from 'camstreamerlib/CameraVapix';
+import { VapixAPI } from 'camstreamerlib/cjs';
+import { DefaultClient } from 'camstreamerlib/cjs/node';
 import { ReadableStream } from 'stream/web';
+import { getCameraOptions } from '../utils';
 
 export class CameraVideo {
-    private cameraVapix: CameraVapix;
+    private vapix: VapixAPI;
 
     constructor(cameraSettings: TServerData['camera']) {
-        this.cameraVapix = this.setCameraVapix(cameraSettings);
+        this.vapix = this.setVapix(cameraSettings);
     }
 
-    private setCameraVapix(cameraSettings: TServerData['camera']) {
-        const options = {
-            tls: cameraSettings.protocol !== 'http',
-            tlsInsecure: cameraSettings.protocol === 'https_insecure',
-            ip: cameraSettings.ip,
-            port: cameraSettings.port,
-            user: cameraSettings.user,
-            pass: cameraSettings.pass,
-        };
-        return new CameraVapix(options);
+    private setVapix(cameraSettings: TServerData['camera']) {
+        const options = getCameraOptions(cameraSettings);
+        const httpClient = new DefaultClient(options);
+        return new VapixAPI(httpClient);
     }
 
     async getIDs(source: number) {
         const path = '/axis-cgi/record/list.cgi';
-        const response = await await this.cameraVapix.vapixGet(path, { recordingid: 'all' });
+        const agent = this.vapix.getClient();
+        const response = await agent.get({ path, parameters: { recordingid: 'all' } });
         if (!response.ok) {
             throw new Error(
                 `The response from camera was not OK. Status code: ${response.status}. Download cancelled.`
@@ -51,7 +48,8 @@ export class CameraVideo {
 
     async getSchemaVersion() {
         const path = '/axis-cgi/record/storage/schemaversions.cgi';
-        const xml = await (await this.cameraVapix.vapixGet(path)).text();
+        const agent = this.vapix.getClient();
+        const xml = await (await agent.get({ path })).text();
 
         const dom = new JSDOM(xml, { contentType: 'text/xml' });
 
@@ -86,7 +84,8 @@ export class CameraVideo {
             endtime: this.formatDate(endTime),
         };
 
-        const video = await this.cameraVapix.vapixGet(path, parameters);
+        const agent = this.vapix.getClient();
+        const video = await agent.get({ path, parameters });
 
         if (!video.ok) {
             throw new Error('The response was not OK. Status code: ' + video.status);

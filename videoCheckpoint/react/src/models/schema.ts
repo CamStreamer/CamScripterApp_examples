@@ -100,8 +100,8 @@ export const serverDataSchema = z.object({
     }),
     led: z.object({
         enabled: z.boolean(),
-        led_green_port: z.number().nonnegative().lt(100).optional(),
-        led_red_port: z.number().nonnegative().lt(100).optional(),
+        led_green_port: z.number().nonnegative().lt(100),
+        led_red_port: z.number().nonnegative().lt(100),
     }),
 });
 export type TServerData = z.infer<typeof serverDataSchema>;
