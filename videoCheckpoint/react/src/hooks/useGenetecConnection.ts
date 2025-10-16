@@ -1,22 +1,12 @@
 import { useFormContext, useWatch } from 'react-hook-form';
 import { useState, useEffect } from 'react';
-import { areValuesInList, generateParams } from '../utils';
+import { areValuesInList, generateParams, TGenetec } from '../utils';
 import { TSnackData } from './useSnackbar';
 
 export type TCameraListOption = {
     index: number;
     value: string;
     label: string;
-};
-
-type TGenetec = {
-    protocol: string;
-    ip: string;
-    port: number;
-    base_uri: string;
-    app_id: string;
-    user: string;
-    pass: string;
 };
 
 type Props = {
@@ -36,13 +26,20 @@ export const useGenetecConnection = ({ displaySnackbar }: Props) => {
         port: useWatch({ control, name: `genetec.port` }),
         base_uri: useWatch({ control, name: `genetec.base_uri` }),
         app_id: useWatch({ control, name: `genetec.app_id` }),
+        app_id_enabled: useWatch({ control, name: `genetec.app_id_enabled` }),
         user: useWatch({ control, name: `genetec.user` }),
         pass: useWatch({ control, name: `genetec.pass` }),
     };
 
     const selectedCameras = useWatch({ control, name: 'genetec.camera_list' });
 
-    const isDisabled = !proxy.ip || !proxy.port || !proxy.base_uri || !proxy.app_id || !proxy.user || !proxy.pass;
+    const isDisabled =
+        !proxy.ip ||
+        !proxy.port ||
+        !proxy.base_uri ||
+        (proxy.app_id_enabled && !proxy.app_id) ||
+        !proxy.user ||
+        !proxy.pass;
 
     const handleCheckConnection = async () => {
         setIsFetching(true);
@@ -50,18 +47,19 @@ export const useGenetecConnection = ({ displaySnackbar }: Props) => {
             `/local/camscripter/proxy/video_checkpoint/genetec/checkConnection?${generateParams(proxy)}`
         );
 
-        void handleFetchCameraList();
+        const isConnected = isConnectedResponse.status === 200;
+        void handleFetchCameraList(isConnected);
 
-        setIsConnected(isConnectedResponse.status === 200);
+        setIsConnected(isConnected);
         setIsFetching(false);
     };
 
-    const handleFetchCameraList = async () => {
+    const handleFetchCameraList = async (isConnected = true) => {
         const cameraListResponse: TCameraListOption[] = await fetch(
             `/local/camscripter/proxy/video_checkpoint/genetec/getCameraList?${generateParams(proxy)}`
         ).then((res) => res.json());
 
-        if (!areValuesInList(selectedCameras, cameraListResponse)) {
+        if (isConnected && !areValuesInList(selectedCameras, cameraListResponse)) {
             const filtered = selectedCameras.filter((v: string) => cameraListResponse.find((o) => o.value === v));
             setValue('genetec.camera_list', filtered);
         }
@@ -117,6 +115,7 @@ export const useGenetecConnection = ({ displaySnackbar }: Props) => {
         proxy.user,
         proxy.pass,
         proxy.app_id,
+        proxy.app_id_enabled,
     ]);
 
     return [

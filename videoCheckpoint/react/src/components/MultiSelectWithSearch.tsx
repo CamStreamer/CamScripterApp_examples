@@ -45,7 +45,7 @@ export const MultiSelectWithSearch = forwardRef(
         };
 
         const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-            if (list.length === 0) {
+            if (list.length === 0 || disabled) {
                 return;
             }
 
