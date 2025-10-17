@@ -98,16 +98,21 @@ export type TGenetec = {
     user: string;
     pass: string;
     app_id: string;
+    app_id_enabled: boolean;
 };
 
 export const generateParams = (genetec: TGenetec) => {
-    return `protocol=${encodeURIComponent(genetec.protocol)}&ip=${encodeURIComponent(
+    const params = `protocol=${encodeURIComponent(genetec.protocol)}&ip=${encodeURIComponent(
         genetec.ip
     )}&port=${encodeURIComponent(genetec.port)}&baseUri=${encodeURIComponent(
         genetec.base_uri
-    )}&user=${encodeURIComponent(genetec.user)}&pass=${encodeURIComponent(genetec.pass)}&appId=${encodeURIComponent(
-        genetec.app_id
-    )}`;
+    )}&user=${encodeURIComponent(genetec.user)}&pass=${encodeURIComponent(genetec.pass)}`;
+
+    if (genetec.app_id_enabled) {
+        return params + `&appId=${encodeURIComponent(genetec.app_id)}`;
+    }
+
+    return params;
 };
 
 export const areValuesInList = (oldList: string[], newList: TCameraListOption[]): boolean => {

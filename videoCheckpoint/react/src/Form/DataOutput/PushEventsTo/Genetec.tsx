@@ -9,7 +9,17 @@ import { ConnectionCheck } from '../../../components/ConnectionCheck';
 import { MultiSelectWithSearch } from '../../../components/MultiSelectWithSearch';
 import { InfoSnackbar } from '../../../components/Snackbar';
 import { useSnackbar } from '../../../hooks/useSnackbar';
-import { FormHelperText, Radio, RadioGroup, Link, Button, Box, Typography } from '@mui/material';
+import {
+    FormHelperText,
+    Radio,
+    RadioGroup,
+    Link,
+    Button,
+    Box,
+    Typography,
+    FormControlLabel,
+    Switch,
+} from '@mui/material';
 import styled from '@mui/material/styles/styled';
 
 export const Genetec = () => {
@@ -28,6 +38,7 @@ export const Genetec = () => {
         displaySnackbar,
     });
 
+    const isAppIdDisabled = useWatch({ control, name: 'genetec.app_id_enabled' });
     const selectedCameraList = useWatch({ control, name: 'genetec.camera_list' });
     const isSendDisabled =
         !isConnected || cameraList?.length === 0 || selectedCameraList.length === 0 || !serverRunning || isDisabled;
@@ -36,13 +47,24 @@ export const Genetec = () => {
         <>
             <InfoSnackbar snackbarData={snackbarData} closeSnackbar={closeSnackbar} />
             <FormHelperText>
-                For this integration, you need to obtain an SDK certificate application ID to send events via the WebSDK
-                API. Please contact your Genetec vendor to acquire an ID. Use the Bookmarks module to view the created
+                To connect with <StyledBoldText>Genetec Security Center</StyledBoldText>, purchase one{' '}
+                <StyledBoldText>CamStreamer Connector (GSC-1SDK-CAMSTREAMER-CONNECTOR)</StyledBoldText> license from
+                your <StyledBoldText>Genetec Vendor</StyledBoldText> and activate it via{' '}
+                <StyledBoldText>Genetec Server Admin</StyledBoldText> at{' '}
+                <Link href="http://localhost/Genetec/" target="_blank">
+                    http://localhost/Genetec/
+                </Link>
+                . Use the <StyledBoldText>Bookmarks</StyledBoldText> module in Security Center to view the created
                 bookmarks. More information on using the Bookmarks module can be found{' '}
                 <Link href="https://camstreamer.com/genetec-bookmarks" target="_blank">
                     here
                 </Link>
                 .
+                <FormHelperText>
+                    If you wish to use a <StyledBoldText>development license</StyledBoldText>, activate the{' '}
+                    <StyledBoldText>Development Application ID</StyledBoldText> and enter the identifier of your
+                    development application.
+                </FormHelperText>
             </FormHelperText>
             {/* ------PROTOCOL------*/}
             <Controller
@@ -110,18 +132,34 @@ export const Genetec = () => {
                         control={control}
                         render={({ field }) => <StyledTextField {...field} fullWidth label="Base Uri" />}
                     />
-                    {/* ------BOOKMARK CAMERA(S)------*/}
                     <Controller
-                        name={`genetec.camera_list`}
+                        name="genetec.app_id_enabled"
                         control={control}
-                        render={({ field, formState }) => (
-                            <MultiSelectWithSearch
+                        render={({ field }) => (
+                            <FormControlLabel
+                                control={
+                                    <Switch
+                                        {...field}
+                                        checked={field.value}
+                                        onChange={(e, v) => {
+                                            field.onChange(v);
+                                        }}
+                                    />
+                                }
+                                label={'Enable Development Application ID'}
+                            />
+                        )}
+                    />
+                    {/* ------APPLICATION ID------*/}
+                    <Controller
+                        name="genetec.app_id"
+                        control={control}
+                        render={({ field }) => (
+                            <StyledTextField
                                 {...field}
-                                cameraList={cameraList}
-                                onChange={(data) => field.onChange(data)}
-                                reloadCameras={handleFetchCameraList}
-                                error={!!formState.errors.genetec?.camera_list}
-                                helperText={formState.errors.genetec?.camera_list?.message}
+                                disabled={!isAppIdDisabled}
+                                fullWidth
+                                label="Development Application ID"
                             />
                         )}
                     />
@@ -143,11 +181,21 @@ export const Genetec = () => {
                     />
                     {/* ------PASSWORD------*/}
                     <PasswordInput control={control} name={`genetec.pass`} areCredentialsValid={true} />
-                    {/* ------APPLICATION ID------*/}
+                    {/* ------BOOKMARK CAMERA(S)------*/}
                     <Controller
-                        name="genetec.app_id"
+                        name={`genetec.camera_list`}
                         control={control}
-                        render={({ field }) => <StyledTextField {...field} fullWidth label="Application ID" />}
+                        render={({ field, formState }) => (
+                            <MultiSelectWithSearch
+                                {...field}
+                                cameraList={cameraList}
+                                onChange={(data) => field.onChange(data)}
+                                reloadCameras={handleFetchCameraList}
+                                disabled={!isConnected || isDisabled}
+                                error={!!formState.errors.genetec?.camera_list}
+                                helperText={formState.errors.genetec?.camera_list?.message}
+                            />
+                        )}
                     />
                 </StyledForm>
             </StyledRow>
@@ -181,4 +229,8 @@ const StyledBox = styled(Box)`
     align-items: center;
     gap: 1rem;
     padding: 10px 0;
+`;
+
+const StyledBoldText = styled('span')`
+    font-weight: bold;
 `;

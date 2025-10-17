@@ -70,6 +70,7 @@ export const mockedSettings: TServerData = {
         pass: '',
         base_uri: 'WebSdk',
         app_id: '',
+        app_id_enabled: false,
         camera_list: [],
     },
     milestone: {

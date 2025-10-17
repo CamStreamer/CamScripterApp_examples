@@ -25,6 +25,7 @@ export const useCheckConnection = ({ isFetching, isCameraResponding, areCredenti
             ...baseProxy,
             base_uri: useWatch({ control, name: `${name}.base_uri` }),
             app_id: useWatch({ control, name: `${name}.app_id` }),
+            app_id_enabled: useWatch({ control, name: `${name}.app_id_enabled` }),
         };
         isDisabled =
             !proxy.protocol ||
@@ -33,7 +34,7 @@ export const useCheckConnection = ({ isFetching, isCameraResponding, areCredenti
             !proxy.user ||
             !proxy.pass ||
             !proxy.base_uri ||
-            !proxy.app_id;
+            (proxy.app_id_enabled && !proxy.app_id);
     } else {
         isDisabled = !proxy.protocol || !proxy.ip || !proxy.port || !proxy.user || !proxy.pass;
     }

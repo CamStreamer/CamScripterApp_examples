@@ -1,6 +1,6 @@
 {
     "name": "video_checkpoint",
-    "version": "1.2.8",
+    "version": "1.2.9",
     "description": "",
     "prettier": "@camstreamer/prettier-config",
     "main": "main.js",
@@ -13,7 +13,6 @@
         "try": "PERSISTENT_DATA_PATH=\"./localdata/\" ts-node src/main.ts",
         "start": "cd react && npm run dev",
         "in:ui": "cd react && yarn install",
-        "in:flighradarapi": "cd flightradarapi && npm install --omit=dev",
         "build:BE": "tsc",
         "build:FE": "cd react && npm run build",
         "build": "npm-run-all build:BE build:FE",

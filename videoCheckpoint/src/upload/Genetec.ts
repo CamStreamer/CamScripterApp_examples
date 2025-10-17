@@ -1,15 +1,16 @@
 import { IncomingMessage, ServerResponse } from 'http';
 import { TServerData } from '../schema';
 import { GenetecAgent, GenetecAgentOptions, TParams } from 'camstreamerlib/cjs/node';
-
-const PARAMS: TParams = ['Guid', 'Name', 'EntityType'];
+import { CAMSTREAMER_CONNECTOR_APP_ID, PARAMS } from './constants';
 
 export class Genetec {
     private agent: GenetecAgent;
     private settings: GenetecAgentOptions;
+    private appId: string | undefined;
     private cameraList: string[] = [];
 
     constructor(private genetecSettings: TServerData['genetec']) {
+        this.appId = genetecSettings.app_id_enabled ? genetecSettings.app_id : CAMSTREAMER_CONNECTOR_APP_ID;
         this.settings = {
             protocol: genetecSettings.protocol,
             ip: genetecSettings.ip,
@@ -17,7 +18,7 @@ export class Genetec {
             baseUri: genetecSettings.base_uri,
             user: genetecSettings.user,
             pass: genetecSettings.pass,
-            appId: genetecSettings.app_id,
+            appId: this.appId,
         };
 
         this.agent = new GenetecAgent(this.settings);
@@ -138,7 +139,7 @@ export class Genetec {
             baseUri: params.get('baseUri') ?? 'WebSdk',
             user: params.get('user') ?? 'root',
             pass: params.get('pass') ?? '',
-            appId: params.get('appId') ?? '',
+            appId: params.get('appId') ?? CAMSTREAMER_CONNECTOR_APP_ID,
         };
 
         return currentSettings;

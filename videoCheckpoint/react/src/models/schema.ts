@@ -64,6 +64,7 @@ export const serverDataSchema = z.object({
             enabled: z.boolean(),
             base_uri: z.string(),
             app_id: z.string(),
+            app_id_enabled: z.boolean(),
             camera_list: z.string().array(),
         })
     ),
