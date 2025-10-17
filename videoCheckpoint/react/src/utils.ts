@@ -108,7 +108,7 @@ export const generateParams = (genetec: TGenetec) => {
         genetec.base_uri
     )}&user=${encodeURIComponent(genetec.user)}&pass=${encodeURIComponent(genetec.pass)}`;
 
-    if (genetec.app_id_enabled && genetec.app_id !== '') {
+    if (genetec.app_id_enabled) {
         return params + `&appId=${encodeURIComponent(genetec.app_id)}`;
     }
 
