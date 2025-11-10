@@ -1,6 +1,6 @@
 {
     "name": "axis_air_quality_sensor",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "description": "",
     "prettier": "@camstreamer/prettier-config",
     "main": "main.js",
@@ -27,6 +27,7 @@
         "@googleapis/drive": "^8.7.0",
         "basic-ftp": "^5.0.5",
         "camstreamerlib": "^3.2.4",
+        "digest-fetch": "^2.0.3",
         "eslint-plugin-deprecation": "^3.0.0",
         "fast-glob": "^3.3.2",
         "google-auth-library": "^9.7.0",
