@@ -1,6 +1,6 @@
 {
     "name": "axis_air_quality_sensor",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "description": "",
     "prettier": "@camstreamer/prettier-config",
     "main": "main.js",
