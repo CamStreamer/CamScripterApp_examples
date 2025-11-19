@@ -4,9 +4,7 @@ import { TServerData, serverDataSchema } from './schema';
 import { Widget } from './graphics/Widget';
 import { getTemperature, getSeverity } from './utils';
 import { TData, TInfo, DEFAULT_DATA } from './constants';
-
-// Use require for digest-fetch 2.0.3 or below since higher version requires ES modules
-const DigestClient = require('digest-fetch');
+import fetch, { Headers } from 'node-fetch';
 
 let settings: TServerData;
 let widget: Widget | undefined;
@@ -38,15 +36,16 @@ async function watchAirQualityData() {
     const protocol = isTlsInsecure ? 'https' : settings.source_camera.protocol;
     const url = `${protocol}://${settings.source_camera.ip}:${settings.source_camera.port}/axis-cgi/airquality/metadata.cgi`;
 
-    const client = new DigestClient(settings.source_camera.user, settings.source_camera.pass);
-
     const agent = new https.Agent({
         rejectUnauthorized: !isTlsInsecure,
     });
 
     try {
-        const response = await client.fetch(url, {
-            headers: { Accept: 'text/event-stream' },
+        const response = await fetch(url, {
+            headers: new Headers({
+                Accept: 'text/event-stream',
+                Authorization: 'Basic ' + btoa(settings.source_camera.user + ':' + settings.source_camera.pass),
+            }),
             agent: isTlsInsecure ? agent : undefined,
         });
 
