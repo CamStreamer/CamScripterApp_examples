@@ -17,7 +17,7 @@
         "build:BE": "tsc",
         "build:FE": "cd react && npm run build",
         "build": "npm-run-all build:BE build:FE",
-        "zip:package": "node node_modules/camstreamerlib/CreatePackage -i -e=react,testing",
+        "zip:package": "node node_modules/camstreamerlib/cjs/bin/CreatePackage -i -e=react,testing",
         "zip": "npm-run-all clean in:ui build zip:package"
     },
     "author": "CamStreamer s.r.o.",
