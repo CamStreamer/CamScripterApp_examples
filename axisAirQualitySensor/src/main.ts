@@ -67,7 +67,6 @@ async function watchAirQualityData() {
                     } else {
                         dataBuffer += decoder.decode(chunk, { stream: true });
                     }
-                    console.log(dataBuffer);
 
                     const lines = dataBuffer.split('\n');
                     if (lines.length < 2) {
