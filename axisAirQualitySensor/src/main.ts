@@ -1,16 +1,18 @@
 import * as fs from 'fs';
-import * as https from 'https';
 import { TServerData, serverDataSchema } from './schema';
 import { Widget } from './graphics/Widget';
 import { getTemperature, getSeverity } from './utils';
 import { TData, TInfo, DEFAULT_DATA } from './constants';
+import { DefaultClient } from 'camstreamerlib/cjs/node';
 
-// Use require for digest-fetch 2.0.3 or below since higher version requires ES modules
-const DigestClient = require('digest-fetch');
+const RETRY_DELAY_MS = 5000;
+const TIMEOUT_ERROR_RETRY_MS = 1000;
+const TIMEOUT_MS = 300_000;
 
 let settings: TServerData;
 let widget: Widget | undefined;
 let airQualityReader: boolean = false;
+let client: DefaultClient | undefined;
 
 let retryTimeout: NodeJS.Timeout | null = null;
 let dataBuffer = '';
@@ -28,88 +30,93 @@ function readSettings() {
 }
 
 async function watchAirQualityData() {
-    console.log('Watching air quality data...');
     if (retryTimeout) {
         clearTimeout(retryTimeout);
         retryTimeout = null;
     }
 
-    const isTlsInsecure = settings.source_camera.protocol === 'https_insecure';
-    const protocol = isTlsInsecure ? 'https' : settings.source_camera.protocol;
-    const url = `${protocol}://${settings.source_camera.ip}:${settings.source_camera.port}/axis-cgi/airquality/metadata.cgi`;
+    if (client) {
+        try {
+            dataBuffer = '';
+            const response = await client.get({
+                path: '/axis-cgi/airquality/metadata.cgi',
+                headers: {
+                    Accept: 'text/event-stream',
+                },
+                timeout: TIMEOUT_MS,
+            });
 
-    const client = new DigestClient(settings.source_camera.user, settings.source_camera.pass);
+            if (response.body === null) {
+                console.error('No data:', response.statusText);
+                return;
+            }
 
-    const agent = new https.Agent({
-        rejectUnauthorized: !isTlsInsecure,
-    });
+            const decoder = new TextDecoder('utf-8');
+            const stream = response.body;
+            const reader = stream.getReader();
 
-    try {
-        const response = await client.fetch(url, {
-            headers: { Accept: 'text/event-stream' },
-            agent: isTlsInsecure ? agent : undefined,
-        });
+            // PM1.0 = 64, PM2.5 = 25, PM4.0 = 91, PM10.0 = 90, Temperature = 53, Humidity = 19, VOC = 85, NOx = 43, CO2 = 81, AQI = 100, Vaping = 0
+            while (true) {
+                const { done, value: chunk } = await reader.read();
+                if (done) break;
 
-        if (response.body === null) {
-            console.error('No data:', response.statusText);
-            return;
-        }
-
-        const decoder = new TextDecoder('utf-8');
-        const stream = response.body;
-
-        // PM1.0 = 64, PM2.5 = 25, PM4.0 = 91, PM10.0 = 90, Temperature = 53, Humidity = 19, VOC = 85, NOx = 43, CO2 = 81, AQI = 100, Vaping = 0
-        for await (const chunk of stream) {
-            try {
-                if (typeof chunk === 'string') {
-                    dataBuffer += chunk;
-                    continue;
-                } else {
-                    dataBuffer += decoder.decode(chunk, { stream: true });
-                }
-
-                const lines = dataBuffer.split('\n');
-                if (lines.length < 2) {
-                    continue;
-                }
-
-                const lineIndex = lines.length - 2;
-                const values = lines[lineIndex].split(', ').map((value) => value.split(' = '));
-                dataBuffer = lines[lines.length - 1];
-
-                const unit = settings.widget.units;
-
-                for (const v of values) {
-                    const [key, value] = v;
-
-                    if (key === 'Temperature') {
-                        data.Temperature = {
-                            value: getTemperature(value, unit),
-                            severity: getSeverity(key, parseFloat(value)),
-                        };
+                try {
+                    if (typeof chunk === 'string') {
+                        dataBuffer += chunk;
+                        continue;
                     } else {
-                        const typedKey = key as keyof TData;
-                        data[typedKey] = {
-                            value: Number(value) % 1 === 0 ? Number(value) : Number(value).toFixed(1),
-                            severity: getSeverity(typedKey, Number(value)),
-                        };
+                        dataBuffer += decoder.decode(chunk, { stream: true });
                     }
-                }
 
-                const shouldUpdate = shouldUpdateWidget();
-                if (shouldUpdate) {
-                    widget?.displayWidget(data, unit);
+                    const lines = dataBuffer.split('\n');
+                    if (lines.length < 2) {
+                        continue;
+                    }
+
+                    const lineIndex = lines.length - 2;
+                    const values = lines[lineIndex].split(', ').map((value) => value.split(' = '));
+                    dataBuffer = lines[lines.length - 1];
+
+                    const unit = settings.widget.units;
+
+                    for (const v of values) {
+                        const [key, value] = v;
+
+                        if (key === 'Temperature') {
+                            data.Temperature = {
+                                value: getTemperature(value, unit),
+                                severity: getSeverity(key, parseFloat(value)),
+                            };
+                        } else {
+                            const typedKey = key as keyof TData;
+                            data[typedKey] = {
+                                value: Number(value) % 1 === 0 ? Number(value) : Number(value).toFixed(1),
+                                severity: getSeverity(typedKey, Number(value)),
+                            };
+                        }
+                    }
+
+                    const shouldUpdate = shouldUpdateWidget();
+                    if (shouldUpdate) {
+                        widget?.displayWidget(data, unit);
+                    }
+                } catch (err) {
+                    console.error('Error processing stream data:', err);
+                    reader.releaseLock();
+                    break;
                 }
-            } catch (err) {
-                console.error('Error processing stream data:', err);
-                break;
+            }
+        } catch (err) {
+            if (err instanceof Error && err.name === 'TimeoutError') {
+                retryTimeout = setTimeout(watchAirQualityData, TIMEOUT_ERROR_RETRY_MS);
+            } else {
+                console.error('Error fetching air quality data:', err);
+                console.log('Restarting air quality data watcher...');
+                retryTimeout = setTimeout(watchAirQualityData, RETRY_DELAY_MS);
             }
         }
-    } catch (err) {
-        console.error('Error fetching air quality data:', err);
-    } finally {
-        console.log('Restarting air quality data watcher...');
-        retryTimeout = setTimeout(watchAirQualityData, 5000);
+    } else {
+        console.error('VapixAPI instance is not initialized.');
     }
 }
 
@@ -139,6 +146,15 @@ function main() {
             settings.source_camera.pass.length !== 0
         ) {
             airQualityReader = true;
+            client = new DefaultClient({
+                ip: settings.source_camera.ip,
+                port: settings.source_camera.port,
+                user: settings.source_camera.user,
+                pass: settings.source_camera.pass,
+                tls: settings.source_camera.protocol !== 'http',
+                tlsInsecure: settings.source_camera.protocol === 'https_insecure',
+                keepAlive: true,
+            });
         } else {
             console.log('The Axis Air Quality Sensor is not configured and thus is disabled.');
         }
@@ -154,6 +170,7 @@ function main() {
         }
 
         if (airQualityReader && widget) {
+            console.log('Watching air quality data...');
             watchAirQualityData();
         }
 
