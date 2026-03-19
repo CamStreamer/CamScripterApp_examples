@@ -96,14 +96,20 @@ export function parseXmlFeed(xml: string): ParsedFeed {
     return { channels: [], items: [] };
 }
 
-export function fetchFeed(url: string): Promise<string> {
+export function fetchFeed(url: string, maxRedirects: number = 5): Promise<string> {
     return new Promise((resolve, reject) => {
+        if (maxRedirects <= 0) {
+            reject(new Error('Too many redirects'));
+            return;
+        }
+
         const client = url.startsWith('https') ? https : http;
 
         client
             .get(url, (res) => {
                 if (res.statusCode && res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
-                    fetchFeed(res.headers.location).then(resolve).catch(reject);
+                    res.resume();
+                    fetchFeed(res.headers.location, maxRedirects - 1).then(resolve).catch(reject);
                     return;
                 }
 
