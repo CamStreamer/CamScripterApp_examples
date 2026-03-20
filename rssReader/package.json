@@ -17,7 +17,7 @@
     "author": "CamStreamer s.r.o",
     "license": "ISC",
     "dependencies": {
-        "camstreamerlib": "^2.0.2",
+        "camstreamerlib": "^3.5.3",
         "xml-js": "^1.6.11",
         "zod": "^3.22.4"
     },

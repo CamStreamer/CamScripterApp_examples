@@ -129,7 +129,8 @@ function main(): void {
     co = new CamOverlayAPI({
         ip: settings.camera_ip || '127.0.0.1',
         port: settings.camera_port || 80,
-        auth: settings.camera_user + ':' + settings.camera_pass,
+        user: settings.camera_user,
+        pass: settings.camera_pass,
     });
 
     startHttpServer();
