@@ -11,8 +11,7 @@ import { useSnackbar } from './hooks/useSnackbar';
 import { Headline } from './components/Title';
 import { FormWrapper } from './Form/FormWrapper';
 import { mockedSettings } from './models/mock';
-
-const PACKAGE_NAME = 'rss_reader';
+import { PACKAGE_NAME } from './constants';
 
 export const App = () => {
     const { displaySnackbar } = useSnackbar();

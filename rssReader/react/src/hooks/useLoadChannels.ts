@@ -1,16 +1,16 @@
 import { useState, useCallback } from 'react';
 
-export type FeedChannel = {
+export type TFeedChannel = {
     title: string;
 };
 
-type LoadFeedResult = {
-    channels: FeedChannel[];
+type TLoadFeedResult = {
+    channels: TFeedChannel[];
     items: { title: string; description: string }[];
 };
 
 export const useLoadChannels = () => {
-    const [channels, setChannels] = useState<FeedChannel[]>([]);
+    const [channels, setChannels] = useState<TFeedChannel[]>([]);
     const [isFetching, setIsFetching] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -35,9 +35,9 @@ export const useLoadChannels = () => {
                 throw new Error(`HTTP ${response.status}`);
             }
 
-            const data: LoadFeedResult = await response.json();
+            const data: TLoadFeedResult = await response.json();
 
-            if (data.channels && data.channels.length > 0) {
+            if (data.channels?.length > 0) {
                 setChannels(data.channels);
             } else {
                 setChannels([]);

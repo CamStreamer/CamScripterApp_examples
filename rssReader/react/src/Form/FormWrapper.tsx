@@ -6,8 +6,7 @@ import { Form } from './Form';
 import styled from '@emotion/styled';
 import { CircularProgress, Typography, Fab } from '@mui/material';
 import { InfoSnackbar } from '../components/Snackbar';
-
-const PACKAGE_NAME = 'rss_reader';
+import { PACKAGE_NAME } from '../constants';
 
 type Props = {
     defaultValues: TSettings;

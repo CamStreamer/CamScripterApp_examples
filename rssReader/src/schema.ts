@@ -11,7 +11,7 @@ export const settingsSchema = z.object({
     output_type: z.union([z.literal('infoticker'), z.literal('custom_graphics')]),
     service_id: z.number(),
     cg_field_name: z.string(),
-    update_interval: z.number(),
+    update_interval_s: z.number(),
 });
 
 export type TSettings = z.infer<typeof settingsSchema>;

@@ -11,5 +11,5 @@ export const mockedSettings: TSettings = {
     output_type: 'infoticker',
     service_id: 1,
     cg_field_name: 'field1',
-    update_interval: 10,
+    update_interval_s: 10,
 };
