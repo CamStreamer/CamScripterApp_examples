@@ -25,10 +25,7 @@ export const useLoadChannels = () => {
         setError(null);
 
         try {
-            let proxyUrl = `/local/camscripter/proxy/rss_reader/load_feed.cgi?url=${encodeURIComponent(rssUrl)}`;
-            if (process.env.NODE_ENV === 'development') {
-                proxyUrl = 'http://localhost:52520' + proxyUrl;
-            }
+            const proxyUrl = `/local/camscripter/proxy/rss_reader/load_feed.cgi?url=${encodeURIComponent(rssUrl)}`;
 
             const response = await fetch(proxyUrl);
             if (!response.ok) {

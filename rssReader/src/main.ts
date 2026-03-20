@@ -14,15 +14,7 @@ let intervalHandle: NodeJS.Timeout | null = null;
 function readSettings(): TSettings {
     const dataPath = process.env.PERSISTENT_DATA_PATH || './localdata/';
     const data = fs.readFileSync(dataPath + 'settings.json');
-    const raw = JSON.parse(data.toString());
-
-    // backward compatibility: migrate old field name
-    if ('update_interval' in raw && !('update_interval_s' in raw)) {
-        raw.update_interval_s = raw.update_interval;
-        delete raw.update_interval;
-    }
-
-    return settingsSchema.parse(raw);
+    return settingsSchema.parse(JSON.parse(data.toString()));
 }
 
 function getDisplayText(item: FeedItem): string {
