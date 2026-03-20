@@ -10,6 +10,7 @@ let co: InstanceType<typeof CamOverlayAPI>;
 let items: FeedItem[] = [];
 let currentIndex = 0;
 let intervalHandle: NodeJS.Timeout | null = null;
+let fetchCount = 0;
 
 function readSettings(): TSettings {
     const dataPath = process.env.PERSISTENT_DATA_PATH || './localdata/';
@@ -42,7 +43,6 @@ async function displayNextItem(): Promise<void> {
         // Re-fetch feed after cycling through all items
         clearInterval(intervalHandle!);
         intervalHandle = null;
-        console.log('All items displayed, re-fetching RSS feed');
         await fetchAndStart();
         return;
     }
@@ -50,8 +50,6 @@ async function displayNextItem(): Promise<void> {
     const item = items[currentIndex];
     const text = getDisplayText(item);
     currentIndex++;
-
-    console.log(`Displaying item ${currentIndex}/${items.length}: ${text.substring(0, 80)}...`);
 
     try {
         await pushText(text);
@@ -76,7 +74,10 @@ async function fetchAndStart(): Promise<void> {
 
         items = feed.items;
         currentIndex = 0;
-        console.log(`Fetched ${items.length} items from: ${feed.channels[0]?.title || feedUrl}`);
+        fetchCount++;
+        if (fetchCount % 100 === 1) {
+            console.log(`Fetched ${items.length} items from: ${feed.channels[0]?.title || feedUrl}`);
+        }
 
         // Display first item immediately
         await displayNextItem();
