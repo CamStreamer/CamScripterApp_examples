@@ -82,6 +82,8 @@ export class GoogleDriveAPI {
             q: `mimeType = 'application/vnd.google-apps.folder' and name = '${folderName}' and '${this.googleDriveSettings.folder_id}' in parents`,
             fields: 'nextPageToken, files(id, name)',
             spaces: 'drive',
+            supportsAllDrives: true,
+            includeItemsFromAllDrives: true,
         });
         let folderId: string;
         if (
@@ -93,6 +95,7 @@ export class GoogleDriveAPI {
         } else {
             const folder = await drive.files.create({
                 fields: 'id',
+                supportsAllDrives: true,
                 requestBody: {
                     name: folderName,
                     mimeType: 'application/vnd.google-apps.folder',
@@ -119,6 +122,7 @@ export class GoogleDriveAPI {
                 body: readableStream,
             },
             fields: 'id',
+            supportsAllDrives: true,
             requestBody: {
                 name: fileName,
                 parents: [folderId],
@@ -135,6 +139,7 @@ export class GoogleDriveAPI {
                 body: readableStream,
             },
             fields: 'id',
+            supportsAllDrives: true,
             requestBody: {
                 name: name,
                 parents: [folderId],
