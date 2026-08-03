@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 
-import { Collapse, Divider, IconButton, Stack, Typography } from '@mui/material';
+import { Collapse, Divider, Stack, Typography } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { styled } from '@mui/material/styles';
-import { IconButtonProps } from '@mui/material/IconButton';
+import IconButton, { IconButtonProps } from '@mui/material/IconButton';
 
 type Props = {
     children: React.ReactNode;
@@ -15,7 +15,7 @@ export const CollapsibleFormSection = ({ label, defaultExpanded, children }: Pro
     const [expanded, setExpanded] = useState(defaultExpanded);
 
     return (
-        <Stack spacing={1.5}>
+        <Stack spacing={expanded ? 2 : 0}>
             <StyledTextWrapper
                 onClick={() => {
                     setExpanded((prev) => !prev);

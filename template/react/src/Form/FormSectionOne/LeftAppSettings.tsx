@@ -1,21 +1,17 @@
 import { parseValueAsInt } from '../../utils';
+import { PROTOCOLS, PROTOCOL_LABELS } from '../constants';
 import { Controller, useFormContext } from 'react-hook-form';
-import { StyledTextField, StyledRadioControlLabel } from '../../components/FormInputs';
-import { Stack, Radio, RadioGroup } from '@mui/material';
-import { TSettings, TCamera } from '../../models/schema';
+import { StyledTextField, StyledRadioControlLabel, StyledForm } from '../../components/FormInputs';
+import { Radio, RadioGroup } from '@mui/material';
+import { TSettings } from '../../models/schema';
 
-type Props = {
-    name: 'application';
-    onBlur?: () => void;
-};
-
-export const LeftAppSettings = ({ onBlur, name }: Props) => {
+export const LeftAppSettings = () => {
     const { control, setValue } = useFormContext<TSettings>();
 
     return (
-        <Stack spacing={1.5}>
+        <StyledForm>
             <Controller
-                name={`${name}.protocol`}
+                name={`camera.protocol`}
                 control={control}
                 render={({ field }) => (
                     <RadioGroup
@@ -23,12 +19,11 @@ export const LeftAppSettings = ({ onBlur, name }: Props) => {
                         value={field.value}
                         onChange={(event) => {
                             const protocol = event.target.value;
-                            setValue(`${name}.port`, protocol === 'http' ? 80 : 443, {
+                            setValue(`camera.port`, protocol === 'http' ? 80 : 443, {
                                 shouldTouch: true,
                             });
 
                             field.onChange(event);
-                            onBlur?.();
                         }}
                     >
                         {PROTOCOLS.map((value) => (
@@ -43,7 +38,7 @@ export const LeftAppSettings = ({ onBlur, name }: Props) => {
                 )}
             />
             <Controller
-                name={`${name}.ip`}
+                name={`camera.ip`}
                 control={control}
                 render={({ field, formState }) => (
                     <StyledTextField
@@ -51,17 +46,16 @@ export const LeftAppSettings = ({ onBlur, name }: Props) => {
                         InputLabelProps={{ shrink: true }}
                         fullWidth
                         label="IP address"
-                        error={formState.errors[name]?.ip !== undefined}
-                        helperText={formState.errors[name]?.ip?.message}
+                        error={formState.errors.camera?.ip !== undefined}
+                        helperText={formState.errors.camera?.ip?.message}
                         onBlur={() => {
                             field.onBlur();
-                            onBlur?.();
                         }}
                     />
                 )}
             />
             <Controller
-                name={`${name}.port`}
+                name={`camera.port`}
                 control={control}
                 render={({ field, formState }) => (
                     <StyledTextField
@@ -73,22 +67,14 @@ export const LeftAppSettings = ({ onBlur, name }: Props) => {
                             field.onChange(val);
                             e.target.value = val.toString();
                             field.onBlur();
-                            onBlur?.();
                         }}
                         fullWidth
                         label="Port"
-                        error={formState.errors[name]?.port !== undefined}
-                        helperText={formState.errors[name]?.port?.message}
+                        error={formState.errors.camera?.port !== undefined}
+                        helperText={formState.errors.camera?.port?.message}
                     />
                 )}
             />
-        </Stack>
+        </StyledForm>
     );
 };
-
-const PROTOCOL_LABELS: Record<TCamera['protocol'], string> = {
-    http: 'HTTP',
-    https: 'HTTPS',
-    https_insecure: 'HTTPS (not trusted cert)',
-};
-const PROTOCOLS = Object.keys(PROTOCOL_LABELS) as TCamera['protocol'][];

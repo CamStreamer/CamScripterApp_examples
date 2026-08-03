@@ -1,22 +1,18 @@
 import { appInfo } from '../../appInfo';
 import { parseValueAsFloat } from '../../utils';
+import { PORT, PORT_LABELS } from '../constants';
 import { Controller, useFormContext } from 'react-hook-form';
-import { StyledTextField, StyledSelect } from '../../components/FormInputs';
-import { Stack, MenuItem } from '@mui/material';
+import { StyledTextField, StyledSelect, StyledForm } from '../../components/FormInputs';
+import { MenuItem } from '@mui/material';
 import { TSettings } from '../../models/schema';
 
-type Props = {
-    name: 'application';
-    onBlur?: () => void;
-};
-
-export const RightAppSettings = ({ onBlur, name }: Props) => {
+export const RightAppSettings = () => {
     const { control } = useFormContext<TSettings>();
 
     return (
-        <Stack spacing={1.5}>
+        <StyledForm>
             <Controller
-                name={`${name}.updateFrequency`}
+                name={`camera.update_frequency`}
                 control={control}
                 render={({ field, formState }) => (
                     <StyledTextField
@@ -30,15 +26,14 @@ export const RightAppSettings = ({ onBlur, name }: Props) => {
                             field.onChange(val);
                             e.target.value = val.toString();
                             field.onBlur();
-                            onBlur?.();
                         }}
-                        error={formState.errors[name]?.updateFrequency !== undefined}
-                        helperText={formState.errors[name]?.updateFrequency?.message}
+                        error={formState.errors.camera?.update_frequency !== undefined}
+                        helperText={formState.errors.camera?.update_frequency?.message}
                     />
                 )}
             />
             <Controller
-                name={`${name}.portID`}
+                name={`camera.port_id`}
                 control={control}
                 render={({ field }) => (
                     <StyledSelect {...field} label={`${appInfo.name} port ID`}>
@@ -50,12 +45,6 @@ export const RightAppSettings = ({ onBlur, name }: Props) => {
                     </StyledSelect>
                 )}
             />
-        </Stack>
+        </StyledForm>
     );
 };
-
-const PORT_LABELS: Record<string, string> = {
-    1: 'A',
-    2: 'B',
-};
-const PORT = Object.keys(PORT_LABELS);
