@@ -10,7 +10,6 @@ export class VideoScheduler {
     private lastCode?: string;
     private recordingIsOngoing: boolean;
     private sourceList: number[];
-    private recordingStatus: boolean | undefined;
 
     constructor(
         private server: FTPServer | undefined,
@@ -22,11 +21,10 @@ export class VideoScheduler {
     ) {
         this.recordingIsOngoing = false;
         this.sourceList = this.settings.camera_list;
-        this.recordingStatus = false;
     }
 
     get getRecordingStatus() {
-        return this.recordingStatus;
+        return this.recordingIsOngoing;
     }
 
     async onBarCodeScan(code: string) {
@@ -39,13 +37,11 @@ export class VideoScheduler {
 
             if (this.willStopRecording(code)) {
                 // Ending recording
-                this.recordingStatus = false;
                 result = await this.delayedMakeVideo();
                 this.clearMetadata();
             }
             if (startRecording) {
                 // Starting recording
-                this.recordingStatus = true;
                 this.setMetadata(code);
             }
             return result;
