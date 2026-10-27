@@ -31,21 +31,21 @@ export class VideoScheduler {
     async onBarCodeScan(code: string) {
         try {
             if (this.accidentalRead(code)) {
-                return true;
+                return this.scanResultWithoutUpload();
             }
             const startRecording = this.willStartRecording(code); // Must be evaluated before clearing metadata
-            let result = true;
+            let video: Promise<boolean> | undefined;
 
             if (this.willStopRecording(code)) {
                 // Ending recording
-                result = await this.delayedMakeVideo();
+                video = this.delayedMakeVideo(this.recordingStart, this.lastCode as string);
                 this.clearMetadata();
             }
             if (startRecording) {
                 // Starting recording
                 this.setMetadata(code);
             }
-            return result;
+            return video === undefined ? this.scanResultWithoutUpload() : await video;
         } catch (err) {
             console.error('Error while processing recording:', err);
             return false;
@@ -98,6 +98,11 @@ export class VideoScheduler {
         return code === this.lastCode && this.recordingStart !== undefined && Date.now() - this.recordingStart < 3000;
     }
 
+    // A scan that leaves a recording running has nothing to report until that recording is closed.
+    private scanResultWithoutUpload() {
+        return this.recordingIsOngoing ? undefined : true;
+    }
+
     private setMetadata(code: string) {
         this.recordingIsOngoing = true;
         this.recordingStart = Date.now();
@@ -114,21 +119,19 @@ export class VideoScheduler {
     }
 
     private async onTimeout(startTime: number, code: string) {
-        await this.makeVideo(startTime, code);
         this.clearMetadata();
+        try {
+            await this.makeVideo(startTime, code);
+        } catch (err) {
+            console.error('Error while processing recording after timeout:', err);
+        }
     }
 
-    private async delayedMakeVideo() {
-        const startTime = this.recordingStart; // If I pass this.startTime directly, it for some reason does not store the value immediately, which is neccessary
-        const codeToPass = this.lastCode as string;
-
-        const result = new Promise<boolean>((resolve) => {
-            setTimeout(async () => {
-                const res = await this.makeVideo(startTime, codeToPass);
-                resolve(res);
-            }, this.settings.postbuffer_sec * 1000);
+    private async delayedMakeVideo(startTime: number | undefined, code: string) {
+        await new Promise((resolve) => {
+            setTimeout(resolve, this.settings.postbuffer_sec * 1000);
         });
-        return await result;
+        return this.makeVideo(startTime, code);
     }
 
     private clearMetadata() {

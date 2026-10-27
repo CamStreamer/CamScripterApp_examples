@@ -331,7 +331,7 @@ function main() {
             await sendGenetecBookmark(data.code);
             sendMilestoneEvent(data.code);
 
-            const promiseArr: Promise<boolean>[] = [];
+            const promiseArr: Promise<boolean | undefined>[] = [];
             let imagesUploadStatus;
             let videoUploadStatus;
 
@@ -366,9 +366,9 @@ function main() {
             if (results.length === 1) {
                 // Handle video upload indication
                 if (videoUploadStatus !== undefined) {
-                    if (videoUploadStatus && !videoScheduler?.getRecordingStatus) {
+                    if (videoUploadStatus === true) {
                         void ledIndicator?.indicateSuccess(UPLOADS_HIGHLIGHT_DURATION_MS, 2);
-                    } else if (!videoUploadStatus && !videoScheduler?.getRecordingStatus) {
+                    } else if (videoUploadStatus === false) {
                         void ledIndicator?.indicateFailure(FAIL_INDICATION_DURATION_MS, 2);
                     }
                 }
@@ -394,9 +394,9 @@ function main() {
                 }
 
                 if (videoUploadStatus !== undefined) {
-                    if (videoUploadStatus && !videoScheduler?.getRecordingStatus) {
+                    if (videoUploadStatus === true) {
                         void ledIndicator?.indicateSuccess(UPLOADS_HIGHLIGHT_DURATION_MS, 2);
-                    } else if (!videoUploadStatus && !videoScheduler?.getRecordingStatus) {
+                    } else if (videoUploadStatus === false) {
                         void ledIndicator?.indicateFailure(FAIL_INDICATION_DURATION_MS, 2);
                     }
                 }
