@@ -31,23 +31,24 @@ export class VideoScheduler {
 
     async onBarCodeScan(code: string) {
         try {
-            if (!this.accidentalRead(code)) {
-                const startRecording = this.willStartRecording(code); // Must be evaluated before clearing metadata
-
-                if (this.willStopRecording(code)) {
-                    // Ending recording
-                    this.recordingStatus = false;
-                    const result = await this.delayedMakeVideo();
-                    this.clearMetadata();
-                    return result;
-                }
-                if (startRecording) {
-                    // Starting recording
-                    this.recordingStatus = true;
-                    this.setMetadata(code);
-                }
+            if (this.accidentalRead(code)) {
+                return true;
             }
-            return true;
+            const startRecording = this.willStartRecording(code); // Must be evaluated before clearing metadata
+            let result = true;
+
+            if (this.willStopRecording(code)) {
+                // Ending recording
+                this.recordingStatus = false;
+                result = await this.delayedMakeVideo();
+                this.clearMetadata();
+            }
+            if (startRecording) {
+                // Starting recording
+                this.recordingStatus = true;
+                this.setMetadata(code);
+            }
+            return result;
         } catch (err) {
             console.error('Error while processing recording:', err);
             return false;
