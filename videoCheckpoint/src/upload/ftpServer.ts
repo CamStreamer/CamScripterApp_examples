@@ -2,17 +2,25 @@ import { Client, AccessOptions } from 'basic-ftp';
 import { TServerData } from '../schema';
 import { createFileName } from '../utils';
 import { TImageData } from '../vapix/CameraImage';
-import { ReadableStream } from 'stream/web';
 import { Readable } from 'stream';
 
-type Pair<T1, T2> = [T1, T2];
+const MAX_QUEUE_LENGTH = 50;
+
+export type TUploadJob = {
+    name: string;
+    openStream: () => Promise<Readable>;
+};
+
+type TQueuedJob = {
+    job: TUploadJob;
+    resolve: (uploaded: boolean) => void;
+};
 
 export class FTPServer {
     private client: Client;
     private accessOptions: AccessOptions;
     private uploadPath: string;
-    private recordingsBuffer: Pair<ReadableStream, string>[];
-    private imageUploadQueue: Pair<string, TImageData>[];
+    private queue: TQueuedJob[];
     private uploading: boolean;
 
     constructor(ftpSettings: TServerData['ftp_server']) {
@@ -28,83 +36,99 @@ export class FTPServer {
         if (this.uploadPath[0] !== '/') {
             this.uploadPath = '/' + this.uploadPath;
         }
-        this.recordingsBuffer = [];
-        this.imageUploadQueue = [];
+        this.queue = [];
         this.uploading = false;
     }
 
-    async queueVideoUpload(recording: ReadableStream, name: string, code: string) {
-        this.recordingsBuffer.push([recording, name]);
-        return await this.uploadRecordings(code, name);
-    }
-
-    async uploadRecordings(code: string, recordingName: string) {
-        if (this.uploading) {
-            // The FTP protocol doesn't allow multiple requests running in parallel
-            // - https://www.npmjs.com/package/basic-ftp
-            return false;
-        }
-
-        let result = true;
-        this.uploading = true;
+    async queueVideoUpload(openStream: () => Promise<Readable>, name: string, code: string) {
         console.log(`Uploading recording, code: "${code}", to FTP server...`);
-
-        for (let i = 0; i < this.recordingsBuffer.length; i++) {
-            try {
-                const [recording, name] = this.recordingsBuffer[i];
-                if (this.client.closed) {
-                    await this.client.access(this.accessOptions);
-                }
-                await this.client.uploadFrom(Readable.fromWeb(recording), this.uploadPath + '/' + name);
-                console.log(`Recording ${recordingName} uploaded successfully to FTP server.`);
-            } catch (err) {
-                result = false;
-                console.error(
-                    `Error uploading recording ${recordingName} to FTP server:`,
-                    err instanceof Error ? err.message : 'unknown'
-                );
-            }
+        const uploaded = await this.queueUpload({ name, openStream });
+        if (uploaded) {
+            console.log(`Recording ${name} uploaded successfully to FTP server.`);
         }
-
-        this.uploading = false;
-        this.recordingsBuffer = [];
-        return result;
+        return uploaded;
     }
 
     async queueImageUpload(code: string, images: TImageData[], serialNumber: string) {
         const baseFileName = createFileName(code, new Date(), serialNumber);
-        for (let i = 0; i < images.length; i++) {
-            const fileName = `${baseFileName}_camera${images[i].camera + 1}.jpg`;
-            this.imageUploadQueue.push([fileName, images[i]]);
+        console.log(`Uploading image(s), code: "${code}", to FTP server...`);
+        const results = await Promise.all(
+            images.map((image) =>
+                this.queueUpload({
+                    name: `${baseFileName}_camera${image.camera + 1}.jpg`,
+                    openStream: () => Promise.resolve(Readable.from(image.file)),
+                })
+            )
+        );
+        const uploaded = !results.includes(false);
+        if (uploaded) {
+            console.log(`Image(s) ${baseFileName}.jpg uploaded successfully to FTP server.`);
         }
-        return await this.uploadImages(code, baseFileName);
+        return uploaded;
     }
 
-    async uploadImages(code: string, baseImageName: string) {
+    queueUpload(job: TUploadJob) {
+        if (this.queue.length >= MAX_QUEUE_LENGTH) {
+            console.error(`Upload queue is full, dropping ${job.name}`);
+            return Promise.resolve(false);
+        }
+        return new Promise<boolean>((resolve) => {
+            this.queue.push({ job, resolve });
+            void this.processQueue();
+        });
+    }
+
+    private async processQueue() {
         if (this.uploading) {
+            // The FTP protocol doesn't allow multiple requests running in parallel
+            // - https://www.npmjs.com/package/basic-ftp
+            return;
+        }
+
+        this.uploading = true;
+        try {
+            let queued = this.queue.shift();
+            while (queued !== undefined) {
+                queued.resolve(await this.runJob(queued.job));
+                queued = this.queue.shift();
+            }
+        } finally {
+            this.uploading = false;
+        }
+    }
+
+    private async runJob(job: TUploadJob) {
+        let stream: Readable;
+        try {
+            if (this.client.closed) {
+                await this.client.access(this.accessOptions);
+            }
+            stream = await job.openStream();
+        } catch (err) {
+            console.error(`Preparing upload of ${job.name} failed:`, err instanceof Error ? err.message : 'unknown');
             return false;
         }
 
-        let result = true;
-        this.uploading = true;
-        console.log(`Uploading image(s), code: "${code}", to FTP server...`);
+        return this.uploadStream(stream, job.name);
+    }
 
-        for (let i = 0; i < this.imageUploadQueue.length; i++) {
-            try {
-                const [imageName, imageBuffer] = this.imageUploadQueue[i];
-                if (this.client.closed) {
-                    await this.client.access(this.accessOptions);
-                }
-                await this.client.uploadFrom(Readable.from(imageBuffer.file), `${this.uploadPath}/${imageName}`);
-                console.log(`Image(s) ${baseImageName}.jpg uploaded successfully to FTP server.`);
-            } catch (err) {
-                result = false;
-                console.error(`Error uploading image(s) ${baseImageName}.jpg to FTP server:`, err);
-            }
+    private async uploadStream(source: Readable, name: string) {
+        // Basic-ftp drops its own error listener once a transfer settles, so the destroy() below
+        // would otherwise surface as an uncaught exception.
+        source.on('error', () => undefined);
+
+        try {
+            await this.client.uploadFrom(source, this.uploadPath + '/' + name);
+            return true;
+        } catch (err) {
+            console.error(`Upload of ${name} to FTP server failed:`, err instanceof Error ? err.message : 'unknown');
+            // Basic-ftp documents reconnecting as the only way to continue after a failed transfer
+            this.client.close();
+            return false;
+        } finally {
+            // FromWeb() locked the stream, so cancelling it directly would throw. Destroying the
+            // Readable cancels the underlying reader and releases the camera's socket.
+            source.destroy();
         }
-
-        this.imageUploadQueue = [];
-        this.uploading = false;
-        return result;
     }
 }

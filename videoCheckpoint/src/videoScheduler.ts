@@ -1,7 +1,8 @@
+import { PassThrough, Readable } from 'stream';
 import { TServerData } from './schema';
 import { FTPServer } from './upload/ftpServer';
 import { GoogleDriveAPI } from './upload/GoogleDriveAPI';
-import { CameraVideo } from './vapix/CameraVideo';
+import { CameraVideo, TExportRequest } from './vapix/CameraVideo';
 import { createFileName } from './utils';
 
 export class VideoScheduler {
@@ -138,64 +139,108 @@ export class VideoScheduler {
         this.lastCode = undefined;
     }
 
-    private async downloadVideos(startTime: number) {
-        const endTime = Date.now(); // Getting now so the video is not longer because of fetching stuff
+    private async makeVideo(startTime: number | undefined, code: string) {
+        if (this.camera === undefined) {
+            return false;
+        }
+        if (startTime === undefined) {
+            console.error('Cannot download a video, starttime was not set');
+            return false;
+        }
+        const server = this.generalSettings.ftp_server.type === 'video' ? this.server : undefined;
+        const googleDrive = this.generalSettings.google_drive.type === 'video' ? this.googleDrive : undefined;
+        if (server === undefined && googleDrive === undefined) {
+            console.log('No upload target is set to video, nothing will be uploaded.');
+            return true;
+        }
 
-        const promiseArr = [];
+        const endTime = Date.now(); // Getting now so the video is not longer because of fetching stuff
+        const from = startTime - this.settings.prebuffer_sec * 1000;
+        const uploads: Promise<boolean>[] = [];
+        let errorCount = 0;
+
+        const camera = this.camera;
         for (const source of this.sourceList) {
+            let request: TExportRequest;
             try {
-                promiseArr.push(
-                    this.camera?.downloadRecording(startTime - this.settings.prebuffer_sec * 1000, endTime, source)
-                );
+                request = await camera.prepareExport(from, endTime, source);
             } catch (err) {
-                console.error('Error while downloading video:', err);
+                errorCount += 1;
+                console.error(`Preparing video for source ${source + 1} failed:`, err);
+                continue;
+            }
+
+            const openExport = async () => Readable.fromWeb(await camera.openExport(request));
+            const recordingName = `${createFileName(code, new Date(), this.serialNumber, source)}.mkv`;
+
+            if (server && googleDrive) {
+                uploads.push(this.uploadToBoth(server, googleDrive, openExport, recordingName, code));
+            } else if (server) {
+                uploads.push(server.queueVideoUpload(openExport, recordingName, code));
+            } else if (googleDrive) {
+                uploads.push(googleDrive.uploadVideo(openExport, recordingName, code));
             }
         }
 
-        if (promiseArr.length === 0) {
-            console.log(
-                'Warning: There are no ongoing recordings from selected sources. Nothing will be downloaded nor uploaded.'
-            );
-        }
-        return Promise.all(promiseArr);
+        const uploaded = await Promise.all(uploads);
+        return errorCount === 0 && !uploaded.includes(false);
     }
 
-    private async makeVideo(startTime: number | undefined, code: string) {
-        try {
-            if (startTime === undefined) {
-                throw Error('Cannot download a video, starttime was not set');
-            }
+    private async uploadToBoth(
+        server: FTPServer,
+        googleDrive: GoogleDriveAPI,
+        openExport: () => Promise<Readable>,
+        name: string,
+        code: string
+    ) {
+        let exportOpened = false;
+        let driveUpload: Promise<boolean> | undefined;
 
-            const recordings = await this.downloadVideos(startTime);
-            const promiseArr: Promise<boolean>[] = [];
-            let sourceIter = 0;
-            for (const recording of recordings) {
-                if (recording) {
-                    const source = this.sourceList[sourceIter];
-                    const [ftpRecording, googleDriveRecording] = recording.tee();
-                    const recordingName = `${createFileName(code, new Date(), this.serialNumber, source)}.mkv`;
-                    if (this.server && this.generalSettings.ftp_server.type === 'video') {
-                        promiseArr.push(this.server.queueVideoUpload(ftpRecording, recordingName, code));
-                    }
+        // The export is opened only once the FTP queue gets to it, so it does not idle behind earlier uploads.
+        const ftpUploaded = await server.queueVideoUpload(
+            async () => {
+                exportOpened = true;
+                const [toFtp, toDrive] = this.duplicate(await openExport());
+                driveUpload = this.uploadDriveCopy(googleDrive, toDrive, name, code);
+                return toFtp;
+            },
+            name,
+            code
+        );
 
-                    if (this.googleDrive && this.generalSettings.google_drive.type === 'video') {
-                        promiseArr.push(
-                            this.googleDrive.uploadVideo(googleDriveRecording as ReadableStream, recordingName, code)
-                        );
-                    }
-                    sourceIter += 1;
+        if (driveUpload === undefined) {
+            // The FTP job never reached the export (e.g. no connection), so Drive needs its own one.
+            driveUpload = exportOpened ? Promise.resolve(false) : googleDrive.uploadVideo(openExport, name, code);
+        }
+        const driveUploaded = await driveUpload;
+        return ftpUploaded && driveUploaded;
+    }
+
+    private duplicate(source: Readable) {
+        const copies = [new PassThrough(), new PassThrough()];
+        let openCopies = copies.length;
+
+        source.on('error', (err) => copies.forEach((copy) => copy.destroy(err)));
+        for (const copy of copies) {
+            // Uploaders attach their own error listeners; this only covers the time before they do.
+            copy.on('error', () => undefined);
+            copy.on('close', () => {
+                openCopies -= 1;
+                if (openCopies === 0) {
+                    source.destroy();
                 }
-            }
-            const res = await Promise.all(promiseArr);
+            });
+            source.pipe(copy);
+        }
+        return copies;
+    }
 
-            if (res.includes(false)) {
-                return false;
-            } else {
-                return true;
-            }
-        } catch (err) {
-            console.error('Error while working with video:', err);
-            return false;
+    private async uploadDriveCopy(googleDrive: GoogleDriveAPI, copy: PassThrough, name: string, code: string) {
+        try {
+            return await googleDrive.uploadVideo(() => Promise.resolve(copy), name, code);
+        } finally {
+            // Drive may fail before reading, and an unread copy would stall the FTP upload.
+            copy.destroy();
         }
     }
 }

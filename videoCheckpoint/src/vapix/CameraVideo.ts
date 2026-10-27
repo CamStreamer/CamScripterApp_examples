@@ -1,28 +1,42 @@
 import { JSDOM } from 'jsdom';
 import { TServerData } from '../schema';
-import { VapixAPI } from 'camstreamerlib/cjs';
 import { DefaultClient } from 'camstreamerlib/cjs/node';
-import { ReadableStream } from 'stream/web';
-import { getCameraOptions } from '../utils';
+import { getCameraOptions, isWebReadableStream } from '../utils';
+
+// The camera can take longer than the 10s default to answer while it is busy recording/exporting/uploading.
+const CAMERA_BUSY_TIMEOUT_MS = 20 * 1000;
+
+// An unread body keeps its socket checked out of the undici pool, so we must cancel explicitly.
+const discardBody = async (response: Awaited<ReturnType<DefaultClient['get']>>) => {
+    try {
+        await response.body?.cancel();
+    } catch {
+        // We are already abandoning this response; a failed cancel must not mask the real error.
+    }
+};
+
+export type TExportRequest = {
+    source: number;
+    parameters: Record<string, string>;
+};
 
 export class CameraVideo {
-    private vapix: VapixAPI;
+    private client: DefaultClient;
+    private schemaVersion?: string;
 
     constructor(cameraSettings: TServerData['camera']) {
-        this.vapix = this.setVapix(cameraSettings);
-    }
-
-    private setVapix(cameraSettings: TServerData['camera']) {
-        const options = getCameraOptions(cameraSettings);
-        const httpClient = new DefaultClient(options);
-        return new VapixAPI(httpClient);
+        this.client = new DefaultClient(getCameraOptions(cameraSettings));
     }
 
     async getIDs(source: number) {
         const path = '/axis-cgi/record/list.cgi';
-        const agent = this.vapix.getClient();
-        const response = await agent.get({ path, parameters: { recordingid: 'all' } });
+        const response = await this.client.get({
+            path,
+            parameters: { recordingid: 'all' },
+            timeout: CAMERA_BUSY_TIMEOUT_MS,
+        });
         if (!response.ok) {
+            await discardBody(response);
             throw new Error(
                 `The response from camera was not OK. Status code: ${response.status}. Download cancelled.`
             );
@@ -47,9 +61,16 @@ export class CameraVideo {
     }
 
     async getSchemaVersion() {
+        if (this.schemaVersion !== undefined) {
+            return this.schemaVersion;
+        }
         const path = '/axis-cgi/record/storage/schemaversions.cgi';
-        const agent = this.vapix.getClient();
-        const xml = await (await agent.get({ path })).text();
+        const response = await this.client.get({ path, timeout: CAMERA_BUSY_TIMEOUT_MS });
+        if (!response.ok) {
+            await discardBody(response);
+            throw new Error(`The response from camera was not OK. Status code: ${response.status}`);
+        }
+        const xml = await response.text();
 
         const dom = new JSDOM(xml, { contentType: 'text/xml' });
 
@@ -63,40 +84,41 @@ export class CameraVideo {
             throw new Error('VersionNumber is empty');
         }
 
+        this.schemaVersion = versionNumber;
         return versionNumber;
     }
 
-    async downloadRecording(startTime: number, endTime: number, source: number) {
-        const ids = await this.getIDs(source + 1);
-        if (ids.length === 0) {
-            return undefined;
-        }
-        const [diskID, recordingID] = ids;
+    async prepareExport(startTime: number, endTime: number, source: number): Promise<TExportRequest> {
+        const [diskID, recordingID] = await this.getIDs(source + 1);
         const schemaVersion = await this.getSchemaVersion();
 
-        const path = '/axis-cgi/record/export/exportrecording.cgi';
-        const parameters = {
-            schemaversion: schemaVersion,
-            diskid: diskID,
-            recordingid: recordingID,
-            exportformat: 'matroska',
-            starttime: this.formatDate(startTime),
-            endtime: this.formatDate(endTime),
+        return {
+            source,
+            parameters: {
+                schemaversion: schemaVersion,
+                diskid: diskID,
+                recordingid: recordingID,
+                exportformat: 'matroska',
+                starttime: this.formatDate(startTime),
+                stoptime: this.formatDate(endTime),
+            },
         };
+    }
 
-        const agent = this.vapix.getClient();
-        const video = await agent.get({ path, parameters });
-
-        if (!video.ok) {
-            throw new Error('The response was not OK. Status code: ' + video.status);
+    async openExport(request: TExportRequest) {
+        const response = await this.client.get({
+            path: '/axis-cgi/record/export/exportrecording.cgi',
+            parameters: request.parameters,
+            timeout: 30 * 60 * 1000, // Streaming through FTP can take a long time
+        });
+        if (!response.ok) {
+            await discardBody(response);
+            throw new Error(`Export of source ${request.source + 1} failed with status ${response.status}`);
         }
-
-        /**
-         * Response body must be consumed to avoid socket error.
-         * https://github.com/nodejs/undici/issues/583#issuecomment-855384858
-         */
-        const clonedVideo = video.clone();
-        return clonedVideo.body as ReadableStream;
+        if (!isWebReadableStream(response.body)) {
+            throw new Error(`Export of source ${request.source + 1} returned no body`);
+        }
+        return response.body;
     }
 
     formatDate(startTime: number) {
