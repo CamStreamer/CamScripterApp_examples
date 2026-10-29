@@ -6,10 +6,10 @@
     "main": "main.js",
     "scripts": {
         "clean": "rimraf dist/* html/* *.zip",
-        "lint": "eslint \"./src/**/*.ts\"",
-        "lint:fix": "eslint \"./src/**/*.ts\" --fix",
-        "pretty": "prettier --write \"./{src,react/src,react/src/*}/*.{ts,tsx}\"",
-        "pretty:check": "prettier --check \"./{src,react/src,react/src/*}/*.{ts,tsx}\"",
+        "lint": "eslint \"./{src,testing}/**/*.ts\"",
+        "lint:fix": "eslint \"./{src,testing}/**/*.ts\" --fix",
+        "pretty": "prettier --write \"./{src,react/src,react/src/*,testing}/*.{ts,tsx}\"",
+        "pretty:check": "prettier --check \"./{src,react/src,react/src/*,testing}/*.{ts,tsx}\"",
         "try": "PERSISTENT_DATA_PATH=\"./localdata/\" ts-node src/main.ts",
         "start": "cd react && npm run dev",
         "in:ui": "cd react && yarn install",
@@ -17,7 +17,8 @@
         "build:FE": "cd react && npm run build",
         "build": "npm-run-all build:BE build:FE",
         "zip:package": "node node_modules/camstreamerlib/cjs/CreatePackage -i -e=react,testing",
-        "zip": "npm-run-all clean in:ui build zip:package"
+        "zip": "npm-run-all clean in:ui build zip:package",
+        "test": "node --preserve-symlinks -r ts-node/register --test test/*.test.ts"
     },
     "author": "CamStreamer s.r.o.",
     "license": "ISC",
