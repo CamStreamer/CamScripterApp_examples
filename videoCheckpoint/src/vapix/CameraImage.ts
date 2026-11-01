@@ -3,8 +3,6 @@ import { VapixAPI } from 'camstreamerlib/cjs';
 import { DefaultClient } from 'camstreamerlib/cjs/node';
 import { getCameraOptions } from '../utils';
 
-const TIMEOUT_MS = 10_000;
-
 export type TImageData = {
     file: Buffer;
     camera: number;
@@ -32,27 +30,23 @@ export class CameraImage {
         return images;
     }
 
-    private getCameraImage(camera: string) {
-        return new Promise<Buffer>(async (resolve, reject) => {
-            const resolution = this.imageUpload.resolution;
+    private async getCameraImage(camera: string) {
+        try {
+            const res = await this.vapix.getCameraImage({
+                resolution: this.imageUpload.resolution,
+                compression: 10,
+                camera: camera,
+            });
 
-            try {
-                const res = await this.vapix.getCameraImage({
-                    resolution: resolution,
-                    compression: 10,
-                    camera: camera,
-                });
-
-                if (res.ok === false) {
-                    throw new Error(`GetCameraImage: ${res.status} ${res.statusText}`);
-                }
-
-                const imageData = await res.arrayBuffer();
-                resolve(Buffer.from(imageData));
-            } catch (err) {
-                const error = err instanceof Error ? err.message : JSON.stringify(err);
-                reject(new Error(`GetCameraImage: ${error}`));
+            if (res.ok === false) {
+                throw new Error(`GetCameraImage: ${res.status} ${res.statusText}`);
             }
-        });
+
+            const imageData = await res.arrayBuffer();
+            return Buffer.from(imageData);
+        } catch (err) {
+            const error = err instanceof Error ? err.message : JSON.stringify(err);
+            throw new Error(`GetCameraImage: ${error}`);
+        }
     }
 }

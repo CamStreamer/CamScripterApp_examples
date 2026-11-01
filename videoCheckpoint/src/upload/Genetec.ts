@@ -1,6 +1,6 @@
 import { IncomingMessage, ServerResponse } from 'http';
 import { TServerData } from '../schema';
-import { GenetecAgent, GenetecAgentOptions, TParams } from 'camstreamerlib/cjs/node';
+import { GenetecAgent, GenetecAgentOptions } from 'camstreamerlib/cjs/node';
 import { CAMSTREAMER_CONNECTOR_APP_ID, PARAMS } from './constants';
 
 export class Genetec {
