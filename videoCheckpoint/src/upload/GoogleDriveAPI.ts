@@ -2,7 +2,7 @@ import * as Stream from 'stream';
 import { drive, drive_v3 } from '@googleapis/drive';
 import { JWT } from 'google-auth-library';
 import { TImageData } from '../vapix/CameraImage';
-import { getDate, stripCode, createFileName, convertWebStreamToNodeReadable } from '../utils';
+import { getDate, stripCode, createFileName } from '../utils';
 import { TServerData } from '../schema';
 
 export class GoogleDriveAPI {
@@ -45,7 +45,7 @@ export class GoogleDriveAPI {
         }
     }
 
-    async uploadVideo(recording: ReadableStream, name: string, code: string) {
+    async uploadVideo(openStream: () => Promise<Stream.Readable>, name: string, code: string) {
         const dateInfo = getDate();
 
         console.log(`Uploading recording, code: "${code}", to Google Drive...`);
@@ -55,7 +55,7 @@ export class GoogleDriveAPI {
             const googleDrive = drive({ version: 'v3', auth: authClient });
             const folderId = await this.createFolder(googleDrive, dateInfo.date);
 
-            await this.uploadVideoFile(googleDrive, folderId, recording, name);
+            await this.uploadVideoFile(googleDrive, folderId, await openStream(), name);
             console.log(`Recording ${name} uploaded successfully to Google Drive.`);
             return true;
         } catch (err) {
@@ -131,20 +131,25 @@ export class GoogleDriveAPI {
         return file.data.id;
     }
 
-    private async uploadVideoFile(drive: drive_v3.Drive, folderId: string, recording: ReadableStream, name: string) {
-        const readableStream = await convertWebStreamToNodeReadable(recording);
-
-        const file = await drive.files.create({
-            media: {
-                body: readableStream,
-            },
-            fields: 'id',
-            supportsAllDrives: true,
-            requestBody: {
-                name: name,
-                parents: [folderId],
-            },
-        });
-        return file.data.id;
+    private async uploadVideoFile(drive: drive_v3.Drive, folderId: string, recording: Stream.Readable, name: string) {
+        // The upload may stop reading on failure, so a later destroy() error must not become uncaught.
+        recording.on('error', () => undefined);
+        try {
+            const file = await drive.files.create({
+                media: {
+                    body: recording,
+                },
+                fields: 'id',
+                supportsAllDrives: true,
+                requestBody: {
+                    name: name,
+                    parents: [folderId],
+                },
+            });
+            return file.data.id;
+        } finally {
+            // Releases the camera's socket if the upload did not consume the whole export.
+            recording.destroy();
+        }
     }
 }

@@ -1,6 +1,11 @@
-import * as Stream from 'stream';
+import { ReadableStream } from 'stream/web';
 import { TServerData } from './schema';
 import { HttpOptions } from 'camstreamerlib/cjs';
+
+// Undici types a response body as its own ReadableStream, structurally incompatible with the
+// stream/web one Readable.fromWeb() demands, even though both are the same runtime constructor.
+export const isWebReadableStream = (value: unknown): value is ReadableStream<Uint8Array> =>
+    value instanceof ReadableStream;
 
 export function pad(num: number, size: number) {
     const sign = Math.sign(num) === -1 ? '-' : '';
@@ -65,32 +70,6 @@ export function createFileName(code: string, date: Date, serialNumber: string, c
             serialNumber
         );
     }
-}
-
-export async function convertWebStreamToNodeReadable(webStream: ReadableStream): Promise<NodeJS.ReadableStream> {
-    const nodeReadable = new Stream.Readable({
-        read() {},
-    });
-
-    const reader = webStream.getReader();
-
-    async function pushChunks() {
-        try {
-            const { done, value } = await reader.read();
-            if (done) {
-                nodeReadable.push(null);
-                return;
-            }
-
-            nodeReadable.push(value);
-            await pushChunks();
-        } catch (err) {
-            nodeReadable.emit('error', err);
-        }
-    }
-
-    await pushChunks();
-    return Promise.resolve(nodeReadable);
 }
 
 export function getCameraOptions(camera: TServerData['camera' | 'conn_hub']): HttpOptions {
